@@ -8,23 +8,25 @@ Legalize is a multi-country platform that converts official legislation into ver
 
 **Repos:**
 - `legalize-dev/legalize` — public hub: README, index of countries, docs
-- `legalize-dev/legalize-es` — public: Spanish laws as Markdown + git history (8,642 laws, 27,866 commits)
+- `legalize-dev/legalize-es` — public: Spanish laws as Markdown + git history (8,642 laws)
+- `legalize-dev/legalize-fr` — public: French laws (80 codes)
 - `legalize-dev/legalize-pipeline` — public: this repo. Python engine that generates the public repos.
-- `legalize-dev/legalize-web` — public: landing page for legalize.dev
+- `legalize-dev/legalize-web` — **private**: web app + API for legalize.dev
 
 **Local structure:**
 ```
 ~/autonomo/legalize/
 ├── engine/     ← this repo (legalize-pipeline)
 ├── es/         ← Spanish laws (legalize-es)
-├── web/        ← landing page (legalize-web)
+├── fr/         ← French laws (legalize-fr)
+├── web/        ← web app (legalize-web, private)
 ├── hub/        ← hub repo (legalize)
 └── data/       ← XML + JSON cache (no git)
 ```
 
-**Website:** legalize.dev (coming soon)
+**Website:** https://legalize.dev
 
-Currently processing Spanish legislation from the BOE API. Architecture is multi-country ready (future: legalize-fr, legalize-uk, legalize-de).
+Processing Spanish (BOE) and French (LEGI) legislation. Architecture is multi-country ready.
 
 ## Language & Stack
 
