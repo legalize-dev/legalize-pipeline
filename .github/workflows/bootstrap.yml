@@ -1,0 +1,48 @@
+name: Bootstrap histórico
+
+on:
+  workflow_dispatch:
+    inputs:
+      xml_path:
+        description: "Ruta a XML local (vacío = descargar de API)"
+        required: false
+        type: string
+      dry_run:
+        description: "Simular sin crear commits"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.BOT_TOKEN }}
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -e .
+
+      - name: Ejecutar bootstrap
+        env:
+          XML_PATH: ${{ inputs.xml_path }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ARGS=""
+          if [ -n "$XML_PATH" ]; then
+            ARGS="--xml $XML_PATH"
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python -m legalize.cli bootstrap $ARGS
+
+      - name: Push cambios
+        if: ${{ !inputs.dry_run }}
+        run: git push origin main

@@ -1,0 +1,39 @@
+[project]
+name = "legalize"
+version = "0.1.0"
+description = "Legislación española como repositorio Git — cada ley es un fichero Markdown, cada reforma un commit"
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+    "lxml>=5.0",
+    "requests>=2.31",
+    "pyyaml>=6.0",
+    "click>=8.1",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-snapshot",
+    "responses>=0.25",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+legalize = "legalize.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/legalize"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+
+# Cache del pipeline
+.cache/
+.blob/
+.blob-test/
+
+# Output generado
+output/
+
+# Datos crudos (XML + JSON, se regeneran desde la API)
+data/
+
+# Pipeline state (se gestiona por separado)
+.pipeline/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+.gstack/
+.vercel
+*.tgz

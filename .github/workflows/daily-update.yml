@@ -1,0 +1,41 @@
+name: Actualización diaria
+
+on:
+  schedule:
+    # L-S a las 10:00 UTC (12:00 España)
+    - cron: "0 10 * * 1-6"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Fecha a procesar (YYYY-MM-DD), vacío = automático"
+        required: false
+        type: string
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.BOT_TOKEN }}
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -e .
+
+      - name: Ejecutar pipeline daily
+        env:
+          INPUT_DATE: ${{ inputs.date }}
+        run: |
+          DATE_ARG=""
+          if [ -n "$INPUT_DATE" ]; then
+            DATE_ARG="--date $INPUT_DATE"
+          fi
+          python -m legalize.cli daily $DATE_ARG --push
+
+      - name: Push cambios
+        run: git push origin main

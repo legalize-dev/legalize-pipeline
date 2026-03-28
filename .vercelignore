@@ -1,0 +1,14 @@
+.cache/
+.pipeline/
+.blob/
+.gstack/
+.git/
+data/
+tests/
+scripts/
+*.tar.gz
+*.csv
+catalogo-boe.csv
+spec-leyes-git.md
+investigacion-multi-pais.md
+PLAN-LEGALIZE-ES.md

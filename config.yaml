@@ -1,0 +1,40 @@
+# Legalize pipeline configuration
+# Default values — override with CLI args or environment variables
+
+boe:
+  base_url: "https://www.boe.es/datosabiertos"
+  request_timeout: 30
+  max_retries: 5
+  retry_backoff_base: 2.0
+  retry_backoff_multiplier: 2.0
+  retry_jitter: 0.25
+  requests_per_second: 2.0
+  user_agent: "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
+
+scope:
+  rangos:
+    - constitucion
+    - ley_organica
+    - ley
+    - real_decreto_ley
+    - real_decreto_legislativo
+  fecha_desde: null        # null = no lower bound
+  fecha_hasta: null        # null = up to today
+  # All norms are loaded from the catalog via fetch --catalog
+  normas_fijas: []
+
+git:
+  repo_path: "../es"
+  committer_name: "leyes-bot"
+  committer_email: "bot@legalize.dev"
+  branch: "main"
+  push: false
+
+cache_dir: ".cache"
+state_path: ".pipeline/state.json"
+mappings_path: ".pipeline/mappings/id-to-filename.json"
+
+# France (LEGI Open Data)
+# Download dump: ftp://echanges.dila.gouv.fr/LEGI/
+# Extract and point legi_dir to the root of the dump
+legi_dir: ""  # e.g.: "/data/legi" or "../legi-dump"

@@ -1,0 +1,176 @@
+<response>
+<status><code>200</code><text>ok</text></status>
+<data>
+<texto>
+<bloque id="preambulo" tipo="preambulo">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="parrafo_2">DON JUAN CARLOS I, REY DE ESPAÑA, A TODOS LOS QUE LA PRESENTE VIEREN Y ENTENDIEREN,</p>
+<p class="parrafo">SABED: QUE LAS CORTES HAN APROBADO Y EL PUEBLO ESPAÑOL RATIFICADO LA SIGUIENTE CONSTITUCIÓN:</p>
+<p class="centro_redonda">PREÁMBULO</p>
+<p class="parrafo_2">La Nación española, deseando establecer la justicia, la libertad y la seguridad y promover el bien de cuantos la integran, en uso de su soberanía, proclama su voluntad de:</p>
+<p class="parrafo_2">Garantizar la convivencia democrática dentro de la Constitución y de las leyes conforme a un orden económico y social justo.</p>
+<p class="parrafo">Consolidar un Estado de Derecho que asegure el imperio de la ley como expresión de la voluntad popular.</p>
+<p class="parrafo">Proteger a todos los españoles y pueblos de España en el ejercicio de los derechos humanos, sus culturas y tradiciones, lenguas e instituciones.</p>
+<p class="parrafo">Promover el progreso de la cultura y de la economía para asegurar a todos una digna calidad de vida.</p>
+<p class="parrafo">Establecer una sociedad democrática avanzada, y</p>
+<p class="parrafo">Colaborar en el fortalecimiento de unas relaciones pacíficas y de eficaz cooperación entre todos los pueblos de la Tierra.</p>
+<p class="parrafo">En consecuencia, las Cortes aprueban y el pueblo español ratifica la siguiente</p>
+<p class="centro_negrita">CONSTITUCIÓN</p>
+</version>
+</bloque>
+<bloque id="tpreliminar" tipo="encabezado" titulo="TÍTULO PRELIMINAR">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="titulo">TÍTULO PRELIMINAR</p>
+</version>
+</bloque>
+<bloque id="a1" tipo="precepto" titulo="Artículo 1">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Artículo 1</p>
+<p class="parrafo">1. España se constituye en un Estado social y democrático de Derecho, que propugna como valores superiores de su ordenamiento jurídico la libertad, la justicia, la igualdad y el pluralismo político.</p>
+<p class="parrafo">2. La soberanía nacional reside en el pueblo español, del que emanan los poderes del Estado.</p>
+<p class="parrafo">3. La forma política del Estado español es la Monarquía parlamentaria.</p>
+</version>
+</bloque>
+<bloque id="a2" tipo="precepto" titulo="Artículo 2">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Artículo 2</p>
+<p class="parrafo">La Constitución se fundamenta en la indisoluble unidad de la Nación española, patria común e indivisible de todos los españoles, y reconoce y garantiza el derecho a la autonomía de las nacionalidades y regiones que la integran y la solidaridad entre todas ellas.</p>
+</version>
+</bloque>
+<bloque id="a3" tipo="precepto" titulo="Artículo 3">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Artículo 3</p>
+<p class="parrafo">1. El castellano es la lengua española oficial del Estado. Todos los españoles tienen el deber de conocerla y el derecho a usarla.</p>
+<p class="parrafo">2. Las demás lenguas españolas serán también oficiales en las respectivas Comunidades Autónomas de acuerdo con sus Estatutos.</p>
+<p class="parrafo">3. La riqueza de las distintas modalidades lingüísticas de España es un patrimonio cultural que será objeto de especial respeto y protección.</p>
+</version>
+</bloque>
+<bloque id="ti" tipo="encabezado" titulo="TÍTULO I">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="titulo_num">TÍTULO I</p>
+<p class="titulo_tit">De los derechos y deberes fundamentales</p>
+</version>
+</bloque>
+<bloque id="a10" tipo="precepto" titulo="Artículo 10">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Artículo 10</p>
+<p class="parrafo">1. La dignidad de la persona, los derechos inviolables que le son inherentes, el libre desarrollo de la personalidad, el respeto a la ley y a los derechos de los demás son fundamento del orden político y de la paz social.</p>
+<p class="parrafo">2. Las normas relativas a los derechos fundamentales y a las libertades que la Constitución reconoce se interpretarán de conformidad con la Declaración Universal de Derechos Humanos y los tratados y acuerdos internacionales sobre las mismas materias ratificados por España.</p>
+</version>
+</bloque>
+<bloque id="cprimero" tipo="encabezado" titulo="CAPÍTULO PRIMERO">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="capitulo_num">CAPÍTULO PRIMERO</p>
+<p class="capitulo_tit">De los españoles y los extranjeros</p>
+</version>
+</bloque>
+<bloque id="a13" tipo="precepto" titulo="Artículo 13">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Artículo 13</p>
+<p class="parrafo">1. Los extranjeros gozarán en España de las libertades públicas que garantiza el presente Título en los términos que establezcan los tratados y la ley.</p>
+<p class="parrafo">2. Solamente los españoles serán titulares de los derechos reconocidos en el artículo 23, salvo lo que, atendiendo a criterios de reciprocidad, pueda establecerse por tratado o ley para el derecho de sufragio activo en las elecciones municipales.</p>
+<p class="parrafo">3. La extradición sólo se concederá en cumplimiento de un tratado o de la ley, atendiendo al principio de reciprocidad. Quedan excluidos de la extradición los delitos políticos, no considerándose como tales los actos de terrorismo.</p>
+<p class="parrafo">4. La ley establecerá los términos en que los ciudadanos de otros países y los apátridas podrán gozar del derecho de asilo en España.</p>
+</version>
+<version id_norma="BOE-A-1992-20403" fecha_publicacion="19920828" fecha_vigencia="19920828">
+<p class="articulo">Artículo 13</p>
+<p class="parrafo">1. Los extranjeros gozarán en España de las libertades públicas que garantiza el presente Título en los términos que establezcan los tratados y la ley.</p>
+<p class="parrafo">2. Solamente los españoles serán titulares de los derechos reconocidos en el artículo 23, salvo lo que, atendiendo a criterios de reciprocidad, pueda establecerse por tratado o ley para el derecho de sufragio activo y pasivo en las elecciones municipales.</p>
+<p class="parrafo">3. La extradición sólo se concederá en cumplimiento de un tratado o de la ley, atendiendo al principio de reciprocidad. Quedan excluidos de la extradición los delitos políticos, no considerándose como tales los actos de terrorismo.</p>
+<p class="parrafo">4. La ley establecerá los términos en que los ciudadanos de otros países y los apátridas podrán gozar del derecho de asilo en España.</p>
+<blockquote>
+<p class="nota_pie">Se modifica el apartado 2 por el art. único de la Reforma de 27 de agosto de 1992. <a class="refPost">Ref. BOE-A-1992-20403</a></p>
+</blockquote>
+</version>
+</bloque>
+<bloque id="ctercero" tipo="encabezado" titulo="CAPÍTULO TERCERO">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="capitulo_num">CAPÍTULO TERCERO</p>
+<p class="capitulo_tit">De los principios rectores de la política social y económica</p>
+</version>
+</bloque>
+<bloque id="a49" tipo="precepto" titulo="Artículo 49">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Artículo 49</p>
+<p class="parrafo">Los poderes públicos realizarán una política de previsión, tratamiento, rehabilitación e integración de los disminuidos físicos, sensoriales y psíquicos a los que prestarán la atención especializada que requieran y los ampararán especialmente para el disfrute de los derechos que este Título otorga a todos los ciudadanos.</p>
+</version>
+<version id_norma="BOE-A-2024-3099" fecha_publicacion="20240217" fecha_vigencia="20240217">
+<p class="articulo">Artículo 49</p>
+<p class="parrafo">1. Las personas con discapacidad ejercen los derechos previstos en este Título en condiciones de libertad e igualdad reales y efectivas. Se regulará por ley la protección especial que sea necesaria para dicho ejercicio.</p>
+<p class="parrafo">2. Los poderes públicos impulsarán las políticas que garanticen la plena autonomía personal y la inclusión social de las personas con discapacidad, en entornos universalmente accesibles. Asimismo, fomentarán la participación de sus organizaciones, en los términos que la ley establezca. Se atenderán particularmente las necesidades específicas de las mujeres y los menores con discapacidad.</p>
+<blockquote>
+<p class="nota_pie">Se modifica por el art. único de la Reforma de 15 de febrero de 2024. <a class="refPost">Ref. BOE-A-2024-3099</a></p>
+</blockquote>
+</version>
+</bloque>
+<bloque id="tvii" tipo="encabezado" titulo="TÍTULO VII">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="titulo_num">TÍTULO VII</p>
+<p class="titulo_tit">Economía y Hacienda</p>
+</version>
+</bloque>
+<bloque id="a135" tipo="precepto" titulo="Artículo 135">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Artículo 135</p>
+<p class="parrafo">1. El Gobierno habrá de estar autorizado por ley para emitir Deuda Pública o contraer crédito.</p>
+<p class="parrafo">2. Los créditos para satisfacer el pago de intereses y capital de la Deuda Pública del Estado se entenderán siempre incluidos en el estado de gastos de los presupuestos y no podrán ser objeto de enmienda o modificación, mientras se ajusten a las condiciones de la ley de emisión.</p>
+</version>
+<version id_norma="BOE-A-2011-15210" fecha_publicacion="20110927" fecha_vigencia="20110927">
+<p class="articulo">Artículo 135</p>
+<p class="parrafo">1. Todas las Administraciones Públicas adecuarán sus actuaciones al principio de estabilidad presupuestaria.</p>
+<p class="parrafo">2. El Estado y las Comunidades Autónomas no podrán incurrir en un déficit estructural que supere los márgenes establecidos, en su caso, por la Unión Europea para sus Estados Miembros.</p>
+<p class="parrafo">Una ley orgánica fijará el déficit estructural máximo permitido al Estado y a las Comunidades Autónomas, en relación con su producto interior bruto. Las Entidades Locales deberán presentar equilibrio presupuestario.</p>
+<p class="parrafo">3. El Estado y las Comunidades Autónomas habrán de estar autorizados por ley para emitir deuda pública o contraer crédito.</p>
+<p class="parrafo">Los créditos para satisfacer los intereses y el capital de la deuda pública de las Administraciones se entenderán siempre incluidos en el estado de gastos de sus presupuestos y su pago gozará de prioridad absoluta. Estos créditos no podrán ser objeto de enmienda o modificación, mientras se ajusten a las condiciones de la ley de emisión.</p>
+<p class="parrafo">El volumen de deuda pública del conjunto de las Administraciones Públicas en relación con el producto interior bruto del Estado no podrá superar el valor de referencia establecido en el Tratado de Funcionamiento de la Unión Europea.</p>
+<p class="parrafo">4. Los límites de déficit estructural y de volumen de deuda pública sólo podrán superarse en caso de catástrofes naturales, recesión económica o situaciones de emergencia extraordinaria que escapen al control del Estado y perjudiquen considerablemente la situación financiera o la sostenibilidad económica o social del Estado, apreciadas por la mayoría absoluta de los miembros del Congreso de los Diputados.</p>
+<p class="parrafo">5. Una ley orgánica desarrollará los principios a que se refiere este artículo, así como la participación, en los procedimientos respectivos, de los órganos de coordinación institucional entre las Administraciones Públicas en materia de política fiscal y financiera. En todo caso, regulará:</p>
+<p class="parrafo_2">a) La distribución de los límites de déficit y de deuda entre las distintas Administraciones Públicas, los supuestos excepcionales de superación de los mismos y la forma y plazo de corrección de las desviaciones que sobre uno y otro pudieran producirse.</p>
+<p class="parrafo">b) La metodología y el procedimiento para el cálculo del déficit estructural.</p>
+<p class="parrafo">c) La responsabilidad de cada Administración Pública en caso de incumplimiento de los objetivos de estabilidad presupuestaria.</p>
+<p class="parrafo_2">6. Las Comunidades Autónomas, de acuerdo con sus respectivos Estatutos y dentro de los límites a que se refiere este artículo, adoptarán las disposiciones que procedan para la aplicación efectiva del principio de estabilidad en sus normas y decisiones presupuestarias.</p>
+<blockquote>
+<p class="nota_pie">Se modifica por el art. único de la Reforma de 27 de septiembre de 2011. <a class="refPost">Ref. BOE-A-2011-15210</a>.</p>
+<p class="nota_pie_2">Los límites de déficit estructural establecidos en el apartado 2 entran en vigor a partir de 2020, según establece la disposición adicional única.3.</p>
+</blockquote>
+</version>
+</bloque>
+<bloque id="primera" tipo="precepto" titulo="Disposición adicional primera">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Disposición adicional primera.</p>
+<p class="parrafo_2">La Constitución ampara y respeta los derechos históricos de los territorios forales.</p>
+<p class="parrafo">La actualización general de dicho régimen foral se llevará a cabo, en su caso, en el marco de la Constitución y de los Estatutos de Autonomía.</p>
+</version>
+</bloque>
+<bloque id="dd" tipo="precepto" titulo="Disposición derogatoria">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Disposición derogatoria.</p>
+<p class="parrafo_2">1. Queda derogada la Ley 1/1977, de 4 de enero, para la Reforma Política, así como, en tanto en cuanto no estuvieran ya derogadas por la anteriormente mencionada Ley, la de Principios del Movimiento Nacional, de 17 de mayo de 1958; el Fuero de los Españoles, de 17 de julio de 1945; el del Trabajo, de 9 de marzo de 1938; la Ley Constitutiva de las Cortes, de 17 de julio de 1942; la Ley de Sucesión en la Jefatura del Estado, de 26 de julio de 1947, todas ellas modificadas por la Ley Orgánica del Estado, de 10 de enero de 1967, y en los mismos términos esta última y la de Referéndum Nacional de 22 de octubre de 1945.</p>
+<p class="parrafo">2. En tanto en cuanto pudiera conservar alguna vigencia, se considera definitivamente derogada la Ley de 25 de octubre de 1839 en lo que pudiera afectar a las provincias de Álava, Guipúzcoa y Vizcaya.</p>
+<p class="parrafo">En los mismos términos se considera definitivamente derogada la Ley de 21 de julio de 1876.</p>
+<p class="parrafo">3. Asimismo quedan derogadas cuantas disposiciones se opongan a lo establecido en esta Constitución.</p>
+</version>
+</bloque>
+<bloque id="df" tipo="precepto" titulo="Disposición final">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="articulo">Disposición final.</p>
+<p class="parrafo_2">Esta Constitución entrará en vigor el mismo día de la publicación de su texto oficial en el boletín oficial del Estado. Se publicará también en las demás lenguas de España.</p>
+</version>
+</bloque>
+<bloque id="firma" tipo="firma">
+<version id_norma="BOE-A-1978-31229" fecha_publicacion="19781229" fecha_vigencia="19781229">
+<p class="parrafo_2">POR TANTO,</p>
+<p class="parrafo_2">MANDO A TODOS LOS ESPAÑOLES, PARTICULARES Y AUTORIDADES, QUE GUARDEN Y HAGAN GUARDAR ESTA CONSTITUCIÓN COMO NORMA FUNDAMENTAL DEL ESTADO.</p>
+<p class="parrafo_2">PALACIO DE LAS CORTES, A VEINTISIETE DE DICIEMBRE DE MIL NOVECIENTOS SETENTA Y OCHO.</p>
+<p class="firma_rey">JUAN CARLOS</p>
+<p class="firma_ministro">EL PRESIDENTE DE LAS CORTES</p>
+<p class="firma_ministro">Antonio Hernández Gil</p>
+<p class="firma_ministro">EL PRESIDENTE DEL CONGRESO DE LOS DIPUTADOS</p>
+<p class="firma_ministro">Fernando Álvarez de Miranda y Torres</p>
+<p class="firma_ministro">EL PRESIDENTE DEL SENADO</p>
+<p class="firma_ministro">Antonio Fontán Pérez</p>
+</version>
+</bloque>
+</texto>
+</data>
+</response>
