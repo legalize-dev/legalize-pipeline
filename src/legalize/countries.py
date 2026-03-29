@@ -40,6 +40,12 @@ REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
         "text_parser": ("legalize.fetcher.parser_legi", "LEGITextParser"),
         "metadata_parser": ("legalize.fetcher.parser_legi", "LEGIMetadataParser"),
     },
+    "at": {
+        "client": ("legalize.fetcher.client_ris", "RISClient"),
+        "discovery": ("legalize.fetcher.discovery_ris", "RISDiscovery"),
+        "text_parser": ("legalize.fetcher.parser_ris", "RISTextParser"),
+        "metadata_parser": ("legalize.fetcher.parser_ris", "RISMetadataParser"),
+    },
     # To add a new country (e.g. UK):
     # "uk": {
     #     "client": ("legalize.fetcher.client_uk", "UKClient"),

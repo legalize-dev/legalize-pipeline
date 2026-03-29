@@ -34,6 +34,14 @@ RANGO_FOLDERS: dict[str, str] = {
     "ordonnance": "ordonnances",
     "decret": "decrets",
     "constitution_fr": "constitutions",
+    # Austria
+    "bundesverfassungsgesetz": "bundesverfassungsgesetze",
+    "bundesgesetz": "bundesgesetze",
+    "verordnung": "verordnungen",
+    "kundmachung": "kundmachungen",
+    "erlass": "erlaesse",
+    "staatsvertrag": "staatsvertraege",
+    "sonstige": "sonstige",
 }
 
 DEFAULT_FOLDER = "otros"
