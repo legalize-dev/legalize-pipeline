@@ -6,7 +6,7 @@ Each law is a file. Each reform is a commit. Every country is a repo.
 
 ## What it does
 
-1. **Fetches** legislation from official open data sources (BOE for Spain, LEGI for France)
+1. **Fetches** legislation from official open data sources (BOE for Spain, LEGI for France, RIS for Austria)
 2. **Parses** XML into structured data (articles, versions, reforms)
 3. **Generates** Markdown files with YAML frontmatter and git commits with historical dates
 
@@ -16,6 +16,7 @@ Each law is a file. Each reform is a commit. Every country is a repo.
 |---------|------|------|--------|
 | Spain | [legalize-es](https://github.com/legalize-dev/legalize-es) | 8,642 | BOE |
 | France | [legalize-fr](https://github.com/legalize-dev/legalize-fr) | 80 codes | LEGI (Legifrance) |
+| Austria | legalize-at _(coming soon)_ | ~20k+ | RIS OGD API |
 
 ## Architecture
 
@@ -24,6 +25,7 @@ src/legalize/
   fetcher/          # Download from official APIs
     client.py         BOE HTTP client (Spain)
     client_legi.py    LEGI XML dump reader (France)
+    client_ris.py     RIS HTTP client (Austria)
     base.py           Abstract interfaces (add new countries here)
   transformer/      # XML -> Markdown
     xml_parser.py     BOE XML -> Bloque/Version
@@ -40,6 +42,7 @@ src/legalize/
   storage.py        # Save XML + JSON to data/ (intermediate cache)
   pipeline.py       # Spain orchestration
   pipeline_fr.py    # France orchestration
+  pipeline_at.py    # Austria orchestration
 ```
 
 ## Quick start
@@ -67,6 +70,10 @@ legalize status                   # Show pipeline status
 # France
 legalize fetch-fr --discover --legi-dir /path/to/legi  # Process LEGI dump
 legalize bootstrap-fr --legi-dir /path/to/legi         # Full bootstrap
+
+# Austria
+legalize fetch-at --discover   # Discover all Gesetzesnummern from RIS API
+legalize bootstrap-at          # Full bootstrap (~20k Gesetze, ~3h)
 ```
 
 ## Adding a new country
@@ -87,6 +94,7 @@ See `fetcher/client_legi.py` (France) as a reference implementation.
 |---------|--------|--------|------|------|
 | Spain | Live | [BOE](https://www.boe.es/) | 8,642 | [legalize-es](https://github.com/legalize-dev/legalize-es) |
 | France | Beta | [Legifrance](https://www.legifrance.gouv.fr/) | 80 codes | [legalize-fr](https://github.com/legalize-dev/legalize-fr) |
+| Austria | In Progress | [RIS OGD](https://data.bka.gv.at/ris/api/v2.6/) | ~20k+ | legalize-at |
 | Germany | Wanted | [BGBL](https://www.bgbl.de/) | — | Help wanted! |
 | Portugal | Wanted | [DRE](https://dre.pt/) | — | Help wanted! |
 
