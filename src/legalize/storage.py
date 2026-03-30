@@ -84,6 +84,7 @@ def _norma_to_dict(norma: NormaCompleta) -> dict:
         "titulo_corto": meta.titulo_corto,
         "identificador": meta.identificador,
         "pais": meta.pais,
+        "jurisdiccion": meta.jurisdiccion,
         "rango": str(meta.rango),
         "fecha_publicacion": meta.fecha_publicacion.isoformat(),
         "ultima_actualizacion": (

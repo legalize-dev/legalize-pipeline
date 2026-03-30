@@ -36,6 +36,7 @@ class ScopeConfig:
     fecha_desde: Optional[date] = None
     fecha_hasta: Optional[date] = None
     normas_fijas: list[str] = field(default_factory=list)  # BOE IDs always included
+    ambitos: list[str] = field(default_factory=list)  # Empty = all ambitos (1=estatal, 2=autonómico)
 
 
 @dataclass
@@ -115,6 +116,7 @@ def load_config(path: str | Path = "config.yaml", overrides: dict | None = None)
             fecha_desde=_parse_date(scope_raw.get("fecha_desde")),
             fecha_hasta=_parse_date(scope_raw.get("fecha_hasta")),
             normas_fijas=scope_raw.get("normas_fijas", []),
+            ambitos=scope_raw.get("ambitos", []),
         ),
         git=GitConfig(
             repo_path=git_raw.get("repo_path", GitConfig.repo_path),

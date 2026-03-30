@@ -25,6 +25,11 @@ RANGO_FOLDERS: dict[str, str] = {
     "circular": "circulares",
     "instruccion": "instrucciones",
     "decreto": "decretos",
+    "decreto_ley": "decretos-leyes",
+    "decreto_legislativo": "decretos-legislativos",
+    "ley_foral": "leyes-forales",
+    "decreto_ley_foral": "decretos-leyes-forales",
+    "decreto_foral_legislativo": "decretos-forales-legislativos",
     "acuerdo": "acuerdos",
     "reglamento": "reglamentos",
     # France
@@ -46,10 +51,17 @@ def rango_to_folder(rango: str | Rango) -> str:
 
 
 def norma_to_filepath(metadata: NormaMetadata) -> str:
-    """Generates the path: '{category}/{identificador}.md'.
+    """Generates the path: '{jurisdiccion}/{category}/{identificador}.md'.
 
-    Example: 'leyes/BOE-A-2015-11430.md'
+    State-level norms (jurisdiccion="es") omit the prefix for backwards compatibility:
+        'leyes/BOE-A-2015-11430.md'
+
+    Autonomic norms include the jurisdiction:
+        'es-pv/leyes/BOE-A-2020-615.md'
     """
     folder = rango_to_folder(metadata.rango)
     filename = f"{metadata.identificador}.md"
+    jurisdiccion = metadata.jurisdiccion
+    if "-" in jurisdiccion:
+        return f"{jurisdiccion}/{folder}/{filename}"
     return f"{folder}/{filename}"

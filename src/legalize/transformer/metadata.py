@@ -56,11 +56,15 @@ _RANGO_MAP: dict[str, Rango] = {
     "decreto": Rango.DECRETO,
     "acuerdo": Rango.ACUERDO,
     "reglamento": Rango.REGLAMENTO,
-    "decreto-ley": Rango.REAL_DECRETO_LEY,
+    "decreto-ley": Rango.DECRETO_LEY,
+    "decreto legislativo": Rango.DECRETO_LEGISLATIVO,
+    "ley foral": Rango.LEY_FORAL,
+    "decreto-ley foral": Rango.DECRETO_LEY_FORAL,
+    "decreto foral legislativo": Rango.DECRETO_FORAL_LEGISLATIVO,
 }
 
 # Mapping of BOE rank codes to our enum
-_RANGO_CODE_MAP: dict[str, Rango] = {
+RANGO_CODE_MAP: dict[str, Rango] = {
     "1070": Rango.CONSTITUCION,
     "1010": Rango.LEY_ORGANICA,
     "1020": Rango.LEY,
@@ -76,6 +80,23 @@ _RANGO_CODE_MAP: dict[str, Rango] = {
     "1200": Rango.INSTRUCCION,
     "1030": Rango.DECRETO,
     "1160": Rango.ACUERDO,
+    # Alternate state-level codes (catalog endpoint uses different codes than metadata endpoint)
+    "1310": Rango.REAL_DECRETO_LEGISLATIVO,
+    "1320": Rango.REAL_DECRETO_LEY,
+    "1340": Rango.REAL_DECRETO,
+    "1350": Rango.ORDEN,
+    "1370": Rango.RESOLUCION,
+    "1180": Rango.ACUERDO_INTERNACIONAL,
+    "1390": Rango.CIRCULAR,
+    "1410": Rango.INSTRUCCION,
+    "1510": Rango.DECRETO,
+    "1220": Rango.REGLAMENTO,
+    # Autonomic ranks
+    "1500": Rango.DECRETO_LEY,
+    "1450": Rango.LEY_FORAL,
+    "1470": Rango.DECRETO_LEGISLATIVO,
+    "1325": Rango.DECRETO_LEY_FORAL,
+    "1480": Rango.DECRETO_FORAL_LEGISLATIVO,
 }
 
 
@@ -112,8 +133,8 @@ def _parse_date_boe(text: str) -> date | None:
 def _parse_rango(meta: etree._Element) -> Rango | None:
     """Resolves the rank from code or text."""
     code = _code_of(meta, "rango")
-    if code and code in _RANGO_CODE_MAP:
-        return _RANGO_CODE_MAP[code]
+    if code and code in RANGO_CODE_MAP:
+        return RANGO_CODE_MAP[code]
 
     text = _text_of(meta, "rango").lower()
     return _RANGO_MAP.get(text)
@@ -127,6 +148,47 @@ def _parse_estado(meta: etree._Element) -> EstadoNorma:
     if derogacion == "P":
         return EstadoNorma.PARCIALMENTE_DEROGADA
     return EstadoNorma.VIGENTE
+
+
+# Mapping of autonomous bulletin ID prefixes to ELI jurisdictions
+_BOLETIN_PREFIX_MAP: dict[str, str] = {
+    "BOCL": "es-cl",
+    "BOCM": "es-md",
+    "BOCT": "es-cb",
+    "BOJA": "es-an",
+    "BOPV": "es-pv",
+    "BORM": "es-mc",
+    "BOIB": "es-ib",
+    "DOCM": "es-cm",
+    "DOGC": "es-ct",
+    "DOGV": "es-vc",
+    "BOA": "es-ar",
+    "BOC": "es-cn",
+    "BON": "es-nc",
+    "DOE": "es-ex",
+    "DOG": "es-ga",
+}
+
+
+def extract_jurisdiccion(url_eli: str, identificador: str) -> str:
+    """Extracts ELI jurisdiction from url_eli or infers from bulletin prefix.
+
+    Examples:
+        https://www.boe.es/eli/es/lo/1985/07/01/6 → "es"
+        https://www.boe.es/eli/es-pv/l/2019/12/20/11 → "es-pv"
+        BOA-d-2019-90260 (no ELI) → "es-ar" (via prefix)
+    """
+    if url_eli:
+        parts = url_eli.split("/eli/")
+        if len(parts) > 1:
+            return parts[1].split("/")[0]
+
+    # Fallback: infer from bulletin prefix (sorted longest-first to avoid prefix collisions)
+    for prefix, juris in sorted(_BOLETIN_PREFIX_MAP.items(), key=lambda x: -len(x[0])):
+        if identificador.startswith(prefix):
+            return juris
+
+    return "es"
 
 
 def _infer_rango_from_titulo(titulo: str) -> Rango | None:
@@ -190,17 +252,21 @@ def parse_metadatos(xml_data: bytes, id_boe: str) -> NormaMetadata:
     fecha_vigencia = _parse_date_boe(_text_of(meta, "fecha_vigencia"))
     estado = _parse_estado(meta)
 
+    url_eli = _text_of(meta, "url_eli")
     fuente = (
-        _text_of(meta, "url_eli")
+        url_eli
         or _text_of(meta, "url_html_consolidada")
         or f"https://www.boe.es/buscar/act.php?id={identificador}"
     )
+
+    jurisdiccion = extract_jurisdiccion(url_eli, identificador)
 
     return NormaMetadata(
         titulo=titulo,
         titulo_corto=titulo_corto,
         identificador=identificador,
         pais="es",
+        jurisdiccion=jurisdiccion,
         rango=rango,
         fecha_publicacion=fecha_pub,
         estado=estado,

@@ -44,6 +44,11 @@ class Rango(str):
     CIRCULAR = "circular"
     INSTRUCCION = "instruccion"
     DECRETO = "decreto"
+    DECRETO_LEY = "decreto_ley"
+    DECRETO_LEGISLATIVO = "decreto_legislativo"
+    LEY_FORAL = "ley_foral"
+    DECRETO_LEY_FORAL = "decreto_ley_foral"
+    DECRETO_FORAL_LEGISLATIVO = "decreto_foral_legislativo"
     ACUERDO = "acuerdo"
     REGLAMENTO = "reglamento"
 
@@ -135,6 +140,7 @@ class NormaMetadata:
     estado: EstadoNorma
     departamento: str
     fuente: str  # Official URL
+    jurisdiccion: str = "es"  # ELI jurisdiction: "es", "es-ct", "es-pv", etc.
     fecha_ultima_modificacion: Optional[date] = None
     url_pdf: Optional[str] = None
     materias: tuple[str, ...] = ()

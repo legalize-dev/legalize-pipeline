@@ -457,6 +457,7 @@ def _parse_metadatos_legi(xml_data: bytes, norm_id: str) -> NormaMetadata:
         estado=_parse_etat(etat),
         departamento=departamento,
         fuente=fuente,
+        jurisdiccion="fr",
         fecha_ultima_modificacion=fecha_modif,
     )
 

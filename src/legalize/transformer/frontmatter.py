@@ -24,15 +24,18 @@ def render_frontmatter(metadata: NormaMetadata, version_date: date) -> str:
     """Generates the YAML frontmatter block for a norm at a given date."""
     titulo = _clean_titulo(metadata.titulo)
 
+    jurisdiccion = metadata.jurisdiccion
+
     lines = [
         "---",
         f'titulo: "{_escape_yaml(titulo)}"',
         f'identificador: "{metadata.identificador}"',
         f'pais: "{metadata.pais}"',
+        f'jurisdiccion: "{jurisdiccion}"',
         f'rango: "{metadata.rango}"',
         f'fecha_publicacion: "{metadata.fecha_publicacion.isoformat()}"',
         f'ultima_actualizacion: "{version_date.isoformat()}"',
-        f'estado: "{metadata.estado}"',
+        f'estado: "{metadata.estado.value}"',
         f'fuente: "{metadata.fuente}"',
     ]
 

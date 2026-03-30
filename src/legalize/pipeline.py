@@ -105,10 +105,10 @@ def fetch_all(config: Config, force: bool = False) -> list[str]:
 
 
 def fetch_catalog(config: Config, force: bool = False) -> list[str]:
-    """Download ALL state-level norms from the BOE catalog.
+    """Download norms from the BOE consolidated legislation catalog.
 
     Paginates correctly (the API has a 10,000 per request limit).
-    Downloads all state-level norms, regardless of rango.
+    Filters by ambito if configured (empty = all ambitos).
     Skips those already in data/.
     """
     import requests
@@ -136,14 +136,18 @@ def fetch_catalog(config: Config, force: bool = False) -> list[str]:
         all_items.extend(items)
         offset += batch
 
-    # Filter state-level only
-    in_scope = [
-        item["identificador"]
-        for item in all_items
-        if item.get("ambito", {}).get("codigo") == "1"
-    ]
-
-    console.print(f"  {len(in_scope)} state-level norms found\n")
+    # Filter by ambito if configured (empty list = accept all)
+    ambitos = config.scope.ambitos
+    if ambitos:
+        in_scope = [
+            item["identificador"]
+            for item in all_items
+            if item.get("ambito", {}).get("codigo") in ambitos
+        ]
+        console.print(f"  {len(in_scope)} norms found (ambitos: {ambitos})\n")
+    else:
+        in_scope = [item["identificador"] for item in all_items]
+        console.print(f"  {len(in_scope)} norms found (all ambitos)\n")
 
     # Download each one (skips those that already exist)
     fetched = []
@@ -527,6 +531,7 @@ def _load_norma_from_json(json_path: Path) -> NormaCompleta:
         titulo_corto=meta["titulo_corto"],
         identificador=meta["identificador"],
         pais=meta["pais"],
+        jurisdiccion=meta.get("jurisdiccion", "es"),
         rango=Rango(meta["rango"]),
         fecha_publicacion=date.fromisoformat(meta["fecha_publicacion"]),
         estado=EstadoNorma(meta["estado"]),

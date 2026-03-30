@@ -22,6 +22,9 @@ scope:
   fecha_hasta: null        # null = up to today
   # All norms are loaded from the catalog via fetch --catalog
   normas_fijas: []
+  # Ambito filter for catalog fetch (empty = all ambitos)
+  # 1 = estatal, 2 = autonómico
+  ambitos: []
 
 git:
   repo_path: "../es"
