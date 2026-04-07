@@ -127,3 +127,14 @@ countries:
         - "decretos-ley"
         - "constitucion"
       law_number_max: 20500
+
+  lv:
+    repo_path: "../countries/lv"
+    data_dir: "../countries/data-lv"
+    max_workers: 1
+    source:
+      # likumi.lv robots.txt requires Crawl-delay: 1
+      base_url: "https://likumi.lv"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 1.0
