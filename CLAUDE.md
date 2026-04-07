@@ -185,13 +185,44 @@ source: "https://www.boe.es/eli/es/c/1978/12/27/(1)"
 
 ## Adding New Countries
 
-To add a new country:
-1. Create `fetcher/{code}/` with `client.py`, `discovery.py`, `parser.py`
-2. Implement the 4 interfaces from `fetcher/base.py`
-3. Register in `countries.py` REGISTRY
-4. Add `countries:` section to `config.yaml` with `source` params for the client
+[ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md) is the **end-to-end playbook**. Follow
+every step — it takes a country from name-only to merged PR and live on
+legalize.dev. Do not improvise shortcuts.
 
-See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md) for the full walkthrough.
+High-level order:
+
+0. **Research the source** — save 5 fixtures, inventory every metadata field and
+   every rich-formatting construct into `RESEARCH-{CC}.md`.
+1. Create `fetcher/{code}/` with `client.py`, `discovery.py`, `parser.py`
+   implementing the 4 interfaces from `fetcher/base.py`.
+2. Register in `countries.py` REGISTRY.
+3. Add `countries:` section to `config.yaml`.
+4. Create the GitHub repo `legalize-dev/legalize-{code}`.
+5. (Optional) Custom `daily.py` if the country has a non-standard daily flow.
+6. Write parser tests against the fixtures.
+7. **Quality gate (mandatory):** fetch 5 sample laws, render to MD, and run an
+   AI review covering TEXT correctness, METADATA completeness, STRUCTURE,
+   RICH FORMATTING preservation, and ENCODING. Do not proceed until 5/5 PASS.
+8. Tune `max_workers` against a 50-law benchmark.
+9. Full bootstrap → `legalize health` → push country repo → open engine PR →
+   open web PR → verify on https://legalize.dev/{code}.
+
+**Non-negotiable rules for the parser:**
+
+- **Metadata completeness:** every field the source exposes must be captured
+  (generic fields in `NormMetadata`, source-specific in `extra` with English
+  snake_case keys). Regenerating commit history to add a forgotten field is
+  expensive, so we capture everything up front.
+- **Rich formatting preservation:** tables → Markdown pipe tables (see
+  `fetcher/lv/parser.py` for the canonical implementation), bold → `**...**`,
+  italic → `*...*`, lists → `- ...`, cross-references → `[text](url)`, quoted
+  amending text → `> ...`, signatories → `firma_rey` css class. Inline
+  bold/italic must be pre-wrapped in the parser (the CSS→MD map is paragraph-level).
+- **Images are explicitly skipped** — we are not ready for binary assets. Drop
+  image nodes and count them in `extra.images_dropped`.
+- **Encoding is UTF-8 only** — decode source bytes explicitly, strip C0/C1
+  control chars, normalize whitespace at paragraph boundaries. Never rely on
+  `requests` auto-detection.
 
 ## BOE API (Spain)
 

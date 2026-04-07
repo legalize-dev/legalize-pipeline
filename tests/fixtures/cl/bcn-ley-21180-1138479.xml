@@ -1,0 +1,1068 @@
+<?xml version="1.0" encoding="UTF-8"?><Norma xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.leychile.cl/esquemas" xsi:schemaLocation="http://www.leychile.cl/esquemas http://www.leychile.cl/esquemas/EsquemaIntercambioNorma-v1-0.xsd" normaId="1138479" esTratado="no tratado" fechaVersion="2022-06-09" SchemaVersion="1.0" derogado="no derogado">
+  <Identificador fechaPromulgacion="2019-10-25" fechaPublicacion="2019-11-11">
+    <TiposNumeros>
+      <TipoNumero>
+        <Tipo>Ley</Tipo>
+        <Numero>21180</Numero>
+      </TipoNumero>
+    </TiposNumeros>
+    <Organismos>
+      <Organismo>MINISTERIO SECRETAR&#205;A GENERAL DE LA PRESIDENCIA</Organismo>
+    </Organismos>
+  </Identificador>
+  <Metadatos>
+    <TituloNorma>TRANSFORMACI&#211;N DIGITAL DEL ESTADO</TituloNorma>
+    <Materias>
+      <Materia>Documentos Electr&#243;nicos</Materia>
+      <Materia>Transformaci&#243;n Digital</Materia>
+      <Materia>Procedimiento Administrativo Electr&#243;nico</Materia>
+      <Materia>Gesti&#243;n Documental Electr&#243;nica</Materia>
+      <Materia>Sistema Documental Digital del Archivo Nacional</Materia>
+    </Materias>
+    
+    
+    <IdentificacionFuente>Diario Oficial</IdentificacionFuente>
+    <NumeroFuente>42499</NumeroFuente>
+  </Metadatos>
+  <Encabezado fechaVersion="2019-11-11" derogado="no derogado">
+    <Texto>
+LEY N&#218;M. 21.180
+ 
+TRANSFORMACI&#211;N DIGITAL DEL ESTADO
+ 
+     Teniendo presente que el H. Congreso Nacional ha dado
+su aprobaci&#243;n al siguiente,
+ 
+     Proyecto de ley:</Texto>
+  </Encabezado>
+  <EstructurasFuncionales>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067375">
+      <Texto>     "Art&#237;culo 1&#186;.- Introd&#250;cense las siguientes
+modificaciones en la ley N&#186; 19.880, que establece bases de
+los procedimientos administrativos que rigen los actos de
+los &#243;rganos de la Administraci&#243;n del Estado:
+ 
+     1. En el art&#237;culo 1:
+ 
+     a. Elim&#237;nase, en el inciso primero, la siguiente
+oraci&#243;n: "En caso de que la ley establezca procedimientos
+administrativos especiales, la presente ley se aplicar&#225; con
+car&#225;cter de supletoria.".
+     b. Interc&#225;lanse los siguientes incisos segundo y
+tercero, nuevos, pasando el actual inciso segundo a ser
+inciso final:
+ 
+     "Todo procedimiento administrativo deber&#225; expresarse a
+trav&#233;s de los medios electr&#243;nicos establecidos por ley,
+salvo las excepciones legales.
+     En caso de que la ley establezca procedimientos
+administrativos especiales, la presente ley se aplicar&#225; con
+car&#225;cter supletorio.".
+ 
+     2. Sustit&#250;yese, en el art&#237;culo 4&#186;, la conjunci&#243;n
+"y" por una coma, y agr&#233;gase, a continuaci&#243;n de la palabra
+"publicidad", la frase "y aquellos relativos a los medios
+electr&#243;nicos".
+     3. Reempl&#225;zase el art&#237;culo 5&#186;, por el siguiente:
+ 
+     "Art&#237;culo 5&#186;. Principio de escrituraci&#243;n. El
+procedimiento administrativo y los actos administrativos a
+los cuales da origen se expresar&#225;n por escrito a trav&#233;s de
+medios electr&#243;nicos, a menos que se configure alguna
+excepci&#243;n establecida en la ley.".
+ 
+     4. Reempl&#225;zase, en el art&#237;culo 6&#186;, la frase "ser&#225;n
+gratuitas para los interesados, salvo disposici&#243;n legal en
+contrario.", por lo siguiente: "y la obtenci&#243;n de
+documentos e informaci&#243;n necesaria para su conclusi&#243;n
+ser&#225;n gratuitas para los interesados, salvo disposici&#243;n
+legal en contrario. No proceder&#225;n cobros entre los &#243;rganos
+de la Administraci&#243;n del Estado que deban participar en su
+desarrollo e intercambio, salvo disposici&#243;n legal en
+contrario.".
+     5. Reempl&#225;zase el inciso tercero del art&#237;culo 9&#186;,
+por el siguiente:
+ 
+     "Toda comunicaci&#243;n entre &#243;rganos de la
+Administraci&#243;n que se practique en el marco del
+procedimiento se realizar&#225; por medios electr&#243;nicos,
+dej&#225;ndose constancia del &#243;rgano requirente, el funcionario
+responsable que practica el requerimiento, destinatario,
+procedimiento a que corresponde, gesti&#243;n que se encarga y
+el plazo establecido para su realizaci&#243;n. Asimismo, deber&#225;
+remitirse una copia electr&#243;nica de tal comunicaci&#243;n a
+todos quienes figuren como interesados en el procedimiento
+administrativo de que se trate.".
+
+     6. Agr&#233;gase, a continuaci&#243;n del art&#237;culo 16, un
+art&#237;culo 16 bis del siguiente tenor:
+ 
+     "Art&#237;culo 16 bis. Principios generales relativos a los
+medios electr&#243;nicos. En la tramitaci&#243;n de los
+procedimientos administrativos por medios electr&#243;nicos se
+deber&#225; cumplir con los principios de neutralidad
+tecnol&#243;gica, de actualizaci&#243;n, de equivalencia funcional,
+de fidelidad, de interoperabilidad y de cooperaci&#243;n.
+     En virtud del principio de actualizaci&#243;n, los &#243;rganos
+de la Administraci&#243;n del Estado deber&#225;n actualizar sus
+plataformas a tecnolog&#237;as no obsoletas o carentes de
+soporte, as&#237; como generar medidas que permitan el rescate
+de los contenidos de formatos de archivo electr&#243;nicos que
+caigan en desuso.
+     El principio de equivalencia funcional consiste en que
+los actos administrativos suscritos por medio de firma
+electr&#243;nica ser&#225;n v&#225;lidos y producir&#225;n los mismos
+efectos que si se hubieren llevado a cabo en soporte de
+papel.
+     El principio de fidelidad consiste en que todas las
+actuaciones del procedimiento se registrar&#225;n y conservar&#225;n
+&#237;ntegramente y en orden sucesivo en el expediente
+electr&#243;nico, el que garantizar&#225; su fidelidad,
+preservaci&#243;n y la reproducci&#243;n de su contenido.
+     El principio de interoperabilidad consiste en que los
+medios electr&#243;nicos deben ser capaces de interactuar y
+operar entre s&#237; al interior de la Administraci&#243;n del
+Estado, a trav&#233;s de est&#225;ndares abiertos que permitan una
+segura y expedita interconexi&#243;n entre ellos.
+     El principio de cooperaci&#243;n consiste en que los
+distintos &#243;rganos de la Administraci&#243;n del Estado deben
+cooperar efectivamente entre s&#237; en la utilizaci&#243;n de
+medios electr&#243;nicos.".
+ 
+     7. Modif&#237;case el art&#237;culo 17, en los siguientes
+t&#233;rminos:
+ 
+     a. En el literal a), reempl&#225;zase el punto y coma final
+por un punto seguido, y a&#241;&#225;dese la siguiente oraci&#243;n:
+"Constituye copia autorizada aquella generada por la
+plataforma electr&#243;nica donde se acceda al expediente
+electr&#243;nico, que cuente con un medio de verificaci&#243;n de su
+autenticidad;".
+     b. Agr&#233;gase un nuevo literal c), pasando el actual
+literal c) a ser literal d), y as&#237; sucesivamente, del
+siguiente tenor:
+ 
+     "c) Acompa&#241;ar documentos electr&#243;nicos, tales como
+copias digitalizadas de documentos en soporte de papel o
+documentos electr&#243;nicos en su origen, que no sean emitidos
+por los &#243;rganos de la Administraci&#243;n del Estado, en la
+medida que conste su autenticidad e integridad, salvo que
+por mandato legal o reglamentario &#233;stos deban ser
+acompa&#241;ados a los autos en soporte de papel, a su costa;".
+ 
+     c. Reempl&#225;zase el actual literal c), que ha pasado a
+ser d), por el siguiente:
+ 
+     "d) Eximirse de presentar documentos que no
+correspondan al procedimiento o que emanen y se encuentren
+en poder de cualquier &#243;rgano de la Administraci&#243;n del
+Estado. En este &#250;ltimo caso, dichos documentos deber&#225;n ser
+remitidos por el &#243;rgano que los tuviere en su poder a aquel
+que estuviere tramitando el procedimiento administrativo;".
+ 
+     8. Modif&#237;case el art&#237;culo 18, como sigue:
+ 
+     a. En el inciso tercero, reempl&#225;zase la frase ",
+escrito o electr&#243;nico,", por la siguiente: "electr&#243;nico,
+salvo las excepciones contempladas en la ley,".
+     b. Interc&#225;lanse los siguientes incisos cuarto y
+quinto, nuevos, pasando el actual inciso cuarto a ser inciso
+sexto:
+ 
+     "El ingreso de las solicitudes, formularios o
+documentos se har&#225; mediante documentos electr&#243;nicos o por
+medio de formatos o medios electr&#243;nicos, a trav&#233;s de las
+plataformas de los &#243;rganos de la Administraci&#243;n del
+Estado.
+     Aquella persona que carezca de los medios
+tecnol&#243;gicos, no tenga acceso a medios electr&#243;nicos o
+s&#243;lo actuare excepcionalmente a trav&#233;s de ellos, podr&#225;
+solicitar por medio de un formulario, ante el &#243;rgano
+respectivo, efectuar presentaciones dentro del procedimiento
+administrativo en soporte de papel. El &#243;rgano respectivo
+deber&#225; pronunciarse dentro de tercero d&#237;a, y deber&#225;
+hacerlo de manera fundada en caso de denegar la solicitud.
+Sin perjuicio de lo anterior, la presentaci&#243;n de dicha
+solicitud no suspender&#225; los plazos para los interesados por
+lo que, en todo caso, antes del vencimiento de un plazo y
+mientras no se haya pronunciado la Administraci&#243;n podr&#225;n
+efectuarse las presentaciones en soporte de papel. Las
+solicitudes, formularios o escritos presentados en soporte
+de papel ser&#225;n digitalizados e ingresados al expediente
+electr&#243;nico inmediatamente por el funcionario
+correspondiente. Un reglamento dictado conjuntamente por el
+Ministerio Secretar&#237;a General de la Presidencia y el
+Ministerio de Hacienda establecer&#225; las formas de acreditar
+el encontrarse dentro de las circunstancias indicadas en
+este inciso.".
+ 
+     c. Reempl&#225;zase el inciso cuarto, que ha pasado a ser
+inciso sexto, por el siguiente:
+ 
+     "Los expedientes electr&#243;nicos, a los que tendr&#225;n
+acceso permanente los interesados, contendr&#225;n un registro
+actualizado de todas las actuaciones del procedimiento,
+seg&#250;n lo se&#241;alado en el inciso tercero, que estar&#225; a
+disposici&#243;n tanto en las plataformas electr&#243;nicas como en
+las dependencias de la Administraci&#243;n para su consulta. La
+consulta en las dependencias de la Administraci&#243;n deber&#225;
+ser guiada y asesorada, si as&#237; se requiere, para el caso de
+quienes estuvieren autorizados para efectuar presentaciones
+en soporte de papel por la Administraci&#243;n. S&#243;lo podr&#225;n
+ponerse a disposici&#243;n en soporte de papel en los casos en
+que no hubiere sido posible digitalizarse seg&#250;n se
+establece en el art&#237;culo 19 bis. En tal evento, as&#237; como
+en el caso de personas autorizadas para efectuar
+presentaciones en soporte de papel, podr&#225; solicitarse
+obtenci&#243;n de copias en soporte de papel. Un reglamento,
+dictado en conjunto por el Ministerio Secretar&#237;a General de
+la Presidencia y el Ministerio de Hacienda, regular&#225;
+aquellos casos en que la Administraci&#243;n pueda excusarse de
+entregar copias en soporte de papel por razones de distraer
+indebidamente a los funcionarios del cumplimiento de sus
+labores habituales, esto es la utilizaci&#243;n de un tiempo
+excesivo considerando su jornada de trabajo, o un
+alejamiento de sus funciones habituales, as&#237; como en los
+que podr&#225; exigir el pago de los costos directos de
+reproducci&#243;n y la fijaci&#243;n de sus valores.".
+ 
+     d. Agr&#233;gase el siguiente inciso final:
+      
+     "Excepcionalmente, cuando el sistema o las plataformas
+electr&#243;nicas que soportan los medios electr&#243;nicos no se
+encuentren disponibles por emergencia, fuerza mayor u otro
+motivo calificado, el jefe superior del servicio, por
+resoluci&#243;n fundada, podr&#225; autorizar la emisi&#243;n de ciertos
+actos administrativos as&#237; como efectuar presentaciones en
+soporte de papel. Lo anterior deber&#225; digitalizarse
+posteriormente y agregarse en el expediente electr&#243;nico
+correspondiente.".
+ 
+     9. Reempl&#225;zase el art&#237;culo 19, por el siguiente:
+ 
+     "Art&#237;culo 19. Uso obligatorio de plataformas
+electr&#243;nicas. Los &#243;rganos de la Administraci&#243;n estar&#225;n
+obligados a disponer y utilizar adecuadamente plataformas
+electr&#243;nicas para efectos de llevar expedientes
+electr&#243;nicos, las que deber&#225;n cumplir con est&#225;ndares de
+seguridad, interoperabilidad, interconexi&#243;n y
+ciberseguridad.
+     Los escritos, documentos, actos y actuaciones de toda
+especie que se presenten o verifiquen en el procedimiento se
+registrar&#225;n en el expediente electr&#243;nico correspondiente,
+siguiendo las nomenclaturas pertinentes, de acuerdo a cada
+etapa del procedimiento.
+     La conservaci&#243;n de los expedientes electr&#243;nicos
+estar&#225; a cargo del &#243;rgano respectivo, el cual ser&#225; el
+responsable de su integridad, disponibilidad y autenticidad.
+     Si fuere necesaria la reconstituci&#243;n de un expediente
+o piezas de &#233;ste se reemplazar&#225; en todo o parte por una
+copia fiel, que se obtendr&#225; de quien la tuviere, si no se
+dispusiere de ella directamente.
+     Si no existiere copia fiel los actos se dictar&#225;n
+nuevamente, para lo cual la Administraci&#243;n reunir&#225; los
+antecedentes que le permitan fundamentar su preexistencia y
+contenido, y las actuaciones se repetir&#225;n con las
+formalidades previstas para cada caso.
+     Las comunicaciones oficiales entre los &#243;rganos de la
+Administraci&#243;n ser&#225;n registradas en una plataforma
+electr&#243;nica destinada al efecto.
+     Mediante reglamento, dictado en conjunto por el
+Ministerio Secretar&#237;a General de la Presidencia y el
+Ministerio de Hacienda, se fijar&#225;n los est&#225;ndares que
+deber&#225;n cumplir dichas plataformas, en los t&#233;rminos
+previstos en esta ley considerando, adem&#225;s, condiciones de
+accesibilidad para los interesados, seguridad,
+funcionamiento, calidad, protecci&#243;n y conservaci&#243;n de los
+documentos.".
+ 
+     10. Interc&#225;lase un art&#237;culo 19 bis, nuevo, del
+siguiente tenor:
+ 
+     "Art&#237;culo 19 bis. Documentos electr&#243;nicos y
+digitalizaci&#243;n. Los actos de la Administraci&#243;n y los
+documentos de los interesados deber&#225;n cumplir con lo
+establecido en la ley N&#186; 19.799, sobre documentos
+electr&#243;nicos, firma electr&#243;nica y servicios de
+certificaci&#243;n de dicha firma.
+     Los documentos presentados por interesados cuyo formato
+original no sea electr&#243;nico podr&#225;n presentarse mediante
+copias digitalizadas directamente en el expediente
+electr&#243;nico. Asimismo, podr&#225;n presentarse en la
+dependencia de la Administraci&#243;n correspondiente,
+documentos electr&#243;nicos o bien en soporte de papel si lo
+anterior no fuere posible, debiendo el funcionario
+correspondiente digitalizarlos e ingresarlos inmediatamente
+al expediente electr&#243;nico.
+     La forma de cotejar la autenticidad y conformidad de
+los documentos en soporte de papel y sus copias
+digitalizadas presentadas seg&#250;n lo indicado en el inciso
+anterior ser&#225; regulada por un reglamento dictado en
+conjunto por el Ministerio Secretar&#237;a General de la
+Presidencia, el Ministerio de Hacienda y el Ministerio de
+las Culturas, las Artes y el Patrimonio. Toda infracci&#243;n a
+la autenticidad y conformidad de las copias digitalizadas
+respecto a los documentos originales en soporte de papel
+har&#225; incurrir en las sanciones que determine la ley.
+     En caso de documentos presentados por &#243;rganos de la
+Administraci&#243;n cuyo formato original no sea electr&#243;nico,
+&#233;stos deber&#225;n ser digitalizados por el funcionario
+correspondiente de acuerdo a lo previsto en la ley N&#186;
+18.845, que establece sistemas de microcopia o
+micrograbaci&#243;n de documentos.
+     En casos excepcionales y cuando se haya autorizado a
+una persona para efectuar presentaciones en soporte de
+papel, no ser&#225; necesario acompa&#241;ar copias digitalizadas.
+En estos casos, los documentos presentados en formato que no
+sea electr&#243;nico ser&#225;n digitalizados e ingresados
+inmediatamente por el funcionario correspondiente al
+expediente electr&#243;nico, a menos que ello no fuere
+materialmente posible por su naturaleza, formato o cantidad
+seg&#250;n los criterios que se establezcan mediante un
+reglamento dictado en conjunto por el Ministerio Secretar&#237;a
+General de la Presidencia, el Ministerio de Hacienda y el
+Ministerio de las Culturas, las Artes y el Patrimonio. En
+este caso, se dejar&#225; constancia de ello en el expediente.".
+ 
+     11. Reempl&#225;zase el inciso segundo del art&#237;culo 22,
+por el siguiente:
+ 
+     "El poder podr&#225; constar en documento suscrito mediante
+firma electr&#243;nica simple o avanzada. Se aceptar&#225; tambi&#233;n
+aquel que conste por escritura p&#250;blica o documento privado
+suscrito ante notario. Con todo, se requerir&#225; siempre de
+documento suscrito mediante firma electr&#243;nica avanzada o de
+escritura p&#250;blica cuando el acto administrativo de que se
+trate produzca efectos que exijan solemnidad de instrumento
+o escritura p&#250;blica.".
+ 
+     12. Reempl&#225;zase, en el inciso primero del art&#237;culo
+24, la expresi&#243;n "oficina correspondiente", por la frase
+"dependencia respectiva, a trav&#233;s de medios
+electr&#243;nicos,".
+     13. Agr&#233;gase, a continuaci&#243;n del art&#237;culo 24, el
+siguiente art&#237;culo 24 bis:
+ 
+     "Art&#237;culo 24 bis. En virtud de los principios de
+interoperabilidad y cooperaci&#243;n, en todo procedimiento
+administrativo los &#243;rganos de la Administraci&#243;n del Estado
+que tengan en su poder documentos o informaci&#243;n respecto de
+materias de su competencia, que sean necesarios para su
+conocimiento o resoluci&#243;n, deber&#225;n remitirlos por medios
+electr&#243;nicos a aquel &#243;rgano ante el cual se estuviere
+tramitando el respectivo procedimiento, que as&#237; lo
+solicite. No obstante, se requerir&#225; previa autorizaci&#243;n
+del interesado en los t&#233;rminos indicados en la letra f) del
+art&#237;culo 30, en el caso de que dichos documentos o
+informaci&#243;n contengan datos sensibles de aquel interesado,
+ya sea que est&#233;n incluidos o no en bases de datos
+personales, de conformidad con lo establecido en el
+art&#237;culo 30.
+     Se dejar&#225; registro de toda solicitud entre los
+&#243;rganos de la Administraci&#243;n del Estado respecto a
+informaci&#243;n de car&#225;cter sensible del interesado, al que
+tendr&#225;n acceso. Este registro deber&#225; indicar, al menos, lo
+siguiente:
+ 
+     a) El &#243;rgano requirente.
+     b) El funcionario responsable.
+     c) El &#243;rgano destinatario.
+     d) El procedimiento a que corresponde.
+     e) Los datos o informaci&#243;n que se solicita.
+     f) El plazo establecido para su realizaci&#243;n, si
+corresponde.
+ 
+     Para efectos de este art&#237;culo ser&#225; aplicable lo
+dispuesto en los art&#237;culos 7&#186; y 11 de la ley N&#186; 19.628.".
+ 
+     14. Agr&#233;gase, en el art&#237;culo 25, el siguiente inciso
+cuarto:
+ 
+     "Las plataformas electr&#243;nicas permitir&#225;n la
+presentaci&#243;n de documentos todos los d&#237;as del a&#241;o durante
+las veinticuatro horas. No obstante, la presentaci&#243;n en un
+d&#237;a inh&#225;bil se entender&#225; realizada en la primera hora del
+primer d&#237;a h&#225;bil siguiente.".
+ 
+     15. Modif&#237;case el art&#237;culo 30, de la siguiente forma:
+ 
+     a. Reempl&#225;zase, en el literal a) del inciso primero,
+la frase "la identificaci&#243;n del medio preferente o del
+lugar que se se&#241;ale, para los efectos de las
+notificaciones", por el siguiente texto: "el medio
+electr&#243;nico a trav&#233;s del cual se llevar&#225;n a cabo las
+notificaciones, pudiendo para estos efectos indicar una
+direcci&#243;n de correo electr&#243;nico, caso en el cual se
+entender&#225; &#233;ste como domicilio v&#225;lido para practicar las
+notificaciones, el que se incluir&#225; en el registro indicado
+en el art&#237;culo 46. Excepcionalmente, podr&#225; indicar un
+medio alternativo de notificaci&#243;n, en los t&#233;rminos
+se&#241;alados en dicho art&#237;culo".
+     b. Agr&#233;gase, en el inciso primero, la siguiente letra
+f):
+ 
+     "f) Manifestaci&#243;n si se autoriza al &#243;rgano de la
+Administraci&#243;n del Estado que tuviera en su poder
+documentos o informaci&#243;n que contengan datos de car&#225;cter
+sensible del interesado, para que &#233;stos sean remitidos por
+medios electr&#243;nicos al &#243;rgano que corresponda resolver en
+el procedimiento respectivo, conforme al art&#237;culo 9&#186; de la
+ley N&#186; 19.628.".
+ 
+     c. Sustit&#250;yese, en el inciso tercero, la frase
+"admiti&#233;ndose como tal una copia donde se acceda al
+expediente electr&#243;nico, en el que figure la fecha de
+presentaci&#243;n anotada por la oficina.", por la siguiente:
+"consider&#225;ndose suficiente acreditaci&#243;n un certificado de
+ingreso generado por la plataforma electr&#243;nica donde se
+acceda al expediente electr&#243;nico, en el que figure la fecha
+de presentaci&#243;n.".
+     d. Reempl&#225;zase el inciso cuarto, por el siguiente:
+ 
+     "La Administraci&#243;n deber&#225; establecer formularios de
+solicitudes cuando se trate de procedimientos de com&#250;n
+tramitaci&#243;n, los que estar&#225;n a disposici&#243;n de los
+ciudadanos por medios electr&#243;nicos o en las dependencias
+administrativas, en los casos autorizados de tramitaci&#243;n
+mediante presentaciones en soporte de papel.".
+ 
+     16. Reempl&#225;zase, en el inciso segundo del art&#237;culo
+42, la expresi&#243;n "el escrito" por "la solicitud".
+     17. Reempl&#225;zase el art&#237;culo 46, por el siguiente:
+ 
+     "Art&#237;culo 46. Procedimiento. Las notificaciones se
+practicar&#225;n por medios electr&#243;nicos en base a la
+informaci&#243;n contenida en un registro &#250;nico dependiente del
+Servicio de Registro Civil e Identificaci&#243;n, sobre el cual
+se configurar&#225;n domicilios digitales &#250;nicos, cuyas
+caracter&#237;sticas y operatividad ser&#225; regulada mediante
+reglamento dictado conjuntamente por el Ministerio
+Secretar&#237;a General de la Presidencia, el Ministerio de
+Hacienda y el Ministerio de Justicia y Derechos Humanos.
+Dichas notificaciones tendr&#225;n el car&#225;cter de personal.
+     Quienes carezcan de los medios tecnol&#243;gicos, no tengan
+acceso a medios electr&#243;nicos o s&#243;lo actuaren
+excepcionalmente a trav&#233;s de ellos, podr&#225;n solicitar por
+medio de un formulario, ante el &#243;rgano respectivo o ante el
+encargado del registro se&#241;alado en el inciso anterior, que
+la notificaci&#243;n se practique mediante forma diversa, quien
+deber&#225; pronunciarse dentro del tercer d&#237;a, seg&#250;n lo
+establezca el reglamento, y deber&#225; hacerlo de manera
+fundada en caso de denegar la solicitud. La notificaci&#243;n se
+realizar&#225; en la forma solicitada si fuere posible o
+mediante carta certificada dirigida al domicilio que debiere
+designar al presentar esta solicitud. En caso de
+notificaciones por carta certificada, &#233;stas se entender&#225;n
+practicadas a contar del tercer d&#237;a siguiente a su
+recepci&#243;n en la oficina de correos que corresponda.
+     Asimismo, las notificaciones podr&#225;n hacerse en las
+dependencias de la Administraci&#243;n, si el interesado se
+apersonare a recibirla, dej&#225;ndose constancia de ello en el
+expediente electr&#243;nico, consign&#225;ndose la fecha y hora de
+la misma. Si el interesado requiriere copia del acto o
+resoluci&#243;n que se le notifica se le dar&#225;, sin m&#225;s
+tr&#225;mite, en el mismo momento, en el formato que se tramite
+el procedimiento.
+     Mediante el reglamento referido en el inciso primero se
+regular&#225; de qu&#233; forma los &#243;rganos de la Administraci&#243;n
+deber&#225;n practicar las notificaciones electr&#243;nicas,
+considerarlas practicadas y obtener informaci&#243;n necesaria
+para llevar el registro indicado, estableciendo, a lo menos,
+los requisitos y condiciones necesarios que aseguren la
+constancia de la fecha y hora de env&#237;o de notificaciones,
+la recepci&#243;n o acceso por el interesado o su apoderado,
+especialmente en el caso de la primera notificaci&#243;n para
+resguardar su derecho a la defensa, as&#237; como la integridad
+del contenido, la identidad fidedigna del remitente y el
+destinatario de la misma.".</Texto>
+      <Metadatos>
+        <NombreParte presente="si">1 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067376">
+      <Texto>     Art&#237;culo 2&#186;.- Introd&#250;cense las siguientes
+modificaciones en el numeral 2 del inciso primero del
+art&#237;culo 29 de la ley N&#186; 21.045, que crea el Ministerio de
+las Culturas, las Artes y el Patrimonio:
+ 
+     1. Incorp&#243;ranse las siguientes oraciones finales:
+"Para cumplir sus funciones tambi&#233;n desarrollar&#225; un
+archivo electr&#243;nico, en conformidad con sus
+disponibilidades presupuestarias. Para efectos
+archiv&#237;sticos las siguientes son las etapas generales del
+ciclo documental dentro de la Administraci&#243;n del Estado:
+Fase Activa, que se refiere a la producci&#243;n y gesti&#243;n del
+documento electr&#243;nico en cada instituci&#243;n p&#250;blica, as&#237;
+como su utilizaci&#243;n para los fines pertinentes; Fase
+Semiactiva, que corresponde a la conservaci&#243;n temporal del
+documento al interior de cada instituci&#243;n p&#250;blica
+dependiendo del per&#237;odo de vigencia de cada expediente o
+documento; y Fase Hist&#243;rica, que aplica a aquellos
+documentos que de acuerdo a la normativa vigente y a su
+proceso de valoraci&#243;n, deben ser transferidos al Archivo
+Nacional, para su preservaci&#243;n y disponibilizaci&#243;n.".
+     2. Agr&#233;gase un p&#225;rrafo segundo, del siguiente tenor:
+ 
+     "Mediante un reglamento emitido a trav&#233;s del
+Ministerio de las Culturas, las Artes y el Patrimonio, y
+suscrito por los Ministros de Hacienda y Secretar&#237;a General
+de la Presidencia, se establecer&#225;n los est&#225;ndares
+t&#233;cnicos y administrativos que deber&#225; cumplir el archivo
+electr&#243;nico referido en el p&#225;rrafo anterior. En relaci&#243;n
+a la integraci&#243;n al proceso documental digital, se deber&#225;
+cumplir con los est&#225;ndares a que se refiere la ley N&#186;
+18.845 y su reglamento.".</Texto>
+      <Metadatos>
+        <NombreParte presente="si">2 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067377">
+      <Texto>     Art&#237;culo 3&#186;.- Agr&#233;gase, en el art&#237;culo 14 del
+decreto con fuerza de ley N&#186; 5.200, del Ministerio de
+Educaci&#243;n P&#250;blica, de 1929, sobre instituciones nacionales
+patrimoniales dependientes del Servicio Nacional del
+Patrimonio Cultural, el siguiente inciso final:
+ 
+     "Los documentos generados electr&#243;nicamente, as&#237; como
+los documentos creados en soporte electr&#243;nico a partir de
+originales digitalizados, de acuerdo a lo establecido en la
+ley N&#186; 18.845, deber&#225;n ser enviados por los &#243;rganos
+se&#241;alados en este art&#237;culo y almacenados por el Archivo
+Nacional, en formato electr&#243;nico, lo cual podr&#225; ser
+realizado incluso con anterioridad a los plazos establecidos
+en el inciso primero, esto &#250;ltimo previa autorizaci&#243;n del
+Archivo Nacional.".</Texto>
+      <Metadatos>
+        <NombreParte presente="si">3 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067378">
+      <Texto>     Art&#237;culo 4&#186;.- Introd&#250;cense las siguientes
+modificaciones en la ley N&#186; 18.845, que establece sistemas
+de microcopia o micrograbaci&#243;n de documentos:
+ 
+     1. Reempl&#225;zase el art&#237;culo 1&#186;, por el siguiente:
+ 
+     "Art&#237;culo 1&#186;.- Para los efectos de esta ley, se
+entender&#225; que una microforma es una imagen compactada o
+digitalizada de un documento original a trav&#233;s de una
+tecnolog&#237;a id&#243;nea para su almacenamiento, conservaci&#243;n,
+uso y recuperaci&#243;n posterior.
+     La microforma ser&#225; el soporte que d&#233; sustento al
+documento original en t&#233;rminos tales que &#233;ste pueda ser
+visto y le&#237;do con la ayuda de equipos visores o m&#233;todos
+an&#225;logos, digitales o similares; y pueda ser reproducido en
+copias impresas, esencialmente iguales al documento
+original.
+     En la generaci&#243;n de microformas se utilizar&#225;n los
+medios y procedimientos t&#233;cnicos y administrativos
+definidos por un reglamento sobre la materia dictado en
+conjunto por el Ministerio de las Culturas, las Artes y el
+Patrimonio, el Ministerio de Hacienda y el Ministerio
+Secretar&#237;a General de la Presidencia, el que tendr&#225; por
+prop&#243;sito normar el proceso que permite capturar, grabar y
+almacenar en forma compactada la imagen de un documento
+original, en t&#233;rminos tales que contenga una copia
+id&#233;ntica del mismo, que sea susceptible de ser almacenado y
+que permita el uso de la imagen compactada o grabada, tal y
+como si se tratara del documento original.
+ 
+     El m&#233;rito probatorio de las microformas que se
+obtengan se regir&#225; por la ley N&#186; 19.799 y por las
+disposiciones de esta ley, en lo que resulte aplicable.".
+ 
+     2. Sustit&#250;yese, en el art&#237;culo 2&#186;, la expresi&#243;n
+"microcopiados o micrograbados." por "a que da soporte.".
+     3. Modif&#237;case el art&#237;culo 3&#186;, de la siguiente forma:
+ 
+     a. En el inciso primero, reempl&#225;zase la expresi&#243;n
+"microcopia o micrograbado", por la siguiente: "elaboraci&#243;n
+de microformas".
+     b. En el inciso tercero, reempl&#225;zase la expresi&#243;n "en
+la cual se estampar&#225;n la firma y un signo, sello o timbre
+indeleble y aut&#233;ntico de dicho funcionario.", por la que
+sigue: "quien la suscribir&#225; con su firma electr&#243;nica
+avanzada o, en casos que resulte inaplicable, de pu&#241;o y
+letra.".
+     c. En el inciso cuarto, reempl&#225;zanse la expresi&#243;n "la
+microcopia o micrograbado" por "la elaboraci&#243;n de
+microformas", y la frase "El m&#233;todo de microcopia o
+micrograbado" por "El m&#233;todo de elaboraci&#243;n de
+microformas".
+     d. En el inciso quinto, sustit&#250;yense la expresi&#243;n "el
+proceso de microcopia o micrograbado" por "el proceso de
+elaboraci&#243;n de microformas", y la frase "procederse a la
+microcopia o micrograbado" por "procederse a su
+elaboraci&#243;n".
+     e. Sustit&#250;yese el inciso final, por el siguiente:
+ 
+     "La impugnaci&#243;n de las microformas y la de sus
+reproducciones se sujetar&#225;n a las prescripciones de la ley
+N&#186; 19.799 y aquellas del derecho com&#250;n que regulen la
+impugnaci&#243;n de documentos e instrumentos.".
+ 
+     4. Sustit&#250;yese, en el literal a) del inciso primero
+del art&#237;culo 5&#186;, la expresi&#243;n "La microcopia o
+micrograbado deber&#225; haber sido" por "Que la microforma haya
+sido".
+     5. Modif&#237;case el art&#237;culo 6&#186;, de la siguiente forma:
+ 
+     a. En el inciso primero, reempl&#225;zase la expresi&#243;n
+"haya sido microcopiado o micrograbado." por "conste en una
+microforma.".
+     b. En el inciso tercero, reempl&#225;zase la expresi&#243;n
+"que sean microcopiados o micrograbados" por "en soporte
+f&#237;sico que consten en una microforma".
+     c. En el inciso final, reempl&#225;zase la expresi&#243;n
+"microcopiados o micrograbados" por "incluidos en una
+microforma".
+ 
+     6. Efect&#250;anse las siguientes modificaciones en el
+art&#237;culo 7&#186;:
+ 
+     a. En el inciso primero, reempl&#225;zase la expresi&#243;n
+"microcopiados o micrograbados." por "incluidos en una
+microforma.".
+     b. En el inciso segundo, reempl&#225;zase la expresi&#243;n "su
+microcopia o micrograbado" por "incluir tales documentos en
+una microforma".
+ 
+     7. Agr&#233;gase un art&#237;culo 11, del siguiente tenor:
+ 
+     "Art&#237;culo 11.- A las microformas elaboradas a trav&#233;s
+de los m&#233;todos a que se refiere la ley N&#186; 19.799, sobre
+documentos electr&#243;nicos, firma electr&#243;nica y servicios de
+certificaci&#243;n de dicha firma, se aplicar&#225;n las normas
+contenidas en dicha ley y sus disposiciones reglamentarias
+en todo lo que no sea incompatible con la presente ley.".</Texto>
+      <Metadatos>
+        <NombreParte presente="si">4 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067379">
+      <Texto>     Art&#237;culo 5&#186;.- Introd&#250;cense las siguientes
+modificaciones en la ley N&#186; 18.290, de Tr&#225;nsito, cuyo
+texto refundido, coordinado y sistematizado fue fijado por
+el decreto con fuerza de ley N&#186; 1, del Ministerio de
+Transportes y Telecomunicaciones y del Ministerio de
+Justicia, promulgado el a&#241;o 2007 y publicado el a&#241;o 2009:
+ 
+     1. En el art&#237;culo 39:
+ 
+     a. Reempl&#225;zase, en el inciso primero, la palabra
+"mecanizado" por "electr&#243;nico".
+     b. Supr&#237;mese el inciso segundo.
+ 
+     c. Reempl&#225;zase, en el inciso tercero, la expresi&#243;n
+"Archivo Nacional" por "Repositorio Digital".
+     d. Interc&#225;lase en el inciso cuarto, entre la palabra
+"veh&#237;culo" y el punto final, la siguiente frase: ", en la
+forma y condiciones que indique el reglamento referido en el
+art&#237;culo 46".
+      
+     2. Incorp&#243;rase el siguiente art&#237;culo 39 bis:
+ 
+     "Art&#237;culo 39 bis.- La primera inscripci&#243;n de los
+veh&#237;culos nuevos o usados, seg&#250;n corresponda, as&#237; como
+las variaciones del dominio de los veh&#237;culos inscritos; los
+grav&#225;menes, prohibiciones, embargos y medidas precautorias;
+los arrendamientos con opci&#243;n de compra y otros t&#237;tulos
+que otorguen la mera tenencia material; las alteraciones que
+hagan cambiar la naturaleza de los veh&#237;culos, sus
+caracter&#237;sticas esenciales o que los identifican; su
+abandono, destrucci&#243;n o desarmadur&#237;a total o parcial; las
+denuncias por la apropiaci&#243;n de un veh&#237;culo motorizado;
+las rectificaciones de errores, omisiones o cualquier
+modificaci&#243;n equivalente de una inscripci&#243;n; y las
+cancelaciones de inscripci&#243;n, se tramitar&#225;n a trav&#233;s del
+sistema electr&#243;nico del Registro de Veh&#237;culos Motorizados
+del Servicio de Registro Civil e Identificaci&#243;n,
+acompa&#241;ando la documentaci&#243;n pertinente.
+     Trat&#225;ndose de la primera inscripci&#243;n del dominio de
+un veh&#237;culo en el Registro de Veh&#237;culos Motorizados, quien
+solicite dicho tr&#225;mite deber&#225; presentar la respectiva
+factura electr&#243;nica, documentos aduaneros o sentencia
+judicial y el comprobante del pago de los tributos
+correspondientes, sin perjuicio de cualquier otra
+documentaci&#243;n cuya presentaci&#243;n disponga el reglamento
+indicado en el art&#237;culo 46.".
+ 
+     3. En el art&#237;culo 41:
+ 
+     a. Reempl&#225;zase el inciso tercero por el siguiente:
+ 
+     "Si el acto que sirvi&#243; de t&#237;tulo a la transferencia
+de un veh&#237;culo fuere consensual, &#233;sta se realizar&#225;
+mediante declaraci&#243;n escrita conjunta que suscribir&#225;n, el
+adquirente y la persona a cuyo nombre figure inscrito el
+veh&#237;culo ante Oficial de Registro Civil e Identificaci&#243;n,
+a trav&#233;s del formulario correspondiente en el sistema
+electr&#243;nico del Registro de Veh&#237;culos Motorizados del
+Servicio de Registro Civil e Identificaci&#243;n o adjuntando
+dicha declaraci&#243;n suscrita por ambas partes con firma
+electr&#243;nica avanzada. Cuando la transferencia se verifique
+a trav&#233;s de un instrumento p&#250;blico o privado autorizado
+ante notario, se incorporar&#225; al sistema electr&#243;nico del
+Registro de Veh&#237;culos Motorizados del Servicio de Registro
+Civil e Identificaci&#243;n. El reglamento referido en el
+art&#237;culo 46 indicar&#225; la forma de llevar a cabo estas
+anotaciones.".
+ 
+     b. Agr&#233;gase el siguiente inciso final:
+ 
+     "Asimismo, el citado reglamento regular&#225; la forma en
+la cual se incorporar&#225;n al sistema electr&#243;nico del
+Registro de Veh&#237;culos Motorizados aquellos actos que deban
+efectuarse de manera presencial.".
+ 
+     4. En el art&#237;culo 42:
+ 
+     a. Reempl&#225;zase el inciso segundo por el siguiente:
+ 
+     "De igual manera quedar&#225;n anotadas dichas solicitudes
+en el Repertorio Electr&#243;nico que se formar&#225; con las
+presentaciones diarias, anotaci&#243;n que valdr&#225; como fecha de
+la inscripci&#243;n.".
+ 
+     b. Sustit&#250;yese el inciso tercero por el siguiente:
+ 
+     "El Repertorio ser&#225; generado diariamente por el
+Oficial de Registro Civil e Identificaci&#243;n, quien deber&#225;
+incorporar los datos en el sistema electr&#243;nico del Registro
+de Veh&#237;culos Motorizados, certificando el n&#250;mero de
+anotaciones efectuadas, de conformidad a lo dispuesto en el
+reglamento referido en el art&#237;culo 46.".
+ 
+     5. Reempl&#225;zase, en el art&#237;culo 45, la frase "ante
+cualquier Oficial de Registro Civil e Identificaci&#243;n del
+pa&#237;s" por "a trav&#233;s del sistema electr&#243;nico del Registro
+de Veh&#237;culos Motorizados del Servicio de Registro Civil e
+Identificaci&#243;n, de conformidad a lo se&#241;alado en el
+reglamento referido en el art&#237;culo 46".
+ 
+     6. Agr&#233;gase, en el art&#237;culo 46, el siguiente inciso
+segundo:
+ 
+     "Asimismo, regular&#225; las materias dispuestas en el
+art&#237;culo 39 bis, y todas aquellas que resulten necesarias
+para el buen funcionamiento del sistema electr&#243;nico del
+Registro de Veh&#237;culos Motorizados.".
+ 
+     7. Der&#243;gase el inciso tercero del art&#237;culo 51.
+ 
+     8. Reempl&#225;zanse los incisos primero y segundo del
+art&#237;culo 53, por los siguientes:
+ 
+     "Art&#237;culo 53.- La obtenci&#243;n de la placa patente
+&#250;nica y de la inscripci&#243;n correspondiente deber&#225;
+solicitarse a trav&#233;s de cualquiera de las oficinas del
+Servicio de Registro Civil e Identificaci&#243;n del pa&#237;s,
+mediante su sistema electr&#243;nico, de conformidad a lo
+dispuesto en el respectivo reglamento. La entrega material
+de la placa patente &#250;nica se efectuar&#225; en las oficinas
+habilitadas al efecto. El Servicio de Registro Civil e
+Identificaci&#243;n dispondr&#225; la habilitaci&#243;n de al menos una
+oficina en cada regi&#243;n del pa&#237;s para efectos de la entrega
+material de las placas patentes.
+     El certificado que d&#233; cuenta de la solicitud de
+inscripci&#243;n a que se refiere el inciso anterior deber&#225;
+otorgarse cada vez que se cambie el titular del dominio del
+veh&#237;culo.".</Texto>
+      <Metadatos>
+        <NombreParte presente="si">5 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067380">
+      <Texto>     Art&#237;culo 6&#186;.- Los actos administrativos referidos a
+materia de personal y tr&#225;mites asociados a dicha materia
+afectos a toma de raz&#243;n o registro continuar&#225;n rigi&#233;ndose
+por lo dispuesto en la ley N&#186; 20.766.</Texto>
+      <Metadatos>
+        <NombreParte presente="si">6 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067381">
+      <Texto>     Art&#237;culo 7&#186;.- La toma de raz&#243;n y el registro
+electr&#243;nico que deba efectuar la Contralor&#237;a General de la
+Rep&#250;blica continuar&#225; rigi&#233;ndose por lo dispuesto en el
+decreto N&#186; 2.421, del Ministerio de Hacienda, de 1964, que
+fija el texto refundido de la Ley de Organizaci&#243;n y
+Atribuciones de la Contralor&#237;a General de la Rep&#250;blica, y
+la ley N&#186; 20.766, sobre procedimiento de toma de raz&#243;n y
+registro electr&#243;nicos.</Texto>
+      <Metadatos>
+        <NombreParte presente="si">7 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067382">
+      <Texto>     Art&#237;culo 8&#186;.- Der&#243;gase el inciso final del art&#237;culo
+5 de la ley N&#186; 18.483, que establece nuevo r&#233;gimen legal
+para la industria automotriz.</Texto>
+      <Metadatos>
+        <NombreParte presente="si">8 </NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+      </Metadatos>
+    </EstructuraFuncional>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="T&#237;tulo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067383">
+      <Texto>     ART&#205;CULOS TRANSITORIOS
+ 
+
+
+</Texto>
+      <Metadatos>
+        <NombreParte presente="no">&#160;</NombreParte>
+        <TituloParte presente="si">ART&#205;CULOS TRANSITORIOS</TituloParte>
+        
+      </Metadatos>
+      <EstructurasFuncionales>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067384">
+          <Texto>     Art&#237;culo primero.- Fac&#250;ltase al Presidente de la
+Rep&#250;blica para que, dentro del plazo de un a&#241;o contado
+desde la publicaci&#243;n de esta ley, establezca mediante uno o
+m&#225;s decretos con fuerza de ley, expedidos por intermedio
+del Ministerio Secretar&#237;a General de la Presidencia, los
+que tambi&#233;n deber&#225;n ser suscritos por el Ministro de
+Hacienda, las normas necesarias para regular las siguientes
+materias:
+ 
+     1.- Determinar la gradualidad para la aplicaci&#243;n de
+esta ley a los &#243;rganos de la Administraci&#243;n del Estado que
+indique, y a qu&#233; tipo de procedimientos administrativos o
+materias, respecto de todos o alguno de dichos &#243;rganos.
+     2.- Determinar la aplicaci&#243;n de todo o parte de esta
+ley, respecto de aquellos procedimientos administrativos
+regulados en leyes especiales que se expresan a trav&#233;s de
+medios electr&#243;nicos.</Texto>
+          <Metadatos>
+            <NombreParte presente="si">primero</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2022-06-09" derogado="no derogado" idParte="10067385">
+          <Texto>     Art&#237;culo segundo.- La presente ley entrar&#225; en
+vigencia ciento ochenta d&#237;as despu&#233;s de la &#250;ltima de las
+publicaciones en el Diario Oficial a que se refiere el
+art&#237;culo cuarto transitorio.
+     En todo caso, esta ley se aplicar&#225; gradualmente, de
+acuerdo a las fases establecidas en el decreto con fuerza de
+ley N&#176; 1, de 2020, del Ministerio Secretar&#237;a General de la
+Presidencia, y no podr&#225; extenderse para ning&#250;n &#243;rgano de
+la Administraci&#243;n del Estado m&#225;s all&#225; del 31 de diciembre
+del a&#241;o 2027. 
+     A fin de facilitar la implementaci&#243;n de la presente
+ley en el sector municipal, el gobierno central, a trav&#233;s
+de la Divisi&#243;n de Gobierno Digital, disponibilizar&#225;
+activos y servicios digitales, as&#237; como el apoyo t&#233;cnico
+necesario.
+</Texto>
+          <Metadatos>
+            <NombreParte presente="si">segundo</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2022-06-09" derogado="no derogado" idParte="10067386">
+          <Texto>     Art&#237;culo tercero.- Las disposiciones de esta ley s&#243;lo
+se aplicar&#225;n respecto de los procedimientos administrativos
+que se inicien con posterioridad a la entrada en vigencia de
+las respectivas fases a que se refiere el inciso segundo del
+art&#237;culo anterior. Respecto de todos aquellos que se
+hubieren iniciado con anterioridad y respecto de los cuales
+no se afectaren a los interesados o terceros, los &#243;rganos
+de la Administraci&#243;n podr&#225;n cambiar su tramitaci&#243;n a
+medios electr&#243;nicos. En caso contrario, los &#243;rganos de la
+Administraci&#243;n podr&#225;n optar por cambiar su tramitaci&#243;n a
+medios electr&#243;nicos previo consentimiento dado por todos
+los interesados o terceros por escrito en soporte de papel o
+electr&#243;nico.
+</Texto>
+          <Metadatos>
+            <NombreParte presente="si">tercero</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067387">
+          <Texto>     Art&#237;culo cuarto.- Los reglamentos mencionados en esta
+ley deber&#225;n dictarse dentro del plazo de un a&#241;o contado
+desde la publicaci&#243;n de la presente ley.</Texto>
+          <Metadatos>
+            <NombreParte presente="si">cuarto</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067388">
+          <Texto>     Art&#237;culo quinto.- El mayor gasto fiscal que represente
+la aplicaci&#243;n de esta ley durante su primer a&#241;o
+presupuestario de vigencia se financiar&#225; con reasignaciones
+presupuestarias del Ministerio Secretar&#237;a General de la
+Presidencia y del Ministerio de las Culturas, las Artes y el
+Patrimonio, seg&#250;n corresponda. No obstante, el Ministerio
+de Hacienda podr&#225; suplementar dicho presupuesto en lo que
+faltare, con cargo a la partida presupuestaria del Tesoro
+P&#250;blico. En los a&#241;os siguientes se estar&#225; a lo que
+considere la Ley de Presupuestos del Sector P&#250;blico
+respectiva.</Texto>
+          <Metadatos>
+            <NombreParte presente="si">quinto</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2022-06-09" derogado="no derogado" idParte="10067389">
+          <Texto>     Art&#237;culo sexto.- Hasta el 31 de diciembre del a&#241;o
+2027, quienes carezcan de los medios tecnol&#243;gicos, no
+tengan acceso a medios electr&#243;nicos o s&#243;lo actuaren
+excepcionalmente a trav&#233;s de ellos, podr&#225;n realizar
+presentaciones en el procedimiento administrativo en soporte
+de papel y solicitar que la notificaci&#243;n se practique
+mediante carta certificada dirigida al domicilio designado
+en la presentaci&#243;n, de acuerdo a lo contemplado en el
+inciso quinto del art&#237;culo 18 de la ley N&#186; 19.880 y al
+pronunciamiento respecto de esta solicitud establecido en el
+inciso segundo del art&#237;culo 46 de la ley N&#186; 19.880.
+</Texto>
+          <Metadatos>
+            <NombreParte presente="si">sexto</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067390">
+          <Texto>     Art&#237;culo s&#233;ptimo.- El Presidente de la Rep&#250;blica
+dictar&#225; un decreto supremo que actualice, conforme las
+disposiciones introducidas por el art&#237;culo 5&#186; de esta ley,
+el decreto supremo N&#186; 1.111, del Ministerio de Justicia,
+promulgado el a&#241;o 1984 y publicado el a&#241;o 1985, que
+Aprueba Reglamento del Registro de Veh&#237;culos Motorizados,
+el que deber&#225; ser emitido a trav&#233;s del Ministerio de
+Justicia y Derechos Humanos, dentro del plazo de tres meses
+contado desde la publicaci&#243;n de la presente ley.
+     Las disposiciones del art&#237;culo 5&#186; y el art&#237;culo 8&#186;
+de esta ley entrar&#225;n en vigencia en el plazo de treinta
+d&#237;as contado desde la publicaci&#243;n del reglamento a que se
+refiere el inciso anterior.</Texto>
+          <Metadatos>
+            <NombreParte presente="si">s&#233;ptimo</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067391">
+          <Texto>     Art&#237;culo octavo.- Fac&#250;ltase al Presidente de la
+Rep&#250;blica para que dentro del plazo de un a&#241;o desde la
+publicaci&#243;n de esta ley, mediante un decreto con fuerza de
+ley expedido por intermedio del Ministerio de Justicia y
+Derechos Humanos, establezca las normas necesarias para
+regular, conforme las competencias del Servicio de Registro
+Civil e Identificaci&#243;n, las siguientes materias: 
+     1.- Los registros y procedimientos relativos a
+inscripciones, subinscripciones y certificados, a cargo del
+Servicio de Registro Civil e Identificaci&#243;n, necesarias por
+las modificaciones introducidas a la ley N&#186; 19.880.
+     2.- El Archivo, los libros y los documentos, y sus
+medios de registro, que deban llevar los Oficiales Civiles
+del Servicio de Registro Civil e Identificaci&#243;n.</Texto>
+          <Metadatos>
+            <NombreParte presente="si">octavo</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+        <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="2019-11-11" derogado="no derogado" idParte="10067392">
+          <Texto>     Art&#237;culo noveno.- Fac&#250;ltase al Presidente de la
+Rep&#250;blica para que dentro del plazo de un a&#241;o contado
+desde la publicaci&#243;n de esta ley, mediante un decreto con
+fuerza de ley expedido por intermedio del Ministerio de las
+Culturas, las Artes y el Patrimonio, determine los
+requisitos del m&#233;todo de elaboraci&#243;n, conservaci&#243;n y uso
+de las microformas y aquellos a emplear en la destrucci&#243;n
+de los documentos originales a los que se refiere la ley N&#186;
+18.845, que establece sistemas de microcopia o
+micrograbaci&#243;n de documentos.".</Texto>
+          <Metadatos>
+            <NombreParte presente="si">noveno</NombreParte>
+            <TituloParte presente="no">&#160;</TituloParte>
+            
+          </Metadatos>
+        </EstructuraFuncional>
+      </EstructurasFuncionales>
+    </EstructuraFuncional>
+  </EstructurasFuncionales>
+  <Promulgacion fechaVersion="2019-11-11" derogado="no derogado">
+    <Texto>     Habi&#233;ndose cumplido con lo establecido en el N&#186; 1 del
+art&#237;culo 93 de la Constituci&#243;n Pol&#237;tica de la Rep&#250;blica
+y por cuanto he tenido a bien aprobarlo y sancionarlo; por
+tanto, prom&#250;lguese y ll&#233;vese a efecto como Ley de la
+Rep&#250;blica.
+ 
+     Santiago, 25 de octubre de 2019.- SEBASTI&#193;N PI&#209;ERA
+ECHENIQUE, Presidente de la Rep&#250;blica.- Gonzalo Blumel
+Mac-Iver, Ministro Secretario General de la Presidencia.-
+Felipe Larra&#237;n Bascu&#241;&#225;n, Ministro de Hacienda.- Hern&#225;n
+Larra&#237;n Fern&#225;ndez, Ministro de Justicia y Derechos
+Humanos.- Gloria Hutt Hesse, Ministra de Transportes y
+Telecomunicaciones.- Consuelo Vald&#233;s Chadwick, Ministra de
+las Culturas, las Artes y el Patrimonio.
+     Lo que transcribo a Ud. para su conocimiento.- Saluda
+Atte. a Ud., Juan Francisco Galli Basili, Subsecretario
+General de la Presidencia.</Texto>
+  </Promulgacion>
+  <Anexos>
+    <Anexo fechaVersion="2019-11-11" derogado="no derogado" idParte="10067394" transitorio="no transitorio">
+      <Metadatos>
+        <Titulo>Proyecto de ley que modifica la Ley que establece Bases de los Procedimientos Administrativos, en materia de documentos electr&#243;nicos, contenido en el bolet&#237;n N&#186; 11.882-06</Titulo>
+        
+      </Metadatos>
+      <Texto> 
+     Tribunal Constitucional
+ 
+     Proyecto de ley que modifica la Ley que establece Bases
+de los Procedimientos Administrativos, en materia de
+documentos electr&#243;nicos, contenido en el bolet&#237;n N&#186;
+11.882-06
+ 
+     La secretaria del Tribunal Constitucional, quien
+suscribe, certifica que el Honorable Senado envi&#243; el
+proyecto de ley enunciado en el rubro, aprobado por el
+Congreso Nacional, a fin de que este Tribunal ejerciera el
+control de constitucionalidad respecto de los n&#250;meros 1, 4,
+5, 6, 8, 11, 13, 14 y 15 del art&#237;culo 1&#186; permanente, y de
+los art&#237;culos primero y tercero transitorios del proyecto,
+y por sentencia de 10 de octubre en curso, en los autos Rol
+N&#186; 7504-19-CPR.
+ 
+     Se declara:
+ 
+     Se resuelve:
+ 
+     Que esta magistratura no emite pronunciamiento, en
+examen preventivo de constitucionalidad, respecto de las
+disposiciones contenidas en los n&#250;meros 1, 4, 5, 6, 8, 11,
+13,14 y 15 del art&#237;culo 1&#186; permanente, y en los art&#237;culos
+primero y tercero transitorios del proyecto de ley remitido
+por el Congreso Nacional, por no versar sobre materias
+propias de Ley Org&#225;nica Constitucional.
+ 
+     Santiago, 11 de octubre de 2019.- Mar&#237;a Ang&#233;lica
+Barriga Meza, Secretaria.</Texto>
+    </Anexo>
+  </Anexos>
+</Norma>

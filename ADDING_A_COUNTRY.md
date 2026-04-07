@@ -1,12 +1,21 @@
 # Adding a New Country to Legalize
 
-This guide walks through adding a new country to the pipeline. Use France (`fr`) as the reference implementation.
+This guide is the **end-to-end playbook** for taking a country from "name only" to
+a merged PR with the country repo live on legalize.dev. If you follow every step,
+an AI agent (or a human) can go from zero to pushed bootstrap without extra instructions.
+
+Reference implementations in order of recency and completeness:
+- **Latvia** (`lv/`) — HTML scraping, rich tables, full metadata, ~15K laws. Canonical
+  example for rich-formatting preservation.
+- **Andorra** (`ad/`) — Azure Functions API + blob storage, BOPA gazette.
+- **France** (`fr/`) — local LEGI XML dump with embedded versions.
+- **Spain** (`es/`) — REST API with reforms-via-affected-norms daily pattern.
 
 ## Prerequisites
 
 Before starting, you need:
 - An open data source for the country's legislation (API, XML dump, or HTML)
-- Understanding of the source's data format
+- Understanding of the source's data format (and its licensing — must allow redistribution)
 - Knowledge of the country's legal hierarchy (types of laws, reform process)
 - Whether the source provides version history (amendments) or only current text
 
@@ -34,6 +43,85 @@ Generic pipeline         <-- provided for free
   cli.py                 Unified CLI (legalize fetch -c xx, legalize bootstrap -c xx)
   pipeline.py            Orchestration (fetch, commit, bootstrap, daily)
 ```
+
+## Step 0: Research the source and inventory what it gives you
+
+**Do not skip this step.** Every quality problem we have ever shipped (mojibake,
+missing metadata, lost tables, wrong dates) was caused by skipping it. Produce a
+`RESEARCH-{CC}.md` file at the workspace root (`~/autonomo/legalize/RESEARCH-XX.md`)
+before writing any code.
+
+### 0.1 Identify the source(s)
+
+Look for **official** open data. In this order of preference:
+1. Government open-data API with bulk dump (best: ES, FR, LT, LV)
+2. Government REST API with pagination (AT, SE, AD)
+3. HTML scraping of the official gazette (LV likumi.lv — only if nothing else exists)
+4. PDF scraping (last resort — only EE Lisa uses this)
+
+Document in `RESEARCH-{CC}.md`:
+- Base URLs, endpoints, auth requirements, rate limits, licensing
+- Whether historical versions are available (see "Version history strategies" below)
+- Any robots.txt / Crawl-delay constraints
+- Estimated total norm count and cadence of daily updates
+
+### 0.2 Save 5 representative fixtures
+
+Download 5 laws **by hand** and save them to `engine/tests/fixtures/{code}/`:
+
+```
+engine/tests/fixtures/{code}/
+  sample-constitution.{xml,html,json}    # highest rank
+  sample-code.{xml,html,json}             # a code / compilation
+  sample-ordinary-law.{xml,html,json}     # a regular law
+  sample-regulation.{xml,html,json}       # a decree / regulation
+  sample-with-tables.{xml,html,json}      # one that has tables/images/attachments
+```
+
+Pick laws that between them exercise every structure you expect to see. If you
+cannot find a law with tables, say so in the research doc — but still look hard,
+because tables almost always exist in tax codes, tariff schedules, and annexes.
+
+### 0.3 Metadata inventory — capture EVERYTHING
+
+Open each fixture and list **every single field** the source exposes, not just the
+ones the pipeline needs today. Put this list in `RESEARCH-{CC}.md` as a table:
+
+| Source field | Type | Example | Maps to | Notes |
+|---|---|---|---|---|
+| `title` | string | "Ley 1/1978..." | `NormMetadata.title` | |
+| `identifier` | string | "BOE-A-1978-31229" | `NormMetadata.identifier` | |
+| `publication_date` | date | "1978-12-29" | `NormMetadata.publication_date` | parse dd/mm/yyyy |
+| `department` | string | "Jefatura del Estado" | `NormMetadata.department` | |
+| `ministry_signatory` | string | "Juan Carlos R." | `extra.signatory` | country-specific |
+| `eli` | url | "https://data.../eli/..." | `extra.eli` | country-specific |
+| `official_gazette_number` | string | "BOE núm. 311" | `extra.gazette_reference` | |
+| `subjects` | list[string] | ["constitución", ...] | `NormMetadata.subjects` | |
+| ... | | | | |
+
+**Rule:** if the source provides it, you capture it. Fields that don't fit the
+generic `NormMetadata` dataclass go into `extra` with **English snake_case keys**.
+Do not editorialize which fields are "useful" — a future consumer of the data may
+need any of them, and regenerating history to add fields is expensive.
+
+### 0.4 Formatting inventory — what rich content does the source have?
+
+Scroll through the 5 fixtures and list every rich-formatting construct you see:
+
+- [ ] **Tables** — any `<table>`, TSV blocks, or tabular data? Tariff schedules,
+      fines, dates of effect tables, annexes?
+- [ ] **Bold** — inline `<b>/<strong>` or CSS classes meaning "bold"?
+- [ ] **Italic** — inline `<i>/<em>` or CSS classes?
+- [ ] **Lists** — ordered/unordered, nested?
+- [ ] **Footnotes / endnotes** — superscript markers, reference blocks?
+- [ ] **Links** — cross-references to other laws or articles?
+- [ ] **Formulas** — equations, MathML, TeX?
+- [ ] **Quotations** — block quotes or amending text quoted verbatim?
+- [ ] **Attachments / annexes** — appendices with their own structure?
+- [ ] **Signatories** — who signed, where, on what date?
+
+Each "yes" becomes a concrete task for `parser.py`. Each "no" becomes a documented
+assumption in `RESEARCH-{CC}.md` that can be verified in the quality review (Step 7).
 
 ## Step 1: Create the fetcher package
 
@@ -144,7 +232,11 @@ class MyDiscovery(NormDiscovery):
 
 ### `parser.py` -- TextParser + MetadataParser
 
-Parses raw bytes into the generic data model:
+Parses raw bytes into the generic data model. This is where quality is made or lost.
+Two hard requirements you must hit:
+
+1. **Capture every metadata field the source exposes** (Step 0.3 inventory).
+2. **Preserve every rich-formatting construct the source has** (Step 0.4 inventory).
 
 ```python
 from typing import Any
@@ -188,22 +280,46 @@ class MyTextParser(TextParser):
 class MyMetadataParser(MetadataParser):
 
     def parse(self, data: bytes, norm_id: str) -> NormMetadata:
-        """Parse raw metadata into NormMetadata."""
+        """Parse raw metadata into NormMetadata.
+
+        Rule: every field the source exposes is captured. Generic fields go
+        into the dataclass, source-specific fields go into `extra` with
+        English snake_case keys.
+        """
+        # --- extract every source field (from Step 0.3 inventory) ---
+        raw = _parse_source_metadata(data)
+        title = raw["title"]
+        publication_date = _parse_date(raw["publication_date"])
+        department = raw.get("department", "")
+        status = NormStatus.IN_FORCE if raw.get("in_force") else NormStatus.REPEALED
+
+        # --- subjects / topics ---
+        subjects = tuple(raw.get("subjects", []))
+
+        # --- everything else the source gives us → extra ---
+        extra: list[tuple[str, str]] = []
+        for key in ("official_number", "eli", "gazette_reference", "signatory",
+                    "entry_into_force", "expiry_date", "amendment_count",
+                    "european_directive_refs", "summary_official"):
+            if value := raw.get(key):
+                extra.append((key, str(value)[:500]))  # cap to avoid giant frontmatter
+
         return NormMetadata(
-            title="Full Title of the Law",
-            short_title="Short Title",
-            identifier=norm_id,        # must be filesystem-safe
-            country="xx",              # ISO 3166-1 alpha-2
-            rank=Rank("act"),          # free-form string
-            publication_date=date(2024, 1, 15),
-            status=NormStatus.IN_FORCE,
-            department="Ministry of Justice",
-            source="https://official-source.gov/law/123",
-            extra=(                    # country-specific fields (optional)
-                ("department", "Ministry of Justice"),
-                ("summary", "Establishes the legal framework for..."),
-                ("eli", "https://data.example.gov/eli/act/1/2024"),
-            ),
+            title=title,
+            short_title=raw.get("short_title") or title,
+            identifier=norm_id,                    # filesystem-safe
+            country="xx",                          # ISO 3166-1 alpha-2
+            rank=Rank(raw["rank"]),                # source-native rank string
+            publication_date=publication_date,
+            status=status,
+            department=department,
+            source=f"https://official-source.gov/law/{norm_id}",
+            jurisdiction=raw.get("jurisdiction"),  # ELI code or None
+            last_modified=_parse_date(raw.get("last_modified")),
+            pdf_url=raw.get("pdf_url"),
+            subjects=subjects,
+            summary=raw.get("summary", ""),
+            extra=tuple(extra),
         )
 ```
 
@@ -211,15 +327,133 @@ class MyMetadataParser(MetadataParser):
 
 - `Block` -- structural unit (article, chapter, section) with versioned content
 - `Version` -- a temporal version with `publication_date` and `paragraphs`
-- `Paragraph` -- text + `css_class` (controls markdown rendering: `"articulo"` for article headings, `"parrafo"` for body text, `"titulo_tit"` for title headings, `"capitulo_tit"` for chapter headings)
-- `NormMetadata` -- title, id, country, rank, dates, status
+- `Paragraph` -- text + `css_class` (controls markdown rendering — see CSS→MD map below)
+- `NormMetadata` -- title, id, country, rank, dates, status, plus `extra` tuple
 - `identifier` must be filesystem-safe: no `:`, no spaces, no `/\*?"<>|`. Use `-` as separator. Example: SFS `1962:700` becomes `SFS-1962-700`
 - `country` must be the ISO 3166-1 alpha-2 code (e.g., `"se"`, `"fr"`, `"es"`)
 - `rank` is a free-form string (`Rank("act")`, `Rank("code")`, `Rank("lag")`). Goes in YAML frontmatter, not in the file path
-- `extra` is a tuple of `(key, value)` pairs for country-specific metadata. These are rendered as additional YAML fields in the frontmatter, after the generic fields. Use English keys. Only countries that populate `extra` get these fields -- other countries are unaffected
+- `extra` is a tuple of `(key, value)` pairs for country-specific metadata. These
+  are rendered as additional YAML fields in the frontmatter, after the generic
+  fields. Use English snake_case keys. **If the source exposes a field, it goes
+  here — we do not pick and choose.**
 - You can reuse `extract_reforms()` from `transformer/xml_parser.py` -- it works with any list of Blocks
 
-**Reference:** `fetcher/fr/parser.py` (XML), `fetcher/es/parser.py` (XML)
+### Metadata completeness — the contract
+
+Regenerating commit history to add a forgotten metadata field is expensive (it
+rewrites every bootstrap commit for that law). So the contract is: **capture
+everything the source publishes, even if you do not think anyone will use it**.
+
+Concrete checklist per norm:
+
+- [ ] Every field in your `RESEARCH-{CC}.md` metadata inventory is either mapped
+      to a `NormMetadata` dataclass field or appended to `extra`.
+- [ ] Dates are parsed into `datetime.date` at the parser boundary (never strings).
+- [ ] Strings are stripped and normalized to UTF-8 (see "Encoding" below).
+- [ ] `extra` keys are English, snake_case, and stable (renaming a key forces a reprocess).
+- [ ] Long values (e.g., multi-line gazette references) are capped to ~500 chars
+      to keep frontmatter readable. If the full value matters, store a URL instead.
+- [ ] Lists (subjects, tags) use `NormMetadata.subjects`, not `extra`, so the web
+      app can index them uniformly.
+
+### Rich formatting — preserving what the source has
+
+The markdown renderer in `transformer/markdown.py` maps `Paragraph.css_class` to
+Markdown formatting. The parser's job is to emit paragraphs with the right
+`css_class` (or pre-formatted text) so nothing is lost.
+
+**Paragraph-level CSS classes already recognized by the renderer:**
+
+| css_class | Renders as | Use for |
+|---|---|---|
+| `titulo_tit`, `titulo_num` | `## {text}` | Top-level titles (libro, título) |
+| `capitulo_tit`, `capitulo_num` | `### {text}` | Chapters |
+| `seccion` | `#### {text}` | Sections |
+| `articulo` | `##### {text}` | Article headings |
+| `parrafo` (or any unknown class) | `{text}` | Body paragraphs |
+| `centro_negrita` | `# {text}` | Centered bold (title pages) |
+| `firma_rey` | `**{text}**` | Signatories, bold-emphasized lines |
+| `list_item` | `{text}` | Individual list items (you add `- ` prefix) |
+| `table_row` | `{text}` | Individual table rows (you emit full MD pipe rows) |
+| `pre` | ```` ```{text}``` ```` | Preformatted code / math |
+
+**How to handle each construct from the Step 0.4 inventory:**
+
+1. **Tables** → emit a single `Paragraph(css_class="table", text=<full MD pipe table>)`.
+   The unknown `css_class` passes through as plain text, so your pre-formatted
+   Markdown table reaches the file untouched. Use `fetcher/lv/parser.py`
+   (`_table_to_markdown`, `_parse_table_div`) as the reference — it handles
+   rowspan/colspan, empty cells, and header rows.
+
+2. **Bold / italic (paragraph-level)** → reuse `firma_rey` (renders as `**...**`)
+   for bold lines. For italic, pre-wrap the text: `Paragraph(css_class="parrafo", text=f"*{text}*")`.
+
+3. **Bold / italic (inline, mid-paragraph)** → the CSS→MD map is paragraph-level,
+   so inline formatting must be **pre-wrapped in the parser**. Walk the source
+   node's children; for each `<b>`/`<strong>` wrap the text in `**`, for each
+   `<i>`/`<em>` wrap in `*`, then flatten to one string. See
+   `fetcher/lv/parser.py::_inline_text` for the pattern.
+
+4. **Lists** → emit one `Paragraph(css_class="list_item", text=f"- {item}")` per
+   item. For nested lists, prefix with two spaces per level. For ordered lists,
+   use `- 1. {item}` (Markdown renders correctly).
+
+5. **Footnotes** → two options: (a) inline with `[^1]` markers and a footnote
+   block at the end of the article; (b) parenthetical `(see footnote: ...)`. Pick
+   the one that round-trips best from the source; document your choice in
+   `RESEARCH-{CC}.md`.
+
+6. **Links / cross-references** → emit Markdown links: `[art. 5](#art-5)` for
+   internal refs, `[Ley 2/2024](https://...)` for external. Do not strip the
+   reference — legal cross-references are core content.
+
+7. **Images / figures** → **explicitly skipped.** We are not ready for binary
+   assets in the repo. Drop image nodes in the parser and, if the norm relied on
+   the image for meaning, append a note `[image omitted]` in place. Record the
+   count of dropped images in `extra.images_dropped` so we can come back later.
+
+8. **Formulas / math** → wrap in `$...$` (LaTeX-style) if the source has MathML
+   or TeX; otherwise keep as plain text with a note in `extra.has_formulas`.
+
+9. **Quotations / amending text** → use Markdown blockquote: prefix each line
+   with `> `. Put this on a `Paragraph(css_class="parrafo", text="> ...")`.
+
+10. **Attachments / annexes** → render as a new Block with `block_type="annex"`
+    and the annex number in the title: `Block(id="annex-i", title="Annex I", ...)`.
+    Same rules apply to the annex body.
+
+11. **Signatories** → `Paragraph(css_class="firma_rey", text=...)`.
+
+If the source has a rich construct that is not in this list, **do not silently
+drop it**. Add a new `css_class` + renderer entry in `transformer/markdown.py`
+and document it here.
+
+### Encoding — UTF-8, always
+
+Every parser MUST output valid UTF-8 text with no C0/C1 control characters.
+
+- Decode source bytes explicitly: `data.decode("utf-8")`. If the source is
+  Latin-1 / Windows-1252 / ISO-8859-*, decode with the correct codec and
+  re-encode as UTF-8. **Never rely on `requests` auto-detection** — it has
+  gotten us mojibake twice (LV bootstrap 2026-04-07).
+- Strip C0/C1 controls before emitting paragraphs:
+  ```python
+  import re
+  _CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+  text = _CTRL.sub("", text)
+  ```
+- Normalize whitespace (`\s+` → ` `, strip) at the paragraph boundary.
+- Replace non-breaking spaces (`\u00a0`) with regular spaces unless they are
+  semantically meaningful (e.g., in French "M. Dupont").
+
+The sync-to-DB step in `web/scripts/sync_from_git.py` will fail loudly on bad
+UTF-8, so a clean parser saves hours of bootstrap rework.
+
+**Reference implementations:**
+- `fetcher/lv/parser.py` — canonical for tables, bold, metadata completeness, encoding
+- `fetcher/ad/parser.py` — BOPA API with multiple document kinds
+- `fetcher/fr/parser.py` — XML with embedded versions
+- `fetcher/es/parser.py` — XML with reforms extracted from `<analisis>`
 
 ## Step 2: Register in `countries.py`
 
@@ -263,21 +497,19 @@ countries:
 
 The `source` dict is passed through to your client's `create()` classmethod via `country_config.source`. Put any source-specific configuration there.
 
-## Step 4: Create the output repo
+## Step 4: Plan the output repo structure
 
-```bash
-gh repo create legalize-dev/legalize-{code} --public \
-  --description "Legislation from [Country] in Markdown, version-controlled with Git"
+**Do not create the GitHub repo yet.** Creating it now means a public, empty repo
+sits on the org while you debug the parser, and a failed bootstrap leaves
+garbage in the public history. The repo is created for real in Step 9.1, after
+the 5-law quality gate passes.
 
-git init ../countries/xx/
-mkdir -p ../countries/xx/{code}
-git -C ../countries/xx commit --allow-empty \
-  -m "[bootstrap] Init legalize-{code}"
-git -C ../countries/xx remote add origin git@github.com:legalize-dev/legalize-{code}.git
-git -C ../countries/xx push -u origin main
-```
+For Step 7 (sample bootstrap) you will init a **local-only** sandbox repo under
+`../countries/{code}/` with no remote. That's fine — the pipeline only needs a
+git directory to commit to.
 
-Output structure is flat -- all laws in `{country_dir}/`, rank goes in YAML frontmatter:
+The final output structure is flat — all laws in `{country_dir}/`, rank goes in
+YAML frontmatter:
 
 ```
 legalize-{code}/
@@ -474,23 +706,144 @@ class TestCountryDispatch:
         assert isinstance(parser, MyTextParser)
 ```
 
-## Step 7: Test end-to-end and tune parallelism
+## Step 7: Fetch a 5-law sample and quality-review it (MANDATORY GATE)
+
+**This is the gate that separates "parser compiles" from "ready to bootstrap".**
+Do not skip it and do not run the full bootstrap until every item below is green.
+
+### 7.1 Fetch and render 5 representative laws
+
+Pick 5 laws that between them exercise every structure you found in Step 0.4
+(different ranks, at least one with tables, at least one with footnotes if the
+source has them). Fetch them explicitly by ID so you get the **same** set every
+time you iterate:
 
 ```bash
-# Fetch 5 laws to verify the client and discovery work
+# Option A: fetch by explicit IDs
+legalize fetch -c xx --id LAW-2024-1 --id LAW-2024-42 --id LAW-1998-100 \
+                     --id LAW-2012-5 --id LAW-2023-TARIFF
+
+# Option B: limit-based (less reproducible, OK for first smoke test)
 legalize fetch -c xx --all --limit 5
-
-# Dry-run bootstrap to see what commits it would create
-legalize bootstrap -c xx --dry-run
-
-# Full bootstrap (creates git commits in the output repo)
-legalize bootstrap -c xx
-
-# Daily dry-run to verify daily processing
-legalize daily -c xx --date 2026-03-28 --dry-run
 ```
 
-### Tuning `max_workers` for the full bootstrap
+Then render them into a sandbox country repo (do NOT push):
+
+```bash
+# Create a throwaway repo for the sample
+git init ../countries/xx/
+mkdir -p ../countries/xx/xx
+git -C ../countries/xx commit --allow-empty -m "[bootstrap] Init sample"
+
+# Dry-run first to see what would happen
+legalize bootstrap -c xx --dry-run --limit 5
+
+# Actually produce the 5 MD files
+legalize bootstrap -c xx --limit 5
+```
+
+You should now have 5 files under `../countries/xx/xx/*.md`.
+
+### 7.2 AI quality review — the 5 checks
+
+Open a fresh Claude Code session in the workspace and paste the prompt below.
+The agent will read each MD next to its source fixture and grade the parser on
+five dimensions. **The parser is not ready until the agent reports all five as
+PASS for all 5 laws.**
+
+Ready-to-paste review prompt:
+
+```text
+You are reviewing a new-country parser for the legalize-pipeline repo.
+
+Read these 5 generated MD files:
+  ../countries/xx/xx/LAW-2024-1.md
+  ../countries/xx/xx/LAW-2024-42.md
+  ../countries/xx/xx/LAW-1998-100.md
+  ../countries/xx/xx/LAW-2012-5.md
+  ../countries/xx/xx/LAW-2023-TARIFF.md
+
+And their source fixtures:
+  engine/tests/fixtures/xx/sample-*.{html,xml,json}
+
+Plus the research doc: RESEARCH-XX.md
+
+For EACH of the 5 laws, grade PASS / FAIL on these five checks and explain any FAIL:
+
+1. TEXT CORRECTNESS
+   - No mojibake (Ã©, â€œ, \x00, replacement chars).
+   - No leftover HTML/XML tags in the body.
+   - No truncated sentences, no duplicated paragraphs.
+   - UTF-8 clean (try `file ../countries/xx/xx/*.md`).
+
+2. METADATA COMPLETENESS
+   - Every field listed in RESEARCH-XX.md §0.3 metadata inventory is present
+     either in the dataclass fields or in `extra:` in the frontmatter.
+   - Dates are ISO-8601 (YYYY-MM-DD), not localized strings.
+   - Identifier matches the filename and is filesystem-safe.
+   - `source:` URL opens the correct page on the official site.
+
+3. STRUCTURE PRESERVATION
+   - Heading levels match the source hierarchy (title > chapter > section > article).
+   - Article numbers and titles are correct and in order.
+   - No articles skipped, no articles duplicated.
+   - Annexes rendered as their own blocks.
+
+4. RICH FORMATTING
+   - Tables in the source render as Markdown pipe tables (with headers).
+   - Bold / italic in the source are preserved (inline ** or *).
+   - Lists in the source are real Markdown lists, not flattened paragraphs.
+   - Cross-references are rendered as Markdown links.
+   - Quoted / amending text uses blockquotes.
+   - Signatories are bold at the end.
+   - If the source has NONE of a construct, note it ("no tables in sample").
+
+5. ENCODING & HYGIENE
+   - `grep -P '[\x00-\x08\x0b\x0c\x0e-\x1f]'` on all 5 files returns nothing.
+   - No `\r\n` line endings (Unix-only).
+   - File ends with a single newline.
+   - No trailing spaces on lines.
+
+For any FAIL, quote the offending excerpt and point to the probable cause in
+fetcher/xx/parser.py (which function, which class). Do not fix code — only
+report. I will iterate on the parser based on your findings.
+
+Report format:
+  Law 1 (LAW-2024-1):
+    1. TEXT CORRECTNESS: PASS
+    2. METADATA: FAIL — `gazette_reference` missing from extra (see source pase-container)
+    3. STRUCTURE: PASS
+    4. FORMATTING: FAIL — table in annex II rendered as flat text (see lines 340-352)
+    5. ENCODING: PASS
+  Law 2: ...
+  ...
+  SUMMARY: X/5 laws fully PASS, top 3 issues to fix first: ...
+```
+
+### 7.3 Iterate until 5/5 PASS
+
+Every FAIL points at a parser bug. Fix, re-fetch with `--force`, re-render, and
+re-run the review. Typical iteration loop:
+
+```bash
+# Edit fetcher/xx/parser.py
+legalize fetch -c xx --id LAW-2024-1 --id LAW-2024-42 ... --force
+legalize reprocess -c xx --reason "parser fix" LAW-2024-1 LAW-2024-42 ...
+# (or simpler: rm -rf ../countries/xx && re-init and re-bootstrap --limit 5)
+```
+
+Do not move on until the reviewer returns `SUMMARY: 5/5 laws fully PASS`.
+
+### 7.4 Manual spot-check (2 minutes)
+
+Even after the AI review passes, open one MD and its source side-by-side in a
+browser. Look at:
+- The title line matches the official title exactly.
+- The first article reads naturally in the country's language.
+- A table (if present) is readable and has the right column count.
+- The frontmatter YAML parses without errors: `python -c "import yaml; yaml.safe_load(open('file.md').read().split('---')[1])"`
+
+## Step 8: Tune `max_workers` for the full bootstrap
 
 Before running a full bootstrap, test the source API's capacity to set the right
 `max_workers` in `config.yaml`. Each worker creates its own client with its own
@@ -519,29 +872,168 @@ Reference benchmarks from existing countries:
 | AT | 4,000+ | REST (RIS) | 8 | 2 | ~30min |
 | LT | 14,957 | REST (data.gov.lt) | 8 | 2 | ~1-2h |
 | LV | 48,490 (15K with content) | HTML scraping (likumi.lv) | 12 | 2 | ~70min |
+| AD | 3,537 | Azure Functions API | 8 | 2 | ~45min |
 
 Government open data APIs typically handle 10-20 req/sec without issues.
 Commercial/rate-limited APIs may need `max_workers: 1`.
 
 **HTML scraping note** (Latvia case): when the source has no API and you must scrape HTML pages, the parser becomes CPU-bound on lxml HTML parsing instead of network-bound. With `max_workers: 12 × requests_per_second: 2`, Latvia hit ~9 req/s effective (CPU was the bottleneck, not the server). The `robots.txt` `Crawl-delay: 1` directive is a politeness baseline; many state publishers tolerate higher rates without errors. Always test conservatively first and back off if the server returns 429/503 or starts dropping connections.
 
-## Checklist
+## Step 9: Full bootstrap and push to production
 
-- [ ] `fetcher/{code}/__init__.py` -- re-exports all classes
-- [ ] `fetcher/{code}/client.py` -- with `create()`, rate limiting, retry
-- [ ] `fetcher/{code}/discovery.py` -- `discover_all()` and `discover_daily()`
-- [ ] `fetcher/{code}/parser.py` -- `TextParser` and `MetadataParser`
-- [ ] `fetcher/{code}/daily.py` -- `daily()` function for incremental updates
-- [ ] `countries.py` -- registry entry added
-- [ ] `config.yaml` -- country section with source params
-- [ ] `tests/test_parser_{code}.py` -- passing
-- [ ] GitHub repo `legalize-dev/legalize-{code}` -- with README in local language
-- [ ] Tested with `legalize fetch -c {code} --all --limit 5`
-- [ ] Tested with `legalize bootstrap -c {code} --dry-run`
-- [ ] Tested with `legalize daily -c {code} --date YYYY-MM-DD --dry-run`
-- [ ] Tested daily reform path: run with a date that has reform dispositions, verify affected norms are resolved and commits created
-- [ ] Tested daily idempotency: re-run the same date, verify 0 duplicate commits
-- [ ] Full bootstrap run
+This is the last step. By now the 5-law review has passed and parallelism is tuned.
+
+### 9.1 Create the GitHub repo
+
+```bash
+gh repo create legalize-dev/legalize-{code} --public \
+  --description "Legislation from {Country} in Markdown, version-controlled with Git"
+
+# Wipe the sandbox repo from Step 7 and re-init clean
+rm -rf ../countries/xx
+git init ../countries/xx/
+mkdir -p ../countries/xx/xx
+git -C ../countries/xx commit --allow-empty -m "[bootstrap] Init legalize-{code}"
+git -C ../countries/xx remote add origin git@github.com:legalize-dev/legalize-{code}.git
+git -C ../countries/xx push -u origin main
+```
+
+Add a README in the country's language and an MIT LICENSE. Copy the structure
+from an existing country repo (`legalize-lv`, `legalize-ad`).
+
+### 9.2 Run the full bootstrap
+
+```bash
+# Kick off the bootstrap. Tail the log to a file so you can review afterwards.
+legalize bootstrap -c xx 2>&1 | tee bootstrap-xx.log
+
+# For long runs, use nohup + background
+nohup legalize bootstrap -c xx > bootstrap-xx.log 2>&1 &
+```
+
+Watch `bootstrap-xx.log` for:
+- Fetch errors (429, 500, connection resets) → reduce workers and restart
+- Parser warnings → investigate; the 5-law review should have caught these
+- Commit errors → usually date parsing; fix and `legalize reprocess`
+
+### 9.3 Health check before pushing
+
+```bash
+legalize health -c xx                  # full scan
+legalize health -c xx --sample 500     # sampled scan for big repos
+```
+
+`health` verifies: commit dates, empty files, remote configured, orphan files
+(files in repo with no entry in state), frontmatter validity. **Every issue
+reported must be zero before pushing.**
+
+### 9.4 Push to origin
+
+```bash
+# Push main with full history
+git -C ../countries/xx push origin main
+
+# If the remote rejects (large push), push in batches
+git -C ../countries/xx push origin main --force-with-lease  # only if you own the repo
+```
+
+### 9.5 Open the engine PR
+
+```bash
+cd engine
+git checkout -b feat/{code}-initial
+git add src/legalize/fetcher/{code}/ src/legalize/countries.py config.yaml \
+        tests/test_parser_{code}.py tests/fixtures/{code}/
+git commit -m "feat({code}): add {Country} fetcher + bootstrap"
+git push -u origin feat/{code}-initial
+gh pr create --fill --base main
+```
+
+CI will run the full test suite + the per-country smoke test. Wait for green.
+
+### 9.6 Wire the web sync
+
+Once the engine PR is merged and the country repo has commits:
+
+```bash
+cd ../web
+# Add {code} to the country list in api/countries.py
+# Add the language mapping in src/i18n if needed
+# Add the country to the sync workflow matrix
+git checkout -b feat/{code}-web
+# ... edit ...
+git commit -m "feat({code}): enable {Country} in web app"
+git push -u origin feat/{code}-web
+gh pr create --fill --base main
+```
+
+The daily sync cron (`web/.github/workflows/sync.yml`) will pick up the new
+country automatically on the next run. To sync immediately:
+
+```bash
+gh workflow run sync.yml -R legalize-dev/legalize-web -f country={code}
+```
+
+### 9.7 Verify on production
+
+- Visit https://legalize.dev/{code} and confirm the country appears.
+- Click through to a law and confirm the text, metadata, and reform history render.
+- Open a law with a table (from your Step 0.4 inventory) and confirm it renders.
+- Switch the UI language to the country's native language and confirm translations.
+
+### 9.8 Update the memory and MEMORY.md
+
+Save a one-line memory recording the country as shipped (date, law count, any
+quirks discovered during bootstrap). Delete `RESEARCH-{CC}.md` from the workspace
+root only after all the above is verified green.
+
+## Final checklist — do not ship with any box unchecked
+
+### Research (Step 0)
+- [ ] `RESEARCH-{CC}.md` exists at workspace root with source + licensing + API details
+- [ ] 5 representative fixtures saved under `engine/tests/fixtures/{code}/` (different ranks, at least one with tables)
+- [ ] Metadata inventory table in research doc lists **every** field the source exposes
+- [ ] Formatting inventory in research doc covers tables, bold, italic, lists, footnotes, links, formulas, quotations, annexes, signatories (images skipped)
+
+### Fetcher (Step 1)
+- [ ] `fetcher/{code}/__init__.py` — re-exports all classes
+- [ ] `fetcher/{code}/client.py` — with `create()`, rate limiting, retry, UTF-8 decoding
+- [ ] `fetcher/{code}/discovery.py` — `discover_all()` and `discover_daily()`
+- [ ] `fetcher/{code}/parser.py` — `TextParser` and `MetadataParser`
+- [ ] **Every field in the §0.3 metadata inventory** is captured (dataclass or `extra`)
+- [ ] **Every construct in the §0.4 formatting inventory** is preserved (tables → pipe MD, bold → `**`, italic → `*`, lists → `-`, links → `[...]()`, quotes → `>`, signatories → `firma_rey`)
+- [ ] Parser strips C0/C1 control chars and enforces UTF-8
+- [ ] Images are dropped and counted in `extra.images_dropped`
+
+### Wiring (Steps 2–4)
+- [ ] `countries.py` — registry entry added
+- [ ] `config.yaml` — country section with `repo_path`, `data_dir`, `source`, `max_workers`
+- [ ] GitHub repo `legalize-dev/legalize-{code}` created (public, MIT) with README in local language
+
+### Tests (Step 6)
+- [ ] `tests/test_parser_{code}.py` — passing against the 5 fixtures
+- [ ] `tests/test_countries.py::test_registry_{code}` — passing
+- [ ] `ruff check src/legalize/fetcher/{code}/ tests/` — clean
+
+### Quality gate (Step 7) — MANDATORY
+- [ ] 5 sample laws fetched and bootstrapped into sandbox repo
+- [ ] AI review returned `SUMMARY: 5/5 laws fully PASS` for TEXT, METADATA, STRUCTURE, FORMATTING, ENCODING
+- [ ] Manual spot-check of one MD side-by-side with source — OK
+
+### Daily path (Step 5)
+- [ ] `legalize daily -c {code} --date YYYY-MM-DD --dry-run` works
+- [ ] Reform path tested: a date with reforms resolves affected norms and creates commits
+- [ ] Idempotency tested: re-running the same date produces 0 duplicate commits
+
+### Production (Steps 8–9)
+- [ ] Parallelism tuned against a 50-law benchmark
+- [ ] Full `legalize bootstrap -c {code}` run completed without errors
+- [ ] `legalize health -c {code}` reports zero issues
+- [ ] Country repo pushed to `legalize-dev/legalize-{code}`
+- [ ] Engine PR merged on `legalize-pipeline`
+- [ ] Web PR merged on `legalize-web` and daily sync triggered
+- [ ] `https://legalize.dev/{code}` live and renders a table-containing law correctly
+- [ ] Memory updated and `RESEARCH-{CC}.md` deleted
 
 ## Version history strategies
 

@@ -138,4 +138,5 @@ def render_norm_at_date(
             if not md.endswith("\n\n"):
                 parts.append("\n")
 
-    return "".join(parts)
+    # Normalize terminal newlines: exactly one trailing newline, never more.
+    return "".join(parts).rstrip("\n") + "\n"

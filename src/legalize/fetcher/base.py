@@ -58,7 +58,11 @@ class LegislativeClient(ABC):
 
 
 _DEFAULT_USER_AGENT = "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
-_RETRY_STATUS_CODES = (429, 503)
+# Retry on rate-limit and transient gateway errors. BCN's nuevo.leychile.cl
+# returns intermittent 502s during discovery walks; CloudFront 504s also
+# happen on rare cold-start fetches. Retrying with backoff is safe because
+# all our endpoints are GETs with idempotent semantics.
+_RETRY_STATUS_CODES = (429, 502, 503, 504)
 
 
 class HttpClient(LegislativeClient):

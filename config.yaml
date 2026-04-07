@@ -87,12 +87,17 @@ countries:
   cl:
     repo_path: "../countries/cl"
     data_dir: "../countries/data-cl"
-    max_workers: 1
+    # BCN's obtxml endpoint returns 429 above ~4 req/s sustained — measured
+    # 2026-04-07. The search endpoint tolerated more, but per-norm fetches
+    # are the bulk of the work, so we cap at 2 workers x 1 req/s = ~2 req/s
+    # effective. Conservative but reliable; full bootstrap of ~6.4k norms
+    # takes ~1h.
+    max_workers: 2
     source:
       base_url: "https://www.leychile.cl"
       search_url: "https://nuevo.leychile.cl/servicios/Consulta/script/exportarBSimpleMetas"
       request_timeout: 30
-      max_retries: 3
+      max_retries: 5
       requests_per_second: 1.0
       ranks:
         - "Ley"

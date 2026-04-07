@@ -49,7 +49,14 @@ class BCNDiscovery(NormDiscovery):
 
         Yields idNorma values for norms whose type is in scope.
         Iterates each norm type separately to control pagination.
+
+        BCN's nuevo.leychile.cl is intermittently flaky and returns 502/504 on
+        certain page boundaries even after the HTTP retries in HttpClient. We
+        soft-skip a stuck page after a few attempts so a single bad page does
+        not abort a multi-hour bootstrap.
         """
+        import requests
+
         assert isinstance(client, BCNClient)
         seen: set[str] = set()
 
@@ -58,14 +65,46 @@ class BCNDiscovery(NormDiscovery):
             # BCN requires totalitems > 0 to return data.
             # Start with a high estimate; the API caps at the actual total.
             total = "500000"
+            consecutive_failures = 0
+            max_consecutive_failures = 3
+            # BCN's exportarBSimpleMetas silently ignores `npagina` and returns
+            # the same first page on every request — see RESEARCH-CHILE.md §7.5.
+            # Detect "no new IDs on this page" and move on to the next type
+            # after one stale page (allowing for one flaky duplicate page).
+            stale_pages = 0
+            max_stale_pages = 1
 
             while True:
-                csv_data = client.search(
-                    page=page,
-                    items_per_page=100,
-                    total=total,
-                    tipo_norma=tipo,
-                )
+                size_before = len(seen)
+                try:
+                    csv_data = client.search(
+                        page=page,
+                        items_per_page=100,
+                        total=total,
+                        tipo_norma=tipo,
+                    )
+                except requests.HTTPError as exc:
+                    consecutive_failures += 1
+                    logger.warning(
+                        "[%s] Page %d failed (%s); skip attempt %d/%d",
+                        tipo,
+                        page,
+                        exc,
+                        consecutive_failures,
+                        max_consecutive_failures,
+                    )
+                    if consecutive_failures >= max_consecutive_failures:
+                        logger.error(
+                            "[%s] Giving up at page %d after %d consecutive failures",
+                            tipo,
+                            page,
+                            consecutive_failures,
+                        )
+                        break
+                    page += 1
+                    continue
+
+                consecutive_failures = 0
                 rows = _parse_csv(csv_data)
                 if not rows:
                     break
@@ -76,17 +115,33 @@ class BCNDiscovery(NormDiscovery):
                         seen.add(id_norma)
                         yield id_norma
 
+                added_now = len(seen) - size_before
                 logger.info(
-                    "[%s] Page %d: %d rows, %d unique norms so far",
+                    "[%s] Page %d: %d rows (+%d new), %d unique total",
                     tipo,
                     page,
                     len(rows),
+                    added_now,
                     len(seen),
                 )
 
-                # If we got fewer rows than requested, we've reached the end
+                # Stop conditions:
+                # 1. fewer rows than requested → end of data
                 if len(rows) < 100:
                     break
+                # 2. no new unique IDs on this page → BCN is returning stale
+                #    duplicates (the API ignores npagina). Move to next type.
+                if added_now == 0:
+                    stale_pages += 1
+                    if stale_pages >= max_stale_pages:
+                        logger.info(
+                            "[%s] No new norms on page %d — moving to next type",
+                            tipo,
+                            page,
+                        )
+                        break
+                else:
+                    stale_pages = 0
                 page += 1
 
     def discover_daily(

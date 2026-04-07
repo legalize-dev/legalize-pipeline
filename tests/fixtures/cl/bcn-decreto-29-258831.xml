@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><Norma xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.leychile.cl/esquemas" xsi:schemaLocation="http://www.leychile.cl/esquemas http://www.leychile.cl/esquemas/EsquemaIntercambioNorma-v1-0.xsd" normaId="258831" esTratado="no tratado" fechaVersion="2007-02-19" SchemaVersion="1.0" derogado="derogado">
+  <Identificador fechaPromulgacion="1978-01-10" fechaPublicacion="1978-01-31">
+    <TiposNumeros>
+      <TipoNumero>
+        <Tipo>Decreto</Tipo>
+        <Numero>29</Numero>
+      </TipoNumero>
+    </TiposNumeros>
+    <Organismos>
+      <Organismo>MINISTERIO DE VIVIENDA Y URBANISMO</Organismo>
+    </Organismos>
+  </Identificador>
+  <Metadatos>
+    <TituloNorma>DECLARA NORMA OFICIAL DE LA REPUBLICA DE CHILE LA NORMA
+QUE INDICA Y DEJA SIN EFECTO NORMAS QUE SE&#209;ALA</TituloNorma>
+    
+    
+    
+    <FechaDerogacion>2007-02-19</FechaDerogacion>
+    <IdentificacionFuente>Diario Oficial</IdentificacionFuente>
+    <NumeroFuente>29977</NumeroFuente>
+  </Metadatos>
+  <Encabezado fechaVersion="2007-02-19" derogado="derogado">
+    <Texto>DECLARA NORMA OFICIAL DE LA REPUBLICA DE CHILE LA NORMA QUE INDICA Y DEJA SIN EFECTO NORMAS QUE SE&#209;ALA 
+     Santiago, 10 de Enero de 1978.- Hoy se decret&#243; lo que sigue:
+     N&#250;m. 29.- Visto: el oficio N&#186; 545, de 14 de Diciembre de 1977, de la Divisi&#243;n de Pol&#237;tica Habitacional; el informe sobre la materia del Jefe del Departamento de Normalizaci&#243;n de la misma Divisi&#243;n; la proposici&#243;n de fecha 17 de Noviembre de 1977, del Instituto Nacional de Normalizaci&#243;n, y sus informes anexos; el art&#237;culo 13&#186;, letra c), del D.L. N&#186; 1.305, de 1976, y el art&#237;culo 3&#186;, incisos 5&#186; y 6&#186; del D.S. n&#250;mero 458 (V. y U.), de 18 de Diciembre de 1975, publicado en el Diario Oficial de 13 de Abril de 1976, que contiene la Ley General de Urbanismo y Construcciones, 
+     Decreto:
+
+</Texto>
+  </Encabezado>
+  <EstructurasFuncionales>
+    <EstructuraFuncional transitorio="no transitorio" tipoParte="Art&#237;culo" fechaVersion="1978-01-31" derogado="derogado" idParte="7337381">
+      <Texto>     1&#186;.- Decl&#225;rase Norma Oficial de la Rep&#250;blica de Chile, la siguiente:
+
+     NCh 204, Of. 77: Acero Barras laminadas en caliente para hormig&#243;n armado.
+     2&#186;.- Por el presente decreto supremo se dejan sin efecto las normas NCh 204, Of. 67 y NCh 519, Of. 69, ambas declaradas oficiales de la Rep&#250;blica de Chile, por decretos supremos n&#250;meros 237 y 602, de fechas 8 de Marzo de 1968 y 25 de Junio de 1970, respectivamente, del Ministerio de Obras P&#250;blicas y Transportes.
+     3&#186;.- La norma aprobada en el n&#250;mero 1&#186; de este decreto deber&#225; ser publicada &#237;ntegramente en la revista u &#243;rgano de difusi&#243;n del Instituto Nacional de Normalizaci&#243;n, el que deber&#225; enviar tres ejemplares de dichas normas debidamente certificada su conformidad con el texto oficial a la Contralor&#237;a General de la Rep&#250;blica y, adem&#225;s, proporcionar&#225; gratuitamente el mismo n&#250;mero de ejemplares a los organismos fiscales y semifiscales que tengan relaci&#243;n con la materia de que se trata.</Texto>
+      <Metadatos>
+        <NombreParte presente="no">&#160;</NombreParte>
+        <TituloParte presente="no">&#160;</TituloParte>
+        
+        <FechaDerogacion>2007-02-19</FechaDerogacion>
+      </Metadatos>
+    </EstructuraFuncional>
+  </EstructurasFuncionales>
+  <Promulgacion fechaVersion="1978-01-31" derogado="derogado">
+    <Texto>     An&#243;tese, t&#243;mese raz&#243;n, comun&#237;quese y publ&#237;quese.- Por orden del Presidente de la Rep&#250;blica, Edmundo Ruiz Undurraga, Ministro de Vivienda y Urbanismo.
+
+     Lo que transcribo a US. para su conocimiento.- Dios guarde a US.- Arthur Clark Flores, Comandante de Grupo (I), Subsecretario de Vivienda y Urbanismo.</Texto>
+  </Promulgacion>
+  
+</Norma>
