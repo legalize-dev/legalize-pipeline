@@ -44,6 +44,19 @@ from legalize.models import (
 
 logger = logging.getLogger(__name__)
 
+# Reusable HTML parser with explicit UTF-8 encoding.
+# likumi.lv serves UTF-8 (Content-Type: text/html; charset=utf-8), but
+# lxml's auto-detection from raw bytes sometimes misfires on large pages
+# and falls back to Latin-1, producing mojibake in the parsed tree
+# (e.g. "BeÄ¼Ä£ijas" instead of "Beļģijas" in id=198715).
+# Forcing UTF-8 decoding via the parser fixes this.
+_HTML_PARSER = lxml_html.HTMLParser(encoding="utf-8")
+
+
+def _parse_html(data: bytes):
+    """Parse HTML bytes into an lxml tree with forced UTF-8 decoding."""
+    return lxml_html.fromstring(data, parser=_HTML_PARSER)
+
 
 # Map likumi.lv "Veids" (act type) to internal rank strings.
 # The Veids URL pattern is /ta/veids/{issuer}/{type} — we use the second segment.
@@ -141,11 +154,19 @@ def _parse_dotted_date(s: str) -> date | None:
         return None
 
 
+# C0 control chars (except \t, \n, \r) and C1 control chars (0x80-0x9F).
+# These are never legitimately in text but occasionally leak from likumi.lv
+# source data (e.g. U+009A between "pa" and "švaldības" in id=305766 breaks
+# YAML parsing in the web sync).
+_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+
+
 def _clean_text(text: str) -> str:
-    """Normalize whitespace and strip non-breaking spaces."""
+    """Normalize whitespace, strip non-breaking spaces and invalid control chars."""
     if not text:
         return ""
     text = text.replace("\xa0", " ")
+    text = _CONTROL_CHAR_RE.sub("", text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
@@ -489,7 +510,7 @@ class LikumiTextParser(TextParser):
             return []
 
         try:
-            tree = lxml_html.fromstring(data)
+            tree = _parse_html(data)
         except Exception as exc:
             logger.warning("Failed to parse HTML: %s", exc)
             return []
@@ -716,7 +737,7 @@ class LikumiMetadataParser(MetadataParser):
         if not data:
             raise ValueError(f"Empty data for norm {norm_id}")
 
-        tree = lxml_html.fromstring(data)
+        tree = _parse_html(data)
 
         # Title from <title> or og:title meta
         title = ""
