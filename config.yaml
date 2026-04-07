@@ -108,3 +108,11 @@ countries:
         - "decretos-ley"
         - "constitucion"
       law_number_max: 20500
+
+  ad:
+    repo_path: "../countries/ad"
+    data_dir: "../countries/data-ad"
+    max_workers: 1
+    source:
+      base_url: "https://raw.githubusercontent.com/ericrisco/legalize-ad/main/data"
+      requests_per_second: 5.0
