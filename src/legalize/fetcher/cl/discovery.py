@@ -33,34 +33,103 @@ DEFAULT_SCOPE = frozenset(
 
 
 class BCNDiscovery(NormDiscovery):
-    """Discovers Chilean norms from BCN search API (CSV pagination)."""
+    """Discovers Chilean norms from BCN search API (CSV pagination).
 
-    def __init__(self, scope: frozenset[str] | None = None) -> None:
+    Strategy:
+      Phase A — iterate idLey 1..id_ley_max on the ``Navegar/get_norma_json``
+        endpoint, resolving each Chilean law number to its BCN idNorma. This
+        bypasses BCN's undocumented 1,600-row cap on the simple search and
+        yields every Ley in the catalog (~22k as of 2026).
+      Phase B — paginate ``exportarBSimpleMetas`` per norm type for the
+        remaining ranks (Decreto, Decreto Ley, DFL, Decreto Supremo, tratados,
+        ley orgánica, ley de quórum calificado). The cap still applies here
+        (only the most recent ~1,600 per type), but those types have smaller
+        corpora and less historical depth than leyes.
+
+    Phase A alone bumps the full-bootstrap corpus from ~6,400 to ~27,000 norms.
+    """
+
+    # BCN's latest Ley as of 2026 is #21,812. Probe up to 22,000 with slack
+    # for the next few years — the loop skips missing numbers cheaply.
+    DEFAULT_ID_LEY_MAX = 22_000
+
+    def __init__(
+        self,
+        scope: frozenset[str] | None = None,
+        id_ley_max: int = DEFAULT_ID_LEY_MAX,
+    ) -> None:
         self._scope = scope or DEFAULT_SCOPE
+        self._id_ley_max = id_ley_max
 
     @classmethod
     def create(cls, source: dict) -> BCNDiscovery:
         ranks = source.get("ranks")
         scope = frozenset(ranks) if ranks else None
-        return cls(scope=scope)
+        id_ley_max = int(source.get("id_ley_max", cls.DEFAULT_ID_LEY_MAX))
+        return cls(scope=scope, id_ley_max=id_ley_max)
+
+    def _iter_id_ley_range(
+        self, client: BCNClient, lower: int, upper: int
+    ) -> Iterator[str]:
+        """Resolve idLey values in [lower, upper] to idNormas.
+
+        Skips missing law numbers (500s from BCN). Logs progress every 500.
+        """
+        found = 0
+        for id_ley in range(lower, upper + 1):
+            id_norma = client.resolve_id_ley(id_ley)
+            if id_norma:
+                found += 1
+                yield id_norma
+            if id_ley % 500 == 0:
+                logger.info(
+                    "[idLey pass] probed %d/%d, %d idNormas found",
+                    id_ley - lower + 1,
+                    upper - lower + 1,
+                    found,
+                )
+        logger.info(
+            "[idLey pass] complete: %d idNormas from %d probes",
+            found,
+            upper - lower + 1,
+        )
 
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
-        """Paginate through exportarBSimpleMetas to find all norm IDs.
+        """Discover all norm IDs in scope.
 
-        Yields idNorma values for norms whose type is in scope.
-        Iterates each norm type separately to control pagination.
+        Runs in two phases:
+          Phase A — iterate idLey 1..id_ley_max via Navegar/get_norma_json to
+            resolve the complete Ley catalog (~22k leyes). Only runs if "Ley"
+            is in scope.
+          Phase B — paginate exportarBSimpleMetas per remaining norm type
+            (Decreto, Decreto Ley, DFL, Decreto Supremo, ...). The simple
+            search endpoint silently ignores npagina, so we stop each type
+            after the first "no new IDs" page.
 
-        BCN's nuevo.leychile.cl is intermittently flaky and returns 502/504 on
-        certain page boundaries even after the HTTP retries in HttpClient. We
-        soft-skip a stuck page after a few attempts so a single bad page does
-        not abort a multi-hour bootstrap.
+        BCN is intermittently flaky and returns 502/504 on some pages even
+        after the HTTP retries in HttpClient; we soft-skip a stuck page after
+        a few attempts so a single bad page does not abort a multi-hour
+        bootstrap.
         """
         import requests
 
         assert isinstance(client, BCNClient)
         seen: set[str] = set()
 
-        for tipo in sorted(self._scope):
+        # Phase A — iterate idLey for the complete Ley catalog.
+        if "Ley" in self._scope:
+            logger.info(
+                "[Phase A] iterating idLey 1..%d to resolve every Chilean law",
+                self._id_ley_max,
+            )
+            for id_norma in self._iter_id_ley_range(client, 1, self._id_ley_max):
+                if id_norma not in seen:
+                    seen.add(id_norma)
+                    yield id_norma
+
+        # Phase B — paginated exportarBSimpleMetas for the remaining types.
+        phase_b_scope = sorted(t for t in self._scope if t != "Ley")
+        for tipo in phase_b_scope:
             page = 1
             # BCN requires totalitems > 0 to return data.
             # Start with a high estimate; the API caps at the actual total.

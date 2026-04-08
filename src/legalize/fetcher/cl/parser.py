@@ -575,6 +575,33 @@ class CLTextParser(TextParser):
             if prom_block is not None:
                 blocks.append(prom_block)
 
+        # 5. Fallback: BCN occasionally publishes "shell" entries with a
+        #    TituloNorma but an empty <Encabezado>/<Texto> and no body
+        #    (e.g. CL-271766, CL-3903). Emit a placeholder block so the norm
+        #    still makes it to the catalog with its metadata instead of being
+        #    dropped as an orphan.
+        if not blocks:
+            fecha = _parse_date(root.get("fechaVersion", "")) or date(1900, 1, 1)
+            placeholder_text = (
+                "[Texto no disponible en la fuente BCN. "
+                "Consulte la ficha original en el enlace `source` del frontmatter.]"
+            )
+            blocks.append(
+                Block(
+                    id=f"{norma_id}-placeholder",
+                    block_type="placeholder",
+                    title=official_title or "Sin texto",
+                    versions=(
+                        Version(
+                            norm_id=norma_id,
+                            publication_date=fecha,
+                            effective_date=fecha,
+                            paragraphs=(Paragraph(css_class="parrafo", text=placeholder_text),),
+                        ),
+                    ),
+                )
+            )
+
         return blocks
 
     # --- builders ---

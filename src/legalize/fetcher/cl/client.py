@@ -98,3 +98,44 @@ class BCNClient(HttpClient):
             "seleccionado": "0",
         }
         return self._get(self._search_url, params=params)
+
+    def resolve_id_ley(self, id_ley: int) -> str | None:
+        """Resolve a Chilean law number (idLey) to its BCN idNorma.
+
+        BCN's ``exportarBSimpleMetas`` endpoint silently caps every query at
+        ~1,600 rows regardless of filter, which means it only returns the
+        most recent ~1,600 laws per type — missing the older 20,000+ norms in
+        the corpus. The undocumented ``Navegar/get_norma_json`` endpoint
+        resolves ``idLey={N}`` to the corresponding ``id_norma`` for any
+        valid law number, so iterating 1…21,900 gives us the full catalog.
+
+        Returns the idNorma as a string on success, or None if the law
+        number does not exist (500 response, malformed JSON, or missing
+        ``id_norma`` field in the metadata).
+        """
+        import requests
+
+        url = "https://nuevo.leychile.cl/servicios/Navegar/get_norma_json"
+        params = {
+            "idLey": str(id_ley),
+            "idNorma": "",
+            "idVersion": "",
+            "tipoVersion": "",
+            "cve": "",
+            "agrupa_partes": "1",
+            "r": "",
+        }
+        try:
+            raw = self._get(url, params=params)
+        except requests.HTTPError:
+            return None
+        try:
+            import json
+
+            payload = json.loads(raw.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            return None
+        id_norma = payload.get("metadatos", {}).get("id_norma")
+        if not id_norma:
+            return None
+        return str(id_norma)
