@@ -11,6 +11,7 @@ dependencies = [
     "click>=8.1",
     "rich>=13.0",
     "pdfplumber>=0.11",  # Estonia: PDF annex → Markdown table conversion
+    "pypdfium2>=4.30",  # Greece: column-aware PDF text extraction (BSD-3-Clause)
 ]
 
 [project.optional-dependencies]

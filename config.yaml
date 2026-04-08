@@ -190,3 +190,31 @@ countries:
       request_timeout: 30
       max_retries: 5
       requests_per_second: 8.0
+
+  gr:
+    repo_path: "../countries/gr"
+    data_dir: "../countries/data-gr"
+    cache_dir: ".cache"
+    # max_workers: 1 because pypdfium2 + pdfplumber are NOT thread-safe.
+    # Running PDF extraction in the engine's ThreadPoolExecutor crashes
+    # with EXC_BREAKPOINT/SIGTRAP at any worker count > 1 (verified
+    # 2026-04-08 on macOS). Daily updates process 1-2 norms so single-
+    # threaded is fine. A future refactor could move PDF extraction to
+    # a child process to lift this constraint.
+    max_workers: 1
+    source:
+      # Official source: searchetv99 Azure Functions API + Azure Blob.
+      # The same backend that powers https://search.et.gr/. Verified
+      # public, no authentication, CORS-open with Origin header.
+      # Endpoints: simplesearch (discovery), documententitybyid
+      # (metadata), timeline (modification graph — Phase 2 reforms),
+      # tagsbydocumententity (tags), namedentity (NER).
+      # PDFs at ia37rg02wpsa01.blob.core.windows.net/fek/{II}/{YYYY}/.
+      # Verified rate ceiling 2026-04-08: ~21 req/s sustained without
+      # errors. We use 4 req/s × 12 workers = 48 req/s aggregate cap
+      # (real throughput is API-limited).
+      api_base: "https://searchetv99.azurewebsites.net/api"
+      blob_base: "https://ia37rg02wpsa01.blob.core.windows.net/fek"
+      request_timeout: 60
+      max_retries: 5
+      requests_per_second: 4.0
