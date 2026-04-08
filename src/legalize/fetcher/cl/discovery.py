@@ -71,23 +71,23 @@ class BCNDiscovery(NormDiscovery):
     def _iter_id_ley_range(
         self, client: BCNClient, lower: int, upper: int
     ) -> Iterator[str]:
-        """Resolve idLey values in [lower, upper] to idNormas in parallel.
+        """Resolve idLey values in [lower, upper] to idNormas.
 
-        BCN's ``Navegar/get_norma_json`` endpoint tolerates ~10 req/s per
-        client instance without 429s (measured 2026-04-08). To get true
-        parallelism we spin up N worker threads, each with its own dedicated
-        client instance so the per-client rate limiter doesn't serialize them.
-        With 8 workers × 5 req/s = ~30 effective req/s, the full 22k Ley
-        catalog is probed in ~12 minutes instead of ~3 hours.
+        Uses a small amount of parallelism (4 workers × 1 req/s each) to
+        keep BCN's CloudFront WAF happy. A 2026-04-08 benchmark at
+        8 workers × 5 req/s = ~30 req/s triggered the WAF and IP-banned
+        the caller for ~30-60 minutes, so we stay conservative: 4 req/s
+        effective means the full 22k pass takes ~90 minutes but reliably
+        completes without hitting rate limits.
 
-        Missing law numbers (500 responses) are skipped cheaply. Progress is
-        logged every 1,000 probes.
+        Missing law numbers (500 responses) are skipped cheaply. Progress
+        is logged every 500 probes.
         """
         import concurrent.futures
         import threading
 
-        num_workers = 8
-        per_worker_rate = 5.0
+        num_workers = 4
+        per_worker_rate = 1.0
 
         thread_local = threading.local()
 
@@ -107,12 +107,12 @@ class BCNDiscovery(NormDiscovery):
         found = 0
         done = 0
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
-            for id_ley, id_norma in executor.map(_probe, probe_range):
+            for _id_ley, id_norma in executor.map(_probe, probe_range):
                 done += 1
                 if id_norma:
                     found += 1
                     yield id_norma
-                if done % 1000 == 0:
+                if done % 500 == 0:
                     logger.info(
                         "[idLey pass] probed %d/%d (%.0f%%), %d idNormas found",
                         done,
