@@ -16,19 +16,36 @@ repos:
         pass_filenames: false
         types: [python]
 
-      - id: conflict-markers
-        name: no conflict markers
-        entry: bash -c 'if grep -rn "<<<<<<\|>>>>>>\|=======" --include="*.py" --include="*.yaml" --include="*.md" src/ tests/ .github/ 2>/dev/null; then echo "CONFLICT MARKERS FOUND"; exit 1; fi'
-        language: system
-        pass_filenames: false
-        always_run: true
-
       - id: country-dispatch
         name: verify country dispatch
         entry: python3 scripts/check-dispatch.py
         language: system
         pass_filenames: false
         types: [python]
+
+  # ─── Standard pre-commit hooks: syntax, hygiene, large files ───
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=2000']
+      - id: check-yaml
+      - id: check-toml
+
+  # ─── Secret scanning ───
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: '\.secrets\.baseline$'
+
+  # ─── GitHub Actions linting ───
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
 
   # ─── Pre-push: full test suite (slower, only on push) ───
   - repo: local
