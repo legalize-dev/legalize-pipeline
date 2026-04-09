@@ -1014,8 +1014,8 @@ class GreekMetadataParser(MetadataParser):
     def _collect_amend_refs(text: str) -> list[tuple[str, str]]:
         """Collect cross-references to other laws and decrees.
 
-        Stored under ``extra.amends`` so the web app can render an
-        "amends/amended-by" backlink section without having to re-scan
+        Stored under ``extra.amends`` so downstream consumers can render
+        an "amends/amended-by" backlink section without having to re-scan
         the Markdown body.
 
         Sort order: by **year descending then number descending** so the

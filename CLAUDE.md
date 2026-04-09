@@ -19,7 +19,7 @@ Legalize is a multi-country platform that converts official legislation into ver
 │   ├── {code}/          ← country repos (legalize-{code}), cloned on demand
 │   └── data-{code}/     ← data caches (no git), regenerable via fetch
 ├── hub/                 ← public hub repo (legalize-dev/legalize)
-└── web/                 ← legalize.dev website
+└── web/                 ← legalize.dev website (separate repo)
 ```
 
 The local `countries/` directory may be empty. Do not assume repos or data dirs exist locally. Always check before running commands that depend on them.
@@ -64,7 +64,7 @@ source: "https://www.boe.es/eli/es/c/1978/12/27/(1)"
 ---
 ```
 
-Country-specific extras go in an `extra` sub-mapping (or as additional frontmatter keys for fields the web DB consumes).
+Country-specific extras go in an `extra` sub-mapping (or as additional frontmatter keys for fields downstream consumers need).
 
 **Commit message types:** `[bootstrap]`, `[reforma]`, `[nueva]`, `[derogacion]`, `[correccion]`, `[fix-pipeline]`
 
@@ -93,7 +93,7 @@ High-level order:
 6. Write parser tests against the 5 fixtures.
 7. **Quality gate (mandatory):** fetch 5 sample laws, render to Markdown, and run an AI review covering TEXT correctness, METADATA completeness, STRUCTURE, RICH FORMATTING preservation, and ENCODING. Do not proceed until 5/5 PASS.
 8. Tune `max_workers` against a 50-law benchmark.
-9. Full bootstrap → `legalize health` → push country repo → open engine PR → coordinate with the web team for sync wiring → verify on https://legalize.dev/{code}.
+9. Full bootstrap → `legalize health` → push country repo → open engine PR → verify on https://legalize.dev/{code}.
 
 **Non-negotiable rules for the parser:**
 

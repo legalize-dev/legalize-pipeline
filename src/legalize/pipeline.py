@@ -425,8 +425,8 @@ def generic_bootstrap(
     # critically, sorts commits by publication date so the resulting git
     # history is chronological. The slow commit_all() walks json files in
     # filename order, which for countries with mixed pre/post-1970 laws
-    # leaves clamped 1970-01-02 commits at HEAD and breaks the web's
-    # incremental sync (`?since=…` filter on committer date returns 0).
+    # leaves clamped 1970-01-02 commits at HEAD and breaks downstream
+    # incremental sync (committer-date filter returns 0).
     total_commits = commit_all_fast(config, country, dry_run=dry_run)
 
     write_country_meta(config, country)
@@ -757,7 +757,7 @@ def bootstrap_from_local_xml(
 def write_country_meta(config: Config, country: str) -> None:
     """Write country_meta.yaml alongside the JSON data.
 
-    This file helps the web seed script auto-detect countries
+    This file helps downstream tooling auto-detect countries
     and suggest configuration for new ones.
     """
     import yaml

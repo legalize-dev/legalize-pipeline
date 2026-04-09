@@ -8,7 +8,7 @@ result to `<data_dir>/catalog.json`. Subsequent calls to
 re-probing.
 
 Usage:
-    python scripts/build_uy_catalog.py [--start 9000] [--end 20500] [--workers 16]
+    python -m legalize.fetcher.uy.catalog [--start 9000] [--end 20500] [--workers 16]
 """
 
 from __future__ import annotations

@@ -157,7 +157,7 @@ def _parse_dotted_date(s: str) -> date | None:
 # C0 control chars (except \t, \n, \r) and C1 control chars (0x80-0x9F).
 # These are never legitimately in text but occasionally leak from likumi.lv
 # source data (e.g. U+009A between "pa" and "švaldības" in id=305766 breaks
-# YAML parsing in the web sync).
+# YAML parsing downstream).
 _CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 

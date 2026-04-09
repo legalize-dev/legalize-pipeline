@@ -6,18 +6,15 @@ Riksdagen discovery pagination. Also discovers new norms from
 2017-2026 by paginating from a specific start page.
 
 Usage:
-    python scripts/refetch_se.py              # re-fetch all existing + discover new
-    python scripts/refetch_se.py --limit 10   # test with 10 norms
+    python -m legalize.fetcher.se.refetch              # re-fetch all existing + discover new
+    python -m legalize.fetcher.se.refetch --limit 10   # test with 10 norms
 """
 
 import argparse
 import logging
 import re
-import sys
 import time
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from legalize.config import load_config
 from legalize.pipeline import generic_fetch_one
@@ -37,9 +34,8 @@ def extract_norm_ids_from_json(json_dir: Path) -> list[str]:
 
 def discover_recent(start_page: int = 488) -> list[str]:
     """Discover base statute SFS numbers from a specific page onward."""
-    from legalize.fetcher.se.discovery import SwedishDiscovery, _is_amendment
+    from legalize.fetcher.se.discovery import _is_amendment
 
-    import json
     import requests
 
     seen: set[str] = set()
@@ -65,7 +61,7 @@ def discover_recent(start_page: int = 488) -> list[str]:
                 break
             except Exception as e:
                 if attempt < 2:
-                    time.sleep(2 ** attempt)
+                    time.sleep(2**attempt)
                 else:
                     print(f"  Error on page {page} after 3 attempts: {e}")
         if result is None:
@@ -102,8 +98,9 @@ def discover_recent(start_page: int = 488) -> list[str]:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--skip-existing", action="store_true",
-                        help="Only discover and fetch new norms (2017+)")
+    parser.add_argument(
+        "--skip-existing", action="store_true", help="Only discover and fetch new norms (2017+)"
+    )
     args = parser.parse_args()
 
     config = load_config()
@@ -115,7 +112,9 @@ def main():
         existing_ids = []
     else:
         existing_ids = extract_norm_ids_from_json(json_dir)
-        print(f"Existing norms: {existing_ids[-1] if existing_ids else 'none'} ({len(existing_ids)})")
+        print(
+            f"Existing norms: {existing_ids[-1] if existing_ids else 'none'} ({len(existing_ids)})"
+        )
 
     # Phase 2: discover new norms (2017-2026)
     print("Discovering new norms from 2017+...")
@@ -127,7 +126,7 @@ def main():
 
     all_ids = existing_ids + truly_new
     if args.limit:
-        all_ids = all_ids[:args.limit]
+        all_ids = all_ids[: args.limit]
 
     print(f"\nTotal to fetch: {len(all_ids)}")
     print(f"Estimated time: ~{len(all_ids) * 3 / 10 / 60:.0f} minutes\n")
@@ -152,8 +151,10 @@ def main():
             elapsed = time.time() - t0
             rate = i / elapsed if elapsed > 0 else 0
             eta = (len(all_ids) - i) / rate / 60 if rate > 0 else 0
-            print(f"  [{i}/{len(all_ids)}] {fetched} OK, {errors} errors "
-                  f"({rate:.1f}/s, ETA {eta:.0f}m)")
+            print(
+                f"  [{i}/{len(all_ids)}] {fetched} OK, {errors} errors "
+                f"({rate:.1f}/s, ETA {eta:.0f}m)"
+            )
 
     elapsed = time.time() - t0
     print(f"\nDone in {elapsed / 60:.1f}m: {fetched} fetched, {errors} errors")

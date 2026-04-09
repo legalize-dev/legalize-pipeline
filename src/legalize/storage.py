@@ -97,7 +97,7 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
         metadata_dict["jurisdiction"] = meta.jurisdiction
 
     # Extra: country-specific fields (department, summary, pdf_url, etc.)
-    # These go into a single dict for the web's JSONB column.
+    # These go into a single dict for the extra JSONB column downstream.
     extra_dict: dict[str, str] = {}
     if meta.department:
         extra_dict["department"] = meta.department
