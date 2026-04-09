@@ -87,11 +87,13 @@ countries:
   cl:
     repo_path: "../countries/cl"
     data_dir: "../countries/data-cl"
-    # BCN's obtxml endpoint returns 429 above ~4 req/s sustained — measured
-    # 2026-04-07. The search endpoint tolerated more, but per-norm fetches
-    # are the bulk of the work, so we cap at 2 workers x 1 req/s = ~2 req/s
-    # effective. Conservative but reliable; full bootstrap of ~6.4k norms
-    # takes ~1h.
+    # BCN's obtxml CloudFront WAF is aggressive: a sustained 8 req/s burst
+    # triggered a ~30-minute IP ban on 2026-04-08 (4 workers × 2 rps, plus
+    # the get_text/get_metadata deduplication that doubled effective rate).
+    # Staying at 2 workers × 1 rps = 2 req/s effective, which is the exact
+    # config that successfully bootstrapped 6,400 norms yesterday without
+    # any 429/403 errors. Slower (~2h for the ~14k new fetches) but
+    # guaranteed safe.
     max_workers: 2
     source:
       base_url: "https://www.leychile.cl"
@@ -158,3 +160,82 @@ countries:
       request_timeout: 30
       max_retries: 5
       requests_per_second: 2.0
+
+  pl:
+    repo_path: "../countries/pl"
+    data_dir: "../countries/data-pl"
+    cache_dir: ".cache"
+    max_workers: 8
+    source:
+      # ELI API of the Polish Sejm — public, no auth.
+      # See RESEARCH-POLAND.md for the full inventory.
+      # Scope v1: DU publisher only, HTML-only client-side filter.
+      # The API's WAF rejects unknown query parameters, so `html_only` is
+      # enforced by the discovery layer, not by the URL.
+      #
+      # Benchmark 2026-04-07 (50 DU acts, metadata + text, 8 workers):
+      #    4 req/s → 0.51 s/act → ~8.5 h for 60K acts
+      #    8 req/s → 0.26 s/act → ~4.3 h for 60K acts
+      #   12 req/s → 0.19 s/act → ~3.2 h for 60K acts
+      # Zero 429/5xx at every rate. Settled on 8 req/s as a polite default.
+      #
+      # year_start=2000: HTML coverage is ~100% from ~2012, ~5-50% in 2000-2011,
+      # and ~0% before 2000. Iterating 1918-1999 just wastes discovery requests.
+      base_url: "https://api.sejm.gov.pl/eli"
+      publisher: "DU"
+      year_start: 2000
+      html_only: true
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 8.0
+
+  it:
+    repo_path: "../countries/it"
+    data_dir: "../countries/data-it"
+    cache_dir: ".cache"
+    # Benchmark 2026-04-09 (URN endpoint, concurrent workers):
+    #   2 workers →  ~5 req/s   4 workers →  ~9 req/s
+    #   8 workers → ~18 req/s  16 workers → ~28 req/s
+    #  20 workers → WAF IP ban (~2 min cooldown)
+    # Settled on 4 workers × 2 req/s = safe ~9 req/s effective.
+    # Full bootstrap (~90K acts): ~2.8h at this rate.
+    max_workers: 4
+    source:
+      # Normattiva Open Data API — public, no auth.
+      # See RESEARCH-IT.md for full API documentation.
+      # Article-level API: each request returns one article.
+      # Discovery via ricerca/semplice with filtriMap.
+      # Daily via ricerca/aggiornati with ISO timestamps.
+      # DPR/DPCM: web scraping fallback (API URN not supported).
+      api_base: "https://api.normattiva.it/t/normattiva.api"
+      web_base: "https://www.normattiva.it"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 2.0
+
+  gr:
+    repo_path: "../countries/gr"
+    data_dir: "../countries/data-gr"
+    cache_dir: ".cache"
+    # The Greek bootstrap script (scripts/gr_full_bootstrap.py) uses
+    # ProcessPoolExecutor for thread-safety isolation around pypdfium2
+    # + pdfplumber. ``max_workers`` is consumed by that script as the
+    # process pool size, NOT by the engine's ThreadPoolExecutor (which
+    # would crash with EXC_BREAKPOINT/SIGTRAP — verified 2026-04-08).
+    max_workers: 12
+    source:
+      # Official source: searchetv99 Azure Functions API + Azure Blob.
+      # The same backend that powers https://search.et.gr/. Verified
+      # public, no authentication, CORS-open with Origin header.
+      # Endpoints: simplesearch (discovery), documententitybyid
+      # (metadata), timeline (modification graph — Phase 2 reforms),
+      # tagsbydocumententity (tags), namedentity (NER).
+      # PDFs at ia37rg02wpsa01.blob.core.windows.net/fek/{II}/{YYYY}/.
+      # Verified rate ceiling 2026-04-08: ~21 req/s sustained without
+      # errors. We use 4 req/s × 12 workers = 48 req/s aggregate cap
+      # (real throughput is API-limited).
+      api_base: "https://searchetv99.azurewebsites.net/api"
+      blob_base: "https://ia37rg02wpsa01.blob.core.windows.net/fek"
+      request_timeout: 60
+      max_retries: 5
+      requests_per_second: 4.0

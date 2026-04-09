@@ -68,9 +68,7 @@ class BCNDiscovery(NormDiscovery):
         id_ley_max = int(source.get("id_ley_max", cls.DEFAULT_ID_LEY_MAX))
         return cls(scope=scope, id_ley_max=id_ley_max)
 
-    def _iter_id_ley_range(
-        self, client: BCNClient, lower: int, upper: int
-    ) -> Iterator[str]:
+    def _iter_id_ley_range(self, client: BCNClient, lower: int, upper: int) -> Iterator[str]:
         """Resolve idLey values in [lower, upper] to idNormas.
 
         Uses a small amount of parallelism (4 workers × 1 req/s each) to
