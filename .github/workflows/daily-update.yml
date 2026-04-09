@@ -27,22 +27,22 @@ jobs:
       matrix:
         country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","fr","at","de","se","pt","lv","ad","lt","ee","pl","uy","gr"]') }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
+      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
         id: app-token
         with:
           app-id: ${{ secrets.LEGALIZE_APP_ID }}
           private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
 
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: legalize-dev/legalize-${{ matrix.country }}
           path: repos/${{ matrix.country }}
           token: ${{ steps.app-token.outputs.token }}
           fetch-depth: 0
 
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
           python-version: "3.12"
 
