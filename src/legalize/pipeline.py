@@ -243,7 +243,7 @@ def generic_fetch_one(
     from legalize.countries import get_client_class, get_metadata_parser, get_text_parser
 
     cc = config.get_country(country)
-    safe_id = norm_id.replace(":", "-").replace("/", "-")
+    safe_id = norm_id.replace(":", "-").replace("/", "-").replace(" ", "")
     json_path = Path(cc.data_dir) / "json" / f"{safe_id}.json"
 
     if json_path.exists() and not force:
@@ -324,11 +324,22 @@ def generic_fetch_all(
     client_cls = get_client_class(country)
     discovery_cls = get_discovery_class(country)
 
-    # Discover all norm IDs (pass data_dir for discovery cache)
+    # Discover all norm IDs — cache to disk so restarts skip rediscovery
     source_with_cache = {**cc.source, "cache_dir": cc.data_dir}
-    with client_cls.create(cc) as client:
-        discovery = discovery_cls.create(source_with_cache)
-        norm_ids = list(discovery.discover_all(client))
+    discovery_cache = Path(cc.data_dir) / "discovery_ids.txt"
+
+    if discovery_cache.exists() and not force:
+        norm_ids = [
+            line.strip() for line in discovery_cache.read_text().splitlines() if line.strip()
+        ]
+        console.print(f"[dim]Loaded {len(norm_ids)} IDs from discovery cache[/dim]")
+    else:
+        with client_cls.create(cc) as client:
+            discovery = discovery_cls.create(source_with_cache)
+            norm_ids = list(discovery.discover_all(client))
+        discovery_cache.parent.mkdir(parents=True, exist_ok=True)
+        discovery_cache.write_text("\n".join(norm_ids) + "\n")
+        console.print(f"[dim]Saved {len(norm_ids)} IDs to discovery cache[/dim]")
 
     if limit:
         norm_ids = norm_ids[:limit]
@@ -421,7 +432,13 @@ def generic_bootstrap(
         return 0
 
     console.print("\n[bold]Commit — generating git history[/bold]\n")
-    total_commits = commit_all(config, country, dry_run=dry_run)
+    # Use fast-import for bootstrap: 10-50x faster than commit_all() and,
+    # critically, sorts commits by publication date so the resulting git
+    # history is chronological. The slow commit_all() walks json files in
+    # filename order, which for countries with mixed pre/post-1970 laws
+    # leaves clamped 1970-01-02 commits at HEAD and breaks the web's
+    # incremental sync (`?since=…` filter on committer date returns 0).
+    total_commits = commit_all_fast(config, country, dry_run=dry_run)
 
     write_country_meta(config, country)
 
@@ -474,6 +491,17 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
     metadata = norm.metadata
     blocks = norm.blocks
     reforms = norm.reforms
+
+    # Ensure at least one bootstrap reform so the law gets committed.
+    # Some sources (e.g. old Swedish SFS) have no amendment register entries.
+    if not reforms and blocks:
+        reforms = (
+            Reform(
+                date=metadata.publication_date,
+                norm_id=metadata.identifier,
+                affected_blocks=(),
+            ),
+        )
 
     logger.info("Committing %s: %d reforms", norm_id, len(reforms))
     console.print(
@@ -598,6 +626,7 @@ def commit_all_fast(
     country: str,
     limit: int | None = None,
     offset: int = 0,
+    dry_run: bool = False,
 ) -> int:
     """Generate commits for ALL laws using git fast-import.
 
@@ -635,27 +664,51 @@ def commit_all_fast(
             logger.error("Error loading %s, skipping", json_file, exc_info=True)
             continue
 
-        for i, reform in enumerate(norm.reforms):
+        reforms = norm.reforms
+        if not reforms and norm.blocks:
+            reforms = (
+                Reform(
+                    date=norm.metadata.publication_date,
+                    norm_id=norm.metadata.identifier,
+                    affected_blocks=(),
+                ),
+            )
+
+        for i, reform in enumerate(reforms):
             all_reforms.append((reform.date, json_file.stem, i, json_file))
 
     all_reforms.sort(key=lambda x: x[0])
 
     console.print(f"  {len(all_reforms)} total commits to generate (sorted by date)\n")
 
-    # Cache loaded norms to avoid re-reading JSON
-    norm_cache: dict[str, ParsedNorm] = {}
+    if dry_run:
+        console.print("[yellow]dry-run: skipping fast-import[/yellow]")
+        return len(all_reforms)
+
+    # Cache loaded norms (with synthetic bootstrap reform if needed)
+    norm_cache: dict[str, tuple[ParsedNorm, tuple[Reform, ...]]] = {}
     errors = 0
 
     with FastImporter(cc.repo_path, config.git.committer_name, config.git.committer_email) as fi:
         for idx, (reform_date, norm_id, reform_idx, json_file) in enumerate(all_reforms):
             try:
                 if norm_id not in norm_cache:
-                    norm_cache[norm_id] = load_norma_from_json(json_file)
+                    loaded = load_norma_from_json(json_file)
+                    r = loaded.reforms
+                    if not r and loaded.blocks:
+                        r = (
+                            Reform(
+                                date=loaded.metadata.publication_date,
+                                norm_id=loaded.metadata.identifier,
+                                affected_blocks=(),
+                            ),
+                        )
+                    norm_cache[norm_id] = (loaded, r)
 
-                norm = norm_cache[norm_id]
+                norm, reforms_cached = norm_cache[norm_id]
                 metadata = norm.metadata
                 blocks = norm.blocks
-                reform = norm.reforms[reform_idx]
+                reform = reforms_cached[reform_idx]
 
                 is_first = reform_idx == 0
                 commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM

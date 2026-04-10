@@ -84,6 +84,11 @@ class SwedishDiscovery(NormDiscovery):
         seen: set[str] = set()
         page = 1
         count = 0
+        pages_without_new = 0
+        # The Riksdagen SFS catalog has ~1.3M entries (mostly amendments).
+        # Base statutes are ~10K. Once we stop finding new ones for 200
+        # consecutive pages (~40K amendment entries), we can safely stop.
+        _MAX_EMPTY_PAGES = 200
 
         while True:
             url = (
@@ -98,6 +103,7 @@ class SwedishDiscovery(NormDiscovery):
             if not documents:
                 break
 
+            found_new = False
             for doc in documents:
                 title = doc.get("titel", "")
                 sfs = doc.get("beteckning", "")
@@ -113,14 +119,28 @@ class SwedishDiscovery(NormDiscovery):
                 if sfs not in seen:
                     seen.add(sfs)
                     count += 1
+                    found_new = True
                     logger.info("Discovered: SFS %s — %s", sfs, title)
                     yield sfs
+
+            if found_new:
+                pages_without_new = 0
+            else:
+                pages_without_new += 1
+                if pages_without_new >= _MAX_EMPTY_PAGES:
+                    logger.info(
+                        "Early exit: %d pages with no new base statutes. "
+                        "Stopping discovery at page %d.",
+                        _MAX_EMPTY_PAGES,
+                        page,
+                    )
+                    break
 
             if not has_more:
                 break
             page += 1
 
-        logger.info("Total discovered: %d base statutes", count)
+        logger.info("Total discovered: %d base statutes (%d pages)", count, page)
 
     def discover_daily(
         self,

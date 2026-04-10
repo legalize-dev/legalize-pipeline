@@ -13,6 +13,7 @@ References:
 
 from __future__ import annotations
 
+import html as html_module
 import json
 import logging
 import re
@@ -374,6 +375,153 @@ def _extract_html_metadata(html: str) -> dict[str, str]:
 
 
 # ─────────────────────────────────────────────
+# HTML-based text parsing (improved formatting)
+# ─────────────────────────────────────────────
+
+# Chapter headings: <h3 name="K1"><a name="K1">1 kap. Title</a></h3>
+_HTML_CHAPTER_RE = re.compile(
+    r'<a\s+name="K(\d+)"[^>]*>\s*(\d+)\s*kap\.\s*(.*?)\s*</a>',
+    re.IGNORECASE | re.DOTALL,
+)
+
+# Section anchors: <a class="paragraf" name="K1P3"><b>3 §</b></a>
+_HTML_SECTION_RE = re.compile(
+    r'<a\s+class="paragraf"\s+name="K(\d+)P(\d+[a-z]?)"[^>]*>'
+    r"\s*<b>\s*(\d+\s*[a-z]?)\s*§\s*</b>\s*</a>",
+    re.IGNORECASE,
+)
+
+# Sub-headings: <h4 ...><a name="...">Title</a></h4>
+_HTML_SUBHEADING_RE = re.compile(
+    r"<h4[^>]*>\s*<a[^>]*>\s*(.*?)\s*</a>\s*</h4>",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _inline_html_to_md(chunk: str) -> str:
+    """Convert inline HTML formatting to Markdown.
+
+    Handles <i>, <b>, <br>, <p> and strips remaining tags.
+    Decodes HTML entities.
+    """
+    text = chunk
+    # Italic: law refs <i>Lag (1994:458)</i> and version markers
+    text = re.sub(r"<i>\s*(.*?)\s*</i>", r"*\1*", text, flags=re.DOTALL)
+    # Bold in body text
+    text = re.sub(r"<b>\s*(.*?)\s*</b>", r"**\1**", text, flags=re.DOTALL)
+    # <br> → newline
+    text = re.sub(r"<br\s*/?>", "\n", text)
+    # <p> → paragraph break
+    text = re.sub(r"<p[^>]*>", "\n\n", text)
+    text = text.replace("</p>", "")
+    # Sub-headings → bold line (before stripping tags)
+    text = _HTML_SUBHEADING_RE.sub(r"\n\n**\1**\n\n", text)
+    # Strip remaining tags (anchors, style, div, etc.)
+    text = re.sub(r"<[^>]+>", "", text)
+    # Decode HTML entities
+    text = html_module.unescape(text)
+    # Normalize whitespace within lines
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r" *\n *", "\n", text)
+    # Collapse 3+ newlines to 2
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def _parse_html_provisions(html: str) -> list[dict[str, Any]]:
+    """Parse Riksdagen HTML body into provisions with Markdown formatting.
+
+    Uses HTML structure for section boundaries instead of regex on
+    plain text. Properly separates version variants (/Upphör att gälla/,
+    /Träder i kraft/) that share the same section anchor.
+
+    Returns the same provision dict format as _parse_provisions().
+    """
+    # Find body after <hr>
+    hr_match = re.search(r"<hr\s*/?>", html)
+    if not hr_match:
+        return []
+    body = html[hr_match.end() :]
+
+    # Strip TOC and style blocks
+    body = re.sub(r"<div\s+class=\"sfstoc\">.*?</div>", "", body, flags=re.DOTALL)
+    body = re.sub(r"<style[^>]*>.*?</style>", "", body, flags=re.DOTALL)
+
+    # Find all structural markers with positions
+    markers: list[tuple[str, int, int, str, str, str]] = []
+
+    for m in _HTML_CHAPTER_RE.finditer(body):
+        # Strip HTML from title text (may contain tags)
+        title = re.sub(r"<[^>]+>", "", m.group(3)).strip()
+        markers.append(("chapter", m.start(), m.end(), m.group(1), m.group(2), title))
+
+    for m in _HTML_SECTION_RE.finditer(body):
+        markers.append(("section", m.start(), m.end(), m.group(1), m.group(2), m.group(3)))
+
+    markers.sort(key=lambda x: x[1])
+
+    if not markers:
+        return []
+
+    # Build provisions
+    provisions: list[dict[str, Any]] = []
+    current_chapter: str | None = None
+    pending_chapter_title: str | None = None
+    seen_keys: set[str] = set()
+
+    for i, marker in enumerate(markers):
+        marker_type, _start, end = marker[0], marker[1], marker[2]
+
+        # Content: from end of this marker to start of next marker
+        next_start = markers[i + 1][1] if i + 1 < len(markers) else len(body)
+        content_html = body[end:next_start]
+        content_md = _inline_html_to_md(content_html)
+
+        if marker_type == "chapter":
+            current_chapter = marker[3]
+            pending_chapter_title = marker[5] or None
+            continue
+
+        # Section marker
+        sec_num_raw = marker[4]
+
+        # Normalize: "3a" → "3 a", "3" → "3"
+        section_ref = re.sub(r"(\d+)([a-z])", r"\1 \2", sec_num_raw).strip()
+
+        key = f"{current_chapter}:{section_ref}" if current_chapter else section_ref
+
+        if key in seen_keys:
+            # Version variant (duplicate anchor) — merge into existing provision
+            for prov in reversed(provisions):
+                if prov.get("_key") == key:
+                    prov["content"] += f"\n\n{content_md}"
+                    break
+        else:
+            seen_keys.add(key)
+            provision_ref = f"{current_chapter}:{section_ref}" if current_chapter else section_ref
+
+            title = pending_chapter_title
+            pending_chapter_title = None
+
+            provisions.append(
+                {
+                    "provision_ref": provision_ref,
+                    "chapter": current_chapter,
+                    "section": section_ref,
+                    "title": title,
+                    "content": content_md,
+                    "_key": key,
+                }
+            )
+
+    # Clean up internal tracking key
+    for prov in provisions:
+        prov.pop("_key", None)
+
+    return provisions
+
+
+# ─────────────────────────────────────────────
 # SFSR amendment register parsing
 # ─────────────────────────────────────────────
 
@@ -486,9 +634,9 @@ class SwedishTextParser(TextParser):
     def parse_text(self, data: bytes) -> list[Any]:
         """Parse the Riksdagen JSON into a list of Block objects.
 
-        Extracts the text field from the JSON, then parses chapters
-        and sections using regex patterns ported from the TypeScript
-        riksdagen-provision-parser.ts.
+        Prefers the HTML field (preserves formatting and separates
+        version variants). Falls back to plain text if no usable
+        HTML structure is found.
 
         Args:
             data: Full Riksdagen document JSON as bytes.
@@ -496,6 +644,14 @@ class SwedishTextParser(TextParser):
         Returns:
             List of Block objects (sections and articles).
         """
+        # Try HTML first — better formatting and version separation
+        html = _extract_html_from_json(data)
+        if html and '<a class="paragraf"' in html:
+            provisions = _parse_html_provisions(html)
+            if provisions:
+                return _provisions_to_blocks(provisions)
+
+        # Fallback: plain text
         text = _extract_text_from_json(data)
         if not text:
             logger.warning("No text content in Riksdagen document")
@@ -625,7 +781,9 @@ class SwedishMetadataParser(MetadataParser):
 
         # Identifier
         # Normalize for filesystem: "1962:700" → "SFS-1962-700"
-        identifier = f"SFS-{norm_id.replace(':', '-')}"
+        # Also strip spaces from old SFS numbers like "1851-55 s.4" → "SFS-1851-55s.4"
+        safe_norm = norm_id.replace(":", "-").replace(" ", "")
+        identifier = f"SFS-{safe_norm}"
 
         # Source URL
         sfs_slug = norm_id.replace(":", "-")
@@ -769,10 +927,12 @@ def _provisions_to_blocks(provisions: list[dict[str, Any]]) -> list[Block]:
             # Only add title if it was not already used as chapter title
             pass
 
-        # Content paragraphs
+        # Content paragraphs — split on double newlines for version markers
         if content:
-            # Split on double spaces or sentence boundaries for readability
-            paragraphs.append(Paragraph(css_class="parrafo", text=content))
+            for para_text in content.split("\n\n"):
+                para_text = para_text.strip()
+                if para_text:
+                    paragraphs.append(Paragraph(css_class="parrafo", text=para_text))
 
         if paragraphs:
             blocks.append(
