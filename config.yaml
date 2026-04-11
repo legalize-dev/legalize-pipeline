@@ -218,3 +218,22 @@ countries:
       request_timeout: 60
       max_retries: 5
       requests_per_second: 4.0
+
+  ua:
+    repo_path: "../countries/ua"
+    data_dir: "../countries/data-ua"
+    max_workers: 1
+    source:
+      # data.rada.gov.ua open data API. Rate limit: 60 req/min.
+      # JSON per-document endpoints are broken; using .txt + .xml instead.
+      # zakon_base_url is used for type lists (t1.txt, t21.txt).
+      base_url: "https://data.rada.gov.ua"
+      zakon_base_url: "https://zakon.rada.gov.ua"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 1.0
+      # Type lists to discover from zakon.rada.gov.ua/laws/main/t{N}.txt:
+      #   t1=Laws, t3=VR Resolutions, t4=Presidential Decrees,
+      #   t5=CMU Resolutions, t21=Codes, t216=Constitution
+      type_lists: ["t1", "t3", "t4", "t5", "t21", "t216"]
+      include_perv1: true  # also include perv1.txt (different nreg format)
