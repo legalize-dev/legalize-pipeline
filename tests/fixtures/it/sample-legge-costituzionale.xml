@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/legge_costituzionale/stato/2002-10-23/1/!main"/>
+                    <FRBRuri value="/akn/it/act/legge_costituzionale/stato/2002-10-23/1"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:stato:legge.costituzionale:2002-10-23;1"/>
+                    <FRBRalias name="eli" value="eli/id/2002/10/26/002G0267/ORIGINAL"/>
+                    <FRBRdate date="2002-10-23" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2002/10/26/002G0267/ORIGINAL" aknrelname="eli/id/2002/10/26/002G0267/ORIGINAL">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content="Cessazione degli effetti dei commi primo e secondo della XIII disposizione transitoria e finale della Costituzione. " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="002G0267" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#LEGGE COSTITUZIONALE"/>
+                            <nrdfa:span content="2002-10-23" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/legge_costituzionale/stato/2002-10-23/1/ita@2002-11-10/!main"/>
+                    <FRBRuri value="/akn/it/act/legge_costituzionale/stato/2002-10-23/1/ita@2002-11-10"/>
+                    <FRBRdate date="2002-11-10" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2002/10/26/002G0267/ORIGINAL/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/2002/10/26/002G0267/ORIGINAL"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/2002/10/26/002G0267/ORIGINAL/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/legge_costituzionale/stato/2002-10-23/1/ita@2002-11-10/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/legge_costituzionale/stato/2002-10-23/1/ita@2002-11-10.xml"/>
+                    <FRBRdate date="2002-10-23" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2002/10/26/002G0267/ORIGINAL/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="2002-10-26" name="" number="252" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="2002-10-26" eId="eventRef_0" source="ro1"/>
+            </lifecycle>
+            <workflow source="">
+                <step by="#senato" date="2002-10-23" refersTo="#S.77"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.277"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.401"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.417"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.431"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.507"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.674"/>
+                <step by="#camera" date="2002-10-23" refersTo="#C.2288-B"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.715"/>
+                <step by="#camera" date="2002-10-23" refersTo="#C.2288"/>
+                <step by="#senato" date="2002-10-23" refersTo="#S.77-277-401-417-431-507-674-715-B"/>
+            </workflow>
+            <analysis source="">
+                <activeModifications>
+                    <textualMod eId="amod_0" type="insertion">
+                        <source href="urn:nir:stato:legge.costituzionale:2002-10-23;1#1"/>
+                        <destination href="urn:nir:stato:costituzione#Allegato-XIII"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 1, comma 1) la modifica della XIII disposizione transitoria e finale, commi primo e secondo.</nakn:text>
+                        </new>
+                    </textualMod>
+                </activeModifications>
+            </analysis>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/LEGGE_COSTITUZIONALE/stato/2002-10-23/1/!main" showAs=""/>
+                <passiveRef eId="S.77" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;77" showAs=""/>
+                <passiveRef eId="S.277" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;277" showAs=""/>
+                <passiveRef eId="S.401" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;401" showAs=""/>
+                <passiveRef eId="S.417" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;417" showAs=""/>
+                <passiveRef eId="S.431" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;431" showAs=""/>
+                <passiveRef eId="S.507" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;507" showAs=""/>
+                <passiveRef eId="S.674" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;674" showAs=""/>
+                <passiveRef eId="C.2288-B" href="/akn/it/camera-it:parlamento:scheda.progetto.legge:camera;14.legislatura;2288-B" showAs=""/>
+                <passiveRef eId="S.715" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;715" showAs=""/>
+                <passiveRef eId="C.2288" href="/akn/it/camera-it:parlamento:scheda.progetto.legge:camera;14.legislatura;2288" showAs=""/>
+                <passiveRef eId="S.77-277-401-417-431-507-674-715-B" href="/akn/it/senato-it:parl:ddl:senato;14.legislatura;77-277-401-417-&#10;431-507-674-&#10;715-B" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/2002/10/26/002G0267/ORIGINAL">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it">Cessazione degli effetti dei commi primo e secondo della XIII disposizione transitoria e finale della Costituzione. </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>002G0267</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#LEGGE COSTITUZIONALE"/>
+                        <eli:date_document rdf:datatype="xsd:date">2002-10-23</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2002/10/26/002G0267/ORIGINAL/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/2002/10/26/002G0267/ORIGINAL"/>
+                        <eli:is_embodied_by rdf:resource="na:id/2002/10/26/002G0267/ORIGINAL/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2002/10/26/002G0267/ORIGINAL/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>LEGGE COSTITUZIONALE</docType>
+                <docDate date="2002-10-23">23 ottobre 2002</docDate>
+                <docNumber>1</docNumber>
+                <docTitle>Cessazione degli effetti dei commi primo e secondo della XIII disposizione transitoria e finale della Costituzione.
+</docTitle>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="formulaInizialePreambolo">
+                <p>La Camera dei deputati ed il Senato della Repubblica, con la</p>
+            </formula>
+            <p>maggioranza assoluta dei rispettivi componenti hanno approvato;</p>
+            <p>Nessuna richiesta di referendum costituzionale e' stata presentata:</p>
+            <p>IL PRESIDENTE DELLA REPUBBLICA</p>
+            <formula name="formulaFinalePreambolo">
+                <p>Promulga la seguente legge costituzionale:</p>
+            </formula>
+        </preamble>
+        <body>
+            <article eId="art_1">
+                <num>Art. 1.</num>
+                <heading/>
+                <paragraph eId="art_1__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>I commi primo e secondo della XIII disposizione transitoria e 
+finale della Costituzione esauriscono i loro effetti a decorrere dalla data di entrata in vigore della presente legge costituzionale. 
+ La presente legge costituzionale, munita del sigillo dello Stato, sara' inserita nella Raccolta ufficiale degli atti normativi della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarla e di farla osservare come legge dello Stato. 
+ 
+ Data a Roma, addi' 23 ottobre 2002 
+ 
+ CIAMPI 
+ Berlusconi, Presidente del Consiglio 
+ dei Ministri 
+Visto, il Guardasigilli: Castelli 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_1" placement="bottom">
+                                <p> Avvertenza:
+ Il testo della nota qui pubblicato e' stato redatto dall'amministrazione competente per materia, ai sensi dell'art. 10, comma 3, del testo unico delle disposizioni sulla promulgazione delle leggi, sull'emanazione dei decreti del Presidente della Repubblica e sulle pubblicazioni ufficiali della Repubblica italiana, approvato con <ref eId="content__ref_1" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1985-12-28/1092/!main">D.P.R. 28 dicembre 1985, n. 1092</ref>, al solo fine di facilitare la lettura della disposizione di legge alla quale e' operato il rinvio e della quale restano invariati il valore e l'efficacia.
+ Nota all'art. 1, comma 1:
+ - Il testo dei commi primo e secondo della XIII disposizione transitoria e finale della Costituzione, i cui effetti si esauriranno a decorrere dalla data di entrata in vigore della presente legge, e' il seguente:
+ "XIII. - I membri e i discendenti di Casa Savoia non sono elettori e non possono ricoprire uffici pubblici ne' cariche elettive.
+ Agli ex re di Casa Savoia, alle loro consorti e ai loro discendenti maschi sono vietati l'ingresso e il soggiorno nel territorio nazionale.".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+        </body>
+    </act>
+</akomaNtoso>

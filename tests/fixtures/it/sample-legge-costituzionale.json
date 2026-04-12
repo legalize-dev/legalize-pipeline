@@ -1,0 +1,29 @@
+{
+  "code": null,
+  "message": null,
+  "data": {
+    "atto": {
+      "titolo": "LEGGE COSTITUZIONALE 23 ottobre 2002, n. 1",
+      "sottoTitolo": "Cessazione  degli  effetti  dei  commi  primo  e  secondo  della XIII\ndisposizione transitoria e finale della Costituzione.\n",
+      "articoloHtml": "<div class=\"bodyTesto\">\n        <h2 class=\"preamble-title-akn\">La Camera dei deputati ed il Senato della Repubblica, con la</h2>\n        <div>\n            <div class=\"preamble-text-akn\">maggioranza assoluta dei rispettivi componenti hanno approvato;</div>\n        </div>\n        <div>\n            <div class=\"preamble-text-akn\">Nessuna richiesta di referendum costituzionale &egrave; stata presentata:</div>\n        </div>\n        <div>\n            <div class=\"preamble-text-akn\">IL PRESIDENTE DELLA REPUBBLICA</div>\n        </div>\n        <h2 class=\"preamble-end-akn\">Promulga</h2>\n        <p class=\"formula-introduttiva\"> la seguente legge costituzionale:</p>\n        <h2 class=\"article-num-akn\" id=\"art_1\">Art. 1</h2>\n        <div class=\"art-commi-div-akn\">\n            <div class=\"art-comma-div-akn\">\n                <span class=\"comma-num-akn\">1. </span><span class=\"art_text_in_comma\">I commi primo e secondo della XIII disposizione transitoria e \n                    <br>\n                    finale della Costituzione esauriscono i loro effetti a decorrere dalla data di entrata in vigore della presente legge costituzionale. \n                    <br>\n                     La presente legge costituzionale, munita del sigillo dello Stato, sar&agrave; inserita nella Raccolta ufficiale degli atti normativi della Repubblica italiana. &Egrave; fatto obbligo a chiunque spetti di osservarla e di farla osservare come legge dello Stato. \n                    <br>\n                     \n                    <br>\n                     Data a Roma, add&igrave; 23 ottobre 2002 \n                    <br>\n                     \n                    <br>\n                     CIAMPI \n                    <br>\n                     Berlusconi, Presidente del Consiglio \n                    <br>\n                     dei Ministri \n                    <br>\n                    Visto, il Guardasigilli: Castelli \n                    <br>\n                    \n                </span>\n            </div>\n        </div>\n        <div class=\"note-akn\">\n             Avvertenza:\n            <br>\n             Il testo della nota qui pubblicato &egrave; stato redatto dall'amministrazione competente per materia, ai sensi dell'art. 10, comma 3, del testo unico delle disposizioni sulla promulgazione delle leggi, sull'emanazione dei decreti del Presidente della Repubblica e sulle pubblicazioni ufficiali della Repubblica italiana, approvato con <a href=\"http://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1985-12-28;1092\" target=\"_blank\">D.P.R. 28 dicembre 1985, n. 1092</a>, al solo fine di facilitare la lettura della disposizione di legge alla quale &egrave; operato il rinvio e della quale restano invariati il valore e l'efficacia.\n            <br>\n             Nota all'art. 1, comma 1:\n            <br>\n             - Il testo dei commi primo e secondo della XIII disposizione transitoria e finale della Costituzione, i cui effetti si esauriranno a decorrere dalla data di entrata in vigore della presente legge, &egrave; il seguente:\n            <br>\n             \"XIII. - I membri e i discendenti di Casa Savoia non sono elettori e non possono ricoprire uffici pubblici n&egrave; cariche elettive.\n            <br>\n             Agli ex re di Casa Savoia, alle loro consorti e ai loro discendenti maschi sono vietati l'ingresso e il soggiorno nel territorio nazionale.\".\n            <br>\n            \n        </div>\n    </div>",
+      "tipoProvvedimentoDescrizione": "LEGGE COSTITUZIONALE",
+      "tipoProvvedimentoCodice": "PLC",
+      "annoProvvedimento": 2002,
+      "meseProvvedimento": 10,
+      "giornoProvvedimento": 23,
+      "numeroProvvedimento": 1,
+      "tipoSupplementoCode": "NO",
+      "numeroSupplemento": 0,
+      "annoGU": 2002,
+      "meseGU": 10,
+      "giornoGU": 26,
+      "numeroGU": 252,
+      "dataPubblicazioneInGazzetta": null,
+      "articoloDataInizioVigenza": "20021110",
+      "articoloDataFineVigenza": "99999999",
+      "testoInVigore": null
+    },
+    "message": null
+  },
+  "success": true
+}

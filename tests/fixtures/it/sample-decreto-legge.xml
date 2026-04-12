@@ -1,0 +1,1530 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/decreto-legge/stato/2026-03-27/38/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto-legge/stato/2026-03-27/38"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:stato:decreto.legge:2026-03-27;38"/>
+                    <FRBRalias name="eli" value="eli/id/2026/03/27/26G00057/CONSOLIDATED/20260404"/>
+                    <FRBRdate date="2026-03-27" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404" aknrelname="eli/id/2026/03/27/26G00057/CONSOLIDATED/20260404">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content="Disposizioni urgenti in materia fiscale ed economica. (26G00057)  " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="26G00057" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#DECRETO-LEGGE"/>
+                            <nrdfa:span content="2026-03-27" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/decreto-legge/stato/2026-03-27/38/ita@2026-04-04/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto-legge/stato/2026-03-27/38/ita@2026-04-04"/>
+                    <FRBRdate date="2026-04-04" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/decreto-legge/stato/2026-03-27/38/ita@2026-04-04/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/decreto-legge/stato/2026-03-27/38/ita@2026-04-04.xml"/>
+                    <FRBRdate date="2026-03-27" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="2026-03-27" name="" number="72" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="2026-03-27" eId="eventRef_0" source="ro1"/>
+                <eventRef date="2026-04-03" eId="eventRef_1" source="rp1"/>
+            </lifecycle>
+            <analysis source="">
+                <activeModifications>
+                    <textualMod eId="amod_0" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#1"/>
+                        <destination href="urn:nir:stato:legge:2025-12-30;199#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 1, comma 1) la modifica dell'art. 1, comma 139.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_1" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#2"/>
+                        <destination href="urn:nir:stato:legge:2016-12-11;232#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 2, commi 1 e 2) la modifica dell'art. 1, comma 154. </nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_2" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#3"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#86"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 3, comma 1) l'introduzione del comma 5-ter all'art. 86; (con l'art. 3, comma 3) la modifica dell'art. 86, comma 5-ter. </nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_3" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#3"/>
+                        <destination href="urn:nir:stato:decreto.legislativo:1997-12-15;446#11"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 3, comma 2) l'introduzione del comma 4-nonies all'art. 11; (con l'art. 3, comma 3) la modifica dell'art. 11, comma 4-nonies.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_4" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#5"/>
+                        <destination href="urn:nir:stato:legge:2025-12-30;199#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 5, comma 1) la modifica dell'art. 1, comma 126.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_5" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#6"/>
+                        <destination href="urn:nir:stato:legge:2025-12-30;199#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 6, comma 1) la modifica dell'art. 1, comma 142.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_6" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#7"/>
+                        <destination href="urn:nir:stato:legge:2025-12-30;199#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 7, commi 1 e 3) la modifica dell'art. 1, comma 427.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_7" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#10"/>
+                        <destination href="urn:nir:stato:decreto.legislativo:2024-07-29;110#3"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 10, comma 1) l'introduzione del comma 3-bis all'art. 3.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_8" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#10"/>
+                        <destination href="urn:nir:stato:decreto.legislativo:2025-03-24;33#Allegato-art. 211"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 10, comma 2) l'introduzione del comma 3-bis all'art. 3.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_9" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1973-09-29;600#27"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, commi 2 e 5) la modifica dell'art. 27, comma 3-ter.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_10" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#58"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, commi 1, lettera a) e 5) la modifica dell'art. 58, comma 2.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_11" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#59"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, comma 1, lettera b)) l'abrogazione del comma 1-bis dell'art. 59.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_12" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#59"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, commi 1, lettera b) e 5) la modifica dell'art. 59, comma 1.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_13" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#87"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, comma 1, lettera c)) l'abrogazione del comma 1.1 dell'art. 87.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_14" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#87"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, commi 1, lettera c) e 5) la modifica dell'art. 87, comma 3.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_15" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#89"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, comma 1, lettera d)) l'abrogazione del comma 2.1 dell'art. 89.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_16" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917#89"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, commi 1, lettera d) e 5) la modifica dell'art. 89, commi 2, 3, 3-bis lettera a).</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_17" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:decreto.legislativo:2025-03-24;33#Allegato-art. 55"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, commi 3 e 5) la modifica dell'art. 55, comma 5.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_18" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#11"/>
+                        <destination href="urn:nir:stato:legge:2025-12-30;199#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, comma 4) l'abrogazione dei commi 51, 52, 53, 54 e 55 dell'art. 1; (con l'art. 11, comma 5) la modifica dell'art. 1, commi 51, 52, 53, 54 e 55. </nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_19" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#12"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1972-10-26;642#Allegato A-art. 13"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 12, commi 1 e 2) la modifica dell'art. 13, comma 2-bis, lettera b) della Tariffa.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_20" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#12"/>
+                        <destination href="urn:nir:stato:decreto.legislativo:2025-08-01;123#Allegato 3-art. 1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 12, commi 1 e 2) la modifica articolo 9, comma 3, lettera b), della tariffa, parte I, di cui all'Allegato 3.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_21" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#13"/>
+                        <destination href="urn:nir:stato:legge:2022-12-29;197#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 13, comma 3) la modifica dell'art. 1, comma 763.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_22" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#13"/>
+                        <destination href="urn:nir:stato:legge:2024-12-30;207#"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 13, comma 1) la modifica dell'art. 1, comma 830; (con l'art. 13, comma 2) la modifica dell'art. 1, comma 607.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_23" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#14"/>
+                        <destination href="urn:nir:stato:decreto.legge:1981-07-29;402#13"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 14, comma 1) la modifica dell'art. 13, comma 1.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_24" type="insertion">
+                        <source href="urn:nir:stato:decreto.legge:2026-03-27;38#15"/>
+                        <destination href="urn:nir:stato:decreto.legge:2016-12-23;237#24 bis"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 15, comma 1, lettera a)) la modifica dell'art. 24-bis, comma 1; (con l'art. 15, comma 1, lettera b)) la modifica dell'art. 24-bis, comma 3, lettera a); (con l'art. 15, comma 1, lettera c)) la modifica dell'art. 24-bis, comma 7; (con l'art. 15, comma 1, lettera d)) la modifica dell'art. 24-bis, comma 8; (con l'art. 15, comma 1, lettera e)) l'introduzione del comma 8-bis all'art. 24-bis; (con l'art. 15, comma 1, lettera f)) la modifica dell'art. 24-bis, comma 9. </nakn:text>
+                        </new>
+                    </textualMod>
+                </activeModifications>
+                <passiveModifications>
+                    <textualMod eId="pmod_0" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_1"/>
+                        <new>
+                            <nakn:text>((Ai sensi dell'articolo 1, comma 770, secondo periodo, della legge 30 dicembre 2025, n. 199, alle imprese che hanno presentato le comunicazioni di cui all'articolo 38, comma 10, primo periodo, del decreto-legge 2 marzo 2024, n. 19, convertito, con modificazioni, dalla legge 29 aprile 2024, n. 56, e che abbiano ricevuto dal GSE la comunicazione che l'investimento risponde tecnicamente ai requisiti di ammissibilita' previsti dal decreto del Ministro delle imprese e del made in Italy 24 luglio 2024, pubblicato nella Gazzetta Ufficiale 6 agosto 2024, n. 183, nonche' dell'esaurimento delle risorse disponibili, spetta, nell'anno 2026, un contributo, sotto forma di credito d'imposta, nel limite di spesa di 1.302,3 milioni di euro per l'anno 2026, pari all'89,77 per cento dell'ammontare del credito d'imposta richiesto con le predette comunicazioni con riferimento agli investimenti relativi agli allegati A e B annessi alla legge 11 dicembre 2016, n. 232, e alle spese di formazione del personale.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_1" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_2"/>
+                        <new>
+                            <nakn:text>((di cui al comma 1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_2" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_3"/>
+                        <new>
+                            <nakn:text>((Alle imprese di cui al comma 1 e' concesso un contributo, nel limite massimo di 57,7 milioni di euro per l'anno 2026, di 80 milioni di euro per l'anno 2027 e di 60 milioni di euro per l'anno 2028. Il contributo e' concesso in proporzione alle spese sostenute per gli investimenti in impianti finalizzati all'autoproduzione di energia elettrica da fonti rinnovabili destinata all'autoconsumo, comprese le spese per i sistemi di accumulo dell'energia prodotta, nel rispetto del principio di non arrecare un danno significativo all'ambiente (DNSH) e alle spese sostenute per le certificazioni relative alla documentazione contabile e per quelle necessarie alla dimostrazione della riduzione dei consumi energetici e della conformita' al principio DNSH, rilasciate da soggetti abilitati, risultanti dalle comunicazioni di cui al comma 1. Il contributo di cui al presente comma non puo' eccedere per ciascuna istanza l'ammontare del credito d'imposta richiesto con le predette comunicazioni per le medesime spese. Il Ministero delle Imprese e del Made in Italy provvede all'erogazione dei contributi, sulla base delle informazioni fornite dal GSE in relazione alle spese sostenute, secondo le modalita' individuate con proprio decreto. Le disposizioni di cui al presente comma si applicano nel rispetto della normativa europea in materia di aiuti di Stato. Ai relativi adempimenti europei provvede il Ministero delle imprese e del made in Italy.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_3" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_4"/>
+                        <new>
+                            <nakn:text>((1.302,3 milioni di euro))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_4" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_5"/>
+                        <new>
+                            <nakn:text>((Agli oneri derivanti dal comma 3-bis, pari a 57,7 milioni di euro per l'anno 2026, a 80 milioni di euro per l'anno 2027 e a 60 milioni di euro per l'anno 2028 si provvede ai sensi dell'articolo 18.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_5" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_6"/>
+                        <new>
+                            <nakn:text>(( (Misure in materia di accise).))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_6" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_7"/>
+                        <new>
+                            <nakn:text>((In continuita' con quanto previsto dall'articolo 2, del decreto-legge 18 marzo 2026, n. 33 e in considerazione dell'eccezionale incremento dei prezzi dei prodotti energetici, le aliquote di accisa sulla benzina e sul gasolio, sui gas di petrolio liquefatti (GPL) e sul gas naturale usati come carburanti, di cui all'Allegato I al testo unico delle disposizioni legislative concernenti le imposte sulla produzione e sui consumi e relative sanzioni penali e amministrative, approvato con il decreto legislativo 26 ottobre 1995, n. 504, sono rideterminate, dall'8 aprile 2026 e fino al 1° maggio 2026, nelle seguenti misure:))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_7" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_8"/>
+                        <new>
+                            <nakn:text>((benzina: 472,90 euro per 1000 litri;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_8" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_9"/>
+                        <new>
+                            <nakn:text>((oli da gas o gasolio usato come carburante: 472,90 euro per 1000 litri;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_9" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_10"/>
+                        <new>
+                            <nakn:text>((gas di petrolio liquefatti (GPL) usati come carburanti: 167,77 euro per mille chilogrammi;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_10" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_11"/>
+                        <new>
+                            <nakn:text>((gas naturale usato come carburante: zero euro per metro cubo.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_11" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_12"/>
+                        <new>
+                            <nakn:text>((Per il medesimo periodo di cui al comma 1, l'aliquota di accisa di cui all'articolo 3, comma 4, del decreto legislativo 28 marzo 2025, n. 43, applicata ai gasoli paraffinici ottenuti da sintesi o da idrotrattamento (HVO) e al biodiesel, immessi in consumo tal quali per essere impiegati come carburanti, che soddisfano le condizioni previste dall'articolo 44, paragrafo 5, del regolamento (UE) n. 651/2014 della Commissione, del 17 giugno 2014, e' rideterminata nella misura di 472,90 euro per mille litri.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_12" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_13"/>
+                        <new>
+                            <nakn:text>((Agli oneri derivanti dai commi 1 e 2, valutati in 308 milioni di euro per l'anno 2026 e in 4,4 milioni di euro nell'anno 2028, si provvede ai sensi dell'articolo 18.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_13" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_14"/>
+                        <new>
+                            <nakn:text>(( (Credito d'imposta per l'acquisto di gasolio e benzina a favore delle imprese agricole).))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_14" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_15"/>
+                        <new>
+                            <nakn:text>((Al fine di mitigare gli effetti economici derivanti dal perdurare dell'aumento eccezionale del prezzo del gasolio e della benzina, derivanti dalle recenti crisi internazionali, alle imprese agricole e' riconosciuto, nel limite di 30 milioni di euro per l'anno 2026, a parziale compensazione dei maggiori oneri effettivamente sostenuti per l'acquisto di gasolio e benzina per l'alimentazione dei mezzi utilizzati per l'esercizio delle attivita' agricole, un contributo straordinario, sotto forma di credito d'imposta, fino al 20 per cento della spesa sostenuta per l'acquisto del carburante effettuato nel mese di marzo dell'anno 2026, comprovato mediante le relative fatture d'acquisto, al netto dell'imposta sul valore aggiunto.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_15" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_16"/>
+                        <new>
+                            <nakn:text>((Il credito d'imposta di cui al comma 1 e' utilizzabile esclusivamente in compensazione ai sensi dell'articolo 17 del decreto legislativo 9 luglio 1997, n. 241, entro la data del 31 dicembre 2026. Non si applicano i limiti di cui all'articolo 1, comma 53, della legge 24 dicembre 2007, n. 244, e all'articolo 34 della legge 23 dicembre 2000, n. 388 e all'articolo 31 del decreto-legge 31 maggio 2010, n. 78, convertito, con modificazioni, dalla legge 30 luglio 2010, n. 122. Il credito d'imposta non concorre alla formazione del reddito dell'impresa ne' della base imponibile dell'imposta regionale sulle attivita' produttive e non rileva ai fini del rapporto di cui agli articoli 61 e 109, comma 5, del testo unico delle imposte sui redditi, di cui al decreto del Presidente della Repubblica 22 dicembre 1986, n. 917. Il credito d'imposta e' cumulabile con altre agevolazioni che abbiano a oggetto i medesimi costi, a condizione che tale cumulo, tenuto conto anche della non concorrenza alla formazione del reddito e della base imponibile dell'imposta regionale sulle attivita' produttive, non porti al superamento del costo sostenuto.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_16" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_17"/>
+                        <new>
+                            <nakn:text>((Con decreto del Ministro dell'agricoltura, della sovranita' alimentare e delle foreste, adottato entro 30 giorni dall'entrata in vigore del presente decreto, di concerto con il Ministro dell'economia e delle finanze, sono definiti i criteri e le modalita' di attuazione delle disposizioni di cui al comma 1, con particolare riguardo alle procedure di concessione del contributo, sotto forma di credito d'imposta, anche ai fini del rispetto del limite di spesa previsto, nonche' alla documentazione richiesta, alle condizioni di revoca e all'effettuazione dei controlli.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_17" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_18"/>
+                        <new>
+                            <nakn:text>((Le disposizioni di cui al presente articolo si applicano nel rispetto della normativa europea in materia di aiuti di Stato. Ai relativi adempimenti europei provvede il Ministero dell'agricoltura, della sovranita' alimentare e delle foreste.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_18" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_19"/>
+                        <new>
+                            <nakn:text>((Agli oneri derivanti dal presente articolo, pari a 30 milioni di euro per l'anno 2026, si provvede ai sensi dell'articolo 18.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_19" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_20"/>
+                        <new>
+                            <nakn:text>(( (Misure urgenti per il sostegno all'internazionalizzazione delle imprese italiane impattate dal rincaro dei costi energetici o dalle conseguenze del conflitto).))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_20" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_21"/>
+                        <new>
+                            <nakn:text>((Nel limite di 800 milioni di euro delle disponibilita' del fondo rotativo di cui all'articolo 2, primo comma, del decreto-legge 28 maggio 1981, n. 251, convertito, con modificazioni, dalla legge 29 luglio 1981, n. 394, qualora sussistano le condizioni di cui al comma 2, il cofinanziamento a fondo perduto di cui all'articolo 72, comma 1, lettera d), del decreto-legge 17 marzo 2020, n. 18, convertito, con modificazioni, dalla legge 24 aprile 2020, n. 27, e' incrementato fino al venti per cento dei finanziamenti concessi ai sensi dell'articolo 2, primo comma, del decreto-legge n. 251 del 1981.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_21" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_22"/>
+                        <new>
+                            <nakn:text>((Le disposizioni di cui al comma 1 si applicano alle domande di finanziamento agevolato a valere sul fondo di cui al comma 1 se sussistono le seguenti condizioni:))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_22" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_23"/>
+                        <new>
+                            <nakn:text>((le domande sono presentate entro il 31 dicembre 2026;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_23" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_24"/>
+                        <new>
+                            <nakn:text>((le domande riguardano il sostegno ad iniziative volte alla transizione digitale o ecologica di cui all'articolo 7 del decreto del Ministro degli affari esteri e della cooperazione internazionale 1° giugno 2023 pubblicato nella Gazzetta ufficiale - Serie generale n. 164 del 15 luglio 2023;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_24" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_25"/>
+                        <new>
+                            <nakn:text>((le imprese richiedenti hanno subito un impatto negativo a causa del rincaro dei costi energetici o una diminuzione del fatturato o dei flussi di cassa in relazione al conflitto nell'area del Golfo Persico.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_25" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_26"/>
+                        <new>
+                            <nakn:text>((Il cofinanziamento a fondo perduto di cui al comma 1 e' elevato fino al trenta per cento per le imprese qualificabili come piccola e media impresa (PMI) come individuate dall'Allegato 1 al Regolamento (UE) n. 651/2014 della Commissione del 17 giugno 2014.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_26" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_27"/>
+                        <new>
+                            <nakn:text>((Le erogazioni afferenti al cofinanziamento a fondo perduto di cui ai commi 1 e 3 sono autorizzate, complessivamente, nel limite massimo di 160 milioni di euro per l'anno 2026 e di 140 milioni di euro per l'anno 2027.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_27" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_28"/>
+                        <new>
+                            <nakn:text>((Con una o piu' deliberazioni, il Comitato agevolazioni di cui all'articolo 1, comma 270, della legge 27 dicembre 2017, n. 205, puo' stabilire i criteri per la verifica delle condizioni di cui al comma 2, i termini e le modalita' per l'applicazione della misura prevista dal presente articolo.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_28" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_29"/>
+                        <new>
+                            <nakn:text>((43 milioni di euro per l'anno 2031 e))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_29" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_30"/>
+                        <new>
+                            <nakn:text>((Il Fondo per le emergenze in agricoltura di cui all'articolo 1, comma 443, della legge 30 dicembre 2023, n. 213, e' incrementato di 30 milioni di euro per l'anno 2027.
+Per le finalita' di cui all'articolo 1, comma 95 della legge 30 dicembre 2018, n. 145, relativamente alla quota destinata al potenziamento del Fondo nazionale per l'efficienza energetica e' autorizzata la spesa ulteriore di 175 milioni di euro per l'anno 2027, di 159,2 milioni di euro per l'anno 2028, di 129,6 milioni di euro per l'anno 2029, di 78,5 milioni di euro per l'anno 2030 e di 30,1 milioni di euro per l'anno 2031. Per il finanziamento dei contratti di sviluppo, disciplinati ai sensi dell'articolo 43 del decreto-legge 25 giugno 2008, n. 112, convertito, con modificazioni, dalla legge 6 agosto 2008, n. 133, e' autorizzata la spesa ulteriore di 13,5 milioni di euro per l'anno 2027, di 17,4 milioni di euro per l'anno 2028, di 17,7 milioni di euro per l'anno 2029, di 10,65 milioni di euro per l'anno 2030 e di 6,45 milioni di euro per l'anno 2031. Per le finalita' di cui all'articolo 1, comma 647, della legge 28 dicembre 2015, n. 208, e' autorizzata la spesa di ulteriori 9,45 milioni di euro per l'anno 2027, di 12,18 milioni di euro per l'anno 2028, di 12,39 milioni di euro per l'anno 2029, di 7,46 milioni di euro per l'anno 2030 e di 4,52 milioni di euro per l'anno 2031. Per le finalita' di cui all'articolo 1, comma 648, della legge 28 dicembre 2015, n. 208, e' autorizzata la spesa di ulteriori 4,05 milioni di euro per l'anno 2027, di 5,22 milioni di euro per l'anno 2028, di 5,31 milioni di euro per l'anno 2029, di 3,19 milioni di euro per l'anno 2030 e di 1,93 milioni di euro per l'anno 2031. Il fondo di cui all'articolo 1, comma 519, della legge 30 dicembre 2023, n. 213, e' incrementato di 773 milioni di euro per l'anno 2026))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_30" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_31"/>
+                        <new>
+                            <nakn:text>((Agli oneri derivanti dal comma 1 e dagli articoli 3, comma 2, 4, comma 1, 6, comma 1, 7, comma 1, 8, commi 1 e 3-bis, 8-bis, 8-ter, 9, comma 1, 11, comma 1, 13, commi 1 e 3, 14, comma 1, valutati in 401,88 milioni di euro per l'anno 2026, 171,5 milioni di euro per l'anno 2027, 274,6 milioni di euro per l'anno 2028, 359,1 milioni di euro per ciascuno degli anni 2029 e 2030, 329,2 milioni di euro per l'anno 2031, 233,6 milioni di euro per l'anno 2032, 106,8 milioni di euro per l'anno 2033, 67,2 milioni di euro per l'anno 2034 e 61,6 milioni di euro annui a decorrere dall'anno 2035, e pari a 2.166,25 milioni di euro per l'anno 2026, 314,75 milioni di euro per l'anno 2027, 254,5 milioni di euro per l'anno 2028, 165,5 milioni di euro per l'anno 2029, 100,3 milioni di euro per l'anno 2030, 86,5 milioni di euro per l'anno 2031, 0,5 milioni di euro per ciascuno degli anni dal 2032 al 2034, 27,5 milioni di euro per l'anno 2035 e 0,5 milioni di euro annui a decorrere dall'anno 2036, si provvede:))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_31" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_32"/>
+                        <new>
+                            <nakn:text>((7, comma 1, 8-bis, 12, comma 1, e delle minori spese derivanti dagli articoli 7, comma 1, e 8-bis))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_32" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_33"/>
+                        <new>
+                            <nakn:text>((1.300 milioni di euro))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_33" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_34"/>
+                        <new>
+                            <nakn:text>((quanto a 50 milioni per il 2026, 80 milioni per il 2027 e 60 milioni per il 2028 mediante corrispondente riduzione dell'autorizzazione di spesa di cui all'articolo 1, comma 460, della legge 30 dicembre 2024, n. 207;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_34" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_35"/>
+                        <new>
+                            <nakn:text>((quanto a 10 milioni di euro per l'anno 2026 mediante corrispondente versamento in entrata del bilancio dello Stato, delle somme disponibili in conto residui nell'ambito dello stato di previsione del Ministero delle imprese e del made in Italy, ai sensi dell'articolo 1, comma 460, della legge 30 dicembre 2024, n. 207;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_35" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_36"/>
+                        <new>
+                            <nakn:text>((quanto a 64 milioni di euro per l'anno 2026, mediante corrispondente utilizzo delle somme versate all'entrata del bilancio dello Stato ai sensi dell'articolo 148, comma 1, della legge 23 dicembre 2000, n. 388 che, alla data del 30 marzo 2026, non sono riassegnate ai pertinenti programmi e restano, per detto importo, acquisite all'erario;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_36" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_37"/>
+                        <new>
+                            <nakn:text>((quanto a 497,626 milioni di euro per l'anno 2026, mediante corrispondente utilizzo di quota parte dei proventi derivanti dalle aste delle quote di emissione di gas a effetto serra dell'anno 2025, di cui all'articolo 23 del decreto legislativo 9 giugno 2020, n. 47, nell'ambito delle attribuzioni di cui al secondo periodo del comma 4 del medesimo articolo 23. Tale quota resta definitivamente acquisita all'erario;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_37" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_38"/>
+                        <new>
+                            <nakn:text>((quanto a 30 milioni di euro per l'anno 2026 mediante corrispondente riduzione del fondo di cui all'articolo 1, comma 443, della legge 30 dicembre 2023, n. 213;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_38" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_39"/>
+                        <new>
+                            <nakn:text>((quanto a euro 333.924.858 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica e quanto a euro 94.756 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero delle infrastrutture e dei trasporti, ai sensi dell'articolo 23, comma 7, del decreto legislativo 9 giugno 2020, n. 47;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_39" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_40"/>
+                        <new>
+                            <nakn:text>((quanto a euro 1.300.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 15, comma 1, del decreto legislativo 4 luglio 2014, n. 102;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_40" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_41"/>
+                        <new>
+                            <nakn:text>((quanto a euro 398.600 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 15, comma 1, del decreto legislativo 8 novembre 2021, n. 199;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_41" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_42"/>
+                        <new>
+                            <nakn:text>((quanto a euro 29.448.311 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 5, comma 12, del decreto legislativo 4 luglio 2014, n. 102;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_42" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_43"/>
+                        <new>
+                            <nakn:text>((quanto a euro 400.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 8, comma 11, del decreto legislativo 4 luglio 2014, n. 102;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_43" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_44"/>
+                        <new>
+                            <nakn:text>((quanto a euro 3.000.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 13 del decreto legislativo 4 luglio 2014, n. 102;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_44" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_45"/>
+                        <new>
+                            <nakn:text>((quanto a euro 11.799.752 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 6, comma 2, del decreto legislativo 9 giugno 2020, n. 47;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_45" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_46"/>
+                        <new>
+                            <nakn:text>((quanto a euro 20.000.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 14, comma 8, del decreto-legge 16 settembre 2024, n. 131, convertito, con modificazioni, dalla legge 14 novembre 2024, n. 166;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_46" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_47"/>
+                        <new>
+                            <nakn:text>((quanto a euro 119.576.369 per l'anno 2026 mediante corrispondente versamento all'entrata del bilancio dello Stato, nel medesimo anno, delle risorse disponibili in conto residui, nello stato di previsione Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 23, comma 7, del decreto legislativo 9 giugno 2020, n. 47 e dell'articolo 5, comma 12, del decreto legislativo 4 luglio 2014, n. 102;))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_47" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_48"/>
+                        <new>
+                            <nakn:text>((quanto a 222 milioni di euro per l'anno 2027, 199 milioni di euro per l'anno 2028, 165 milioni di euro per l'anno 2029, 100 milioni di euro per l'anno 2030 e 86 milioni di euro per l'anno 2031, mediante utilizzo del fondo di cui all'articolo 1, comma 519, della legge 30 dicembre 2023, n. 213.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_48" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_49"/>
+                        <new>
+                            <nakn:text>((8-quater,))</nakn:text>
+                        </new>
+                    </textualMod>
+                </passiveModifications>
+            </analysis>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/DECRETO-LEGGE/stato/2026-03-27/38/!main" showAs=""/>
+                <passiveRef eId="rp1" href="/akn/it/act/DECRETO-LEGGE/stato/2026-04-03/42/!main" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it">Disposizioni urgenti in materia fiscale ed economica. (26G00057)  </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>26G00057</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#DECRETO-LEGGE"/>
+                        <eli:date_document rdf:datatype="xsd:date">2026-03-27</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404"/>
+                        <eli:is_embodied_by rdf:resource="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2026/03/27/26G00057/CONSOLIDATED/20260404/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>DECRETO-LEGGE</docType>
+                <docDate date="2026-03-27">27 marzo 2026</docDate>
+                <docNumber>38</docNumber>
+                <docTitle>Disposizioni urgenti in materia fiscale ed economica. (26G00057) 
+</docTitle>
+            </p>
+            <p>
+                <authorialNote eId="atn1" placement="bottom">
+                    <p>Entrata in vigore del provvedimento: 28/03/2026</p>
+                </authorialNote>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="formulaInizialePreambolo">
+                <p>IL PRESIDENTE DELLA REPUBBLICA</p>
+            </formula>
+            <citations eId="cits_1">
+                <citation eId="cits_1__cit_1">
+                    <p>Visti gli <ref eId="ref_1" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_77">articoli 77</ref> e <ref eId="ref_2" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_87-com5">87 quinto comma della Costituzione</ref>;</p>
+                </citation>
+            </citations>
+            <p>Ritenuta la straordinaria necessita' e urgenza di prevedere misure urgenti in materia fiscale;</p>
+            <p>Ritenuta, altresi', la straordinaria necessita' e urgenza di prevedere misure urgenti per garantire l'operativita' delle pubbliche amministrazioni, nonche' il regolare svolgimento delle attivita' economiche;</p>
+            <citations eId="cits_2">
+                <citation eId="cits_2__cit_1">
+                    <p>Vista la deliberazione del Consiglio dei ministri, adottata nella riunione del 27 marzo 2026;</p>
+                </citation>
+            </citations>
+            <p>Sulla proposta del Presidente del Consiglio dei ministri e del Ministro dell'economia e delle finanze;</p>
+            <formula name="formulaFinalePreambolo">
+                <p>Emana il seguente decreto-legge:</p>
+            </formula>
+        </preamble>
+        <body>
+            <chapter eId="chp_I">
+                <num>Capo I</num>
+                <heading>Misure urgenti in materia fiscale</heading>
+                <article eId="art_1">
+                    <num>Art. 1.</num>
+                    <heading> Modifiche alla decorrenza del nuovo regime IVA 
+ delle operazioni permutative</heading>
+                    <paragraph eId="art_1__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>All'<ref eId="content__ref_3" href="/akn/it/act/legge/stato/2025-12-30/199/!main#art_1">articolo 1 della legge 30 dicembre 2025, n. 199</ref>, il comma 139 e' sostituto dal seguente: «139. Le disposizioni di cui al comma 138 si applicano alle operazioni effettuate in esecuzione di contratti stipulati o rinnovati a decorrere dal 1° gennaio 2026.». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_1__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Sono fatti salvi i comportamenti pregressi adottati anteriormente al 1° gennaio 2026 nonche' quelli adottati in conformita' all'<ref eId="content__ref_4" href="/akn/it/act/legge/stato/2026-01-01/199/!main#art_1-com138">articolo 1, comma 138, della legge n. 199 del 2025, dal 1° gennaio 2026</ref> alla data di entrata in vigore del presente decreto. Non si fa luogo, in ogni caso, a rimborsi d'imposta o a rettifiche rispetto all'imposta precedentemente liquidata. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_2">
+                    <num>Art. 2.</num>
+                    <heading> Modifiche al regime fiscale dei lavoratori impatriati</heading>
+                    <paragraph eId="art_2__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>All'<ref eId="content__ref_5" href="/akn/it/act/legge/stato/2016-12-11/232/!main#art_1-com154">articolo 1, comma 154, della legge 11 dicembre 2016, n. 232</ref>, le parole: «e dall'<ref eId="content__ref_6" href="/akn/it/act/decretoLegislativo/stato/2015-09-14/147/!main#art_16">articolo 16 del decreto legislativo 14 settembre 2015, n. 147</ref>» sono sostituite dalle seguenti: «dall'<ref eId="content__ref_7" href="/akn/it/act/decretoLegislativo/stato/2015-09-14/147/!main#art_16">articolo 16 del decreto legislativo 14 settembre 2015, n. 147</ref>, e dall'<ref eId="content__ref_8" href="/akn/it/act/decretoLegislativo/stato/2023-12-27/209/!main#art_5">articolo 5 del decreto legislativo 27 dicembre 2023, n. 209</ref>». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_2__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Le disposizioni del presente articolo si applicano nei confronti dei soggetti che trasferiscono la residenza fiscale in Italia a decorrere dal periodo d'imposta 2027. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_3">
+                    <num>Art. 3.</num>
+                    <heading/>
+                    <paragraph>
+                        <content>
+                            <p>
+ 
+Rateizzazione della tassazione dell'avviamento negativo nelle operazioni di cessione dell'azienda o di un ramo di essa con continuazione dell'attivita' e mantenimento degli assetti occupazionali 
+ 
+ 1. All'articolo 86 del testo unico delle imposte sui redditi, di cui al <ref eId="content__ref_9" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1986-12-22/917/!main">decreto del Presidente della Repubblica 22 dicembre 1986, n. 917</ref>, dopo il comma 5-bis e' aggiunto il seguente: 
+ «5-ter. Per i soggetti che redigono il bilancio in base ai principi contabili internazionali di cui al regolamento (CE) n. 1606/2002 del Parlamento europeo e del Consiglio, del 19 luglio 2002, la differenza, qualora negativa, tra il corrispettivo e il valore dei beni e dei rapporti giuridici che costituiscono l'azienda o il ramo d'azienda, nelle operazioni di cui all'<ref eId="content__ref_10" href="/akn/it/act/legge/stato/2021-12-30/234/!main#art_1-com237">articolo 1, comma 237, della legge 30 dicembre 2021, n. 234</ref>, limitatamente alla quota rilevata nel conto economico, concorre in quote costanti alla formazione del reddito nell'esercizio stesso e nei quattro successivi.». 
+ 2. All'<ref eId="content__ref_11" href="/akn/it/act/decretoLegislativo/stato/1997-12-15/446/!main#art_11">articolo 11 del decreto legislativo 15 dicembre 1997, n. 446</ref>, dopo il comma 4-octies e' aggiunto il seguente: 
+ «4-nonies. Per i soggetti che redigono il bilancio in base ai principi contabili internazionali di cui al regolamento (CE) n. 1606/2002 del Parlamento europeo e del Consiglio, del 19 luglio 2002, la differenza, qualora negativa, tra il corrispettivo e il valore dei beni e dei rapporti giuridici che costituiscono l'azienda o il ramo d'azienda, nelle operazioni di cui all'<ref eId="content__ref_12" href="/akn/it/act/legge/stato/2021-12-30/234/!main#art_1-com237">articolo 1, comma 237, della legge 30 dicembre 2021, n. 234</ref>, limitatamente alla quota rilevata nel conto economico, concorre in quote costanti alla determinazione del valore della produzione netta nell'esercizio stesso e nei quattro successivi.». 
+ 3. Le disposizioni di cui ai commi 1 e 2 si applicano a decorrere dal periodo d'imposta in corso al 31 dicembre 2024. 
+ 4. Agli oneri derivanti dal presente articolo, valutati in 22,2 milioni di euro per l'anno 2026, in 3 milioni di euro per l'anno 2027 e in 0,6 milioni di euro per l'anno 2028, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_4">
+                    <num>Art. 4.</num>
+                    <heading> Esenzione per gli interessi da titolo obbligazionario 
+ corrisposti ai sistemi di garanzia dei depositanti</heading>
+                    <paragraph eId="art_4__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>In considerazione della possibilita' di un consistente incremento dei rendimenti, gli interessi e gli altri proventi delle obbligazioni e dei titoli similari corrisposti ai sistemi di garanzia dei depositanti istituiti ai sensi dell'articolo 96 del testo unico delle leggi in materia bancaria e creditizia, di cui al <ref eId="content__ref_13" href="/akn/it/act/decretoLegislativo/stato/1993-09-01/385/!main">decreto legislativo 1º settembre 1993, n. 385</ref>, sono esenti dall'imposta sostitutiva di cui all'<ref eId="content__ref_14" href="/akn/it/act/decretoLegislativo/stato/1996-04-01/239/!main#art_2">articolo 2 del decreto legislativo 1° aprile 1996, n. 239</ref>. Le disposizioni di cui al primo periodo si applicano agli interessi e agli altri proventi corrisposti a decorrere dalla data di entrata in vigore del presente decreto e fino al 31 dicembre 2028. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_4__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, valutati in 16,8 milioni di euro per ciascuno degli anni 2026, 2027 e 2028, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_5">
+                    <num>Art. 5.</num>
+                    <heading>Differimento dell'applicazione del contributo di cui all'articolo 1, comma 126, della legge 30 dicembre 2025, n. 199</heading>
+                    <paragraph eId="art_5__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>Ferma restando l'attivita' di adeguamento dei sistemi informativi da parte dell'Agenzia delle dogane e dei monopoli, il contributo di cui all'<ref eId="content__ref_15" href="/akn/it/act/legge/stato/2025-12-30/199/!main#art_1-com126">articolo 1, comma 126, della legge 30 dicembre 2025, n. 199</ref>, non si applica alle spedizioni, ivi indicate, di beni importati anteriormente alla data del 1° luglio 2026. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_6">
+                    <num>Art. 6.</num>
+                    <heading> Disposizione in materia di ritenuta sulle provvigioni</heading>
+                    <paragraph eId="art_6__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>All'<ref eId="content__ref_16" href="/akn/it/act/legge/stato/2025-12-30/199/!main#art_1-com142">articolo 1, comma 142, della legge 30 dicembre 2025, n. 199</ref>, le parole: «dal 1° marzo 2026» sono sostituite dalle seguenti: «dal 1° maggio 2026». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_6__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, valutati in 14,3 milioni per l'anno 2026, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_7">
+                    <num>Art. 7.</num>
+                    <heading>Modifiche alla disciplina della maggiorazione dell'ammortamento per gli investimenti in beni strumentali</heading>
+                    <paragraph eId="art_7__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>All'<ref eId="content__ref_17" href="/akn/it/act/legge/stato/2025-12-30/199/!main#art_1-com427">articolo 1, comma 427, della legge 30 dicembre 2025, n. 199</ref>, le parole «in beni prodotti in uno degli Stati membri dell'Unione europea o in Stati aderenti all'Accordo sullo Spazio economico europeo,» sono soppresse. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_7__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, valutati in 95,6 milioni di euro per l'anno 2027, 191,5 milioni di euro per l'anno 2028, 297,5 milioni di euro per ciascuno degli anni 2029 e 2030, 267,6 milioni di euro per l'anno 2031, 172 milioni di euro per l'anno 2032, 45,2 milioni di euro per l'anno 2033 e 5,6 milioni di euro per l'anno 2034, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_7__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>Le disposizioni del presente articolo si applicano agli investimenti effettuati dal 1° gennaio 2026. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_8">
+                    <num>Art. 8.</num>
+                    <heading> Misure fiscali in favore delle imprese</heading>
+                    <paragraph eId="art_8__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_1">((Ai sensi dell'articolo 1, comma 770, secondo periodo, della legge 30 dicembre 2025, n. 199, alle imprese che hanno presentato le comunicazioni di cui all'articolo 38, comma 10, primo periodo, del decreto-legge 2 marzo 2024, n. 19, convertito, con modificazioni, dalla legge 29 aprile 2024, n. 56, e che abbiano ricevuto dal GSE la comunicazione che l'investimento risponde tecnicamente ai requisiti di ammissibilita' previsti dal decreto del Ministro delle imprese e del made in Italy 24 luglio 2024, pubblicato nella Gazzetta Ufficiale 6 agosto 2024, n. 183, nonche' dell'esaurimento delle risorse disponibili, spetta, nell'anno 2026, un contributo, sotto forma di credito d'imposta, nel limite di spesa di 1.302,3 milioni di euro per l'anno 2026, pari all'89,77 per cento dell'ammontare del credito d'imposta richiesto con le predette comunicazioni con riferimento agli investimenti relativi agli allegati A e B annessi alla legge 11 dicembre 2016, n. 232, e alle spese di formazione del personale.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Entro il 30 aprile 2026, il GSE comunica ai soggetti interessati il credito d'imposta utilizzabile dandone preventiva comunicazione all'Agenzia delle entrate. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>Il credito d'imposta <ins eId="ins_2">((di cui al comma 1))</ins> e' utilizzabile esclusivamente in compensazione, ai sensi dell'<ref eId="content__ref_18" href="/akn/it/act/decretoLegislativo/stato/1997-07-09/241/!main#art_17">articolo 17 del decreto legislativo 9 luglio 1997, n. 241</ref>, presentando il modello F24 entro il 31 dicembre 2026, decorsi cinque giorni dalla comunicazione del credito utilizzabile ai soggetti interessati di cui al comma 2.
+Non si applicano i limiti di cui all'<ref eId="content__ref_19" href="/akn/it/act/legge/stato/2007-12-24/244/!main#art_1-com53">articolo 1, comma 53, della legge 24 dicembre 2007, n. 244</ref>, di cui all'<ref eId="content__ref_20" href="/akn/it/act/legge/stato/2000-12-23/388/!main#art_34">articolo 34 della legge 23 dicembre 2000, n. 388</ref>, e di cui all'<ref eId="content__ref_21" href="/akn/it/act/decretoLegge/stato/2010-05-31/78/!main#art_31">articolo 31 del decreto-legge 31 maggio 2010, n. 78</ref>, convertito, con modificazioni, dalla <ref eId="content__ref_22" href="/akn/it/act/legge/stato/2010-07-30/122/!main">legge 30 luglio 2010, n. 122</ref>. Il credito d'imposta non concorre alla formazione del reddito nonche' della base imponibile dell'imposta regionale sulle attivita' produttive e non rileva ai fini del rapporto di cui agli articoli 61 e 109, comma 5, del testo unico di cui al <ref eId="content__ref_23" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1986-12-22/917/!main">decreto del Presidente della Repubblica 22 dicembre 1986, n. 917</ref>. Per tutto quanto non espressamente previsto dal presente articolo, si applicano, in quanto compatibili, le disposizioni di cui all'articolo <ref eId="content__ref_24" href="/akn/it/act/decretoLegge/stato/2024-03-02/19/!main#art_38">articolo 38 del decreto-legge 2 marzo 2024, n. 19</ref>, convertito, con modificazioni, dalla <ref eId="content__ref_25" href="/akn/it/act/legge/stato/2024-04-29/56/!main">legge 29 aprile 2024, n. 56, e del decreto</ref> del Ministro delle imprese e del made in Italy 24 luglio 2024, anche ai fini delle attivita' di controllo. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8__para_3-bis">
+                        <num>3-bis.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_3">((Alle imprese di cui al comma 1 e' concesso un contributo, nel limite massimo di 57,7 milioni di euro per l'anno 2026, di 80 milioni di euro per l'anno 2027 e di 60 milioni di euro per l'anno 2028. Il contributo e' concesso in proporzione alle spese sostenute per gli investimenti in impianti finalizzati all'autoproduzione di energia elettrica da fonti rinnovabili destinata all'autoconsumo, comprese le spese per i sistemi di accumulo dell'energia prodotta, nel rispetto del principio di non arrecare un danno significativo all'ambiente (DNSH) e alle spese sostenute per le certificazioni relative alla documentazione contabile e per quelle necessarie alla dimostrazione della riduzione dei consumi energetici e della conformita' al principio DNSH, rilasciate da soggetti abilitati, risultanti dalle comunicazioni di cui al comma 1. Il contributo di cui al presente comma non puo' eccedere per ciascuna istanza l'ammontare del credito d'imposta richiesto con le predette comunicazioni per le medesime spese. Il Ministero delle Imprese e del Made in Italy provvede all'erogazione dei contributi, sulla base delle informazioni fornite dal GSE in relazione alle spese sostenute, secondo le modalita' individuate con proprio decreto. Le disposizioni di cui al presente comma si applicano nel rispetto della normativa europea in materia di aiuti di Stato. Ai relativi adempimenti europei provvede il Ministero delle imprese e del made in Italy.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8__para_4">
+                        <num>4.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, pari a <ins eId="ins_4">((1.302,3 milioni di euro))</ins> per l'anno 2026, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8__para_4-bis">
+                        <num>4-bis.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_5">((Agli oneri derivanti dal comma 3-bis, pari a 57,7 milioni di euro per l'anno 2026, a 80 milioni di euro per l'anno 2027 e a 60 milioni di euro per l'anno 2028 si provvede ai sensi dell'articolo 18.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_8-bis">
+                    <num>Art. 8-bis.</num>
+                    <heading>
+                        <ins eId="ins_6">(( (Misure in materia di accise).))</ins>
+                    </heading>
+                    <paragraph eId="art_8-bis__para_1">
+                        <num>1.</num>
+                        <list>
+                            <intro eId="art_8-bis__para_1__intro_1">
+                                <p>
+                                    <ins eId="ins_7">((In continuita' con quanto previsto dall'articolo 2, del decreto-legge 18 marzo 2026, n. 33 e in considerazione dell'eccezionale incremento dei prezzi dei prodotti energetici, le aliquote di accisa sulla benzina e sul gasolio, sui gas di petrolio liquefatti (GPL) e sul gas naturale usati come carburanti, di cui all'Allegato I al testo unico delle disposizioni legislative concernenti le imposte sulla produzione e sui consumi e relative sanzioni penali e amministrative, approvato con il decreto legislativo 26 ottobre 1995, n. 504, sono rideterminate, dall'8 aprile 2026 e fino al 1° maggio 2026, nelle seguenti misure:))</ins>
+                                </p>
+                            </intro>
+                            <point eId="art_8-bis__para_1.__point_a">
+                                <num>a)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_8">((benzina: 472,90 euro per 1000 litri;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_8-bis__para_1.__point_b">
+                                <num>b)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_9">((oli da gas o gasolio usato come carburante: 472,90 euro per 1000 litri;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_8-bis__para_1.__point_c">
+                                <num>c)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_10">((gas di petrolio liquefatti (GPL) usati come carburanti: 167,77 euro per mille chilogrammi;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_8-bis__para_1.__point_d">
+                                <num>d)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_11">((gas naturale usato come carburante: zero euro per metro cubo.))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                        </list>
+                    </paragraph>
+                    <paragraph eId="art_8-bis__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_12">((Per il medesimo periodo di cui al comma 1, l'aliquota di accisa di cui all'articolo 3, comma 4, del decreto legislativo 28 marzo 2025, n. 43, applicata ai gasoli paraffinici ottenuti da sintesi o da idrotrattamento (HVO) e al biodiesel, immessi in consumo tal quali per essere impiegati come carburanti, che soddisfano le condizioni previste dall'articolo 44, paragrafo 5, del regolamento (UE) n. 651/2014 della Commissione, del 17 giugno 2014, e' rideterminata nella misura di 472,90 euro per mille litri.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-bis__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_13">((Agli oneri derivanti dai commi 1 e 2, valutati in 308 milioni di euro per l'anno 2026 e in 4,4 milioni di euro nell'anno 2028, si provvede ai sensi dell'articolo 18.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_8-ter">
+                    <num>Art. 8-ter.</num>
+                    <heading>
+                        <ins eId="ins_14">(( (Credito d'imposta per l'acquisto di gasolio e benzina a favore delle imprese agricole).))</ins>
+                    </heading>
+                    <paragraph eId="art_8-ter__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_15">((Al fine di mitigare gli effetti economici derivanti dal perdurare dell'aumento eccezionale del prezzo del gasolio e della benzina, derivanti dalle recenti crisi internazionali, alle imprese agricole e' riconosciuto, nel limite di 30 milioni di euro per l'anno 2026, a parziale compensazione dei maggiori oneri effettivamente sostenuti per l'acquisto di gasolio e benzina per l'alimentazione dei mezzi utilizzati per l'esercizio delle attivita' agricole, un contributo straordinario, sotto forma di credito d'imposta, fino al 20 per cento della spesa sostenuta per l'acquisto del carburante effettuato nel mese di marzo dell'anno 2026, comprovato mediante le relative fatture d'acquisto, al netto dell'imposta sul valore aggiunto.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-ter__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_16">((Il credito d'imposta di cui al comma 1 e' utilizzabile esclusivamente in compensazione ai sensi dell'articolo 17 del decreto legislativo 9 luglio 1997, n. 241, entro la data del 31 dicembre 2026. Non si applicano i limiti di cui all'articolo 1, comma 53, della legge 24 dicembre 2007, n. 244, e all'articolo 34 della legge 23 dicembre 2000, n. 388 e all'articolo 31 del decreto-legge 31 maggio 2010, n. 78, convertito, con modificazioni, dalla legge 30 luglio 2010, n. 122. Il credito d'imposta non concorre alla formazione del reddito dell'impresa ne' della base imponibile dell'imposta regionale sulle attivita' produttive e non rileva ai fini del rapporto di cui agli articoli 61 e 109, comma 5, del testo unico delle imposte sui redditi, di cui al decreto del Presidente della Repubblica 22 dicembre 1986, n. 917. Il credito d'imposta e' cumulabile con altre agevolazioni che abbiano a oggetto i medesimi costi, a condizione che tale cumulo, tenuto conto anche della non concorrenza alla formazione del reddito e della base imponibile dell'imposta regionale sulle attivita' produttive, non porti al superamento del costo sostenuto.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-ter__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_17">((Con decreto del Ministro dell'agricoltura, della sovranita' alimentare e delle foreste, adottato entro 30 giorni dall'entrata in vigore del presente decreto, di concerto con il Ministro dell'economia e delle finanze, sono definiti i criteri e le modalita' di attuazione delle disposizioni di cui al comma 1, con particolare riguardo alle procedure di concessione del contributo, sotto forma di credito d'imposta, anche ai fini del rispetto del limite di spesa previsto, nonche' alla documentazione richiesta, alle condizioni di revoca e all'effettuazione dei controlli.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-ter__para_4">
+                        <num>4.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_18">((Le disposizioni di cui al presente articolo si applicano nel rispetto della normativa europea in materia di aiuti di Stato. Ai relativi adempimenti europei provvede il Ministero dell'agricoltura, della sovranita' alimentare e delle foreste.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-ter__para_5">
+                        <num>5.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_19">((Agli oneri derivanti dal presente articolo, pari a 30 milioni di euro per l'anno 2026, si provvede ai sensi dell'articolo 18.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_8-quater">
+                    <num>Art. 8-quater.</num>
+                    <heading>
+                        <ins eId="ins_20">(( (Misure urgenti per il sostegno all'internazionalizzazione delle imprese italiane impattate dal rincaro dei costi energetici o dalle conseguenze del conflitto).))</ins>
+                    </heading>
+                    <paragraph eId="art_8-quater__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_21">((Nel limite di 800 milioni di euro delle disponibilita' del fondo rotativo di cui all'articolo 2, primo comma, del decreto-legge 28 maggio 1981, n. 251, convertito, con modificazioni, dalla legge 29 luglio 1981, n. 394, qualora sussistano le condizioni di cui al comma 2, il cofinanziamento a fondo perduto di cui all'articolo 72, comma 1, lettera d), del decreto-legge 17 marzo 2020, n. 18, convertito, con modificazioni, dalla legge 24 aprile 2020, n. 27, e' incrementato fino al venti per cento dei finanziamenti concessi ai sensi dell'articolo 2, primo comma, del decreto-legge n. 251 del 1981.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-quater__para_2">
+                        <num>2.</num>
+                        <list>
+                            <intro eId="art_8-quater__para_2__intro_1">
+                                <p>
+                                    <ins eId="ins_22">((Le disposizioni di cui al comma 1 si applicano alle domande di finanziamento agevolato a valere sul fondo di cui al comma 1 se sussistono le seguenti condizioni:))</ins>
+                                </p>
+                            </intro>
+                            <point eId="art_8-quater__para_2.__point_a">
+                                <num>a)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_23">((le domande sono presentate entro il 31 dicembre 2026;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_8-quater__para_2.__point_b">
+                                <num>b)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_24">((le domande riguardano il sostegno ad iniziative volte alla transizione digitale o ecologica di cui all'articolo 7 del decreto del Ministro degli affari esteri e della cooperazione internazionale 1° giugno 2023 pubblicato nella Gazzetta ufficiale - Serie generale n. 164 del 15 luglio 2023;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_8-quater__para_2.__point_c">
+                                <num>c)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_25">((le imprese richiedenti hanno subito un impatto negativo a causa del rincaro dei costi energetici o una diminuzione del fatturato o dei flussi di cassa in relazione al conflitto nell'area del Golfo Persico.))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                        </list>
+                    </paragraph>
+                    <paragraph eId="art_8-quater__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_26">((Il cofinanziamento a fondo perduto di cui al comma 1 e' elevato fino al trenta per cento per le imprese qualificabili come piccola e media impresa (PMI) come individuate dall'Allegato 1 al Regolamento (UE) n. 651/2014 della Commissione del 17 giugno 2014.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-quater__para_4">
+                        <num>4.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_27">((Le erogazioni afferenti al cofinanziamento a fondo perduto di cui ai commi 1 e 3 sono autorizzate, complessivamente, nel limite massimo di 160 milioni di euro per l'anno 2026 e di 140 milioni di euro per l'anno 2027.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_8-quater__para_5">
+                        <num>5.</num>
+                        <content>
+                            <p>
+                                <ins eId="ins_28">((Con una o piu' deliberazioni, il Comitato agevolazioni di cui all'articolo 1, comma 270, della legge 27 dicembre 2017, n. 205, puo' stabilire i criteri per la verifica delle condizioni di cui al comma 2, i termini e le modalita' per l'applicazione della misura prevista dal presente articolo.))</ins>
+                            </p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_9">
+                    <num>Art. 9.</num>
+                    <heading> Soglia per l'esenzione dalla ritenuta 
+ sui premi erogati agli atleti dilettanti</heading>
+                    <paragraph eId="art_9__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>Sulle somme di cui all'<ref eId="content__ref_26" href="/akn/it/act/decretoLegislativo/stato/2021-02-28/36/!main#art_36-com6quater">articolo 36, comma 6-quater, del decreto legislativo 28 febbraio 2021, n. 36</ref>, versate agli atleti partecipanti a manifestazioni sportive dilettantistiche dalla data di entrata in vigore del presente decreto fino al 31 dicembre 2026, non si applicano le ritenute alla fonte previste dall'<ref eId="content__ref_27" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-09-29/600/!main#art_30-com2">articolo 30, secondo comma, del decreto del Presidente della Repubblica 29 settembre 1973, n. 600</ref>, se l'ammontare complessivo delle somme attribuite nel suddetto periodo dal sostituto d'imposta al medesimo soggetto non supera l'importo di 300 euro; se l'ammontare e' superiore a tale importo, le somme sono assoggettate interamente alla ritenuta alla fonte. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_9__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, valutati in euro 1.380.000 per l'anno 2026, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_10">
+                    <num>Art. 10.</num>
+                    <heading>Modifiche in materia di riscossione coattiva e di riconsegna anticipata dei carichi affidati all'Agenzia delle entrate-Riscossione</heading>
+                    <paragraph eId="art_10__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>All'<ref eId="content__ref_28" href="/akn/it/act/decretoLegislativo/stato/2024-07-29/110/!main#art_3">articolo 3 del decreto legislativo 29 luglio 2024, n. 110</ref>, dopo il comma 3 e' inserito il seguente: «3-bis. Per i soli carichi di cui al comma 3, lettera b), relativamente ai quali e' decorso il termine di ventiquattro mesi dalla presa in carico, la richiesta di riconsegna anticipata e' effettuata entro sei mesi dalla data di pubblicazione del decreto di cui al richiamato comma 3.». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_10__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>All'articolo 211 del testo unico in materia di versamenti e riscossione di cui al <ref eId="content__ref_29" href="/akn/it/act/decretoLegislativo/stato/2025-03-24/33/!main">decreto legislativo 24 marzo 2025, n. 33</ref>, dopo il comma 3 e' inserito il seguente: «3-bis. Per i soli carichi di cui al comma 3, lettera b), relativamente ai quali e' decorso il termine di ventiquattro mesi dalla presa in carico, la richiesta di riconsegna anticipata e' effettuata entro sei mesi dalla data di pubblicazione del decreto di cui al richiamato comma 3.». 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_11">
+                    <num>Art. 11.</num>
+                    <heading> Ripristino regime esclusione dividendi e regime PEX</heading>
+                    <paragraph eId="art_11__para_1">
+                        <num>1.</num>
+                        <list>
+                            <intro eId="art_11__para_1__intro_1">
+                                <p>Al testo unico delle imposte sui redditi, di cui al <ref eId="content__ref_30" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1986-12-22/917/!main">decreto del Presidente della Repubblica 22 dicembre 1986, n. 917</ref>, sono apportate le seguenti modificazioni: 
+ </p>
+                            </intro>
+                            <point eId="art_11__para_1.__point_a">
+                                <num>a)</num>
+                                <content>
+                                    <p>all'articolo 58, comma 2, le parole «, con i requisiti di cui al comma 1.1 del medesimo articolo 87,» sono soppresse; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_11__para_1.__point_b">
+                                <num>b)</num>
+                                <content>
+                                    <p>all'articolo 59: 
+ 1) il comma 1 e' sostituito dal seguente: «1. Gli utili relativi alla partecipazione al capitale o al patrimonio delle societa' e degli enti di cui all'articolo 73, nonche' quelli relativi ai titoli e agli strumenti finanziari di cui all'articolo 44, comma 2, lettera a), e le remunerazioni relative ai contratti di cui all'articolo 109, comma 9, lettera b), concorrono alla formazione del reddito complessivo, nella misura del 58,14 per cento del loro ammontare, nell'esercizio in cui sono percepiti. Si applica l'articolo 47, per quanto non diversamente previsto dal periodo precedente.»; 
+ 2) il comma 1-bis e' abrogato; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_11__para_1.__point_c">
+                                <num>c)</num>
+                                <content>
+                                    <p>all'articolo 87: 
+ 1) il comma 1.1 e' abrogato; 
+ 2) il comma 3 e' sostituito dal seguente: «3. L'esenzione di cui al comma 1 si applica, alle stesse condizioni ivi previste, alle plusvalenze realizzate e determinate ai sensi dell'articolo 86, commi 1, 2 e 3, relativamente alle partecipazioni al capitale o al patrimonio, ai titoli e agli strumenti finanziari similari alle azioni ai sensi dell'articolo 44, comma 2, lettera a) ed ai contratti di cui all'articolo 109, comma 9, lettera b). Concorrono in ogni caso alla formazione del reddito per il loro intero ammontare gli utili relativi ai contratti di cui all'articolo 109, comma 9, lettera b), che non soddisfano le condizioni di cui all'articolo 44, comma 2, lettera a), ultimo periodo.»; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_11__para_1.__point_d">
+                                <num>d)</num>
+                                <content>
+                                    <p>all'articolo 89: 
+ 1) al comma 2: 
+ 1.1) il primo periodo e' sostituito dal seguente: «Gli utili distribuiti, in qualsiasi forma e sotto qualsiasi denominazione, anche nei casi di cui all'articolo 47, comma 7, dalle societa' ed enti di cui all'articolo 73, comma 1, lettere a), b) e c), non concorrono a formare il reddito dell'esercizio in cui sono percepiti in quanto esclusi dalla formazione del reddito della societa' o dell'ente ricevente per il 95 per cento del loro ammontare.»; 
+ 1.2) al secondo periodo, le parole «, con i requisiti di cui al comma 2.1, lettera b), del presente articolo» sono soppresse; 
+ 2) il comma 2.1 e' abrogato; 
+ 3) al comma 3: 
+ 3.1) al primo periodo, le parole «, nei quali e' detenuta una partecipazione con i requisiti di cui al comma 2.1, lettera a), del presente articolo» e le parole «, con i requisiti di cui al comma 2.1, lettera b), del presente articolo» sono soppresse; 
+ 3.2) al secondo periodo, le parole «, nei quali e' detenuta una partecipazione con i requisiti di cui al comma 2.1, lettera a), del presente articolo» e le parole «, con i requisiti di cui al comma 2.1, lettera b), del presente articolo» sono soppresse; 
+ 4) al comma 3-bis, lettera a), le parole «di valore fiscale non inferiore a 500.000 euro,» sono soppresse. 
+</p>
+                                </content>
+                            </point>
+                        </list>
+                    </paragraph>
+                    <paragraph eId="art_11__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>All'<ref eId="content__ref_31" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-09-29/600/!main#art_27">articolo 27 del decreto del Presidente della Repubblica 29 settembre 1973, n. 600</ref>, il comma 3-ter e' sostituito dal seguente:
+«3-ter. La ritenuta e' operata a titolo di imposta e con l'aliquota dell'1,20 per cento sugli utili corrisposti alle societa' e agli enti soggetti ad un'imposta sul reddito delle societa' negli Stati membri dell'Unione europea e negli Stati aderenti all'Accordo sullo spazio economico europeo che sono inclusi nella lista di cui ai decreti emanati in attuazione dell'<ref eId="content__ref_32" href="/akn/it/act/decretoLegislativo/stato/1996-04-01/239/!main#art_11-com4-letc">articolo 11, comma 4, lettera c), del decreto legislativo 1° aprile 1996, n. 239</ref>, ed ivi residenti, in relazione alle partecipazioni, agli strumenti finanziari di cui all'articolo 44, comma 2, lettera a), del predetto testo unico e ai contratti di associazione in partecipazione di cui all'articolo 109, comma 9, lettera b), del medesimo testo unico, non relativi a stabili organizzazioni nel territorio dello Stato.». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_11__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>All'articolo 55 del testo unico in materia di versamenti e di riscossione, di cui al <ref eId="content__ref_33" href="/akn/it/act/decretoLegislativo/stato/2025-03-24/33/!main#art_com5">decreto legislativo 24 marzo 2025, n. 33, il comma 5</ref> e' sostituito dal seguente: «5. La ritenuta e' operata a titolo di imposta e con l'aliquota dell'1,20 per cento sugli utili corrisposti alle societa' e agli enti soggetti a un'imposta sul reddito delle societa' negli Stati membri dell'Unione europea e negli Stati aderenti all'Accordo sullo Spazio economico europeo inclusi nella lista di cui ai decreti emanati in attuazione dell'articolo 71, comma 4, lettera c), e ivi residenti, in relazione alle partecipazioni, agli strumenti finanziari di cui all'articolo 44, comma 2, lettera a), del predetto testo unico di cui al <ref eId="content__ref_34" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1986/917/!main">decreto del Presidente della Repubblica n. 917 del 1986</ref> e ai contratti di associazione in partecipazione di cui all'articolo 109, comma 9, lettera b), del medesimo testo unico, non relativi a stabili organizzazioni nel territorio dello Stato.». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_11__para_4">
+                        <num>4.</num>
+                        <content>
+                            <p>I <ref eId="content__ref_35" href="/akn/it/act/legge/stato/2025-12-30/199/!main#art_1-com51">commi da 51</ref> <ref eId="content__ref_36" href="/akn/it/act/legge/stato/2025-12-30/199/!main#art_1-com55">a 55 dell'articolo 1 della legge 30 dicembre 2025, n. 199</ref>, sono abrogati. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_11__para_5">
+                        <num>5.</num>
+                        <content>
+                            <p>Le disposizioni di cui al presente articolo si applicano a decorrere dal 1° gennaio 2026. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_11__para_6">
+                        <num>6.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal presente articolo, valutati in 35,2 milioni di euro per l'anno 2026, 43,9 milioni di euro per l'anno 2027, 45,1 milioni di euro per l'anno 2028 e 45,4 milioni di euro annui a decorrere dall'anno 2029, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_12">
+                    <num>Art. 12.</num>
+                    <heading> Modifica dell'imposta di bollo sui conti correnti 
+ intestati a soggetti diversi dalle persone fisiche</heading>
+                    <paragraph eId="art_12__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>All'articolo 13, comma 2-bis, lettera b), della tariffa, parte I, allegata al <ref eId="content__ref_37" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1972-10-26/642/!main#art_9-com3-letb">decreto del Presidente della Repubblica 26 ottobre 1972, n. 642, e all'articolo 9, comma 3, lettera b)</ref>, della tariffa, parte I, di cui all'Allegato 3 al <ref eId="content__ref_38" href="/akn/it/act/regio.decreto/stato/1986-04-26/131/!main">testo unico delle disposizioni legislative in materia di imposta di registro</ref> e di altri tributi indiretti, di cui al <ref eId="content__ref_39" href="/akn/it/act/decretoLegislativo/stato/2025-08-01/123/!main">decreto legislativo 1° agosto 2025, n. 123</ref>, le parole «euro 100,00» sono sostituite dalle seguenti «euro 118,00». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_12__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>La disposizione di cui al comma 1 si applica agli estratti conto e ai rendiconti emessi a decorrere dalla data di entrata in vigore del presente articolo. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+            </chapter>
+            <chapter eId="chp_II">
+                <num>Capo II</num>
+                <heading>Ulteriori misure urgenti</heading>
+                <article eId="art_13">
+                    <num>Art. 13.</num>
+                    <heading/>
+                    <paragraph>
+                        <content>
+                            <p>
+ 
+Misure urgenti recanti proroghe in favore delle fondazioni lirico-sinfoniche e per garantire l'operativita' di CONSAP 
+ 
+ </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_13__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>All'articolo 1, comma 830, secondo periodo, della <ref eId="content__ref_40" href="/akn/it/act/legge/stato/2024-12-30/207/!main">legge 30 dicembre 2024, n. 207</ref> le parole «2026» sono sostituite dalle seguenti: «2028». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_13__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>All'articolo 1, comma 607, primo periodo, della <ref eId="content__ref_41" href="/akn/it/act/legge/stato/2024-12-30/207/!main">legge 30 dicembre 2024, n. 207</ref>, le parole «pari a 192 milioni di euro,» sono soppresse; le parole: «nell'anno 2025» sono sostituite dalle seguenti: «nell'anno 2026»; le parole «per il triennio 2022-2024» sono sostituite dalle seguenti «per il triennio 2023-2025». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_13__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>All'<ref eId="content__ref_42" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com763">articolo 1, comma 763, della legge 29 dicembre 2022, n. 197</ref>, le parole: «dal 2023 al 2025» sono sostituite dalle seguenti: «dal 2023 al 2026». 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_13__para_4">
+                        <num>4.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, pari a euro 2.250.000 per ciascuno degli anni 2026 e 2027, e dal comma 3, pari a euro 500.000 per l'anno 2026, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_14">
+                    <num>Art. 14.</num>
+                    <heading>Misure in materia di crediti contributivi e di esigenze indifferibili di competenza del Ministero degli affari esteri e della cooperazione internazionale</heading>
+                    <paragraph eId="art_14__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>A decorrere dalla data di entrata in vigore del presente decreto, e' determinata in due punti la maggiorazione di cui all'<ref eId="content__ref_43" href="/akn/it/act/decretoLegge/stato/1981-07-29/402/!main#art_13-com1">articolo 13, primo comma, del decreto-legge 29 luglio 1981, n. 402</ref>, convertito, con modificazioni, nella <ref eId="content__ref_44" href="/akn/it/act/legge/stato/1981-09-26/537/!main">legge 26 settembre 1981, n. 537</ref>. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_14__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, valutati in 4 milioni di euro per l'anno 2026, 12,2 milioni di euro per l'anno 2027 e 16,2 milioni di euro annui a decorrere dall'anno 2028, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_14__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>Gli uffici di amministrazioni pubbliche con sede in Tunisia sono autorizzati a stipulare per le attivita' di vigilanza, pulizia e manutenzione degli immobili, nei casi in cui l'ordinamento locale non consente il ricorso a contratti di appalto, contratti regolati esclusivamente dalla legge locale ai quali non si applicano le disposizioni di cui all'<ref eId="content__ref_45" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_9-com1-letc">articolo 9, comma 1, lettera c), della legge 5 febbraio 1992, n. 91</ref>. I contratti di cui al presente comma non sono stipulati per mansioni proprie del personale di cui alla parte seconda, titolo VI, del <ref eId="content__ref_46" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1967-02-05/18/!main">decreto del Presidente della Repubblica 5 febbraio 1967, n. 18</ref>. Per le finalita' di cui al presente comma e' autorizzata la spesa di euro 258.150 per l'anno 2026, di euro 361.410 per l'anno 2027, di euro 379.481 per l'anno 2028, di euro 398.412 per l'anno 2029, di euro 419.064 per l'anno 2030, di euro 438.855 per l'anno 2031, di euro 461.228 per l'anno 2032, di euro 484.462 per l'anno 2033, di euro 508.556 per l'anno 2034, di euro 534.371 per l'anno 2035 e di euro 561.089 a decorrere dall'anno 2036. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_14__para_4">
+                        <num>4.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 3, pari a euro 258.150 per l'anno 2026, a euro 361.410 per l'anno 2027, a euro 379.481 per l'anno 2028, a euro 398.412 per l'anno 2029, a euro 419.064 per l'anno 2030, a euro 438.855 per l'anno 2031, a euro 461.228 per l'anno 2032, a euro 484.462 per l'anno 2033, a euro 508.556 per l'anno 2034, a euro 534.371 per l'anno 2035 e a euro 561.089 annui a decorrere dall'anno 2036, si provvede mediante riduzione per euro 258.150 per l'anno 2026, euro 361.410 per l'anno 2027 ed euro 561.089 annui a decorrere dall'anno 2028 dello stanziamento del fondo speciale di parte corrente iscritto, ai fini del bilancio triennale 2026-2028, nell'ambito del programma «Fondi di riserva e speciali» della missione «Fondi da ripartire» dello stato di previsione del Ministero dell'economia e delle finanze per l'anno 2026, allo scopo parzialmente utilizzando l'accantonamento relativo al Ministero degli affari esteri e della cooperazione internazionale. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_15">
+                    <num>Art. 15.</num>
+                    <heading> Disposizioni in materia di educazione finanziaria</heading>
+                    <paragraph eId="art_15__para_1">
+                        <num>1.</num>
+                        <list>
+                            <intro eId="art_15__para_1__intro_1">
+                                <p>All'<ref eId="content__ref_47" href="/akn/it/act/decretoLegge/stato/2016-12-23/237/!main#art_24bis">articolo 24-bis del decreto-legge 23 dicembre 2016, n. 237</ref>, convertito, con modificazioni, dalla <ref eId="content__ref_48" href="/akn/it/act/legge/stato/2017-02-17/15/!main">legge 17 febbraio 2017, n. 15</ref>, sono apportate le seguenti modificazioni: 
+ </p>
+                            </intro>
+                            <point eId="art_15__para_1.__point_a">
+                                <num>a)</num>
+                                <content>
+                                    <p>al comma 1, secondo periodo, dopo le parole «e la sistematicita'» sono inserite le seguenti: «, nonche' il miglioramento della qualita'»; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_15__para_1.__point_b">
+                                <num>b)</num>
+                                <content>
+                                    <p>al comma 3, lettera a), le parole «che gli interventi siano continui nel tempo, promuovendo lo scambio di informazioni tra i soggetti e la diffusione delle relative esperienze, competenze e buone pratiche,» sono sostituite dalle seguenti: «, attraverso standard qualitativi adeguati alla complessita' dei contenuti diffusi, la corretta sinergia tra soggetti presenti nonche' la loro indipendenza e terzieta', nonche' la continuita' nel tempo degli interventi»; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_15__para_1.__point_c">
+                                <num>c)</num>
+                                <content>
+                                    <p>al comma 7, le parole «dal comma 9» sono sostituite dalle seguenti: «dai commi 8-bis e 9»; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_15__para_1.__point_d">
+                                <num>d)</num>
+                                <content>
+                                    <p>al comma 8: 
+ 1) al primo periodo, le parole «composto da undici membri» sono sostituite dalle seguenti: «composto da dodici membri»; 
+ 2) al secondo periodo sono aggiunte, in fine, le seguenti parole: «, uno dal Corpo della guardia di finanza»; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_15__para_1.__point_e">
+                                <num>e)</num>
+                                <content>
+                                    <p>dopo il comma 8 e' inserito il seguente: 
+ «8-bis. Per lo svolgimento dei compiti previsti dal presente articolo il Comitato nazionale per l'educazione economica e finanziaria puo' avvalersi di un contingente di consulenti o esperti nella materia, nominati ai sensi dell'<ref eId="content__ref_49" href="/akn/it/act/decretoLegislativo/stato/2001-03-30/165/!main#art_7-com6">articolo 7, comma 6, del decreto legislativo 30 marzo 2001, n. 165</ref>, scelti anche tra soggetti estranei alla pubblica amministrazione cui e' riconosciuto un compenso massimo annuo di euro 30.000 al lordo dei contributi previdenziali e degli oneri fiscali a carico dell'amministrazione, nel limite di spesa di euro 180.000 annui, a valere sulle risorse di cui al comma 11.»; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_15__para_1.__point_f">
+                                <num>f)</num>
+                                <content>
+                                    <p>al comma 9 e' aggiunto, in fine, il seguente periodo: «E' fatta altresi' salva la corresponsione al direttore del Comitato o ad altro membro da questi delegato dei rimborsi delle spese effettivamente documentate per la partecipazione a convegni, riunioni o iniziative, nazionali e internazionali, strettamente connessi all'espletamento delle funzioni istituzionali, a valere sui fondi previsti dal comma 11.». 
+</p>
+                                </content>
+                            </point>
+                        </list>
+                    </paragraph>
+                </article>
+                <article eId="art_16">
+                    <num>Art. 16.</num>
+                    <heading/>
+                    <paragraph>
+                        <content>
+                            <p>
+ 
+Disposizioni per garantire la continuita' del servizio di emissione della Carta europea della disabilita' per l'anno 2026 
+ 
+ </p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_16__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>Nelle more dell'adozione del decreto legislativo di recepimento della <ref eId="content__ref_50" href="/akn/it/act/direttivaUe/eu/2024/2841/!main">direttiva (UE) 2024/2841</ref>, al fine di assicurare la continuita' del servizio di emissione della Carta europea della disabilita' per l'anno 2026, e' autorizzata la spesa di 1,6 milioni di euro per l'anno 2026, cui si fa fronte mediante utilizzo delle somme iscritte sullo stato di previsione della spesa del Ministero dell'economia e delle finanze ai sensi dell'<ref eId="content__ref_51" href="/akn/it/act/legge/stato/2025-06-13/91/!main#art_17-com4">articolo 17, comma 4, della legge 13 giugno 2025, n. 91</ref>. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_17">
+                    <num>Art. 17.</num>
+                    <heading> Disposizioni in materia di contributo unificato 
+ per gli Enti patrocinati dall'Avvocatura dello Stato</heading>
+                    <paragraph eId="art_17__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>Per garantire il rispetto delle tempistiche processuali, a decorrere dall'anno 2026 e' autorizzata la spesa di 500.000 euro annui in favore dell'Avvocatura dello Stato, per il pagamento delle spese degli atti processuali, compreso il contributo unificato, per conto delle parti dalla stessa patrocinate. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_17__para_2">
+                        <num>2.</num>
+                        <content>
+                            <p>Agli oneri derivanti dal comma 1, pari a 500.000 euro annui a decorrere dall'anno 2026, si provvede ai sensi dell'articolo 18. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_18">
+                    <num>Art. 18.</num>
+                    <heading> Disposizioni finanziarie</heading>
+                    <paragraph eId="art_18__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>Il Fondo per interventi strutturali di politica economica di cui all'<ref eId="content__ref_52" href="/akn/it/act/decretoLegge/stato/2004-11-29/282/!main#art_10-com5">articolo 10, comma 5, del decreto-legge 29 novembre 2004, n. 282</ref>, convertito, con modificazioni, dalla <ref eId="content__ref_53" href="/akn/it/act/legge/stato/2004-12-27/307/!main">legge 27 dicembre 2004, n. 307</ref>, e' incrementato di <ins eId="ins_29">((43 milioni di euro per l'anno 2031 e))</ins> 27 milioni di euro per l'anno 2035. <ins eId="ins_30">((Il Fondo per le emergenze in agricoltura di cui all'articolo 1, comma 443, della legge 30 dicembre 2023, n. 213, e' incrementato di 30 milioni di euro per l'anno 2027.
+Per le finalita' di cui all'articolo 1, comma 95 della legge 30 dicembre 2018, n. 145, relativamente alla quota destinata al potenziamento del Fondo nazionale per l'efficienza energetica e' autorizzata la spesa ulteriore di 175 milioni di euro per l'anno 2027, di 159,2 milioni di euro per l'anno 2028, di 129,6 milioni di euro per l'anno 2029, di 78,5 milioni di euro per l'anno 2030 e di 30,1 milioni di euro per l'anno 2031. Per il finanziamento dei contratti di sviluppo, disciplinati ai sensi dell'articolo 43 del decreto-legge 25 giugno 2008, n. 112, convertito, con modificazioni, dalla legge 6 agosto 2008, n. 133, e' autorizzata la spesa ulteriore di 13,5 milioni di euro per l'anno 2027, di 17,4 milioni di euro per l'anno 2028, di 17,7 milioni di euro per l'anno 2029, di 10,65 milioni di euro per l'anno 2030 e di 6,45 milioni di euro per l'anno 2031. Per le finalita' di cui all'articolo 1, comma 647, della legge 28 dicembre 2015, n. 208, e' autorizzata la spesa di ulteriori 9,45 milioni di euro per l'anno 2027, di 12,18 milioni di euro per l'anno 2028, di 12,39 milioni di euro per l'anno 2029, di 7,46 milioni di euro per l'anno 2030 e di 4,52 milioni di euro per l'anno 2031. Per le finalita' di cui all'articolo 1, comma 648, della legge 28 dicembre 2015, n. 208, e' autorizzata la spesa di ulteriori 4,05 milioni di euro per l'anno 2027, di 5,22 milioni di euro per l'anno 2028, di 5,31 milioni di euro per l'anno 2029, di 3,19 milioni di euro per l'anno 2030 e di 1,93 milioni di euro per l'anno 2031. Il fondo di cui all'articolo 1, comma 519, della legge 30 dicembre 2023, n. 213, e' incrementato di 773 milioni di euro per l'anno 2026))</ins>. 
+</p>
+                        </content>
+                    </paragraph>
+                    <paragraph eId="art_18__para_2">
+                        <num>2.</num>
+                        <list>
+                            <intro eId="art_18__para_2__intro_1">
+                                <p>
+                                    <ins eId="ins_31">((Agli oneri derivanti dal comma 1 e dagli articoli 3, comma 2, 4, comma 1, 6, comma 1, 7, comma 1, 8, commi 1 e 3-bis, 8-bis, 8-ter, 9, comma 1, 11, comma 1, 13, commi 1 e 3, 14, comma 1, valutati in 401,88 milioni di euro per l'anno 2026, 171,5 milioni di euro per l'anno 2027, 274,6 milioni di euro per l'anno 2028, 359,1 milioni di euro per ciascuno degli anni 2029 e 2030, 329,2 milioni di euro per l'anno 2031, 233,6 milioni di euro per l'anno 2032, 106,8 milioni di euro per l'anno 2033, 67,2 milioni di euro per l'anno 2034 e 61,6 milioni di euro annui a decorrere dall'anno 2035, e pari a 2.166,25 milioni di euro per l'anno 2026, 314,75 milioni di euro per l'anno 2027, 254,5 milioni di euro per l'anno 2028, 165,5 milioni di euro per l'anno 2029, 100,3 milioni di euro per l'anno 2030, 86,5 milioni di euro per l'anno 2031, 0,5 milioni di euro per ciascuno degli anni dal 2032 al 2034, 27,5 milioni di euro per l'anno 2035 e 0,5 milioni di euro annui a decorrere dall'anno 2036, si provvede:))</ins>
+                                </p>
+                            </intro>
+                            <point eId="art_18__para_2.__point_a">
+                                <num>a)</num>
+                                <content>
+                                    <p>quanto a 60,3 milioni di euro per l'anno 2026, 44,2 milioni di euro per l'anno 2027, 46,8 milioni di euro per l'anno 2028, 52,4 milioni di euro per l'anno 2029, 50,6 milioni di euro per ciascuno degli anni dal 2030 al 2034, 89,9 milioni di euro per l'anno 2035 e 50,6 milioni di euro annui a decorrere dall'anno 2036, mediante utilizzo di quota parte delle maggiori entrate derivanti dagli articoli 1, comma 1, 3, comma 2, <ins eId="ins_32">((7, comma 1, 8-bis, 12, comma 1, e delle minori spese derivanti dagli articoli 7, comma 1, e 8-bis))</ins>; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b">
+                                <num>b)</num>
+                                <content>
+                                    <p>quanto a <ins eId="ins_33">((1.300 milioni di euro))</ins> per l'anno 2026, mediante corrispondente riduzione del Fondo di cui all'<ref eId="content__ref_54" href="/akn/it/act/legge/stato/2025-12-30/199/!main#art_1-com770">articolo 1, comma 770, della legge 30 dicembre 2025, n. 199</ref>; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-bis">
+                                <num>b-bis)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_34">((quanto a 50 milioni per il 2026, 80 milioni per il 2027 e 60 milioni per il 2028 mediante corrispondente riduzione dell'autorizzazione di spesa di cui all'articolo 1, comma 460, della legge 30 dicembre 2024, n. 207;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-ter">
+                                <num>b-ter)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_35">((quanto a 10 milioni di euro per l'anno 2026 mediante corrispondente versamento in entrata del bilancio dello Stato, delle somme disponibili in conto residui nell'ambito dello stato di previsione del Ministero delle imprese e del made in Italy, ai sensi dell'articolo 1, comma 460, della legge 30 dicembre 2024, n. 207;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-quater">
+                                <num>b-quater)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_36">((quanto a 64 milioni di euro per l'anno 2026, mediante corrispondente utilizzo delle somme versate all'entrata del bilancio dello Stato ai sensi dell'articolo 148, comma 1, della legge 23 dicembre 2000, n. 388 che, alla data del 30 marzo 2026, non sono riassegnate ai pertinenti programmi e restano, per detto importo, acquisite all'erario;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-quinquies">
+                                <num>b-quinquies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_37">((quanto a 497,626 milioni di euro per l'anno 2026, mediante corrispondente utilizzo di quota parte dei proventi derivanti dalle aste delle quote di emissione di gas a effetto serra dell'anno 2025, di cui all'articolo 23 del decreto legislativo 9 giugno 2020, n. 47, nell'ambito delle attribuzioni di cui al secondo periodo del comma 4 del medesimo articolo 23. Tale quota resta definitivamente acquisita all'erario;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-sexies">
+                                <num>b-sexies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_38">((quanto a 30 milioni di euro per l'anno 2026 mediante corrispondente riduzione del fondo di cui all'articolo 1, comma 443, della legge 30 dicembre 2023, n. 213;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-septies">
+                                <num>b-septies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_39">((quanto a euro 333.924.858 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica e quanto a euro 94.756 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero delle infrastrutture e dei trasporti, ai sensi dell'articolo 23, comma 7, del decreto legislativo 9 giugno 2020, n. 47;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-octies">
+                                <num>b-octies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_40">((quanto a euro 1.300.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 15, comma 1, del decreto legislativo 4 luglio 2014, n. 102;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-novies">
+                                <num>b-novies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_41">((quanto a euro 398.600 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 15, comma 1, del decreto legislativo 8 novembre 2021, n. 199;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-decies">
+                                <num>b-decies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_42">((quanto a euro 29.448.311 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 5, comma 12, del decreto legislativo 4 luglio 2014, n. 102;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-undecies">
+                                <num>b-undecies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_43">((quanto a euro 400.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 8, comma 11, del decreto legislativo 4 luglio 2014, n. 102;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-duodecies">
+                                <num>b-duodecies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_44">((quanto a euro 3.000.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 13 del decreto legislativo 4 luglio 2014, n. 102;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-terdecies">
+                                <num>b-terdecies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_45">((quanto a euro 11.799.752 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 6, comma 2, del decreto legislativo 9 giugno 2020, n. 47;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-quaterdecies">
+                                <num>b-quaterdecies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_46">((quanto a euro 20.000.000 per l'anno 2026 mediante utilizzo delle risorse iscritte nello stato di previsione del Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 14, comma 8, del decreto-legge 16 settembre 2024, n. 131, convertito, con modificazioni, dalla legge 14 novembre 2024, n. 166;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-quinquiesdecies">
+                                <num>b-quinquiesdecies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_47">((quanto a euro 119.576.369 per l'anno 2026 mediante corrispondente versamento all'entrata del bilancio dello Stato, nel medesimo anno, delle risorse disponibili in conto residui, nello stato di previsione Ministero dell'ambiente e della sicurezza energetica, ai sensi dell'articolo 23, comma 7, del decreto legislativo 9 giugno 2020, n. 47 e dell'articolo 5, comma 12, del decreto legislativo 4 luglio 2014, n. 102;))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_b-sexiesdecies">
+                                <num>b-sexiesdecies)</num>
+                                <content>
+                                    <p>
+                                        <ins eId="ins_48">((quanto a 222 milioni di euro per l'anno 2027, 199 milioni di euro per l'anno 2028, 165 milioni di euro per l'anno 2029, 100 milioni di euro per l'anno 2030 e 86 milioni di euro per l'anno 2031, mediante utilizzo del fondo di cui all'articolo 1, comma 519, della legge 30 dicembre 2023, n. 213.))</ins>
+                                    </p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_c">
+                                <num>c)</num>
+                                <content>
+                                    <p>quanto a 37 milioni di euro per l'anno 2026, 100,2 milioni di euro per l'anno 2027, 223,8 milioni di euro per l'anno 2028, 307,1 milioni di euro per l'anno 2029, 208,9 milioni di euro per l'anno 2030, 79 milioni di euro per l'anno 2031, 84,5 milioni di euro per l'anno 2032, 39,7 milioni di euro per l'anno 2033, mediante corrispondente riduzione del Fondo per interventi strutturali di politica economica di cui all'<ref eId="content__ref_55" href="/akn/it/act/decretoLegge/stato/2004-11-29/282/!main#art_10-com5">articolo 10, comma 5, del decreto-legge 29 novembre 2004, n. 282</ref>, convertito, con modificazioni, dalla <ref eId="content__ref_56" href="/akn/it/act/legge/stato/2004-12-27/307/!main">legge 27 dicembre 2004, n. 307</ref>; 
+</p>
+                                </content>
+                            </point>
+                            <point eId="art_18__para_2.__point_d">
+                                <num>d)</num>
+                                <content>
+                                    <p>quanto a 30 milioni di euro per l'anno 2027, 100 milioni di euro per l'anno 2030, 200 milioni di euro per l'anno 2031, 99 milioni di euro per l'anno 2032, 17 milioni di euro per l'anno 2033, 17,1 milioni di euro per l'anno 2034 e 11,5 milioni di euro a decorrere dall'anno 2036, mediante corrispondente riduzione del Fondo di cui all'<ref eId="content__ref_57" href="/akn/it/act/legge/stato/2014-12-23/190/!main#art_1-com200">articolo 1, comma 200, della legge 23 dicembre 2014, n. 190</ref>. 
+</p>
+                                </content>
+                            </point>
+                        </list>
+                    </paragraph>
+                    <paragraph eId="art_18__para_3">
+                        <num>3.</num>
+                        <content>
+                            <p>Fermo restando quanto previsto ai commi 1 e 2, e agli articoli 2, 5, <ins eId="ins_49">((8-quater,))</ins> 10, 14, comma 3, 15 e 16, le amministrazioni interessate provvedono alle attivita' previste dal presente decreto mediante l'utilizzo delle risorse umane, strumentali e finanziarie disponibili a legislazione vigente e, comunque, senza nuovi e maggiori oneri a carico della finanza pubblica. 
+</p>
+                        </content>
+                    </paragraph>
+                </article>
+                <article eId="art_19">
+                    <num>Art. 19.</num>
+                    <heading> Entrata in vigore</heading>
+                    <paragraph eId="art_19__para_1">
+                        <num>1.</num>
+                        <content>
+                            <p>Il presente decreto entra in vigore il giorno successivo a quello della sua pubblicazione nella Gazzetta Ufficiale della Repubblica italiana e sara' presentato alle Camere per la conversione in legge. 
+ </p>
+                        </content>
+                    </paragraph>
+                </article>
+            </chapter>
+        </body>
+        <conclusions>
+            <formula name="formulaFinaleConclusioni">
+                <p>Il presente decreto, munito del sigillo dello Stato, sara' inserito nella Raccolta ufficiale degli atti normativi della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarlo e di farlo osservare. </p>
+            </formula>
+            <p> Dato a Roma, addi' 27 marzo 2026 </p>
+            <p>MATTARELLA Meloni, Presidente del Consiglio dei ministri Giorgetti, Ministro dell'economia e delle finanze Visto, il Guardasigilli: Nordio</p>
+        </conclusions>
+    </act>
+</akomaNtoso>

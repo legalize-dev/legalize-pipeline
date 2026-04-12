@@ -267,3 +267,19 @@ countries:
       request_timeout: 30
       max_retries: 5
       requests_per_second: 2.0
+
+  it:
+    repo_path: "../countries/it"
+    data_dir: "../countries/data-it"
+    cache_dir: ".cache"
+    max_workers: 4
+    source:
+      # Normattiva - official Italian consolidated legislation portal.
+      # Discovery via OpenData REST API (no auth required).
+      # Full text via caricaAKN endpoint returning Akoma Ntoso XML.
+      # See RESEARCH-IT.md for full API documentation.
+      opendata_api_base: "https://api.normattiva.it/t/normattiva.api/bff-opendata/v1"
+      normattiva_base: "https://www.normattiva.it"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 2.0

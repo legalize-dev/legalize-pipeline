@@ -1,0 +1,29 @@
+{
+  "code": null,
+  "message": null,
+  "data": {
+    "atto": {
+      "titolo": "DECRETO-LEGGE 27 marzo 2026, n. 38",
+      "sottoTitolo": "Disposizioni urgenti in materia fiscale ed economica. (26G00057) \n",
+      "articoloHtml": "<div class=\"bodyTesto\">\n        <h2 class=\"preamble-title-akn\">IL PRESIDENTE DELLA REPUBBLICA</h2>\n        <div class=\"preamble-citations-akn\">\n            <citations eId=\"cits_1\">\n                <citation eId=\"cits_1__cit_1\">\n                    <div class=\"preamble-citation-akn\">Visti gli <a href=\"http://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione:1947-12-27~art77\" target=\"_blank\">articoli 77</a> e <a href=\"http://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione:1947-12-27~art87-com5\" target=\"_blank\">87 quinto comma della Costituzione</a>;</div>\n                </citation>\n            </citations>\n        </div>\n        <div>\n            <div class=\"preamble-text-akn\">Ritenuta la straordinaria necessit&agrave; e urgenza di prevedere misure urgenti in materia fiscale;</div>\n        </div>\n        <div>\n            <div class=\"preamble-text-akn\">Ritenuta, altres&igrave;, la straordinaria necessit&agrave; e urgenza di prevedere misure urgenti per garantire l'operativit&agrave; delle pubbliche amministrazioni, nonch&egrave; il regolare svolgimento delle attivit&agrave; economiche;</div>\n        </div>\n        <div class=\"preamble-citations-akn\">\n            <citations eId=\"cits_2\">\n                <citation eId=\"cits_2__cit_1\">\n                    <div class=\"preamble-citation-akn\">Vista la deliberazione del Consiglio dei ministri, adottata nella riunione del 27 marzo 2026;</div>\n                </citation>\n            </citations>\n        </div>\n        <div>\n            <div class=\"preamble-text-akn\">Sulla proposta del Presidente del Consiglio dei ministri e del Ministro dell'economia e delle finanze;</div>\n        </div>\n        <h2 class=\"preamble-end-akn\">Emana</h2>\n        <p class=\"formula-introduttiva\"> il seguente decreto-legge:</p>\n        <h2 class=\"article-num-akn\" id=\"art_1\">Art. 1</h2>\n        <div class=\"article-heading-akn\">\n             Modifiche alla decorrenza del nuovo regime IVA \n            <br>\n             delle operazioni permutative\n        </div>\n        <div class=\"art-commi-div-akn\">\n            <div class=\"art-comma-div-akn\">\n                <span class=\"comma-num-akn\">1. </span><span class=\"art_text_in_comma\">All'<a href=\"http://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2025-12-30;199~art1\" target=\"_blank\">articolo 1 della legge 30 dicembre 2025, n. 199</a>, il comma 139 &egrave; sostituto dal seguente: &laquo;139. Le disposizioni di cui al comma 138 si applicano alle operazioni effettuate in esecuzione di contratti stipulati o rinnovati a decorrere dal 1° gennaio 2026.&raquo;. \n                    <br>\n                    \n                </span>\n            </div>\n            <div class=\"art-comma-div-akn\">\n                <span class=\"comma-num-akn\">2. </span><span class=\"art_text_in_comma\">Sono fatti salvi i comportamenti pregressi adottati anteriormente al 1° gennaio 2026 nonch&egrave; quelli adottati in conformit&agrave; all'<a href=\"http://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2026-01-01;199~art1-com138\" target=\"_blank\">articolo 1, comma 138, della legge n. 199 del 2025, dal 1° gennaio 2026</a> alla data di entrata in vigore del presente decreto. Non si fa luogo, in ogni caso, a rimborsi d'imposta o a rettifiche rispetto all'imposta precedentemente liquidata. \n                    <br>\n                    \n                </span>\n            </div>\n        </div>\n    </div>",
+      "tipoProvvedimentoDescrizione": "DECRETO-LEGGE",
+      "tipoProvvedimentoCodice": "PDL",
+      "annoProvvedimento": 2026,
+      "meseProvvedimento": 3,
+      "giornoProvvedimento": 27,
+      "numeroProvvedimento": 38,
+      "tipoSupplementoCode": "NO",
+      "numeroSupplemento": 0,
+      "annoGU": 2026,
+      "meseGU": 3,
+      "giornoGU": 27,
+      "numeroGU": 72,
+      "dataPubblicazioneInGazzetta": null,
+      "articoloDataInizioVigenza": "20260328",
+      "articoloDataFineVigenza": "99999999",
+      "testoInVigore": null
+    },
+    "message": null
+  },
+  "success": true
+}

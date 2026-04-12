@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/legge/stato/2024-06-26/86/!main"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/2024-06-26/86"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:stato:legge:2024-06-26;86"/>
+                    <FRBRalias name="eli" value="eli/id/2024/06/28/24G00104/CONSOLIDATED/20241205"/>
+                    <FRBRdate date="2024-06-26" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205" aknrelname="eli/id/2024/06/28/24G00104/CONSOLIDATED/20241205">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content="Disposizioni per l'attuazione dell'autonomia differenziata delle Regioni a statuto ordinario ai sensi dell'articolo 116, terzo comma, della Costituzione. (24G00104)  " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="24G00104" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#LEGGE"/>
+                            <nrdfa:span content="2024-06-26" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/legge/stato/2024-06-26/86/ita@2024-12-05/!main"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/2024-06-26/86/ita@2024-12-05"/>
+                    <FRBRdate date="2024-12-05" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/legge/stato/2024-06-26/86/ita@2024-12-05/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/2024-06-26/86/ita@2024-12-05.xml"/>
+                    <FRBRdate date="2024-06-26" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="2024-06-28" name="" number="150" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="2024-06-28" eId="eventRef_0" source="ro1"/>
+                <eventRef date="2024-12-04" eId="eventRef_1" source="rp1"/>
+            </lifecycle>
+            <workflow source="">
+                <step by="#senato" date="2024-06-26" refersTo="#S.615"/>
+                <step by="#camera" date="2024-06-26" refersTo="#C.1665"/>
+            </workflow>
+            <analysis source="">
+                <passiveModifications>
+                    <textualMod eId="pmod_0" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_1"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_1" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_2"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_2" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_3"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_3" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_4"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_4" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_5"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_5" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_6"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_6" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_7"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_7" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_8"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_8" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_9"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_9" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_10"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_10" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_11"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_11" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_12"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_12" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_13"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_13" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_14"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_14" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_15"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_15" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_16"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_16" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_17"/>
+                        <new>
+                            <nakn:text>((Ministro per gli affari regionali e le autonomie))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_17" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_18"/>
+                        <new>
+                            <nakn:text>((2027 o da un anno antecedente ove ricorrano le condizioni di cui al presente decreto legislativo))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_18" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_19"/>
+                        <new>
+                            <nakn:text>((Ministro per gli affari regionali e le autonomie))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_19" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_20"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                </passiveModifications>
+            </analysis>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/LEGGE/stato/2024-06-26/86/!main" showAs=""/>
+                <passiveRef eId="rp1" href="" showAs=""/>
+                <passiveRef eId="S.615" href="/akn/it/senato-it:parl:ddl:senato;19.legislatura;615" showAs=""/>
+                <passiveRef eId="C.1665" href="/akn/it/camera-it:parlamento:scheda.progetto.legge:camera;19.legislatura;1665" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it">Disposizioni per l'attuazione dell'autonomia differenziata delle Regioni a statuto ordinario ai sensi dell'articolo 116, terzo comma, della Costituzione. (24G00104)  </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>24G00104</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#LEGGE"/>
+                        <eli:date_document rdf:datatype="xsd:date">2024-06-26</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205"/>
+                        <eli:is_embodied_by rdf:resource="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2024/06/28/24G00104/CONSOLIDATED/20241205/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>LEGGE</docType>
+                <docDate date="2024-06-26">26 giugno 2024</docDate>
+                <docNumber>86</docNumber>
+                <docTitle>Disposizioni per l'attuazione dell'autonomia differenziata delle Regioni a statuto ordinario ai sensi dell'articolo 116, terzo comma, della Costituzione. (24G00104) 
+</docTitle>
+            </p>
+            <p>
+                <authorialNote eId="atn1" placement="bottom">
+                    <p>Entrata in vigore del provvedimento: 13/07/2024</p>
+                </authorialNote>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="primaDiFormulaInizialePreambolo">
+                <p>La Camera dei deputati ed il Senato della Repubblica hanno approvato;</p>
+            </formula>
+            <formula name="formulaInizialePreambolo">
+                <p>IL PRESIDENTE DELLA REPUBBLICA</p>
+            </formula>
+            <formula name="formulaFinalePreambolo">
+                <p>Promulga la seguente legge:</p>
+            </formula>
+        </preamble>
+        <body>
+            <article eId="art_1">
+                <num>Art. 1.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ 
+ Finalita' 
+ 
+ </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_1__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>La presente legge, nel rispetto dell'unita' nazionale e al fine di rimuovere discriminazioni e disparita' di accesso ai servizi essenziali sul territorio, nel rispetto altresi' dei principi di unita' giuridica ed economica, di coesione economica, sociale e territoriale, anche con riferimento all'insularita', nonche' dei principi di indivisibilita' e autonomia e in attuazione del principio di decentramento amministrativo e per favorire la semplificazione e l'accelerazione delle procedure, la responsabilita', la trasparenza e la distribuzione delle competenze idonea ad assicurare il pieno rispetto dei principi di sussidiarieta', differenziazione e adeguatezza di cui all'<ref eId="content__ref_1" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_118">articolo 118 della Costituzione</ref>, nonche' del principio solidaristico di cui agli <ref eId="content__ref_2" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_2">articoli 2</ref> e <ref eId="content__ref_3" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_5">5 della Costituzione</ref>, definisce i principi generali per l'attribuzione alle Regioni a statuto ordinario di ulteriori forme e condizioni particolari di autonomia in attuazione dell'<ref eId="content__ref_4" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref> e per la modifica e la revoca delle stesse, nonche' le relative modalita' procedurali di approvazione delle intese fra lo Stato e una Regione, nel rispetto delle prerogative e dei Regolamenti parlamentari. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_1__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>L'attribuzione di funzioni relative alle ulteriori forme e condizioni particolari di autonomia di cui all'<ref eId="content__ref_5" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>, relative a materie o ambiti di materie riferibili ai diritti civili e sociali che devono essere garantiti equamente su tutto il territorio nazionale, e' consentita subordinatamente alla determinazione, nella normativa vigente alla data di entrata in vigore della presente legge o sulla base della procedura di cui all'articolo 3, dei relativi livelli essenziali delle prestazioni concernenti i diritti civili e sociali, ivi compresi quelli connessi alle funzioni fondamentali degli enti locali nel rispetto dell'<ref eId="content__ref_6" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com793-letd">articolo 1, comma 793, lettera d), della legge 29 dicembre 2022, n. 197</ref>, che devono essere garantiti equamente su tutto il territorio nazionale, ai sensi dell'articolo 117, secondo comma, lettera m), e nel rispetto dei principi sanciti dall'articolo 119 della Costituzione. Tali livelli indicano la soglia costituzionalmente necessaria e costituiscono il nucleo invalicabile per rendere effettivi tali diritti su tutto il territorio nazionale e per erogare le prestazioni sociali di natura fondamentale, per assicurare uno svolgimento leale e trasparente dei rapporti finanziari fra lo Stato e le autonomie territoriali e per favorire un'equa ed efficiente allocazione delle risorse e il pieno superamento dei divari territoriali nel godimento delle prestazioni inerenti ai diritti civili e sociali. <ins eId="ins_1">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (1)</p>
+                        <p>
+ La Corte costituzionale, con sentenza 14 novembre - 3 dicembre 2024, n. 192 (in G.U. 1ª s.s. 4/12/2024, n. 49) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="7" href="/akn/it/act/legge/stato/2024-06-26/86/!main#art_1-com2">art. 1, comma 2, della legge 26 giugno 2024, n. 86</ref> (Disposizioni per l'attuazione dell'autonomia differenziata delle Regioni a statuto ordinario ai sensi dell'<ref eId="8" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>), nella parte in cui prevede «[l]'attribuzione di funzioni relative alle ulteriori forme e condizioni particolari di autonomia [...]», anziche' «[l]'attribuzione di specifiche funzioni relative alle ulteriori forme e condizioni particolari di autonomia [...]»". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_2">
+                <num>Art. 2.</num>
+                <heading> Procedimento di approvazione delle intese fra Stato e Regione</heading>
+                <paragraph eId="art_2__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>L'atto di iniziativa relativo alla richiesta di attribuzione di ulteriori forme e condizioni particolari di autonomia, ai sensi dell'<ref eId="content__ref_9" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>, e' deliberato dalla Regione, sentiti gli enti locali, secondo le modalita' e le forme stabilite nell'ambito della propria autonomia statutaria.
+L'atto e' trasmesso al Presidente del Consiglio dei ministri e al Ministro per gli affari regionali e le autonomie che, acquisita entro sessanta giorni la valutazione dei Ministri competenti per materia e del Ministro dell'economia e delle finanze, anche ai fini dell'individuazione delle necessarie risorse finanziarie da assegnare ai sensi dell'<ref eId="content__ref_10" href="/akn/it/act/legge/stato/2009-05-05/42/!main#art_14">articolo 14 della legge 5 maggio 2009, n. 42</ref>, avvia il negoziato con la Regione richiedente ai fini dell'approvazione dell'intesa di cui al presente articolo. Decorso il predetto termine, il Presidente del Consiglio dei ministri o il Ministro per gli affari regionali e le autonomie avvia comunque il negoziato che, con riguardo a materie o ambiti di materie riferibili ai livelli essenziali delle prestazioni di cui all'articolo 3, e' svolto per ciascuna singola materia o ambito di materia. Ai fini dell'avvio del negoziato, il Presidente del Consiglio dei ministri o il Ministro per gli affari regionali e le autonomie tiene conto del quadro finanziario della Regione. Prima dell'avvio del negoziato il Presidente del Consiglio dei ministri o il Ministro per gli affari regionali e le autonomie da lui delegato informa le Camere e la Conferenza permanente per i rapporti tra lo Stato, le regioni e le province autonome di Trento e di Bolzano dell'atto di iniziativa. <ins eId="ins_2">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>L'atto o gli atti di iniziativa di ciascuna Regione possono concernere una o piu' materie o ambiti di materie e le relative funzioni. Al fine di tutelare l'unita' giuridica o economica, nonche' di indirizzo rispetto a politiche pubbliche prioritarie, il Presidente del Consiglio dei ministri, anche su proposta del Ministro per gli affari regionali e le autonomie o dei Ministri competenti per materia, puo' limitare l'oggetto del negoziato ad alcune materie o ambiti di materie individuati dalla Regione nell'atto di iniziativa. <ins eId="ins_3">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Lo schema di intesa preliminare negoziato tra Stato e Regione, corredato di una relazione tecnica redatta ai sensi dell'<ref eId="content__ref_11" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_17">articolo 17 della legge 31 dicembre 2009, n. 196</ref>, anche ai fini di cui all'articolo 9, e' approvato dal Consiglio dei ministri, su proposta del Ministro per gli affari regionali e le autonomie. Alla riunione del Consiglio dei ministri partecipa il Presidente della Giunta regionale interessata. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Lo schema di intesa preliminare di cui al comma 3 e' immediatamente trasmesso alla Conferenza unificata di cui all'<ref eId="content__ref_12" href="/akn/it/act/decretoLegislativo/stato/1997-08-28/281/!main#art_8">articolo 8 del decreto legislativo 28 agosto 1997, n. 281</ref>, per l'espressione del parere, da rendere entro sessanta giorni dalla data di trasmissione. Dopo che il parere e' stato reso dalla Conferenza unificata e comunque decorso il relativo termine, lo schema di intesa preliminare e' immediatamente trasmesso alle Camere per l'esame da parte dei competenti organi parlamentari, che si esprimono con atti di indirizzo, secondo i rispettivi regolamenti, entro novanta giorni dalla data di trasmissione dello schema di intesa preliminare, udito il Presidente della Giunta regionale interessata. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Il Presidente del Consiglio dei ministri o il Ministro per gli affari regionali e le autonomie, valutato il parere della Conferenza unificata e sulla base degli atti di indirizzo di cui al comma 4 e comunque una volta decorso il termine di novanta giorni, predispone lo schema di intesa definitivo al termine di un ulteriore negoziato, ove necessario. Il Presidente del Consiglio dei ministri, ove ritenga di non conformarsi in tutto o in parte agli atti di indirizzo di cui al comma 4, riferisce alle Camere con apposita relazione, nella quale fornisce adeguata motivazione della scelta effettuata. Lo schema di intesa definitivo e' trasmesso alla Regione interessata, che lo approva secondo le modalita' e le forme stabilite nell'ambito della propria autonomia statutaria, assicurando la consultazione degli enti locali. Entro quarantacinque giorni dalla data della comunicazione dell'approvazione da parte della Regione, lo schema di intesa definitivo, corredato di una relazione tecnica redatta ai sensi dell'<ref eId="content__ref_13" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_17">articolo 17 della legge 31 dicembre 2009, n. 196</ref>, anche ai fini del rispetto dell'articolo 9, comma 1, su proposta del Ministro per gli affari regionali e le autonomie, e' deliberato dal Consiglio dei ministri. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>Con lo schema di intesa definitivo, il Consiglio dei ministri, su proposta del Ministro per gli affari regionali e le autonomie, delibera un disegno di legge di approvazione dell'intesa, che vi e' allegata. Alla seduta del Consiglio dei ministri per l'esame dello schema di disegno di legge e dello schema di intesa definitivo partecipa il Presidente della Giunta regionale interessata. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_7">
+                    <num>7.</num>
+                    <content>
+                        <p>L'intesa definitiva, dopo l'approvazione del Consiglio dei ministri, e' immediatamente sottoscritta dal Presidente del Consiglio dei ministri e dal Presidente della Giunta regionale. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_8">
+                    <num>8.</num>
+                    <content>
+                        <p>Il disegno di legge di cui al comma 6, cui e' allegata l'intesa, e' immediatamente trasmesso alle Camere per la deliberazione, ai sensi dell'articolo 116, terzo comma, della Costituzione. 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (1)</p>
+                        <p>
+ La Corte costituzionale, con sentenza 14 novembre - 3 dicembre 2024, n. 192 (in G.U. 1ª s.s. 4/12/2024, n. 49) ha dichiarato: 
+ - "l'illegittimita' costituzionale dell'art. 2, comma 1, terzo periodo, della <ref eId="14" href="/akn/it/act/legge/stato/2024/86/!main">legge n. 86 del 2024</ref>, nella parte in cui stabilisce che il negoziato, «con riguardo a materie o ambiti di materie riferibili ai livelli essenziali delle prestazioni di cui all'articolo 3, e' svolto per ciascuna singola materia o ambito di materia», anziche' stabilire che il negoziato, «con riguardo a specifiche funzioni riferibili ai livelli essenziali delle prestazioni di cui all'articolo 3, e' svolto con riferimento a ciascuna funzione o gruppo di funzioni»"; 
+ - "l'illegittimita' costituzionale dell'<ref eId="15" href="/akn/it/act/legge/stato/2024/86/!main#art_2-com2">art. 2, comma 2, della legge n. 86 del 2024</ref>"; 
+ - "l'illegittimita' costituzionale dell'art. 2, comma 1, primo periodo, della <ref eId="16" href="/akn/it/act/legge/stato/2024/86/!main">legge n. 86 del 2024</ref>, nella parte in cui non prescrive che l'iniziativa regionale sia giustificata alla luce del principio di sussidiarieta'". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_3">
+                <num>Art. 3.</num>
+                <heading>Delega al Governo per la determinazione dei LEP ai fini dell'attuazione dell'articolo 116, terzo comma, della Costituzione</heading>
+                <paragraph eId="art_3__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Ai fini dell'attuazione dell'<ref eId="content__ref_17" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>, per l'individuazione dei livelli essenziali delle prestazioni concernenti i diritti civili e sociali che devono essere garantiti su tutto il territorio nazionale (LEP), il Governo e' delegato ad adottare, entro ventiquattro mesi dalla data di entrata in vigore della presente legge, uno o piu' decreti legislativi, sulla base dei principi e criteri direttivi di cui all'<ref eId="content__ref_18" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com791">articolo 1, commi da 791</ref> <ref eId="content__ref_19" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com801bis">a 801-bis, della legge 29 dicembre 2022, n. 197</ref>. <ins eId="ins_4">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>I decreti legislativi di cui al comma 1 sono adottati su proposta del Presidente del Consiglio dei ministri e del Ministro per gli affari regionali e le autonomie, di concerto con i Ministri competenti e previa acquisizione del parere della Conferenza unificata di cui all'<ref eId="content__ref_20" href="/akn/it/act/decretoLegislativo/stato/1997-08-28/281/!main#art_8">articolo 8 del decreto legislativo 28 agosto 1997, n. 281</ref>. Gli schemi di ciascun decreto legislativo sono successivamente trasmessi alle Camere per l'espressione dei pareri da parte delle Commissioni parlamentari competenti per materia e per i profili finanziari, che si pronunciano entro il termine di quarantacinque giorni dalla data di trasmissione, decorso il quale il decreto legislativo puo' essere comunque adottato. Ove il parere delle Commissioni parlamentari indichi specificamente talune disposizioni come non conformi ai principi e criteri direttivi di cui al presente articolo, il Governo, qualora non intenda conformarsi ai pareri parlamentari, trasmette nuovamente i testi alle Camere con le sue osservazioni e con eventuali modificazioni, corredate dei necessari elementi integrativi di informazione e motivazione. Le Commissioni competenti per materia e per i profili finanziari possono esprimersi sulle osservazioni del Governo entro il termine di venti giorni dall'assegnazione, decorso il quale il decreto legislativo puo' essere comunque emanato. <ins eId="ins_5">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_3">
+                    <num>3.</num>
+                    <list>
+                        <intro eId="art_3__para_3__intro_1">
+                            <p>Nelle materie di cui all'<ref eId="content__ref_21" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>, i LEP sono determinati nelle materie o negli ambiti di materie seguenti: 
+ </p>
+                        </intro>
+                        <point eId="art_3__para_3.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>norme generali sull'istruzione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>tutela dell'ambiente, dell'ecosistema e dei beni culturali; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>tutela e sicurezza del lavoro; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>istruzione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>ricerca scientifica e tecnologica e sostegno all'innovazione per i settori produttivi; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_f">
+                            <num>f)</num>
+                            <content>
+                                <p>tutela della salute; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_g">
+                            <num>g)</num>
+                            <content>
+                                <p>alimentazione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_h">
+                            <num>h)</num>
+                            <content>
+                                <p>ordinamento sportivo; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_i">
+                            <num>i)</num>
+                            <content>
+                                <p>governo del territorio; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_l">
+                            <num>l)</num>
+                            <content>
+                                <p>porti e aeroporti civili; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_m">
+                            <num>m)</num>
+                            <content>
+                                <p>grandi reti di trasporto e di navigazione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_n">
+                            <num>n)</num>
+                            <content>
+                                <p>ordinamento della comunicazione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_o">
+                            <num>o)</num>
+                            <content>
+                                <p>produzione, trasporto e distribuzione nazionale dell'energia; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_p">
+                            <num>p)</num>
+                            <content>
+                                <p>valorizzazione dei beni culturali e ambientali e promozione e organizzazione di attivita' culturali. 
+ <ins eId="ins_6">((1))</ins>
+                                </p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_3__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>I decreti di cui al presente articolo definiscono le procedure e le modalita' operative per monitorare l'effettiva garanzia in ciascuna Regione dell'erogazione dei LEP in condizioni di appropriatezza e di efficienza nell'utilizzo delle risorse, nonche' la congruita' tra le prestazioni da erogare e le risorse messe a disposizione. Per ciascuna delle Regioni che hanno sottoscritto intese ai sensi dell'articolo 2, in relazione alle materie o agli ambiti di materie oggetto di intesa, l'attivita' di monitoraggio e' svolta dalla Commissione paritetica di cui all'articolo 5, comma 1, sulla base di quanto previsto dalle rispettive intese. La Commissione paritetica riferisce annualmente sugli esiti del monitoraggio alla Conferenza unificata. <ins eId="ins_7">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>La Conferenza unificata, sulla base degli esiti del monitoraggio effettuato ai sensi di quanto previsto dal comma 4, adotta, sentito il Presidente della Regione interessata, le necessarie raccomandazioni alle Regioni interessate al fine di superare le criticita' riscontrate. E' in ogni caso fatto salvo l'esercizio del potere sostitutivo del Governo ai sensi dell'articolo 120, secondo comma, della Costituzione. <ins eId="ins_8">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>Il Ministro per gli affari regionali e le autonomie trasmette una relazione annuale alle Camere sull'esito delle procedure di monitoraggio di cui al presente articolo. <ins eId="ins_9">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_7">
+                    <num>7.</num>
+                    <content>
+                        <p>I LEP possono essere aggiornati periodicamente in coerenza e nei limiti delle risorse finanziarie disponibili, anche al fine di tenere conto della necessita' di adeguamenti tecnici prodotta dal mutamento del contesto socioeconomico o dall'evoluzione della tecnologia, con decreti del Presidente del Consiglio dei ministri, su proposta dei Ministri competenti, di concerto con il Ministro per gli affari regionali e le autonomie e il Ministro dell'economia e delle finanze.
+I decreti di cui al primo periodo sono adottati solo successivamente o contestualmente all'entrata in vigore dei provvedimenti legislativi che stanziano le occorrenti risorse finanziarie. Sugli schemi di decreto e' acquisito il parere della Conferenza unificata, da rendere entro venti giorni, decorsi i quali gli stessi schemi di decreto sono trasmessi alle Camere per il relativo parere da parte delle Commissioni parlamentari competenti per materia e per i profili finanziari, che deve essere espresso nel termine di trenta giorni, decorso il quale i decreti possono essere adottati. <ins eId="ins_10">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_8">
+                    <num>8.</num>
+                    <content>
+                        <p>Sulla base delle ipotesi tecniche formulate dalla Commissione tecnica per i fabbisogni standard, secondo le modalita' di cui all'<ref eId="content__ref_22" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com793">articolo 1, commi 793</ref> e <ref eId="content__ref_23" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com796">796, della legge 29 dicembre 2022, n. 197</ref>, i costi e fabbisogni standard sono determinati e aggiornati con cadenza almeno triennale con uno o piu' decreti del Presidente del Consiglio dei ministri. <ins eId="ins_11">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_9">
+                    <num>9.</num>
+                    <content>
+                        <p>Nelle more dell'entrata in vigore dei decreti legislativi di cui al presente articolo, ai fini della determinazione dei LEP, continua ad applicarsi l'<ref eId="content__ref_24" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com791">articolo 1, commi da 791</ref> <ref eId="content__ref_25" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com801bis">a 801-bis, della legge 29 dicembre 2022, n. 197</ref>. <ins eId="ins_12">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_10">
+                    <num>10.</num>
+                    <content>
+                        <p>E' fatta salva la determinazione dei LEP e dei relativi costi e fabbisogni standard, svolta ai sensi dell'<ref eId="content__ref_26" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com791">articolo 1, commi da 791</ref> <ref eId="content__ref_27" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com801bis">a 801-bis, della legge 29 dicembre 2022, n. 197</ref>, alla data di entrata in vigore dei decreti legislativi di cui al presente articolo. <ins eId="ins_13">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_11">
+                    <num>11.</num>
+                    <content>
+                        <p>Qualora, successivamente alla data di entrata in vigore della legge di approvazione dell'intesa, in materie oggetto della medesima, i LEP, con il relativo finanziamento, siano modificati o ne siano determinati ulteriori, la Regione e gli enti locali interessati sono tenuti all'osservanza di tali LEP nel rispetto dell'articolo 119, quarto comma, della Costituzione. 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (1)</p>
+                        <p>
+ La Corte costituzionale, con sentenza 14 novembre - 3 dicembre 2024, n. 192 (in G.U. 1ª s.s. 4/12/2024, n. 49) ha dichiarato: 
+ - "l'illegittimita' costituzionale dell'<ref eId="28" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com3">art. 3, comma 3, della legge n. 86 del 2024</ref>, nella parte in cui prevede che «i LEP sono determinati nelle materie o negli ambiti di materie seguenti», anziche' «i LEP sono determinati per le specifiche funzioni concernenti le materie seguenti»"; 
+ - "l'illegittimita' costituzionale dell'<ref eId="29" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com1">art. 3, comma 1, della legge n. 86 del 2024</ref>"; 
+ - "l'illegittimita' costituzionale dell'<ref eId="30" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com7">art. 3, comma 7, della legge n. 86 del 2024</ref>"; 
+ - "l'illegittimita' costituzionale dell'<ref eId="31" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com9">art. 3, comma 9, della legge n. 86 del 2024</ref>"; 
+ - "in via consequenziale, ai sensi dell'<ref eId="32" href="/akn/it/act/legge/stato/1953-03-11/87/!main#art_27">art. 27 della legge 11 marzo 1953, n. 87</ref> (Norme sulla costituzione e sul funzionamento della Corte costituzionale), l'illegittimita' costituzionale dell'<ref eId="33" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com2">art. 3, commi 2</ref>, <ref eId="34" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com4">4</ref>, <ref eId="35" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com5">5</ref>, <ref eId="36" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com6">6</ref>, <ref eId="37" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com8">8</ref> e <ref eId="38" href="/akn/it/act/legge/stato/2024/86/!main#art_3-com10">10 della legge n. 86 del 2024</ref>". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_4">
+                <num>Art. 4.</num>
+                <heading> Trasferimento delle funzioni</heading>
+                <paragraph eId="art_4__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il trasferimento delle funzioni, con le relative risorse umane, strumentali e finanziarie, concernenti materie o ambiti di materie riferibili ai LEP di cui all'articolo 3, puo' essere effettuato, secondo le modalita' e le procedure di quantificazione individuate dalle singole intese, soltanto dopo la determinazione dei medesimi LEP e dei relativi costi e fabbisogni standard, nei limiti delle risorse rese disponibili nella legge di bilancio. Qualora dalla determinazione dei LEP di cui al primo periodo derivino nuovi o maggiori oneri a carico della finanza pubblica, si puo' procedere al trasferimento delle funzioni solo successivamente all'entrata in vigore dei provvedimenti legislativi di stanziamento delle risorse finanziarie volte ad assicurare i medesimi livelli essenziali delle prestazioni sull'intero territorio nazionale, ivi comprese le Regioni che non hanno sottoscritto le intese, al fine di scongiurare disparita' di trattamento tra Regioni, coerentemente con gli obiettivi programmati di finanza pubblica e con gli equilibri di bilancio, nel rispetto dell'articolo 9 della presente legge e della <ref eId="content__ref_39" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com793-letd">lettera d) del comma 793 dell'articolo 1 della legge 29 dicembre 2022, n. 197</ref>. <ins eId="ins_14">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il trasferimento delle funzioni relative a materie o ambiti di materie diversi da quelli di cui al comma 1, con le relative risorse umane, strumentali e finanziarie, puo' essere effettuato, secondo le modalita', le procedure e i tempi indicati nelle singole intese, nei limiti delle risorse previste a legislazione vigente, dalla data di entrata in vigore della presente legge. 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (1)</p>
+                        <p>
+ La Corte costituzionale, con sentenza 14 novembre - 3 dicembre 2024, n. 192 (in G.U. 1ª s.s. 4/12/2024, n. 49) ha dichiarato "l'illegittimita' costituzionale dell'art. 4, comma 1, primo periodo, della <ref eId="40" href="/akn/it/act/legge/stato/2024/86/!main">legge n. 86 del 2024</ref>, nella parte in cui menziona «materie o ambiti di materie riferibili ai LEP», anziche' «specifiche funzioni riferibili ai LEP»". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_5">
+                <num>Art. 5.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ 
+Principi relativi all'attribuzione delle risorse finanziarie, umane e strumentali corrispondenti alle funzioni oggetto di conferimento 
+ 
+ </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>L'intesa di cui all'articolo 2 stabilisce i criteri per l'individuazione dei beni e delle risorse finanziarie, umane, strumentali e organizzative necessari per l'esercizio da parte della Regione di ulteriori forme e condizioni particolari di autonomia, che sono determinati con decreto del Presidente del Consiglio dei ministri, su proposta del Ministro per gli affari regionali e le autonomie, di concerto con il Ministro dell'economia e delle finanze e i Ministri competenti per materia, su proposta di una Commissione paritetica Stato-Regione-Autonomie locali, disciplinata dall'intesa medesima. Fanno parte della Commissione, per lo Stato, un rappresentante del Ministro per gli affari regionali e le autonomie, un rappresentante del Ministro dell'economia e delle finanze e un rappresentante per ciascuna delle amministrazioni competenti e, per la Regione, i corrispondenti rappresentanti regionali, oltre a un rappresentante dell'Associazione nazionale dei comuni italiani (ANCI) e un rappresentante dell'Unione delle province d'Italia (UPI). In tutti casi in cui si debba procedere alla determinazione delle risorse umane, la Commissione paritetica sente i rappresentanti delle organizzazioni sindacali maggiormente rappresentative. Ai componenti della Commissione paritetica non spettano compensi, indennita', gettoni di presenza, rimborsi di spese o altri emolumenti comunque denominati. Al funzionamento della Commissione paritetica si provvede nell'ambito delle risorse umane, finanziarie e strumentali disponibili a legislazione vigente. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>L'intesa di cui all'articolo 2 individua le modalita' di finanziamento delle funzioni attribuite attraverso compartecipazioni al gettito di uno o piu' tributi erariali maturato nel territorio regionale, nel rispetto dell'<ref eId="content__ref_41" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_17">articolo 17 della legge 31 dicembre 2009, n. 196</ref>, nonche' nel rispetto di quanto previsto dall'articolo 119, quarto comma, della Costituzione. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_1" placement="bottom">
+                                <p> Note all'art. 5: 
+ - Si riporta il testo dell'<ref eId="content__ref_42" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_17">articolo 17 della legge 31 dicembre 2009, n. 196</ref> (Legge di contabilita' e finanza pubblica), pubblicata nella Gazzetta Ufficiale 31 dicembre 2009, n. 303, S.O.: 
+ «Art. 17 (Copertura finanziaria delle leggi). - 1. In attuazione dell'<ref eId="content__ref_43" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_81">articolo 81 della Costituzione</ref>, fermo restando quanto previsto dall'<ref eId="content__ref_44" href="/akn/it/act/legge/stato/2012-12-24/243/!main#art_6">articolo 6 della legge 24 dicembre 2012, n. 243</ref>, e dall'articolo 21 della presente legge, ciascuna legge che comporti nuovi o maggiori oneri indica espressamente, per ciascun anno e per ogni intervento da essa previsto, la spesa autorizzata, che si intende come limite massimo di spesa, ovvero le relative previsioni di spesa, provvedendo alla contestuale copertura finanziaria dei medesimi oneri ai sensi del presente comma.
+ Nel caso si verifichino nuove o maggiori spese rispetto alle previsioni, alla compensazione dei relativi effetti finanziari si provvede ai sensi dei commi 12-bis, 12-ter e 12-quater. La copertura finanziaria delle leggi che comportino nuovi o maggiori oneri, ovvero minori entrate, e' determinata esclusivamente attraverso le seguenti modalita': 
+ a) mediante utilizzo degli accantonamenti iscritti nei fondi speciali previsti dall'articolo 18, restando precluso sia l'utilizzo di accantonamenti del conto capitale per iniziative di parte corrente, sia l'utilizzo per finalita' difformi di accantonamenti per regolazioni contabili e debitorie e per provvedimenti in adempimento di obblighi internazionali; 
+ a-bis) mediante modifica o soppressione dei parametri che regolano l'evoluzione della spesa previsti dalla normativa vigente, dalle quali derivino risparmi di spesa; 
+ b) mediante riduzione di precedenti autorizzazioni legislative di spesa. Ove dette autorizzazioni siano affluite in conti correnti o in contabilita' speciali presso la Tesoreria statale, si procede alla contestuale iscrizione delle risorse da utilizzare come copertura nello stato di previsione dell'entrata, disponendone il versamento. Per le risorse affluite alla Tesoreria statale, la congruita' della copertura e' valutata anche in relazione all'effettiva riduzione della capacita' di spesa dei Ministeri; 
+ c) mediante modificazioni legislative che comportino nuove o maggiori entrate; resta in ogni caso esclusa la copertura di nuovi o maggiori oneri di parte corrente attraverso l'utilizzo dei proventi derivanti da entrate in conto capitale. 
+ 1.1. In ogni caso, per la copertura finanziaria delle leggi che comportino nuovi o maggiori oneri ovvero minori entrate non possono essere utilizzate le risorse derivanti dalla quota dell'otto per mille del gettito dell'imposta sul reddito delle persone fisiche attribuita alla diretta gestione statale ai sensi dell'<ref eId="content__ref_45" href="/akn/it/act/legge/stato/1985-05-20/222/!main#art_47-com2">articolo 47, secondo comma, della legge 20 maggio 1985, n. 222</ref>, ne' quelle derivanti dall'autorizzazione di spesa concernente la quota del cinque per mille del gettito dell'imposta sul reddito delle persone fisiche, di cui all'<ref eId="content__ref_46" href="/akn/it/act/legge/stato/2014-12-23/190/!main#art_1-com154">articolo 1, comma 154, della legge 23 dicembre 2014, n. 190</ref>, che risultino effettivamente utilizzate sulla base delle scelte dei contribuenti. 
+ 1-bis. Le maggiori entrate rispetto a quelle iscritte nel bilancio di previsione derivanti da variazioni degli andamenti a legislazione vigente non possono essere utilizzate per la copertura finanziaria di nuove o maggiori spese o riduzioni di entrate e sono finalizzate al miglioramento dei saldi di finanza pubblica. 
+ 2. Le leggi di delega comportanti oneri recano i mezzi di copertura necessari per l'adozione dei relativi decreti legislativi. Qualora, in sede di conferimento della delega, per la complessita' della materia trattata, non sia possibile procedere alla determinazione degli effetti finanziari derivanti dai decreti legislativi, la quantificazione degli stessi e' effettuata al momento dell'adozione dei singoli decreti legislativi. I decreti legislativi dai quali derivano nuovi o maggiori oneri sono emanati solo successivamente all'entrata in vigore dei provvedimenti legislativi che stanzino le occorrenti risorse finanziarie. A ciascuno schema di decreto legislativo e' allegata una relazione tecnica, predisposta ai sensi del comma 3, che da' conto della neutralita' finanziaria del medesimo decreto ovvero dei nuovi o maggiori oneri da esso derivanti e dei corrispondenti mezzi di copertura. 
+ 3. Fermo restando quanto previsto dal comma 2, i disegni di legge, gli schemi di decreto legislativo, gli emendamenti di iniziativa governativa che comportino conseguenze finanziarie devono essere corredati di una relazione tecnica, predisposta dalle amministrazioni competenti e verificata dal Ministero dell'economia e delle finanze, sulla quantificazione delle entrate e degli oneri recati da ciascuna disposizione, nonche' delle relative coperture, con la specificazione, per la spesa corrente e per le minori entrate, degli oneri annuali fino alla completa attuazione delle norme e, per le spese in conto capitale, della modulazione relativa agli anni compresi nel bilancio pluriennale e dell'onere complessivo in relazione agli obiettivi fisici previsti. Alla relazione tecnica e' allegato un prospetto riepilogativo degli effetti finanziari di ciascuna disposizione ai fini del saldo netto da finanziare del bilancio dello Stato, del saldo di cassa delle amministrazioni pubbliche e dell'indebitamento netto del conto consolidato delle pubbliche amministrazioni.
+ Nella relazione sono indicati i dati e i metodi utilizzati per la quantificazione, le loro fonti e ogni elemento utile per la verifica tecnica in sede parlamentare secondo le norme di cui ai regolamenti parlamentari, nonche' il raccordo con le previsioni tendenziali del bilancio dello Stato, del conto consolidato di cassa e del conto economico delle amministrazioni pubbliche, contenute nel DEF ed eventuali successivi aggiornamenti. 
+ 4. Ai fini della definizione della copertura finanziaria dei provvedimenti legislativi, la relazione tecnica di cui al comma 3 evidenzia anche gli effetti di ciascuna disposizione sugli andamenti tendenziali del saldo di cassa e dell'indebitamento netto delle pubbliche amministrazioni per la verifica del rispetto degli equilibri di finanza pubblica, indicando altresi' i criteri per la loro quantificazione e compensazione nell'ambito della stessa copertura finanziaria. 
+ 5. Le Commissioni parlamentari competenti possono richiedere al Governo la relazione di cui al comma 3 per tutte le proposte legislative e gli emendamenti al loro esame ai fini della verifica tecnica della quantificazione degli oneri da essi recati. La relazione tecnica deve essere trasmessa nel termine indicato dalle medesime Commissioni in relazione all'oggetto e alla programmazione dei lavori parlamentari e, in ogni caso, entro trenta giorni dalla richiesta. Qualora il Governo non sia in grado di trasmettere la relazione tecnica entro il termine stabilito dalle Commissioni deve indicarne le ragioni. I dati devono essere trasmessi in formato telematico. I regolamenti parlamentari disciplinano gli ulteriori casi in cui il Governo e' tenuto alla presentazione della relazione tecnica di cui al comma 3. 
+ 6. I disegni di legge di iniziativa regionale e del Consiglio nazionale dell'economia e del lavoro (CNEL) devono essere corredati, a cura dei proponenti, di una relazione tecnica formulata secondo le modalita' di cui al comma 3. 
+ 6-bis. Per le disposizioni corredate di clausole di neutralita' finanziaria, la relazione tecnica riporta la valutazione degli effetti derivanti dalle disposizioni medesime, i dati e gli elementi idonei a suffragare l'ipotesi di invarianza degli effetti sui saldi di finanza pubblica, attraverso l'indicazione dell'entita' delle risorse gia' esistenti nel bilancio e delle relative unita' gestionali, utilizzabili per le finalita' indicate dalle disposizioni medesime anche attraverso la loro riprogrammazione. In ogni caso, la clausola di neutralita' finanziaria non puo' essere prevista nel caso di spese di natura obbligatoria. 
+ 7. Per le disposizioni legislative in materia pensionistica e di pubblico impiego, la relazione di cui al comma 3 contiene un quadro analitico di proiezioni finanziarie, almeno decennali, riferite all'andamento delle variabili collegate ai soggetti beneficiari e al comparto di riferimento. Per le disposizioni legislative in materia di pubblico impiego, la relazione contiene i dati sul numero dei destinatari, sul costo unitario, sugli automatismi diretti e indiretti che ne conseguono fino alla loro completa attuazione, nonche' sulle loro correlazioni con lo stato giuridico ed economico di categorie o fasce di dipendenti pubblici omologabili. In particolare per il comparto scuola sono indicati anche le ipotesi demografiche e di flussi migratori assunte per l'elaborazione delle previsioni della popolazione scolastica, nonche' ogni altro elemento utile per la verifica delle quantificazioni. 
+ 8. La relazione tecnica di cui ai commi 3 e 5 e il prospetto riepilogativo di cui al comma 3 sono aggiornati all'atto del passaggio dell'esame del provvedimento tra i due rami del Parlamento. 
+ 8-bis. Le relazioni tecniche di cui al presente articolo sono trasmesse al Parlamento in formato elettronico elaborabile. 
+ 9. Ogni quattro mesi la Corte dei conti trasmette alle Camere una relazione sulla tipologia delle coperture finanziarie adottate nelle leggi approvate nel periodo considerato e sulle tecniche di quantificazione degli oneri. Nella medesima relazione la Corte dei conti riferisce sulla tipologia delle coperture finanziarie adottate nei decreti legislativi emanati nel periodo considerato e sulla congruenza tra le conseguenze finanziarie di tali decreti legislativi e le norme di copertura recate dalla legge di delega. 
+ 10. Le disposizioni che comportano nuove o maggiori spese hanno effetto entro i limiti della spesa espressamente autorizzata nei relativi provvedimenti legislativi. Con decreto dirigenziale del Ministero dell'economia e delle finanze - Dipartimento della Ragioneria generale dello Stato, da pubblicare nella Gazzetta Ufficiale, e' accertato l'avvenuto raggiungimento dei predetti limiti di spesa. Le disposizioni recanti espresse autorizzazioni di spesa cessano di avere efficacia a decorrere dalla data di pubblicazione del decreto per l'anno in corso alla medesima data. 
+ 11. Per le amministrazioni dello Stato, il Ministero dell'economia e delle finanze -. Dipartimento della Ragioneria generale dello Stato, anche attraverso gli uffici centrali del bilancio e le ragionerie territoriali dello Stato, vigila sulla corretta applicazione delle disposizioni di cui al comma 10. Per gli enti ed organismi pubblici non territoriali gli organi di revisione e di controllo provvedono agli analoghi adempimenti di vigilanza, dandone completa informazione al Ministero dell'economia e delle finanze - Dipartimento della Ragioneria generale dello Stato. 
+ 12. Il Ministero dell'economia e delle finanze, sulla base delle informazioni trasmesse dai Ministeri competenti, provvede al monitoraggio degli oneri derivanti dalle leggi che indicano le previsioni di spesa di cui al comma 1, al fine di prevenire l'eventuale verificarsi di scostamenti dell'andamento dei medesimi oneri rispetto alle previsioni. 
+ 12-bis. Qualora siano in procinto di verificarsi gli scostamenti di cui al comma 12, il Ministro dell'economia e delle finanze, in attesa delle misure correttive di cui al comma 12-quater, sentito il Ministro competente, con proprio decreto, provvede, per l'esercizio in corso, alla riduzione degli stanziamenti iscritti nello stato di previsione del Ministero competente, nel rispetto dei vincoli di spesa derivanti dalla lettera a) del comma 5 dell'articolo 21. Qualora i suddetti stanziamenti non siano sufficienti alla copertura finanziaria del maggior onere risultante dall'attivita' di monitoraggio di cui al comma 12, allo stesso si provvede, su proposta del Ministro dell'economia e delle finanze, con decreto del Presidente del Consiglio dei ministri, previa deliberazione del Consiglio dei ministri, mediante riduzione degli stanziamenti iscritti negli stati di previsione della spesa, nel rispetto dei vincoli di spesa derivanti dalla lettera a) del comma 5 dell'articolo 21. Gli schemi dei decreti di cui ai precedenti periodi sono trasmessi alle Camere per l'espressione del parere delle Commissioni parlamentari competenti per i profili finanziari, da rendere entro il termine di sette giorni dalla data della trasmissione. Gli schemi dei decreti sono corredati di apposita relazione che espone le cause che hanno determinato gli scostamenti, anche ai fini della revisione dei dati e dei metodi utilizzati per la quantificazione degli oneri previsti dalle predette leggi. Qualora le Commissioni non si esprimano entro il termine di cui al terzo periodo, i decreti possono essere adottati in via definitiva. 
+ 12-ter. Nel caso di scostamenti non compensabili nel corso dell'esercizio con le misure di cui al comma 12-bis, si provvede ai sensi del comma 13. 
+ 12-quater. Per gli esercizi successivi a quello in corso, alla compensazione degli effetti che eccedono le previsioni si provvede con la legge di bilancio, ai sensi dell'articolo 21, comma 1-ter, lettera f), adottando prioritariamente misure di carattere normativo correttive della maggiore spesa. 
+ 13. Il Ministro dell'economia e delle finanze, allorche' riscontri che l'attuazione di leggi rechi pregiudizio al conseguimento degli obiettivi di finanza pubblica, assume tempestivamente le conseguenti iniziative legislative al fine di assicurare il rispetto dell'articolo 81 della Costituzione. La medesima procedura e' applicata in caso di sentenze definitive di organi giurisdizionali e della Corte costituzionale recanti interpretazioni della normativa vigente suscettibili di determinare maggiori oneri, fermo restando quanto disposto in materia di personale dall'<ref eId="content__ref_47" href="/akn/it/act/decretoLegislativo/stato/2001-03-30/165/!main#art_61">articolo 61 del decreto legislativo 30 marzo 2001, n. 165</ref>. 
+ 14. Le disposizioni contenute nei provvedimenti legislativi di iniziativa governativa che prevedono l'incremento o la riduzione di stanziamenti di bilancio indicano anche le missioni di spesa e i relativi programmi interessati». 
+ - Si riporta il testo dell'<ref eId="content__ref_48" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com4">articolo 119, quarto comma, della Costituzione</ref>: 
+ «Art. 119. - Omissis. 
+ Le risorse derivanti dalle fonti di cui ai commi precedenti consentono ai Comuni, alle Province, alle Citta' metropolitane e alle Regioni di finanziare integralmente le funzioni pubbliche loro attribuite. 
+ - Omissis». 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_6">
+                <num>Art. 6.</num>
+                <heading> Ulteriore attribuzione di funzioni amministrative a enti locali</heading>
+                <paragraph eId="art_6__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le funzioni amministrative trasferite alla Regione in attuazione dell'<ref eId="content__ref_49" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref> sono attribuite, dalla Regione medesima, contestualmente alle relative risorse umane, strumentali e finanziarie, ai comuni, salvo che, per assicurarne l'esercizio unitario, siano conferite a province, citta' metropolitane e Regione, sulla base dei principi di sussidiarieta', differenziazione ed adeguatezza. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Restano ferme, in ogni caso, le funzioni fondamentali degli enti locali, con le connesse risorse umane, strumentali e finanziarie, di cui all'articolo 117, secondo comma, lettera p), della Costituzione. </p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_2" placement="bottom">
+                                <p> Note all'art. 6: 
+ - Si riporta il testo dell'<ref eId="content__ref_50" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>: 
+ «Articolo 116. - Omissis. 
+ Ulteriori forme e condizioni particolari di autonomia, concernenti le materie di cui al terzo comma dell'articolo 117 e le materie indicate dal secondo comma del medesimo articolo alle lettere l), limitatamente all'organizzazione della giustizia di pace, n) e s), possono essere attribuite ad altre Regioni, con legge dello Stato, su iniziativa della Regione interessata, sentiti gli enti locali, nel rispetto dei principi di cui all'articolo 119. La legge e' approvata dalle Camere a maggioranza assoluta dei componenti, sulla base di intesa fra lo Stato e la Regione interessata». 
+ - Si riporta il testo dell'<ref eId="content__ref_51" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_117-com2-letp">articolo 117, secondo comma, lettera p), della Costituzione</ref>: 
+ «Articolo 117. - Omissis. 
+ Lo Stato ha legislazione esclusiva nelle seguenti materie: 
+ - Omissis. 
+ p) legislazione elettorale, organi di governo e funzioni fondamentali di Comuni, Province e Citta' metropolitane; 
+ - Omissis». 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_7">
+                <num>Art. 7.</num>
+                <heading> Durata delle intese e successione di leggi nel tempo</heading>
+                <paragraph eId="art_7__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>L'intesa di cui all'<ref eId="content__ref_52" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref> indica la propria durata, comunque non superiore a dieci anni. Con le medesime modalita' previste nell'articolo 2, su iniziativa dello Stato o della Regione interessata, anche sulla base di atti di indirizzo adottati dalle Camere secondo i rispettivi Regolamenti, l'intesa puo' essere modificata. L'intesa prevede inoltre i casi, i tempi e le modalita' con cui lo Stato o la Regione possono chiedere la cessazione della sua efficacia, che e' deliberata con legge a maggioranza assoluta delle Camere. In ogni caso, lo Stato, qualora ricorrano motivate ragioni a tutela della coesione e della solidarieta' sociale, conseguenti alla mancata osservanza, direttamente imputabile alla Regione sulla base del monitoraggio di cui alla presente legge, dell'obbligo di garantire i LEP, dispone la cessazione integrale o parziale dell'intesa, che e' deliberata con legge a maggioranza assoluta delle Camere. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Alla scadenza del termine di durata, l'intesa si intende rinnovata per un uguale periodo, salvo diversa volonta' dello Stato o della Regione, manifestata almeno dodici mesi prima della scadenza. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Ciascuna intesa individua, in un apposito allegato, le disposizioni di legge statale che cessano di avere efficacia, nel territorio regionale, con l'entrata in vigore delle leggi regionali attuative dell'intesa. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>La Presidenza del Consiglio dei ministri-Dipartimento per gli affari regionali e le autonomie, il Ministero dell'economia e delle finanze o la Regione possono, anche congiuntamente, disporre verifiche su specifici profili o settori di attivita' oggetto dell'intesa con riferimento alla garanzia del raggiungimento dei livelli essenziali delle prestazioni, nonche' il monitoraggio delle stesse, e a tal fine ne concordano le modalita' operative. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Le disposizioni statali successive alla data di entrata in vigore delle leggi di approvazione di intese osservano le competenze legislative e l'assegnazione delle funzioni amministrative nonche' le ulteriori disposizioni contenute nelle intese. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_3" placement="bottom">
+                                <p> Note all'art. 7: 
+ - Si riporta il testo dell'<ref eId="content__ref_53" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>: 
+ «Articolo 116. - Omissis. 
+ Ulteriori forme e condizioni particolari di autonomia, concernenti le materie di cui al terzo comma dell'articolo 117 e le materie indicate dal secondo comma del medesimo articolo alle lettere l), limitatamente all'organizzazione della giustizia di pace, n) e s), possono essere attribuite ad altre Regioni, con legge dello Stato, su iniziativa della Regione interessata, sentiti gli enti locali, nel rispetto dei principi di cui all'articolo 119. La legge e' approvata dalle Camere a maggioranza assoluta dei componenti, sulla base di intesa fra lo Stato e la Regione interessata». 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_8">
+                <num>Art. 8.</num>
+                <heading> Monitoraggio</heading>
+                <paragraph eId="art_8__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>La Commissione paritetica di cui all'articolo 5, comma 1, procede annualmente alla valutazione degli oneri finanziari derivanti, per ciascuna Regione interessata, dall'esercizio delle funzioni e dall'erogazione dei servizi connessi alle ulteriori forme e condizioni particolari di autonomia, secondo quanto previsto dall'intesa, in coerenza con gli obiettivi programmatici di finanza pubblica e, comunque, garantendo l'equilibrio di bilancio. La Commissione paritetica fornisce alla Conferenza unificata e alle Camere adeguata informativa degli esiti della valutazione degli oneri finanziari. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>La Commissione paritetica provvede altresi' annualmente alla ricognizione dell'allineamento tra i fabbisogni di spesa gia' definiti e l'andamento del gettito dei tributi compartecipati per il finanziamento delle medesime funzioni. Qualora la suddetta ricognizione evidenzi uno scostamento dovuto alla variazione dei fabbisogni ovvero all'andamento del gettito dei medesimi tributi, anche alla luce delle variazioni del ciclo economico, il Ministro dell'economia e delle finanze, di concerto con il Ministro per gli affari regionali e le autonomie, previa intesa in sede di Conferenza unificata, adotta, su proposta della Commissione paritetica, le necessarie variazioni delle aliquote di compartecipazione definite nelle intese ai sensi dell'articolo 5, comma 2, garantendo comunque l'equilibrio di bilancio e nei limiti delle risorse disponibili.
+Sulla base dei dati del gettito effettivo dei tributi compartecipati rilevati a consuntivo, si procede, di anno in anno, alle conseguenti regolazioni finanziarie relative alle annualita' decorse, sempre nei limiti delle risorse disponibili. <ins eId="ins_15">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>La Corte dei conti riferisce annualmente alle Camere, nell'ambito delle relazioni al Parlamento di cui all'<ref eId="content__ref_54" href="/akn/it/act/legge/stato/1994-01-14/20/!main#art_3-com6">articolo 3, comma 6, della legge 14 gennaio 1994, n. 20</ref>, sui controlli effettuati in base alla normativa vigente, con riferimento in particolare alla verifica della congruita' degli oneri finanziari conseguenti all'attribuzione di forme e condizioni particolari di autonomia rispetto agli obiettivi di finanza pubblica e al principio dell'equilibrio di bilancio di cui all'articolo 81 della Costituzione. 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (1)</p>
+                        <p>
+ La Corte costituzionale, con sentenza 14 novembre - 3 dicembre 2024, n. 192 (in G.U. 1ª s.s. 4/12/2024, n. 49) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="55" href="/akn/it/act/legge/stato/2024/86/!main#art_8-com2">art. 8, comma 2, della legge n. 86 del 2024</ref>". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9">
+                <num>Art. 9.</num>
+                <heading> Clausole finanziarie</heading>
+                <paragraph eId="art_9__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Dall'applicazione della presente legge e di ciascuna intesa non devono derivare nuovi o maggiori oneri a carico della finanza pubblica. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Fermo restando quanto previsto dall'articolo 4, comma 1, il finanziamento dei LEP sulla base dei relativi costi e fabbisogni standard e' attuato nel rispetto dell'<ref eId="content__ref_56" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_17">articolo 17 della legge 31 dicembre 2009, n. 196</ref>, e degli equilibri di bilancio. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Per le singole Regioni che non siano parte delle intese approvate con legge in attuazione dell'<ref eId="content__ref_57" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_116-com3">articolo 116, terzo comma, della Costituzione</ref>, e' garantita l'invarianza finanziaria nonche' il finanziamento delle iniziative finalizzate ad attuare le previsioni di cui all'articolo 119, terzo, quinto e sesto comma, della Costituzione. Le intese, in ogni caso, non possono pregiudicare l'entita' e la proporzionalita' delle risorse da destinare a ciascuna delle altre Regioni, anche in relazione ad eventuali maggiori risorse destinate all'attuazione dei LEP di cui all'articolo 3. E' comunque garantita la perequazione per i territori con minore capacita' fiscale per abitante. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Al fine di garantire il coordinamento della finanza pubblica, resta ferma la possibilita' di prevedere anche per le Regioni che hanno sottoscritto le intese, ai sensi dell'articolo 2, il concorso agli obiettivi di finanza pubblica, tenendo conto delle vigenti regole di bilancio e delle relative procedure, nonche' di quelle conseguenti al processo di riforma del quadro della governance economica avviato dalle istituzioni dell'Unione europea. <ins eId="ins_16">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (1)</p>
+                        <p>
+ La Corte costituzionale, con sentenza 14 novembre - 3 dicembre 2024, n. 192 (in G.U. 1ª s.s. 4/12/2024, n. 49) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="58" href="/akn/it/act/legge/stato/2024/86/!main#art_9-com4">art. 9, comma 4, della legge n. 86 del 2024</ref>, nella parte in cui prevede la facoltativita' del concorso delle regioni differenziate agli obiettivi di finanza pubblica, anziche' la doverosita' su un piano di parita' rispetto alle altre regioni". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_10">
+                <num>Art. 10.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ 
+Misure perequative e di promozione dello sviluppo economico, della coesione e della solidarieta' sociale 
+ 
+ </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_10__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_10__para_1__intro_1">
+                            <p>Al fine di garantire l'unita' nazionale, nonche' la promozione dello sviluppo economico, della coesione e della solidarieta' sociale, dell'insularita', della rimozione degli squilibri economici e sociali e del perseguimento delle ulteriori finalita' di cui all'<ref eId="content__ref_59" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com5">articolo 119, quinto</ref> e <ref eId="content__ref_60" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com6">sesto comma, della Costituzione</ref>, anche nei territori delle Regioni che non concludono le intese, lo Stato, in attuazione dell'<ref eId="content__ref_61" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com3">articolo 119, commi terzo</ref> e <ref eId="content__ref_62" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com5">quinto, della Costituzione</ref>, promuove l'esercizio effettivo dei diritti civili e sociali che devono essere garantiti dallo Stato e dalle amministrazioni regionali e locali nell'esercizio delle funzioni riconducibili ai livelli essenziali delle prestazioni o alle funzioni fondamentali di cui all'<ref eId="content__ref_63" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_117-com2-letm">articolo 117, secondo comma, lettere m)</ref> e <ref eId="content__ref_64" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_117-com2-letp">p), della Costituzione</ref>, previa ricognizione delle risorse allo scopo destinabili, anche attraverso: 
+ </p>
+                        </intro>
+                        <point eId="art_10__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>l'unificazione delle diverse fonti aggiuntive o straordinarie di finanziamento statale di conto capitale, destinate alla promozione dello sviluppo economico, della coesione e della solidarieta' sociale, alla rimozione degli squilibri economici e sociali, all'eliminazione del deficit infrastrutturale tra le diverse aree del territorio nazionale, ivi compreso quello riguardante il trasporto pubblico locale e i collegamenti con le isole, e al perseguimento delle ulteriori finalita' di cui all'<ref eId="content__ref_65" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com5">articolo 119, quinto comma, della Costituzione</ref>, semplificando e uniformando le procedure di accesso, di destinazione territoriale, di spesa e di rendicontazione, al fine di garantire un utilizzo piu' razionale, efficace ed efficiente delle risorse disponibili, e salvaguardando, al contempo, gli specifici vincoli di destinazione, ove previsti, nonche' la programmazione gia' in corso alla data di entrata in vigore della presente disposizione. Resta comunque ferma la disciplina prevista dall'<ref eId="content__ref_66" href="/akn/it/act/decretoLegislativo/stato/2011-05-31/88/!main#art_4">articolo 4 del decreto legislativo 31 maggio 2011, n. 88</ref>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_10__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>l'unificazione delle risorse di parte corrente e la semplificazione delle relative procedure amministrative; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_10__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>l'effettuazione di interventi speciali di conto capitale, ivi compresi quelli finalizzati ad eliminare il deficit infrastrutturale tra le diverse aree del territorio nazionale e a rimuovere gli svantaggi derivanti dall'insularita', da individuare mediante gli strumenti di programmazione finanziaria e di bilancio di cui all'articolo 7, comma 2, lettere a),</p>
+                            </content>
+                        </point>
+                        <point eId="art_10__para_1.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>ed f), della <ref eId="content__ref_67" href="/akn/it/act/legge/stato/2009-12-31/196/!main">legge 31 dicembre 2009, n. 196</ref>; 
+ d) l'individuazione delle misure che concorrano a rimuovere gli svantaggi derivanti dall'insularita', promuovendo il diritto alla mobilita' e alla continuita' territoriale per tutte le isole, le forme di fiscalita' di sviluppo, la perequazione infrastrutturale e la tutela degli ecosistemi nell'ambito delle risorse compatibili con i saldi di finanza pubblica. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_10__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>In attuazione dell'<ref eId="content__ref_68" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com3">articolo 119, terzo comma, della Costituzione</ref>, trova comunque applicazione l'<ref eId="content__ref_69" href="/akn/it/act/decretoLegislativo/stato/2011-05-06/68/!main#art_15">articolo 15 del decreto legislativo 6 maggio 2011, n. 68</ref>, in conformita' con le disposizioni di cui all'<ref eId="content__ref_70" href="/akn/it/act/legge/stato/2023-08-09/111/!main#art_2">articolo 2 della legge 9 agosto 2023, n. 111</ref>, e nel quadro dell'attuazione della milestone del Piano nazionale di ripresa e resilienza relativa alla Riforma del quadro fiscale subnazionale (Missione 1, Componente 1, Riforma 1.14). 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_10__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il Governo informa le Camere e la Conferenza unificata, ai sensi dell'<ref eId="content__ref_71" href="/akn/it/act/decretoLegislativo/stato/1997-08-28/281/!main#art_6">articolo 6 del decreto legislativo 28 agosto 1997, n. 281</ref>, circa le attivita' poste in essere ai sensi del comma 1 del presente articolo. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_4" placement="bottom">
+                                <p> Note all'art. 10: 
+ - Si riporta il testo dell'<ref eId="content__ref_72" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com3">articolo 119, terzo</ref>, <ref eId="content__ref_73" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com5">quinto</ref> e <ref eId="content__ref_74" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_119-com6">sesto comma, della Costituzione</ref>: 
+ «Art. 119. - Omissis. 
+ La legge dello Stato istituisce un fondo perequativo, senza vincoli di destinazione, per i territori con minore capacita' fiscale per abitante. 
+ - Omissis. 
+ Per promuovere lo sviluppo economico, la coesione e la solidarieta' sociale, per rimuovere gli squilibri economici e sociali, per favorire l'effettivo esercizio dei diritti della persona, o per provvedere a scopi diversi dal normale esercizio delle loro funzioni, lo Stato destina risorse aggiuntive ed effettua interventi speciali in favore di determinati Comuni, Province, Citta' metropolitane e Regioni. 
+ La Repubblica riconosce le peculiarita' delle Isole e promuove le misure necessarie a rimuovere gli svantaggi derivanti dall'insularita'. 
+ - Omissis». 
+ - Si riporta il testo dell'<ref eId="content__ref_75" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_117-com2-letm">articolo 117, secondo comma, lettere m)</ref> e <ref eId="content__ref_76" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_117-com2-letp">p) della Costituzione</ref>: 
+ «Art. 117. - Omissis. 
+ Lo Stato ha legislazione esclusiva nelle seguenti materie: 
+ - Omissis. 
+ m) determinazione dei livelli essenziali delle prestazioni concernenti i diritti civili e sociali che devono essere garantiti su tutto il territorio nazionale; - Omissis. 
+ p) legislazione elettorale, organi di governo e funzioni fondamentali di Comuni, Province e Citta' metropolitane; 
+ - Omissis». 
+ - Si riporta il testo dell'<ref eId="content__ref_77" href="/akn/it/act/decretoLegislativo/stato/2011-05-31/88/!main#art_4">articolo 4 del decreto legislativo 31 maggio 2011, n. 88</ref> (Disposizioni in materia di risorse aggiuntive ed interventi speciali per la rimozione di squilibri economici e sociali, a norma dell'<ref eId="content__ref_78" href="/akn/it/act/legge/stato/2009-05-05/42/!main#art_16">articolo 16 della legge 5 maggio 2009, n. 42</ref>), pubblicato nella Gazzetta Ufficiale 22 giugno 2011, n. 143: 
+ «Art. 4 (Fondo per lo sviluppo e la coesione). - 1.
+ Il Fondo per le aree sottoutilizzate, di cui all'<ref eId="content__ref_79" href="/akn/it/act/legge/stato/2002-12-27/289/!main#art_61">articolo 61 della legge 27 dicembre 2002, n. 289</ref>, assume la denominazione di Fondo per lo sviluppo e la coesione, di seguito denominato: "Fondo". Il Fondo e' finalizzato a dare unita' programmatica e finanziaria all'insieme degli interventi aggiuntivi a finanziamento nazionale, che sono rivolti al riequilibrio economico e sociale tra le diverse aree del Paese. 
+ 2. Il Fondo ha carattere pluriennale in coerenza con l'articolazione temporale della programmazione dei Fondi strutturali dell'Unione europea, garantendo l'unitarieta' e la complementarita' delle procedure di attivazione delle relative risorse con quelle previste per i fondi strutturali dell'Unione europea. 
+ 3. Il Fondo e' destinato a finanziare interventi speciali dello Stato e l'erogazione di contributi speciali, secondo le modalita' stabilite dal presente decreto.
+ L'intervento del Fondo e' finalizzato al finanziamento di progetti strategici, sia di carattere infrastrutturale sia di carattere immateriale, di rilievo nazionale, interregionale e regionale, aventi natura di grandi progetti o di investimenti articolati in singoli interventi di consistenza progettuale ovvero realizzativa tra loro funzionalmente connessi, in relazione a obiettivi e risultati quantificabili e misurabili, anche per quanto attiene al profilo temporale. La programmazione degli interventi finanziati a carico del Fondo di cui al presente articolo e' realizzata tenendo conto della programmazione degli interventi di carattere ordinario». 
+ - Si riporta il testo dell'<ref eId="content__ref_80" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_7-com2-leta">articolo 7 comma 2, lettere a)</ref>, <ref eId="content__ref_81" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_7-com2-letd">d)</ref> ed <ref eId="content__ref_82" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_7-com2-letf">f), della legge 31 dicembre 2009, n. 196</ref> (Legge di contabilita' e finanza pubblica), pubblicata nella Gazzetta Ufficiale 31 dicembre 2009, n. 303 S.O. n. 245: 
+ «Art. 7 (Ciclo e strumenti della programmazione finanziaria e di bilancio). - Omissis. 
+ 2. Gli strumenti della programmazione sono: 
+ a) il Documento di economia e finanza (DEF), da presentare alle Camere entro il 10 aprile di ogni anno, per le conseguenti deliberazioni parlamentari; 
+ - Omissis. 
+ d) il disegno di legge del bilancio dello Stato, da presentare alle Camere entro il 20 ottobre di ogni anno; 
+ - Omissis. 
+ f) gli eventuali disegni di legge collegati alla manovra di finanza pubblica, da presentare alle Camere entro il mese di gennaio di ogni anno; 
+ - Omissis.». 
+ - Si riporta il testo dell'<ref eId="content__ref_83" href="/akn/it/act/decretoLegislativo/stato/2011-05-06/68/!main#art_15">articolo 15 del decreto legislativo 6 maggio 2011, n. 68</ref> (Disposizioni in materia di autonomia di entrata delle regioni a statuto ordinario e delle province, nonche' di determinazione dei costi e dei fabbisogni standard nel settore sanitario), pubblicato nella Gazzetta Ufficiale 12 maggio 2011, n. 109: 
+ «Art. 15 (Fase a regime e fondo perequativo). - 1. A decorrere dal 2027 o da un anno antecedente ove ricorrano le condizioni di cui al presente decreto legislativo, in conseguenza dell'avvio del percorso di graduale convergenza verso i costi standard, le fonti di finanziamento delle spese delle regioni di cui all'articolo 14, comma 1, sono le seguenti: 
+ a) la compartecipazione all'IVA di cui all'articolo 4; 
+ b) quote dell'addizionale regionale all'IRPEF, come rideterminata secondo le modalita' dell'articolo 2, comma 1; 
+ c) l'IRAP, fino alla data della sua sostituzione con altri tributi; 
+ d) quote del fondo perequativo di cui al comma 5; 
+ e) le entrate proprie, nella misura convenzionalmente stabilita nel riparto delle disponibilita' finanziarie per il servizio sanitario nazionale per l'anno 2010. 
+ 2. Ai fini del comma 1, il gettito dell'IRAP e' valutato in base all'aliquota ordinariamente applicabile in assenza di variazioni disposte dalla regione ovvero delle variazioni indicate dall'articolo 5, comma 4. Ai fini del comma 1, il gettito derivante dall'applicazione dell'aliquota dell'addizionale regionale all'IRPEF di cui all'articolo 6 e' valutato in base all'aliquota calcolata ai sensi dell'articolo 2, comma 1, primo periodo. Il gettito e', inoltre, valutato su base imponibile uniforme, con le modalita' stabilite con decreto del Presidente del Consiglio dei Ministri, su proposta del Ministro dell'economia e delle finanze, di concerto con il <ins eId="ins_17">((Ministro per gli affari regionali e le autonomie))</ins>, sentita la Conferenza Stato-Regioni. 
+ 3. La percentuale di compartecipazione all'IVA e' stabilita con decreto del Presidente del Consiglio dei Ministri, su proposta del Ministro dell'economia e delle finanze, sentita la Conferenza Stato-Regioni, al livello minimo assoluto sufficiente ad assicurare il pieno finanziamento del fabbisogno corrispondente ai livelli essenziali delle prestazioni in una sola regione. Per il finanziamento integrale dei livelli essenziali delle prestazioni nelle regioni ove il gettito tributario e' insufficiente, concorrono le quote del fondo perequativo di cui al comma 5. 
+ 4. Le fonti di finanziamento delle spese di cui all'articolo 14, comma 2, sono le seguenti: 
+ a) i tributi propri derivati di cui all'articolo 8, comma 3; 
+ b) i tributi propri di cui all'articolo 7, comma 1, lettera b), n. 3), della citata <ref eId="content__ref_84" href="/akn/it/act/legge/stato/2009/42/!main">legge n. 42 del 2009</ref>; 
+ c) quote dell'addizionale regionale all'IRPEF, come rideterminata secondo le modalita' dell'articolo 2, comma 1; 
+ d) quote del fondo perequativo di cui al comma 7. 
+ 5. E' istituito, dall'anno <ins eId="ins_18">((2027 o da un anno antecedente ove ricorrano le condizioni di cui al presente decreto legislativo))</ins>, un fondo perequativo alimentato dal gettito prodotto da una compartecipazione al gettito dell'IVA determinata in modo tale da garantire in ogni regione il finanziamento integrale delle spese di cui all'articolo 14, comma 1. Nel primo anno di funzionamento del fondo perequativo, le suddette spese sono computate in base ai valori di spesa storica e dei costi standard, ove stabiliti; nei successivi quattro anni devono gradualmente convergere verso i costi standard. 
+ Le modalita' della convergenza sono stabilite con decreto del Presidente del Consiglio dei Ministri, su proposta del <ins eId="ins_19">((Ministro per gli affari regionali e le autonomie))</ins>, di concerto con il Ministro dell'economia e delle finanze, d'intesa con la Conferenza Stato-Regioni e previo parere delle Commissioni della Camera dei Deputati e del Senato della Repubblica competenti per i profili di carattere finanziario. Allo schema di decreto del Presidente del Consiglio dei Ministri e' allegata una relazione tecnica concernente le conseguenze di carattere finanziario. Ai fini del presente comma, per il settore sanitario, la spesa coincide con il fabbisogno sanitario standard, come definito ai sensi dell'articolo 26. 
+ 6. La differenza tra il fabbisogno finanziario necessario alla copertura delle spese di cui all'articolo 14, comma 1, e il gettito regionale dei tributi ad esse dedicati, e' determinato con l'esclusione delle variazioni di gettito prodotte dall'esercizio dell'autonomia tributaria, nonche' del gettito di cui all'articolo 9. 
+ E' inoltre garantita la copertura del differenziale certificato positivo tra i dati previsionali e l'effettivo gettito dei tributi, escluso il gettito di cui all'articolo 9, alla regione di cui al comma 3, primo periodo. Nel caso in cui l'effettivo gettito dei tributi sia superiore ai dati previsionali, il differenziale certificato e' acquisito al bilancio dello Stato. 
+ 7. Per il finanziamento delle spese di cui all'articolo 14, comma 2, le quote del fondo perequativo sono assegnate alle regioni sulla base dei seguenti criteri: 
+ a) le regioni con maggiore capacita' fiscale, ovvero quelle nelle quali il gettito per abitante dell'addizionale regionale all'IRPEF supera il gettito medio nazionale per abitante, alimentano il fondo perequativo, in relazione all'obiettivo di ridurre le differenze interregionali di gettito per abitante rispetto al gettito medio nazionale per abitante; 
+ b) le regioni con minore capacita' fiscale, ovvero quelle nelle quali il gettito per abitante dell'addizionale regionale all'IRPEF e' inferiore al gettito medio nazionale per abitante, partecipano alla ripartizione del fondo perequativo, alimentato dalle regioni di cui alla lettera a), in relazione all'obiettivo di ridurre le differenze interregionali di gettito per abitante rispetto al gettito medio nazionale per abitante; 
+ c) il principio di perequazione delle differenti capacita' fiscali dovra' essere applicato in modo da ridurre le differenze, in misura non inferiore al 75 per cento, tra i territori con diversa capacita' fiscale per abitante senza alternarne la graduatoria in termini di capacita' fiscale per abitante; 
+ d) la ripartizione del fondo perequativo tiene conto, per le regioni con popolazione al di sotto di un numero di abitanti determinato con le modalita' previste al comma 8, ultimo periodo, del fattore della dimensione demografica in relazione inversa alla dimensione demografica stessa. 
+ 8. Le quote del fondo perequativo risultanti dall'applicazione del presente articolo sono distintamente indicate nelle assegnazioni annuali. L'indicazione non comporta vincoli di destinazione. Nel primo anno di funzionamento la perequazione fa riferimento alle spese di cui all'articolo 14, comma 2, computate in base ai valori di spesa storica; nei successivi quattro anni la perequazione deve gradualmente convergere verso le capacita' fiscali. Le modalita' della convergenza, nonche' le modalita' di attuazione delle lettere a), b), c) e d) del comma 7, sono stabilite con decreto di natura regolamentare del Presidente del Consiglio dei Ministri, su proposta del Ministro dell'economia e delle finanze, d'intesa con la Conferenza Stato-Regioni e previo parere delle commissioni della Camera dei Deputati e del Senato della Repubblica competenti per i profili di carattere finanziario. Allo schema di decreto del Presidente del Consiglio dei Ministri e' allegata una relazione tecnica concernente le conseguenze di carattere finanziario. 
+ - Si riporta il testo dell'<ref eId="content__ref_85" href="/akn/it/act/legge/stato/2023-08-09/111/!main#art_2">articolo 2 della legge 9 agosto 2023, n. 111</ref> (Delega al Governo per la riforma fiscale), pubblicata nella Gazzetta Ufficiale 14 agosto 2023, n. 189: 
+ «Art. 2 (Principi generali del diritto tributario nazionale). - 1. Nell'esercizio della delega di cui all'articolo 1 il Governo osserva i seguenti principi e criteri direttivi generali: 
+ a) fermi restando i principi della progressivita' e dell'equita' del sistema tributario, stimolare la crescita economica e la natalita' attraverso l'aumento dell'efficienza della struttura dei tributi e la riduzione del carico fiscale, soprattutto al fine di sostenere le famiglie, in particolare quelle in cui sia presente una persona con disabilita', i giovani che non hanno compiuto il trentesimo anno di eta', i lavoratori e le imprese; 
+ b) prevenire, contrastare e ridurre l'evasione e l'elusione fiscale, anche attraverso: 
+ 1) la piena utilizzazione dei dati che affluiscono al sistema informativo dell'anagrafe tributaria, il potenziamento dell'analisi del rischio, il ricorso alle tecnologie digitali e alle soluzioni di intelligenza artificiale, nel rispetto della disciplina dell'Unione europea sulla tutela dei dati personali, nonche' il rafforzamento del regime di adempimento collaborativo ovvero l'aggiornamento e l'introduzione di istituti, anche premiali, volti a favorire forme di collaborazione tra l'Amministrazione finanziaria e i contribuenti; 
+ 2) la piena utilizzazione dei dati resi disponibili dalla fatturazione elettronica e dalla trasmissione telematica dei corrispettivi nonche' la piena realizzazione dell'interoperabilita' delle banche di dati, nel rispetto della disciplina dell'Unione europea sulla tutela dei dati personali; 
+ c) fermo restando il rispetto degli obiettivi programmatici di finanza pubblica e di riduzione del debito, prevedere la possibilita' di destinare alla compensazione della riduzione della pressione fiscale le risorse, accertate come permanenti ai sensi dell'<ref eId="content__ref_86" href="/akn/it/act/legge/stato/2020-12-30/178/!main#art_1-com4">articolo 1, comma 4, della legge 30 dicembre 2020, n. 178</ref>, derivanti dal miglioramento dell'adempimento spontaneo degli obblighi tributari; 
+ d) razionalizzare e semplificare il sistema tributario anche con riferimento: 
+ 1) all'utilizzazione efficiente, anche sotto il profilo tecnologico, da parte dell'Amministrazione finanziaria, dei dati ottenuti attraverso lo scambio di informazioni; 
+ 2) all'individuazione e all'eliminazione di micro-tributi per i quali i costi di adempimento dei contribuenti risultano elevati a fronte di un gettito trascurabile per lo Stato, assicurando le opportune misure compensative nell'ambito dei decreti legislativi adottati ai sensi della presente legge; 
+ 3) alla normativa fiscale riguardante gli enti del Terzo settore e quelli non commerciali, assicurando il coordinamento con le altre disposizioni dell'ordinamento tributario nel rispetto dei principi di mutualita', sussidiarieta' e solidarieta'; 
+ e) rivedere gli adempimenti dichiarativi e di versamento a carico dei contribuenti prevedendo: 
+ 1) la riduzione degli oneri documentali anche mediante il rafforzamento del divieto, per l'Amministrazione finanziaria, di richiedere al contribuente documenti gia' in suo possesso; 
+ 2) nuove e piu' efficienti forme di erogazione di informazioni e di assistenza; 
+ 3) percorsi facilitati per l'accesso ai servizi da parte delle persone anziane o con disabilita'; 
+ f) assicurare un trattamento particolare per gli atti di trasferimento o di destinazione di beni e diritti in favore di persone con disabilita', fermo restando quanto previsto dagli <ref eId="content__ref_87" href="/akn/it/act/legge/stato/2016-06-22/112/!main#art_5">articoli 5</ref> e <ref eId="content__ref_88" href="/akn/it/act/legge/stato/2016-06-22/112/!main#art_6">6 della legge 22 giugno 2016, n. 112</ref>; 
+ g) assicurare la piena applicazione dei principi di autonomia finanziaria degli enti territoriali di cui alla <ref eId="content__ref_89" href="/akn/it/act/legge/stato/2009-05-05/42/!main">legge 5 maggio 2009, n. 42</ref>, al <ref eId="content__ref_90" href="/akn/it/act/decretoLegislativo/stato/2011-05-06/68/!main">decreto legislativo 6 maggio 2011, n. 68</ref>, e agli statuti speciali per le regioni a statuto speciale e per le province autonome di Trento e di Bolzano, con riferimento: 
+ 1) ai principi generali di cui all'<ref eId="content__ref_91" href="/akn/it/act/legge/stato/2009-05-05/42/!main#art_2-com2-lett">articolo 2, comma 2, lettera t), della legge 5 maggio 2009, n. 42</ref>, e ai principi di manovrabilita' e flessibilita' dei tributi di cui agli articoli 7 e 12 della medesima legge, in termini almeno equivalenti rispetto a quanto previsto dalla normativa statale vigente; 
+ 2) all'attribuzione dei gettiti da recupero fiscale su tributi e compartecipazioni; 
+ 3) all'attuazione, compatibilmente con gli equilibri di finanza pubblica, dell'<ref eId="content__ref_92" href="/akn/it/act/decretoLegislativo/stato/2011/68/!main#art_39-com3">articolo 39, comma 3, del decreto legislativo n. 68 del 2011</ref>; 
+ 4) alla partecipazione agli indirizzi di politica fiscale, tramite la Conferenza permanente per il coordinamento della finanza pubblica; 
+ 5) allo sviluppo dell'interoperabilita' delle banche di dati del sistema informativo della fiscalita' per la gestione e l'accertamento dei tributi di cui all'<ref eId="content__ref_93" href="/akn/it/act/legge/stato/2009/42/!main#art_7-com1-letb">articolo 7, comma 1, lettera b), della legge n. 42 del 2009</ref>; 
+ 6) all'opportunita' di considerare le eventuali perdite di gettito rispetto a quanto previsto a legislazione vigente ai fini dell'adeguatezza dei servizi relativi ai livelli essenziali delle prestazioni e al servizio del trasporto pubblico locale, nel rispetto dei principi indicati dalla giurisprudenza costituzionale e dalla <ref eId="content__ref_94" href="/akn/it/act/legge/stato/2009-12-31/196/!main">legge 31 dicembre 2009, n. 196</ref>; 
+ 7) alla garanzia della previsione di meccanismi perequativi in conformita' ai principi di cui all'<ref eId="content__ref_95" href="/akn/it/act/legge/stato/2009/42/!main#art_9">articolo 9 della legge n. 42 del 2009</ref>, con riferimento in particolare all'attuazione delle previsioni di cui all'<ref eId="content__ref_96" href="/akn/it/act/decretoLegislativo/stato/2011/68/!main#art_15">articolo 15 del decreto legislativo n. 68 del 2011</ref>. 
+ 2. Per la predisposizione dei decreti legislativi di cui all'articolo 1 il Governo puo' costituire appositi tavoli tecnici tra l'Amministrazione finanziaria, gli enti territoriali, le organizzazioni sindacali, le associazioni di categoria e dei professionisti maggiormente rappresentative a livello nazionale e le associazioni familiari maggiormente rappresentative a livello nazionale ai fini di quanto previsto al comma 1, lettere d) ed e). Ai componenti dei predetti tavoli, in ogni caso, non possono essere corrisposti compensi, gettoni di presenza, rimborsi di spese ne' altri emolumenti, comunque denominati, a carico della finanza pubblica. 
+ 3. Per la predisposizione dei decreti legislativi di cui all'articolo 1 l'Amministrazione finanziaria si coordina con la segreteria tecnica della Cabina di regia di cui all'<ref eId="content__ref_97" href="/akn/it/act/legge/stato/2022-12-29/197/!main#art_1-com799">articolo 1, comma 799, della legge 29 dicembre 2022, n. 197</ref>, a tal fine coadiuvata dal Nucleo PNRR Stato-regioni di cui all'<ref eId="content__ref_98" href="/akn/it/act/decretoLegge/stato/2021-11-06/152/!main#art_33">articolo 33 del decreto-legge 6 novembre 2021, n. 152</ref>, convertito, con modificazioni, dalla <ref eId="content__ref_99" href="/akn/it/act/legge/stato/2021-12-29/233/!main">legge 29 dicembre 2021, n. 233</ref>, per la cura dell'attivita' istruttoria con le regioni, le province autonome di Trento e di Bolzano e gli enti locali, nel contesto della riforma del quadro fiscale subnazionale di cui alla missione 1, componente 1, riforma 1.14, del Piano nazionale di ripresa e resilienza. 
+ 4. Il Governo, nella predisposizione dei decreti legislativi di cui all'articolo 1, assicura piena collaborazione con le regioni e gli enti locali». 
+ - Si riporta il testo dell'<ref eId="content__ref_100" href="/akn/it/act/decretoLegislativo/stato/1997-08-28/281/!main#art_6">articolo 6 del decreto legislativo 28 agosto 1997, n. 281</ref> (Definizione ed ampliamento delle attribuzioni della Conferenza permanente per i rapporti tra lo Stato, le regioni e le province autonome di Trento e Bolzano ed unificazione, per le materie ed i compiti di interesse comune delle regioni, delle province e dei comuni, con la Conferenza Stato-citta' ed autonomie locali), pubblicato nella Gazzetta Ufficiale 30 agosto 1997, n. 202: 
+ «Art. 6 (Scambio di dati e informazioni). - 1. La Conferenza Stato - regioni favorisce l'interscambio di dati ed informazioni sull'attivita' posta in essere dalle amministrazioni centrali, regionali e delle province autonome di Trento e di Bolzano. 
+ 2. La Conferenza Stato - regioni approva protocolli di intesa tra Governo, regioni e province autonome di Trento e di Bolzano, anche ai fini della costituzione di banche dati sulle rispettive attivita', accessibili sia dallo Stato che dalle regioni e dalle province autonome. Le norme tecniche ed i criteri di sicurezza per l'accesso ai dati ed alle informazioni sono stabiliti di intesa con l'Autorita' per l'informatica nella pubblica amministrazione. 
+ 3. I protocolli di intesa di cui al comma 2 prevedono, altresi', le modalita' con le quali le regioni e le province autonome si avvalgono della rete unitaria delle pubbliche amministrazioni e dei servizi di trasporto e di interoperabilita' messi a disposizione dai gestori, alle condizioni contrattuali previste ai sensi dell'<ref eId="content__ref_101" href="/akn/it/act/legge/stato/1997-03-15/59/!main#art_15-com1">articolo 15, comma 1, della legge 15 marzo 1997, n. 59</ref>». 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_11">
+                <num>Art. 11.</num>
+                <heading> Disposizioni transitorie e finali</heading>
+                <paragraph eId="art_11__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Gli atti di iniziativa delle Regioni gia' presentati al Governo, di cui sia stato avviato il confronto congiunto tra il Governo e la Regione interessata prima della data di entrata in vigore della presente legge, sono esaminati secondo quanto previsto dalle pertinenti disposizioni della presente legge. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_11__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Ai sensi dell'<ref eId="content__ref_102" href="/akn/it/act/legge.costituzionale/stato/2001-10-18/3/!main#art_10">articolo 10 della legge costituzionale 18 ottobre 2001, n. 3</ref>, le disposizioni di cui alla presente legge si applicano anche nei confronti delle Regioni a statuto speciale e delle Province autonome di Trento e di Bolzano. <ins eId="ins_20">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_11__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>E' fatto salvo l'esercizio del potere sostitutivo del Governo ai sensi dell'articolo 120, secondo comma, della Costituzione. 
+ </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (1)</p>
+                        <p>
+ La Corte costituzionale, con sentenza 14 novembre - 3 dicembre 2024, n. 192 (in G.U. 1ª s.s. 4/12/2024, n. 49) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="103" href="/akn/it/act/legge/stato/2024/86/!main#art_11-com2">art. 11, comma 2, della legge n. 86 del 2024</ref>". </p>
+                    </content>
+                </paragraph>
+            </article>
+        </body>
+        <conclusions>
+            <formula name="formulaFinaleConclusioni">
+                <p>La presente legge, munita del sigillo dello Stato, sara' inserita nella Raccolta ufficiale degli atti normativi della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarla e di farla osservare come legge dello Stato. </p>
+            </formula>
+            <p> Data a Roma, addi' 26 giugno 2024 </p>
+            <p>MATTARELLA Meloni, Presidente del Consiglio dei ministri Calderoli, Ministro per gli affari regionali e le autonomie Visto, il Guardasigilli: Nordio</p>
+        </conclusions>
+    </act>
+</akomaNtoso>
