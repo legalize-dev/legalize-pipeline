@@ -26,12 +26,10 @@ References:
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 import threading
-import time
-from datetime import date, datetime
+from datetime import date
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlparse
 from xml.etree import ElementTree as ET
@@ -92,16 +90,45 @@ class NormativaClient(HttpClient):
         self._bundle_cache: dict[str, bytes] = {}
         self._bundle_lock = threading.Lock()
 
+    @staticmethod
+    def _parse_norm_id(norm_id: str) -> tuple[str, str, str]:
+        """Parse a composite norm_id into (codiceRedaz, dataGU, urn).
+
+        Accepted formats:
+            "codiceRedaz:dataGU:urn"  → composite from discovery
+            "urn:nir:stato:..."       → standalone URN
+            "005G0104"                → bare codiceRedaz (limited, needs URN lookup)
+        """
+        if norm_id.startswith("urn:nir:"):
+            return "", "", norm_id
+        parts = norm_id.split(":", 2)
+        if len(parts) == 3 and parts[2].startswith("urn:nir:"):
+            return parts[0], parts[1], parts[2]
+        if len(parts) >= 2 and not parts[0].startswith("urn"):
+            return parts[0], parts[1] if len(parts) > 1 else "", parts[2] if len(parts) > 2 else ""
+        return norm_id, "", ""
+
     def _extract_params_from_html(self, norm_id: str) -> dict[str, str] | None:
         """Visit a law's HTML page and extract caricaAKN parameters.
 
         Returns dict with dataGU, codiceRedaz, dataVigenza or None on failure.
+        Uses the URN permalink (``/uri-res/N2Ls?{urn}``) which is the only
+        reliable access path — the ``vediPermalink`` endpoint does not work
+        for all acts.
         """
         cached = self._params_cache.get(norm_id)
         if cached:
             return cached
 
-        url = f"{self._base_url}/atto/vediPermalink?atto.codiceRedazionale={norm_id}"
+        codice, data_gu, urn = self._parse_norm_id(norm_id)
+
+        if urn:
+            url = f"{self._base_url}/uri-res/N2Ls?{urn}"
+        elif codice:
+            url = f"{self._base_url}/atto/vediPermalink?atto.codiceRedazionale={codice}"
+        else:
+            logger.warning("No URN or codiceRedaz for %s", norm_id)
+            return None
         try:
             html = self._request("GET", url).text
         except Exception as exc:
@@ -174,7 +201,6 @@ class NormativaClient(HttpClient):
         dates: set[str] = set()
         try:
             root = ET.fromstring(xml_data)
-            ns = {"akn": "http://docs.oasis-open.org/legaldocml/ns/akn/3.0"}
             for event in root.iter("{http://docs.oasis-open.org/legaldocml/ns/akn/3.0}eventRef"):
                 d = event.get("date", "")
                 if d and len(d) == 10:

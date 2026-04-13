@@ -201,8 +201,8 @@ class NormativaDiscovery(NormDiscovery):
             "modalita": "C",
             "tipoRicerca": "A",
             "parametriRicerca": {
-                "PubblicazioneFrom": iso,
-                "PubblicazioneTo": iso,
+                "dataInizioPubblicazione": f"{iso}T00:00:00.000Z",
+                "dataFinePubblicazione": f"{iso}T23:59:59.999Z",
             },
         }
 

@@ -105,7 +105,6 @@ def _parse_iso_date(value: str | None) -> date | None:
 def _extract_text(el: etree._Element) -> str:
     """Recursively extract text from an element, applying inline formatting."""
     parts: list[str] = []
-    tag = etree.QName(el.tag).localname if isinstance(el.tag, str) else ""
 
     if el.text:
         parts.append(_clean(el.text))
@@ -479,12 +478,14 @@ class NormativaTextParser(TextParser):
 
         for vig_el in vigenze:
             eff_date = vig_el.get("effective-date", "")
-            act = vig_el.find(f"{{{AKN_NS}}}act")
+            act = vig_el.find(f".//{{{AKN_NS}}}act")
             if act is None:
-                for child in vig_el:
-                    tag = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
+                act = vig_el.find(f".//{{{AKN_NS}}}bill")
+            if act is None:
+                for desc in vig_el.iter():
+                    tag = etree.QName(desc.tag).localname if isinstance(desc.tag, str) else ""
                     if tag in ("act", "bill"):
-                        act = child
+                        act = desc
                         break
             if act is None:
                 continue
@@ -551,13 +552,9 @@ class NormativaMetadataParser(MetadataParser):
             vigenze = list(root)
             if vigenze:
                 last_vig = vigenze[-1]
-                act = last_vig.find(f"{{{AKN_NS}}}act")
+                act = last_vig.find(f".//{{{AKN_NS}}}act")
                 if act is None:
-                    for child in last_vig:
-                        tag = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
-                        if tag in ("act", "bill"):
-                            act = child
-                            break
+                    act = last_vig.find(f".//{{{AKN_NS}}}bill")
                 if act is not None:
                     root = act
 
