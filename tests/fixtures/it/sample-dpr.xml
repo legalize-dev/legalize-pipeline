@@ -1,0 +1,1396 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/decreto_del_presidente_della_repubblica/stato/1999-07-28/510/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto_del_presidente_della_repubblica/stato/1999-07-28/510"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510"/>
+                    <FRBRalias name="eli" value="eli/id/2000/01/07/000G0001/ORIGINAL"/>
+                    <FRBRdate date="1999-07-28" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2000/01/07/000G0001/ORIGINAL" aknrelname="eli/id/2000/01/07/000G0001/ORIGINAL">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content="Regolamento recante nuove norme in favore delle vittime del terrorismo e della criminalita' organizzata. " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="000G0001" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#DECRETO DEL PRESIDENTE DELLA REPUBBLICA"/>
+                            <nrdfa:span content="1999-07-28" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/decreto_del_presidente_della_repubblica/stato/1999-07-28/510/ita@2000-01-22/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto_del_presidente_della_repubblica/stato/1999-07-28/510/ita@2000-01-22"/>
+                    <FRBRdate date="2000-01-22" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2000/01/07/000G0001/ORIGINAL/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/2000/01/07/000G0001/ORIGINAL"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/2000/01/07/000G0001/ORIGINAL/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/decreto_del_presidente_della_repubblica/stato/1999-07-28/510/ita@2000-01-22/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/decreto_del_presidente_della_repubblica/stato/1999-07-28/510/ita@2000-01-22.xml"/>
+                    <FRBRdate date="1999-07-28" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2000/01/07/000G0001/ORIGINAL/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="2000-01-07" name="" number="4" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="2000-01-07" eId="eventRef_0" source="ro1"/>
+            </lifecycle>
+            <analysis source="">
+                <activeModifications>
+                    <textualMod eId="amod_0" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#1"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) che il presente decreto sostituisce le disposizioni di cui al
+ decreto ministeriale 16 marzo 1992, n. 377 è contestualmente abrogato.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_1" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#14"/>
+                        <destination href="urn:nir:stato:legge:1998-11-23;407#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 14, comma 3) la modifica dekk'art. 2, comma 1.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_2" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1991-08-29;319"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) che "Il presente decreto sostituisce le disposizioni di cui ai
+decreti ministeriali [...] 29 agosto 1991, n. 319 [...] che sono contestualmente abrogate".</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_3" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1991-08-29;319#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_4" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1991-08-29;319#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_5" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1991-08-29;319#3"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_6" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1991-08-29;319#4"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_7" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_8" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_9" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#3"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_10" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#4"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_11" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#5"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_12" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#6"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_13" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#7"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_14" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#8"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_15" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#9"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_16" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:ministero.interno:decreto:1992-03-16;377#10"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_17" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) che "Il presente decreto sostituisce le disposizioni di cui (...) al
+ decreto del Presidente della Repubblica 19 aprile 1994, n. 364, che sono contestualmente abrogate".</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_18" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_19" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_20" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#3"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_21" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#4"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_22" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#5"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_23" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#6"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_24" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#7"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_25" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#8"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_26" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#9"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_27" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#10"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_28" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#11"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_29" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#12"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_30" type="insertion">
+                        <source href="urn:nir:stato:decreto.del.presidente.della.repubblica:1999-07-28;510#23"/>
+                        <destination href="urn:nir:stato:decreto.del.presidente.della.repubblica:1994-04-19;364#13"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 23, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                </activeModifications>
+            </analysis>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/DECRETO_DEL_PRESIDENTE_DELLA_REPUBBLICA/stato/1999-07-28/510/!main" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/2000/01/07/000G0001/ORIGINAL">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it">Regolamento recante nuove norme in favore delle vittime del terrorismo e della criminalita' organizzata. </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>000G0001</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#DECRETO DEL PRESIDENTE DELLA REPUBBLICA"/>
+                        <eli:date_document rdf:datatype="xsd:date">1999-07-28</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2000/01/07/000G0001/ORIGINAL/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/2000/01/07/000G0001/ORIGINAL"/>
+                        <eli:is_embodied_by rdf:resource="na:id/2000/01/07/000G0001/ORIGINAL/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2000/01/07/000G0001/ORIGINAL/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>DECRETO DEL PRESIDENTE DELLA REPUBBLICA</docType>
+                <docDate date="1999-07-28">28 luglio 1999</docDate>
+                <docNumber>510</docNumber>
+                <docTitle>Regolamento recante nuove norme in favore delle vittime del terrorismo e della criminalita' organizzata.
+</docTitle>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="formulaInizialePreambolo">
+                <p>IL PRESIDENTE DELLA REPUBBLICA</p>
+            </formula>
+            <citations eId="cits_1">
+                <citation eId="cits_1__cit_1">
+                    <p>Visto l'<ref eId="ref_1" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_87-com5">articolo 87, comma quinto, della Costituzione</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_2">
+                <citation eId="cits_2__cit_1">
+                    <p>Vista la <ref eId="ref_2" href="/akn/it/act/legge/stato/1998-11-23/407/!main">legge 23 novembre 1998, n. 407</ref>, recante "Nuove norme in favore delle vittime del terrorismo e della criminalita' organizzata";</p>
+                </citation>
+            </citations>
+            <citations eId="cits_3">
+                <citation eId="cits_3__cit_1">
+                    <p>Vista la <ref eId="ref_3" href="/akn/it/act/legge/stato/1990-10-20/302/!main">legge 20 ottobre 1990, n. 302</ref>, recante "Norme a favore delle vittime del terrorismo e della criminalita' organizzata";</p>
+                </citation>
+            </citations>
+            <citations eId="cits_4">
+                <citation eId="cits_4__cit_1">
+                    <p>Vista la <ref eId="ref_4" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, recante: "Speciali elargizioni a favore di categorie di dipendenti pubblici e di cittadini vittime del dovere o di azioni terroristiche", e successive modificazioni ed integrazioni;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_5">
+                <citation eId="cits_5__cit_1">
+                    <p>Visto l'<ref eId="ref_5" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_17-com1">articolo 17, commi 1</ref> e <ref eId="ref_6" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_17-com4">4, della legge 23 agosto 1988, n. 400</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_6">
+                <citation eId="cits_6__cit_1">
+                    <p>Visti i decreti ministeriali 30 ottobre 1980, 11 luglio 1983, <ref eId="ref_7" href="/akn/it/act/decreto/ministero./1987-07-29/561/!main">29 luglio 1987, n. 561</ref>, <ref eId="ref_8" href="/akn/it/act/decreto/ministero./1991-08-29/319/!main">29 agosto 1991, n. 319</ref>, <ref eId="ref_9" href="/akn/it/act/decreto/ministero./1992-03-16/377/!main">16 marzo 1992, n. 377</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_7">
+                <citation eId="cits_7__cit_1">
+                    <p>Visto il <ref eId="ref_10" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1994-04-19/364/!main">decreto del Presidente della Repubblica 19 aprile 1994, n. 364</ref>;</p>
+                </citation>
+            </citations>
+            <recitals eId="recs_1">
+                <recital eId="recs_1__rec_1">
+                    <p>Ritenuto di dover riunire e coordinare le disposizioni dettate dai decreti ministeriali e dal decreto presidenziale sopracitato e di dover disciplinare le modalita' di attuazione della <ref eId="ref_11" href="/akn/it/act/legge/stato/1998-11-23/407/!main">legge 23 novembre 1998, n. 407</ref>, ai sensi dell'articolo 5 della predetta legge;</p>
+                </recital>
+            </recitals>
+            <p>Udito il patete del Consiglio di Stato espresso dalla sezione consultiva per gli atti normativi nell'adunanza del 21 giugno 1999;</p>
+            <citations eId="cits_8">
+                <citation eId="cits_8__cit_1">
+                    <p>Vista la delibezazione del Consiglio dei Ministri adottata nella riunione del 23 luglio 1999;</p>
+                </citation>
+            </citations>
+            <p>Sulla proposta del Ministro dell'interno di concerto con i Ministri degli affari esteri, di grazia e giustizia, delle finanze, del tesoro, del bilancio e della programmazione economica, della difesa e delle politiche agricole;</p>
+            <formula name="formulaFinalePreambolo">
+                <p>Emana il seguente regolamento:</p>
+            </formula>
+        </preamble>
+        <body>
+            <article eId="art_1">
+                <num>Art. 1.</num>
+                <heading> Principi generali</heading>
+                <paragraph>
+                    <content>
+                        <p>
+ Il presente regolamento riunisce e coordina le disposizioni riguardanti le modalita' di attuazione delle <ref eId="content__ref_12" href="/akn/it/act/legge/stato/1990-10-20/302/!main">leggi 13 agosto 1980, n. 
+466, e 20 ottobre 1990, n. 302</ref>, recate dai decreti ministeriali 30 ottobre 1980, 11 luglio 1983, <ref eId="content__ref_13" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1987-07-29/561/!main">29 luglio 1987, n. 561</ref>, <ref eId="content__ref_14" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1991-08-29/319/!main">29 agosto 1991, n. 319</ref>, <ref eId="content__ref_15" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1992-03-16/377/!main">16 marzo 1992, n. 377 e dal decreto del Presidente della Repubblica</ref> <ref eId="content__ref_16" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1994-04-19/364/!main">19 aprile 1994, n. 364</ref> nonche' le modalita' di attuazione della <ref eId="content__ref_17" href="/akn/it/act/legge/stato/1998-11-23/407/!main">legge 23 novembre 1998, n. 407</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_1" placement="bottom">
+                                <p> Avvertenza:
+ Il testo delle note qui pubblicato e' stato redatto dall'amministrazione competente per materia, ai sensi dell'art. 10, comma 2, del testo unico delle disposizioni sulla promulgazione delle leggi, sull'emanazione dei decreti del Presidente della Repubblica e sulle pubblicazioni ufficiali della Repubblica italiana, approvato con <ref eId="content__ref_18" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1985-12-28/1092/!main">D.P.R. 28 dicembre 1985, n. 1092</ref>, al solo fine di facilitare la lettura delle disposizioni di legge modificate. Restano invariati il valore e l'efficacia degli atti legislativi qui trascritti.
+ Note alle premesse:
+ - Il <ref eId="content__ref_19" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_87-com5">comma quinto dell'art. 87 della Costituzione</ref> della Repubblica italiana conferisce al Presidente della Repubblica il potere di promulgare le leggi e di emanare i decreti aventi valore di legge ed i regolamenti.
+ - La <ref eId="content__ref_20" href="/akn/it/act/legge/stato/1998-11-23/407/!main">legge 23 novembre 1998, n. 407</ref> (Nuove norme in favore delle vittime del terrorismo e della criminalita' organizzata), e' pubblicata nella Gazzetta Ufficiale - serie generale - n. 277 del 26 novembre 1998.
+ - La <ref eId="content__ref_21" href="/akn/it/act/legge/stato/1990-10-20/302/!main">legge 20 ottobre 1990, n. 302</ref> (Norme a favore delle vittime del terrorismo e della criminalita' organizzata), e' pubblicata nella Gazzetta Ufficiale - serie generale - n. 250 del 25 ottobre 1990.
+ - La <ref eId="content__ref_22" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref> (Speciali elargizioni a favore di categorie di dipendenti pubblici e di cittadini vittime del dovere o di azioni terroristiche), e' pubblicata nella Gazzetta Ufficiale - serie generale - n. 230 del 22 agosto 1980.
+ - Si riporta il testo vigente dell'<ref eId="content__ref_23" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_17-com1">art. 17, commi 1</ref> e <ref eId="content__ref_24" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_17-com4">4, della legge 23 agosto 1988, n. 400</ref> (Disciplina dell'attivita' di Governo e ordinamento della Presidenza del Consiglio dei Ministri):
+ "Art. 17 (Regolamenti). - 1. Con decreto del Presidente della Repubblica, previa deliberazione del Consiglio dei Ministri, sentito il parere del Consiglio di Stato che deve pronunziarsi entro novanta giorni dalla richiesta, possono essere emanati regolamenti per disciplinare:
+ a) l'esecuzione delle leggi e dei decreti legislativi, nonche' dei regolamenti comunitari;
+ b) l'attuazione e l'integrazione delle leggi e dei decreti legislativi recanti norme di principio, esclusi quelli relativi a materie riservate alla competenza regionale;
+ c) le materie in cui manchi la disciplina da parte di leggi o di atti aventi forza di legge, sempre che non si tratti di materie comunque riservate alla legge;
+ d) l'organizzazione ed il funzionamento delle amministrazioni pubbliche secondo le disposizioni dettate dalla legge;
+ e) [l'organizzazione del lavoro ed i rapporti di lavoro dei pubblici dipendenti in base agli accordi sindacali].
+ 2.-3. (Omissis).
+ 4. I regolamenti di cui al comma 1 ed i regolamenti ministeriali ed interministeriali, che devono recare la denominazione di "regolamento , sono adottati previo parere del Consiglio di Stato, sottoposti al visto ed alla registrazione della Corte dei conti e pubblicati nella Gazzetta Ufficiale".
+ - Il decreto ministeriale 30 ottobre 1980 (Modalita' di attuazione della <ref eId="content__ref_25" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, recante speciali elargizioni a favore di categorie di dipendenti pubblici e di cittadini vittime del dovere o di azioni terroristiche), e' pubblicato nella Gazzetta Ufficiale - serie generale - n. 316 del 18 novembre 1980.
+ - Il decreto ministeriale 11 luglio 1983 (Modificazioni al decreto ministeriale 30 ottobre 1980 recante le modalita' di attuazione della <ref eId="content__ref_26" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, concernente speciali elargizioni a favore di categorie di dipendenti pubblici e di cittadini vittime del dovere o di azioni terroristiche), e' pubblicato nella Gazzetta Ufficiale - serie generale - n. 293 del 25 ottobre 1983.
+ - Il <ref eId="content__ref_27" href="/akn/it/act/decreto/ministero./1987-07-29/561/!main">decreto ministeriale 29 luglio 1987, n. 561</ref> (Modificazioni ai decreti ministeriali 30 ottobre 1980 e 11 luglio 1983, recanti modalita' di attuazione delle <ref eId="content__ref_28" href="/akn/it/act/legge/stato/1981-12-04/720/!main">leggi 13 agosto 1980, n. 466 e 4 dicembre 1981, n. 720</ref>, concernenti speciali elargizioni a favore di categorie di dipendenti pubblici e di cittadini vittime del dovere o di azioni terroristiche), e' pubblicato nella Gazzetta Ufficiale - serie generale - n. 22 del 28 gennaio 1988.
+ - Il <ref eId="content__ref_29" href="/akn/it/act/decreto/ministero./1991-08-29/319/!main">decreto ministeriale 29 agosto 1991, n. 319</ref> (Regolamento previsto dall'<ref eId="content__ref_30" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_9">art. 9 della legge 20 ottobre 1990, n. 302</ref>, recante norme a favore delle vittime del terrorismo e della criminalita' organizzata) e' pubblicato nella Gazzetta Ufficiale - serie generale - n. 241 del 14 ottobre 1991.
+ - Il <ref eId="content__ref_31" href="/akn/it/act/decreto/ministero./1992-03-16/377/!main">decreto ministeriale 16 marzo 1992, n. 377</ref> (Regolamento concernente disposizioni integrative e modificative del decreto ministeriale 30 ottobre 1980, e successive modificazioni, avente ad oggetto norme a favore delle vittime del terrorismo e della criminalita' organizzata), e' pubblicato nella Gazzetta Ufficiale - serie generale - n. 218 del 16 settembre 1992.
+ - Il <ref eId="content__ref_32" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1994-04-19/364/!main">decreto del Presidente della Repubblica 19 aprile 1994, n. 364</ref>, reca: "Regolamento recante semplificazione dei procedimenti di concessione di elargizioni a favore delle vittime del dovere, dei dipendenti pubblici rimasti invalidi nell'adempimento del loro dovere e dei cittadini o degli apolidi vittime del terrorismo e della criminalita' organizzata".
+ - Si riporta il testo dell'<ref eId="content__ref_33" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_5">art. 5 della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse):
+ "Art. 5. - I benefici di cui alla presente legge si applicano agli eventi verificatisi a decorrere dal 1o gennaio 1969.
+ 2. Con uno o piu' regolamenti, da emanare ai sensi dell'<ref eId="content__ref_34" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_17-com1">articolo 17, comma 1, della legge 23 agosto 1988, n. 400</ref>, entro tre mesi dalla data di entrata in vigore della presente legge, sono dettate le norme di attuazione della legge stessa".
+ Note all'art. 1: - Per l'argomento della <ref eId="content__ref_35" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, v. nelle note alle premesse.
+ - Per l'argomento della <ref eId="content__ref_36" href="/akn/it/act/legge/stato/1990-10-20/302/!main">legge 20 ottobre 1990, n. 302</ref>, v. nelle note alle premesse.
+ - Per l'argomento dei decreti ministeriali 30 ottobre 1980, 11 luglio 1983, <ref eId="content__ref_37" href="/akn/it/act/decreto/ministero./1987-07-29/561/!main">29 luglio 1987, n. 561</ref>, <ref eId="content__ref_38" href="/akn/it/act/decreto/ministero./1991-08-29/319/!main">29 agosto 1991, n. 319</ref>, e <ref eId="content__ref_39" href="/akn/it/act/decreto/ministero./1992-03-16/377/!main">16 marzo 1992, n. 377</ref>, v. nelle note alle premesse.
+ - Per l'argomento del <ref eId="content__ref_40" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1994-04-19/364/!main">decreto del Presidente della Repubblica 19 aprile 1994, n. 364</ref>, v. nelle note alle premesse.
+ - Per l'argomento della <ref eId="content__ref_41" href="/akn/it/act/legge/stato/1998-11-23/407/!main">legge 23 novembre 1998, n. 407</ref>, v. nelle note alle premesse.
+ - Per l'argomento della <ref eId="content__ref_42" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, v. nelle note alle premesse.
+ - Per l'argomento della <ref eId="content__ref_43" href="/akn/it/act/legge/stato/1990-10-20/302/!main">legge 20 ottobre 1990, n. 302</ref>, v. nelle note alle premesse.
+ - Per l'argomento della <ref eId="content__ref_44" href="/akn/it/act/legge/stato/1998-11-23/407/!main">legge 23 novembre 1998, n. 407</ref>, v. nelle note alle premesse.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_2">
+                <num>Art. 2.</num>
+                <heading> Amministrazioni competenti</heading>
+                <paragraph eId="art_2__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_2__para_1__intro_1">
+                            <p>All'attribuzione delle speciali elargizioni e dell'assegno vitalizio previsti dalle <ref eId="content__ref_45" href="/akn/it/act/legge/stato/1998-11-23/407/!main">leggi 13 agosto 1980, n. 466, 20 ottobre 1990, n. 302, e 23 novembre 1998, n. 407</ref>, in favore dei superstiti di dipendenti pubblici vittime del dovere o in favore degli stessi dipendenti pubblici che abbiano riportato le invalidita' indicate dalle citate leggi nell'adempimento del dovere, provvedono le seguenti amministrazioni:
+ </p>
+                        </intro>
+                        <point eId="art_2__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>il Ministero dell'interno - Dipartimento della pubblica sicurezza - per gli appartenenti alla Polizia di Stato, all'Arma dei carabinieri, al Corpo della guardia di finanza, al Corpo forestale dello Stato, al Corpo di polizia penitenziaria, alle polizie municipali; il Ministero dell'interno - Direzione generale della protezione civile e dei servizi antincendi - per gli appartenenti al Corpo nazionale dei vigili del fuoco;
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>il Ministero di grazia e giustizia per i magistrati ordinari, i giudici di pace, i giudici onorari di tribunale, i giudici popolari ed il personale civile dell'amministrazione penitenziaria non appartenente al Corpo di polizia penitenziaria;
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>il Ministero della difesa per gli appartenenti alle Forze armate dello Stato.
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_2__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il Ministero dell'interno - Dipartimento della pubblica sicurezza e', altresi', competente in ordine all'attribuzione dei benefici previsti dalle predette leggi in favore delle persone che, legalmente richieste, abbiano prestato assistenza ad ufficiali e agenti di polizia giudiziaria o ad autorita', ufficiali e agenti di pubblica sicurezza.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>All'attribuzione dei benefici previsti in favore dei cittadini italiani che non rientrano in alcuna delle categorie per le quali e' determinata l'amministrazione competente, nonche' degli stranieri e degli apolidi, ovvero dei loro superstiti, provvede il Ministero dell'interno - Direzione generale dei servizi civili.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Per i benefici correlati al trattamento pensionistico, per le esenzioni fiscali e per i benefici di guerra, provvedono per i dipendenti pubblici le amministrazioni di appartenenza.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Per i restanti benefici provvedono le amministrazioni competenti.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_3">
+                <num>Art. 3.</num>
+                <heading> Avvio del procedimento</heading>
+                <paragraph eId="art_3__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Per il conferimento dei benefici gli interessati debbono presentare apposita domanda.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Si puo' prescindere dalla medesima e procedere d'ufficio per i dipendenti pubblici vittime del dovere.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_3">
+                    <num>3.</num>
+                    <list>
+                        <intro eId="art_3__para_3__intro_1">
+                            <p>La domanda deve essere presentata:
+ </p>
+                        </intro>
+                        <point eId="art_3__para_3.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>per quanto di competenza del Ministero dell'interno, al prefetto del luogo in cui si e' verificato l'evento o della provincia di residenza dei beneficiari, per il successivo esame;
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3__para_3.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>per quanto di competenza:
+ 1) del Ministero della difesa, al comando militare di appartenenza;
+ 2) del Ministero di grazia e giustizia, alla Direzione generale dell'organizzazione giudiziaria e al Dipartimento dell'amministrazione penitenziaria, per il personale rispettivamente amministrato.
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_3__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Nel caso di residenti all'estero, la domanda e' inoltrata per il tramite dell'ufficio consolare del luogo di residenza dell'interessato, che provvede a trasmettere la domanda e la documentazione occorrente alla prefettura della provincia dove si e' verificato l'evento, per gli ulteriori adempimenti.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_4">
+                <num>Art. 4.</num>
+                <heading> Documenti ed atti richiesti</heading>
+                <paragraph eId="art_4__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_4__para_1__intro_1">
+                            <p>Con la domanda o quando l'amministrazione competente o il prefetto ne fa espressa richiesta, prima della corresponsione delle elargizioni previste dalla normativa vigente, gli interessati devono espressamente dichiarare:
+ </p>
+                        </intro>
+                        <point eId="art_4__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>le provvidenze pubbliche eventualmente gia' percepite, anche in parte, attribuite in ragione delle medesime circostanze, indicando se le stesse abbiano carattere continuativo ovvero siano state corrisposte in un'unica soluzione;
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>se intendano optare, quando si tratti di provvidenze non ancora percepite e non cumulabili, per la corresponsione di tali provvidenze ovvero dei benefici previsti dalle <ref eId="content__ref_46" href="/akn/it/act/legge/stato/1990-10-20/302/!main">leggi 13 agosto 1980, n. 466 e 20 ottobre 1990, n. 302</ref>;
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>se, fatto salvo il caso di non cumulabilita' dei benefici, intendano optare per la elargizione in unica soluzione o per l'assegno vitalizio previsto dall'<ref eId="content__ref_47" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_3">articolo 3 della legge 20 ottobre 1990, n. 302</ref>;
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_1.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>se abbiano richiesto o abbiano gia' ottenuto, anche in parte, il risarcimento del danno, esibendo la relativa documentazione.
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_4__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>La scelta di uno dei predetti benefici deve essere corredata da espressa rinuncia degli interessati ad altre provvidenze non cumulabili.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Si considerano pubbliche le provvidenze corrisposte direttamente da una pubblica amministazione.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Il divieto di cumulo non opera fra l'assegno vitalizio previsto dalla <ref eId="content__ref_48" href="/akn/it/act/legge/stato/1990-10-20/302/!main">legge 20 ottobre 1990, n. 302</ref>, e le altre provvidenze pubbliche non continuative ancorche' corrisposte in piu' soluzioni, ne' fra le elargizioni previste dalla predetta legge e le altre provvidenze pubbliche di carattere continuativo. Non rientrano nel divieto di cumulo il beneficio previsto dall'<ref eId="content__ref_49" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2">articolo 2 della legge 23 novembre 1998, n. 407</ref>, i trattamenti di quiescenza, ancorche' privilegiati o di riversibilita', nonche' i benefici di cui agli <ref eId="content__ref_50" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_9">articoli 9</ref>, <ref eId="content__ref_51" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_14">14</ref> e <ref eId="content__ref_52" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_15">15 della legge 20 ottobre 1990, n. 302</ref> e ogni altro beneficio o diritto non rinunciabile o a carattere generale. Il divieto di cumulo non opera, altresi', per le vittime del dovere destinatarie dei benefici previsti dalla <ref eId="content__ref_53" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Qualora al momento della domanda o successivamente fino all'emanazione del provvedimento finale, risulta che e' stata corrisposta una provvidenza non cumulabile e, tuttavia, di importo inferiore alle provvidenze disciplinate dalla <ref eId="content__ref_54" href="/akn/it/act/legge/stato/1990-10-20/302/!main">legge 20 ottobre 1990, n. 302</ref>, queste ultime sono corrisposte sottraendo al relativo ammontare quanto e' stato riconosciuto in favore del richiedente.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>La sottoscrizione dell'interessato alle dichiarazioni ed alle opzioni di cui ai commi precedenti deve essere resa a norma dell'<ref eId="content__ref_55" href="/akn/it/act/legge/stato/1968-01-04/15/!main#art_20">articolo 20 della legge 4 gennaio 1968, n. 15</ref>, e successive modificazioni.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_2" placement="bottom">
+                                <p> Note all'art. 4:
+ - Per l'argomento della <ref eId="content__ref_56" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, v. nelle note alle premesse.
+ - Si riporta il testo degli articoli 3, 9, 14, e 15 della <ref eId="content__ref_57" href="/akn/it/act/legge/stato/1990-10-20/302/!main">legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse):
+ "Art. 3 (Opzione del beneficiario per un assegno vitalizio). - 1. Il cittadino italiano, anche dipendente pubblico, che subisca un'invalidita' permanente pari almeno a due terzi della capacita' lavorativa, nei casi previsti dall'art. 1, puo' optare, in luogo della elargizione in unica soluzione, per un assegno vitalizio commisurato all'entita' della invalidita' permanente, in riferimento alla capacita' lavorativa, in ragione di lire 12 mila mensili per ogni punto percentuale".
+ "Art. 9 (Applicazione dei benefici di guerra). - 1. Le disposizioni di legge vigenti a favore degli invalidi civili di guerra e delle famiglie dei caduti civili di guerra si applicano anche a favore degli invalidi civili e dei caduti a causa di atti di terrorismo consumati in Italia e delle loro famiglie, in quanto compatibili con la presente legge.
+ 2. Le condizioni di invalido civile e di caduto a causa di atti di terrorismo, nonche' di vittima della criminalita' organizzata sono certificate dal prefetto del luogo di residenza, secondo modalita' stabilite con decreto del Ministro dell'interno".
+ "Art. 14 (Diritto di &#143;assunzione presso le pubbliche amministrazioni). - 1. Il coniuge superstite, i figli e i genitori dei soggetti deceduti o resi permanentemente invalidi in misura non inferiore all'80 per cento della capacita' lavorativa, in conseguenza delle azioni od operazioni di cui all'art. 1, hanno ciascuno diritto di assunzione presso le pubbliche amministrazioni, gli enti pubblici e le aziende private secondo le disposizioni della <ref eId="content__ref_58" href="/akn/it/act/legge/stato/1968-04-02/482/!main">legge 2 aprile 1968, n. 482</ref>, e della <ref eId="content__ref_59" href="/akn/it/act/legge/stato/1977-06-01/285/!main">legge 1o giugno 1977, n. 285</ref>, e successive modificazioni, con precedenza su ogni altra categoria indicata nelle predette leggi".
+ "Art. 15 (Esenzione dai ticket sanitari). - 1. I cittadini italiani che abbiano subito ferite o lesioni in conseguenza degli atti di cui all'art. 1 sono esenti dal pagamento di ticket per ogni tipo di prestazione sanitaria.
+ 2. Entro sessanta giorni dalla data di entrata in vigore della presente legge, il Ministro della sanita' stabilisce con proprio decreto, da emanarsi di concerto con il Ministro dell'interno, le modalita' di attuazione dell'esenzione di cui al comma 1".
+ - Si riporta il testo dell'<ref eId="content__ref_60" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2">art. 2 della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse):
+ "Art. 2. - 1. A chiunque, per effetto di ferite o lesioni riportate in conseguenza degli eventi di cui ai <ref eId="content__ref_61" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com1">commi 1</ref>, <ref eId="content__ref_62" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com2">2</ref>, <ref eId="content__ref_63" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com3">3</ref> e <ref eId="content__ref_64" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com4">4 dell'art. 1 della legge 20 ottobre 1990, n. 302</ref>, come modificati dall'art. 1, comma 1, della presente legge, subisca una invalidita' permanente non inferiore ad un quarto della capacita' lavorativa, nonche' ai superstiti delle vittime di azioni terroristiche e' concesso, oltre alle elargizioni di cui alla citata <ref eId="content__ref_65" href="/akn/it/act/legge/stato/1990/302/!main">legge n. 302 del 1990</ref>, un assegno vitalizio, non reversibile, di lire 500 mila mensili, soggetto alla perequazione automatica di cui all'<ref eId="content__ref_66" href="/akn/it/act/decretoLegislativo/stato/1992-12-30/503/!main#art_11">art. 11 del decreto legislativo 30 dicembre 1992, n. 503</ref>, e successive modificazioni. Per l'attuazione del presente comma e' autorizzata la spesa di lire 1.993 milioni per l'anno 1998, di lire 2.092 milioni per l'anno 1999, di lire 2.193 milioni per l'anno 2000 e di lire 2.293 milioni annue a decorrere dall'anno 2001.
+ 2. Ai fini di cui al comma 1 si considerano superstiti le persone di cui al <ref eId="content__ref_67" href="/akn/it/act/legge/stato/1980-08-13/466/!main#art_6-com1">primo comma dell'art. 6 della legge 13 agosto 1980, n. 466</ref>, come sostituito dall'<ref eId="content__ref_68" href="/akn/it/act/legge/stato/1981-12-04/720/!main#art_2">art. 2 dalla legge 4 dicembre 1981, n. 720</ref>, secondo l'ordine ivi indicato.
+ 3. In caso di decesso dei soggetti di cui al comma 1, ai superstiti aventi diritto alla pensione di reversibilita' secondo le disposizioni del testo unico delle norme sul trattamento di quiescenza dei dipendenti civili e militari dello Stato, approvato con <ref eId="content__ref_69" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main">decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>, e successive modificazioni, sono attribuite due annualita' del suddetto trattamento pensionistico limitatamente al coniuge superstite, ai figli minori, ai figli maggiorenni inabili, ai genitori e ai fratelli e sorelle, se conviventi ed a carico. Per l'attuazione del presente comma e' autorizzata la spesa di lire 11.225 milioni per ciascuno degli anni 1999 e 2000 e di lire 430 milioni annue a decorrere dall'anno 2001.
+ 4. L'assegno vitalizio di cui al comma 1 ha natura di indennizzo ed e' esente dall'imposta sul reddito delle persone fisiche (IRPEF).
+ 5. Il trattamento speciale di reversibilita' corrisposto ai superstiti dei caduti non concorre a formare il reddito imponibile ai fini dell'IRPEF; sul trattamento speciale e' corrisposta l'indennita' integrativa speciale con decorrenza dalla data di liquidazione del predetto trattamento e senza corresponsione di somme a titolo di rivalutazione o interessi anche se il beneficiario percepisca tale indennita' ad altro titolo. Per l'attuazione del presente comma e' autorizzata la spesa di lire 1.823 milioni per l'anno 1998, di lire 226 milioni per l'anno 1999, di lire 229 milioni per l'anno 2000 e di lire 232 milioni annue a decorrere dall'anno 2001.
+ 6. Le pensioni privilegiate dirette di prima categoria erogate ai soggetti di cui all'art. 1, comma 2, che siano anche titolari dell'assegno di superinvalidita' di cui all'art. 100 del citato testo unico approvato con <ref eId="content__ref_70" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main">decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>, e successive modificazioni, non concorrono a formare il reddito imponibile ai fini dell'IRPEF. Per l'attuazione del presente comma e' autorizzata la spesa di lire 1.952 milioni per l'anno 1999 e di lire 122 milioni annue a decorrere dall'anno 2000".
+ - Si riporta il testo vigente dell'<ref eId="content__ref_71" href="/akn/it/act/legge/stato/1968-01-04/15/!main#art_20">art. 20 della legge 4 gennaio 1968, n. 15</ref> (Norme sulla documentazione amministrativa e sulla legalizzazione e autenticazione di firme):
+ "Art. 20 (Autenticazione delle sottoscrizioni). - La sottoscrizione di istanze da produrre agli organi della pubblica amministrazione puo' essere autenticata, ove l'autenticazione sia prescritta, dal funzionario competente a ricevere la documentazione, o da un notaio, cancelliere, segretario comunale, o altro funzionario incaricato dal sindaco.
+ L'autenticazione deve essere redatta di seguito alla sottoscrizione e consiste nell'attestazione, da parte del pubblico ufficiale, che la sottoscrizione stessa e' stata apposta in sua presenza, previo accertamento dell'identita' della persona che sottoscrive.
+ Il pubblico ufficiale che autentica deve indicare le modalita' di identificazione, la data e il luogo della autenticazione, il proprio nome e cognome, la qualifica rivestita, nonche' apporre la propria firma per esteso ed il timbro dell'ufficio.
+ Per l'autenticazione delle firme apposte sui margini dei fogli intermedi e' sufficiente che il pubblico ufficiale aggiunga la propria firma".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_5">
+                <num>Art. 5.</num>
+                <heading> Valutazione della commissione medica ospedaliera
+ della sanita' militare</heading>
+                <paragraph eId="art_5__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Per l'attribuzione dei benefici di legge, oltre al rapporto sulle circostanze che hanno dato luogo all'evento lesivo, e' richiesta la valutazione della commissione medica ospedaliera della sanita' militare, la quale svolge le proprie indagini secondo le modalita' previste dagli <ref eId="content__ref_72" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main#art_172">articoli 172 e seguenti del decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>, e successive modificazioni, esprime il giudizio sanitario sulle cause delle ferite o lesioni che hanno determinato il decesso o la invalidita', accerta il grado dell'eventuale invalidita' riscontrata, stabilisce la percentuale dell'invalidita' e dell'eventuale aggravamento, ed accerta comunque se l'invalidita' riportata comporti la cessazione dell'attivita' lavorativa o del rapporto d'impiego.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>La commissione medica ospedaliera di cui al comma 1 e' integrata, ai fini della concessione dei benefici in favore delle vittime civili del terrorismo e della criminalita' organizzata, da due sanitari della Polizia di Stato esperti in medicina legale.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>I sanitari della Polizia di Stato sono nominati dal direttore centrale di sanita' del Dipartimento di pubblica sicurezza del Ministero dell'interno, su richiesta della competente commissione medica ospedaliera, trasmessa contestualmente alla comunicazione della data in cui si procedera' alla visita dell'interessato o, comunque, alla valutazione da parte della commissione stessa.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>La commissione medica ospedaliera esprime il giudizio entro il termine di sessanta giorni dal ricevimento della richiesta. Decorso inutilmente tale termine, i competenti organi amministrativi possono rivolgersi ad altri soggetti pubblici dotati di qualificazione ed adeguata capacita' tecnica, quali le strutture del servizio sanitario nazionale, ovvero ad istituti universitari, che si pronunciano entro venti giorni dalla richiesta.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>La valutazione della commissione medica ospedaliera non e' richiesta in caso di decesso, quando il nesso di causalita' risulti di immediata evidenza. La medesima valutazione non e', altresi', richiesta qualora il prefetto, relativamente alle istanze concernenti le vittime civili ritenga, sulla base degli elementi istruttori acquisiti, che sia da escludere la natura terroristica o di criminalita' organizzata dell'evento criminoso.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>Il giudizio della commissione medica ospedaliera, nella composizione integrata, e' definitivo.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_7">
+                    <num>7.</num>
+                    <content>
+                        <p>Le disposizioni dei commi precedenti si applicano anche per gli stranieri e gli apolidi. Se i soggetti interessati non sono residenti in Italia, il giudizio sanitario e' espresso da apposite commissioni formate da tre medici scelti dall'autorita' consolare, che svolgono le proprie indagini secondo le stesse modalita' previste per le commissioni mediche ospedaliere. La domanda e i documenti, ivi compreso il giudizio sanitario, sono inviati al prefetto della provincia in cui si e' verificato l'evento.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_3" placement="bottom">
+                                <p> Nota all'<ref eId="content__ref_73" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main#art_5">art. 5:
+ - Il decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>, contiene il testo unico delle norme sul trattamento di quiescenza dei dipendenti civili e militari dello Stato. Si indicano, qui di seguito, le rubriche degli articoli 172 e seguenti:
+ Art. 172 (Accertamenti sanitari).
+ Art. 173 (Spese di ricovero).
+ Art. 174 (Mancata presentazione agli accertamenti sanitari).
+ Art. 175 (Verbale della commissione medica ospedaliera).
+ Art. 176 (Trasmissione degli atti all'amministrazione centrale).
+ Art. 177 (Casi in cui e' richiesto il parere del comitato).
+ Art. 178 (Pareri del Ministero della sanita' e del collegio medico legale).
+ Art. 179 (Provvedimento dell'amministrazione centrale).
+ Art. 180 (Liquidazione provvisoria con riserva di pronuncia sul diritto al trattamento privilegiato diretto).
+ Art. 181 (Accertamenti sanitari per innovazione dell'assegno).
+ Art. 182 (Scadenza dell'assegno rinnovabile).
+ Art. 183 (Aggravamento).
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_6">
+                <num>Art. 6.</num>
+                <heading>Procedimento di competenza del Ministero dell'interno di concessione dei benefici in favore dei superstiti delle vittime del dovere e dei dipendenti pubblici rimasti invalidi nell'adempimento del dovere, nonche' delle persone legalmente richieste di assistenza.</heading>
+                <paragraph eId="art_6__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Ai fini della concessione dei benefici, le amministrazioni competenti provvedono entro il termine stabilito dal regolamento di cui agli <ref eId="content__ref_74" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_2">articoli 2</ref> e <ref eId="content__ref_75" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_4">4 della legge 7 agosto 1990, n. 241</ref>.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Per quanto di competenza del Ministero dell'interno l'ufficio o comando presso il quale prestava servizio il dipendente caduto o ferito nell'adempimento del dovere o dove ha prestato la propria assistenza la persona legalmente richiesta, redige un dettagliato rapporto sulle circostanze che hanno dato luogo all'evento mortale o invalidante, corredato di perizie, di eventuali testimonianze e di ogni altro elemento conoscitivo acquisito. Tale rapporto viene trasmesso, corredato del verbale della commissione medica ospedaliera della sanita' militare, che verifica il nesso causale tra evento ed esito sanitario e che quantifica la percentuale di invalidita' riscontrata, nel piu' breve tempo possibile, al prefetto della provincia in cui si e' verificato l'evento, per l'ulteriore inoltro al Ministero dell'interno, che dispone la concessione della speciale elargizione con apposito decreto, anche in assenza di sentenza, qualora i presupposti per la concessione dei benefici siano di chiara evidenza.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il prefetto e' tenuto ad esprimere il proprio parere in ordine alla natura delle azioni lesive, al nesso di causalita' tra queste e le lesioni prodotte, o l'eventuale decesso, e agli altri presupposti stabiliti per il conferimento dei benefici, ivi compresa la matrice criminosa dell'evento. Tale parere viene trasmesso al Ministero dell'interno, unitamente al rapporto e alla documentazione di cui al comma 2.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Il Ministero dell'interno, ove ritenga che gli elementi informativi acquisiti non consentano di emettere il provvedimento finale, puo' disporre, con provvedimento motivato, un supplemento di istruttoria.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Si applicano, in quanto compatibili, le sospensioni dei termini previsti dal presente regolamento.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_4" placement="bottom">
+                                <p> Nota all'art. 6:
+ - Si riporta il testo degli <ref eId="content__ref_76" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_2">articoli 2</ref> e <ref eId="content__ref_77" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_4">4 della legge 7 agosto 1990, n. 241</ref> (Nuove norme in materia di procedimento amministrativo e di diritto di accesso ai documenti amministrativi):
+ "Art. 2. - 1. Ove il procedimento consegua obbligatoriamente ad una istanza, ovvero debba essere iniziato d'ufficio, la pubblica amministrazione ha il dovere di concluderlo mediante l'adozione di un provvedimento espresso.
+ 2. Le pubbliche amministrazioni determinano per ciascun tipo di procedimento, in quanto non sia gia' direttamente disposto per legge o per regolamento, il termine entro cui esso deve concludersi. Tale termine decorre dall'inizio di ufficio del procedimento o dal ricevimento della domanda se il procedimento e' ad iniziativa di parte.
+ 3. Qualora le pubbliche amministrazioni non provvedano ai sensi del comma 2, il termine e' di trenta giorni.
+ 4. Le determinazioni adottate ai sensi del comma 2 sono rese pubbliche secondo quanto previsto dai singoli ordinamenti".
+ "Art. 4. - 1. Ove non sia gia' direttamente stabilito per legge o per regolamento, le pubbliche amministrazioni sono tenute a determinare per ciascun tipo di procedimento relativo ad atti di loro competenza l'unita' organizzativa responsabile della istruttoria e di ogni altro adempimento procedimentale, nonche' dell'adozione del provvedimento finale.
+ 2. Le disposizioni adottate ai sensi del comma 1 sono rese pubbliche secondo quanto previsto dai singoli ordinamenti".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_7">
+                <num>Art. 7.</num>
+                <heading>Procedimento di competenza del Ministero di grazia e giustizia di concessione dei benefici in favore dei superstiti delle vittime del dovere e dei dipendenti rimasti invalidi nell'adempimento del dovere, nonche' delle persone legalmente richieste di assistenza.</heading>
+                <paragraph eId="art_7__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Per quanto di competenza del Ministero di grazia e giustizia, il procuratore generale presso la corte d'appello del distretto in cui si e' verificato l'evento mortale o invalidante redige un dettagliato rapporto sulle circostanze che vi hanno dato luogo, corredato di perizie, di eventuali testimonianze e di ogni altro elemento conoscitivo acquisito. Tale rapporto viene trasmesso, corredato dal verbale della commissione medica ospedaliera della sanita' militare che verifica il nesso causale tra evento ed esito sanitario e che quantifica la percentuale di invalidita' riscontrata, nel piu' breve tempo possibile al Ministero di grazia e giustizia, che dispone la concessione della speciale elargizione con apposito decreto, anche in assenza di sentenza, se i presupposti per la concessione dei benefici sono di chiara evidenza.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il procuratore generale presso la corte d'appello del distretto in cui si e' verificato l'evento mortale o invalidante e' tenuto ad esprimere il proprio parere in ordine alla natura delle azioni lesive, al nesso di causalita' tra quste e le lesioni prodotte o l'eventuale decesso, e agli altri presupposti stabiliti per il conferimento dei benefici, ivi compresa la matrice criminosa dell'evento. Tale parere viene trasmesso al Ministero di grazia e giustizia, unitamente al rapporto e alla documentazione di cui al comma 1.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il Ministero di grazia e giustizia, se ritiene che gli elementi informativi acquisiti non consentano di emettere il provvedimento finale, puo' disporre, con provvedimento motivato, un supplemento di istruttoria.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Si applicano, in quanto compatibili, le sospensioni dei termini previste dal presente regolamento.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_8">
+                <num>Art. 8.</num>
+                <heading>Procedimento di competenza del Ministero della difesa di concessione dei benefici in favore dei superstiti delle vittime del dovere e dei dipendenti rimasti invalidi nell'adempimento del dovere, nonche' delle persone legalmente richieste di assistenza.</heading>
+                <paragraph eId="art_8__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Per il personale delle Forze armate, esclusa l'Arma dei carabinieri, il comandante del reparto presso il quale prestava servizio il militare caduto o ferito nell'adempimento del dovere, redige un dettagliato rapporto sulle circostanze che hanno dato luogo all'evento mortale o invalidante, corredato di perizie, di eventuali testimonianze e di ogni altro elemento conoscitivo acquisito. Tale rapporto, corredato del parere delle autorita' gerarchiche, nonche' del verbale della commissione medica ospedaliera della sanita' militare che verifica il nesso causale tra evento ed esito sanitario e che quantifica la percentuale di invalidita' riscontrata, viene inviato, nel piu' breve tempo possibile, all'Alto comandante di cui al successivo comma 2, per l'ulteriore inoltro al Ministero della difesa.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>L'Alto comandante da cui dipende il reparto presso il quale prestava servizio il militare caduto o ferito nell'adempimento del dovere e' tenuto ad esprimere il proprio parere in ordine alla natura delle azioni lesive, al nesso di causalita' tra queste e le lesioni prodotte, o l'eventuale decesso, nonche' in ordine agli altri presupposti stabiliti per il conferimento dei benefici, ivi compresa la matrice criminosa dell'evento. Tale parere viene inviato al Ministero della difesa unitamente al rapporto ed alla documentazione indicata al precedente comma 1.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il Ministero della difesa dispone la concessione della speciale elargizione con apposito decreto, anche in assenza di sentenza dell'autorita' giudiziaria competente, qualora i presupposti per la concessione siano di chiara evidenza; ove ritenga che gli elementi informativi acquisiti non consentano di emettere il provvedimento finale puo' disporre, con provvedimento motivato, un supplemento di istruttoria.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Si applicano, in quanto compatibili, le sospensioni dei termini previsti dal presente regolamento.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9">
+                <num>Art. 9.</num>
+                <heading>Procedimento di concessione dei benefici in favore dei cittadini, degli stranieri o degli apolidi vittime del terrorismo e della criminalita' organizzata, o dei superstiti.</heading>
+                <paragraph eId="art_9__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Ai fini della concessione dei benefici, il Ministero dell'interno provvede, entro il termine stabilito dal regolamento di cui agli <ref eId="content__ref_78" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_2">articoli 2</ref> e <ref eId="content__ref_79" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_4">4 della legge 7 agosto 1990, n. 241</ref>, elevato di ulteriori trenta giorni nei casi di sospensione regolati dal successivo articolo 10.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il prefetto competente trasmette l'istanza al Ministero dell'interno, con un dettagliato rapporto sulle circostanze dell'evento mortale o invalidante, corredato di sentenza sui fatti criminosi, di eventuali testimonianze e di ogni altro elemento conoscitivo acquisito, ivi compreso il giudizio sanitario della commissione medica ospedaliera.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il prefetto e' tenuto ad esprimere il proprio parere in ordine alla natura delle azioni lesive, al nesso di causalita' tra queste e le lesioni prodotte, o l'eventuale decesso, e agli altri presupposti stabiliti per il conferimento dei benefici. Tale parere viene trasmesso al Ministero dell'interno unitamente al rapporto e alla documentazione di cui al comma 2.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Qualora vi siano obiettive ragioni di incertezza in merito alla sussistenza dei requisiti diversi da quello sanitario, cui e' subordinata la concessione dei benefici economici, il Ministero dell'interno puo' chiedere il parere della commissione consultiva di cui all'articolo 11.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Il Ministero dell'interno, ove ritenga che gli elementi informativi acquisiti non consentano di emettere il provvedimento finale, puo' disporre, con provvedimento motivato, un supplemento di istruttoria.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_5" placement="bottom">
+                                <p> Nota all'art. 9:
+ - Per il testo degli <ref eId="content__ref_80" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_2">articoli 2</ref> e <ref eId="content__ref_81" href="/akn/it/act/legge/stato/1990-08-07/241/!main#art_4">4 della legge 7 agosto 1990, n. 241</ref>, v. nelle note all'art. 6.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_10">
+                <num>Art. 10.</num>
+                <heading>Definizione dei procedimenti di concessione dei benefici in favore dei cittadini, degli stranieri o degli apolidi vittime del terrorismo e della criminalita' organizzata sulla base delle risultanze giudiziarie successivamente intervenute.</heading>
+                <paragraph eId="art_10__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il prefetto acquisisce la sentenza, nel caso in cui sia stata erogata la provvisionale o l'assegno vitalizio in assenza di un provvedimento dell'autorita' giudiziaria, e trasmette immediatamente la medesima al Ministero dell'interno, che provvede disponendo o negando, in via definitiva, l'erogazione dell'assegno vitalizio o del residuo dell'elargizione in unica soluzione.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_10__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Qualora il provvedimento dell'autorita' giudiziaria, successivamente intervenuto, non contenga elementi sufficienti per la decisione finale, il prefetto esprime, comunque, un ulteriore parere sulla base delle eventuali indagini svolte e delle risultanze processuali, trasmettendolo insieme con il provvedimento dell'autorita' giudiziaria al Ministero dell'interno.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_10__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il Ministero dell'interno, sulla base del provvedimento dell'autorita' giudiziaria, tenendo conto del parere del prefetto e della commissione consultiva di cui all'articolo 11, adotta le conseguenti decisioni.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_11">
+                <num>Art. 11.</num>
+                <heading>Istituzione e composizione della commissione consultiva presso il Ministero dell'interno</heading>
+                <paragraph eId="art_11__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>E' istituita presso il Ministero dell'interno una apposita commissione, nominata dal Ministro e composta da cinque membri: un magistrato amministrativo che la presiede; un prefetto in servizio presso il Dipartimento di pubblica sicurezza o un dirigente generale della Polizia di Stato; un ufficiale generale dell'Arma dei carabinieri, un ufficiale generale del Corpo della guardia di finanza ed un dirigente della direzione generale dei servizi civili del Ministero dell'interno, con qualifica non inferiore a quella di viceprefetto. Le nomine hanno luogo su designazione delle rispettive amministrazioni che provvedono, altresi', ad indicare altro membro supplente, anche di qualifica immediatamente inferiore, per i casi di assenza o di impedimento del titolare.
+ Svolge le funzioni di segretario un funzionario della direzione generale dei servizi civili del Ministero dell'interno, la quale provvede, altresi', ad indicare altro funzionario quale segretario supplente in caso di assenza o impedimento del titolare.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_11__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Alla commissione sono chiamati a partecipare, quando interessati, i rappresentanti delle amministrazioni competenti di cui all'articolo 2, non indicate nel comma 1, su designazione dell'amministrazione di appartenenza.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_11__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il compenso del presidente, dei componenti e del segratario della commissione consultiva e' stabilito con decreto del Ministro dell'interno, di concerto con il Ministro del tesoro, del bilancio e della programmazione economica.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_12">
+                <num>Art. 12.</num>
+                <heading> Sospensione dei termini</heading>
+                <paragraph eId="art_12__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il termine previsto per la definizione del procedimento e' sospeso nel caso in cui il segreto istruttorio su indagini in corso non permetta di acquisire elementi sufficienti per la redazione del rapporto informativo del prefetto. Analogamente il termine e' sospeso qualora il procedimento penale non sia ancora concluso.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_12__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>La sospensione deve essere tempestivamente comunicata all'interessato, o al suo avente diritto, ed al Ministero dell'interno.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_13">
+                <num>Art. 13.</num>
+                <heading> Individuazione dei destinatari dei benefici</heading>
+                <paragraph eId="art_13__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>La speciale elargizione viene ripartita in quote eguali tra il coniuge superstite e ciascuno dei figli, se a carico.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_13__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Quando non vi siano il coniuge, i figli, i genitori, i fratelli e le sorelle conviventi a carico, per le vittime del dovere le amministrazioni competenti procedono all'accertamento d'ufficio sull'esistenza di persone conviventi a carico della persona deceduta negli ultimi tre anni precedenti all'evento e dei conviventi more uxorio. Per gli altri soggetti beneficiari si procede a seguito di domanda da parte degli interessati.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_13__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Per persona a carico si intende il familiare non in grado, al momento dell'evento, di provvedere autonomamente al proprio sostentamento e fiscalmente a carico. A tal fine dovra' essere esibita apposita certificazione o una dichiarazione sostitutiva.
+ Per i fratelli e le sorelle la condizione di convivenza con il defunto dovra' risultare da apposita certificazione rilasciata dal comune di residenza.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_13__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>L'assegno vitalizio non reversibile di cui all'<ref eId="content__ref_82" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2">articolo 2 della legge 23 novembre 1998, n. 407</ref>, compete soltanto ai soggetti destinatari ivi indicati ancora in vita alla data di entrata in vigore della legge medesima.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_13__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Nei casi in cui la vittima di azione terroristica, gia' titolare del diritto, sia deceduta successivamente all'evento criminoso, l'assegno vitalizio viene corrisposto ai superstiti in caso di interdipendenza o di aggravamento causato per effetto diretto e determinante delle lesioni o delle infermita' subite nell'atto terroristico.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_13__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>La riliquidazione prevista dall'<ref eId="content__ref_83" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_3-com2-letb">articolo 3, comma 2, lettera b), della legge 23 novembre 1998, n. 407</ref>, compete agli originari destinatari per gli eventi di terrorismo, di eversione dell'ordine democratico, di criminalita' organizzata e per quelli previsti dalla <ref eId="content__ref_84" href="/akn/it/act/legge/stato/1998-03-31/70/!main">legge 31 marzo 1998, n. 70</ref>, ancora in vita alla data di entrata in vigore della predetta legge. In assenza di questi, si provvede secondo l'ordine dell'<ref eId="content__ref_85" href="/akn/it/act/legge/stato/1980-08-13/466/!main#art_6-com1">articolo 6, comma 1, della legge 13 agosto 1980, n. 466</ref>, qualora i predetti soggetti siano ancora in vita alla data di entrata in vigore della legge.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_6" placement="bottom">
+                                <p> Note all'art. 13:
+ - Per il testo dell'<ref eId="content__ref_86" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2">art. 2 della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 4.
+ - Si riporta il testo dell'<ref eId="content__ref_87" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_3-com2-letb">art. 3, comma 2, lettera b), della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse):
+ "2. All'<ref eId="content__ref_88" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_12">art. 12 della legge 20 ottobre 1990, n. 302</ref>, sono apportate le seguenti modificazioni:
+ a) (omissis);
+ b) il comma 3 e' sostituito dal seguente:
+ "3. Gli importi gia' corrisposti a titolo di speciale elargizione di cui alla <ref eId="content__ref_89" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, e successive modificazioni, sono soggetti a riliquidazione in base alle disposizioni della presente legge .
+ - La <ref eId="content__ref_90" href="/akn/it/act/legge/stato/1998-03-31/70/!main">legge 31 marzo 1998, n. 70</ref>, reca: "Benefici per le vittime della cosidetta "banda della Uno bianca ".
+ - Si riporta il testo dell'<ref eId="content__ref_91" href="/akn/it/act/legge/stato/1980-08-13/466/!main#art_6-com1">art. 6, comma 1, della legge 13 agosto 1980, n. 466</ref> (per l'argomento v. nelle note alle premesse):
+ "Art. 6. - La speciale elargizione di cui alla presente legge ed alle altre in essa richiamate, nei casi in cui compete alle famiglie, e' corrisposta secondo il seguente ordine:
+ 1) coniuge superstite e figli se a carico;
+ 2) figli, in mancanza del coniuge superstite o se lo stesso non abbia diritto a pensione;
+ 3) genitori;
+ 4) fratelli e sorelle se conviventi a carico.".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_14">
+                <num>Art. 14.</num>
+                <heading> Pagamento degli assegni vitalizi</heading>
+                <paragraph eId="art_14__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Al pagamento degli assegni vitalizi, sia provvisori che definitivi, provvedono i dipartimenti provinciali del tesoro competenti in relazione alla residenza degli interessati, secondo le modalita' di pagamento degli stipendi e delle pensioni in base al ruolo di spesa fissa. Le amministrazioni concedenti trasmettono agli uffici centrali del bilancio i provvedimenti per i successivi adempimenti.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_14__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>L'assegno vitalizio ai sensi degli <ref eId="content__ref_92" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_3">articoli 3</ref> e <ref eId="content__ref_93" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_5">5 della legge 20 ottobre 1990, n. 302</ref>, decorre dal primo giorno del mese successivo a quello di presentazione della domanda.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_14__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>L'assegno vitalizio, ai sensi dell'<ref eId="content__ref_94" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com1">articolo 2, comma 1, della legge 23 novembre 1998, n. 407</ref>, decorre dalla data di entrata in vigore della predetta legge.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_7" placement="bottom">
+                                <p> Note all'art. 14:
+ - Per il testo dell'<ref eId="content__ref_95" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_3">art. 3 della legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 4.
+ - Si riporta il testo dell'<ref eId="content__ref_96" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_5">art. 5 della legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse):
+ "Art. 5 (Opzione dei superstiti per un assegno vitalizio). - 1. Il coniuge di cittadinanza italiana o il convivente more uxorio e i parenti a carico entro il secondo grado di cittadinanza italiana possono optare, se destinatari in tutto o in parte della elargizione di cui al comma 1, dell'art. 4, in base all'ordine di spettanza, per un assegno vitalizio personale a loro favore, non reversibile, del seguente ammontare:
+ a) lire 600 mila mensili, se i chiamati all'elargizione sono in numero non superiore a tre;
+ b) lire 375 mila mensili, se i chiamati all'elargizione sono quattro o cinque;
+ c) lire 300 mila mensili, se i chiamati all'elargizione sono in numero superiore a cinque.".
+ - Per il testo dell'<ref eId="content__ref_97" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com1">art. 2, comma 1, della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 4.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_15">
+                <num>Art. 15.</num>
+                <heading>Attribuzione e pagamento di due annualita' del trattamento pensionistico di riversibilita' liquidato secondo le disposizioni del decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092.</heading>
+                <paragraph eId="art_15__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>All'attribuzione del beneficio previsto dall'<ref eId="content__ref_98" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com3">articolo 2, comma 3, della legge 23 novembre 1998, n. 407</ref>, in favore dei superstiti dei soggetti deceduti per effetto di ferite o lesioni riportate in conseguenza degli eventi di cui ai <ref eId="content__ref_99" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com1">commi 1</ref>, <ref eId="content__ref_100" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com2">2</ref>, <ref eId="content__ref_101" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com3">3</ref> e <ref eId="content__ref_102" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1-com4">4 dell'articolo 1 della legge 20 ottobre 1990, n. 302</ref>, come risulta modificato dall'articolo 1, comma 1, della predetta <ref eId="content__ref_103" href="/akn/it/act/legge/stato/1998-11-23/407/!main">legge 23 novembre 1998, n. 407</ref>, nonche' ai superstiti delle vittime delle azioni terroristiche, provvedono, d'ufficio, le amministrazioni competenti a norma dell'articolo 2 del presente regolamento per gli eventi verificatisi successivamente all'11 dicembre 1998. Per gli eventi verificatisi prima della data suddetta le amministrazioni competenti procedono su domanda degli interessati.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_15__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il beneficio e' liquidato agli interessati separatamente e per gli orfani secondo le rispettive quote di compartecipazione stabilite dal <ref eId="content__ref_104" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main">decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_15__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>L'importo da liquidare ai soggetti destinatari del beneficio e' quello corrispondente a due volte l'ammontare annuo lordo del trattamento pensionistico calcolato alla data dell'11 dicembre 1998, comprensivo dell'indennita' integrativa speciale, ove questa non sia gia' stata ricompresa nella liquidazione dello speciale trattamento di pensione in godimento, per gli eventi verificatisi prima di tale data. Per gli eventi verificatisi successivamente, il beneficio in esame viene liquidato ai superstiti sulla base dell'importo annuo lordo della pensione di riversibilita', ovvero del trattamento speciale attribuito ai sensi del <ref eId="content__ref_105" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main">decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>, liquidato alla data del decesso del dante causa.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_15__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Il pagamento avviene contestualmente alla liquidazione e il relativo provvedimento e' soggetto al visto del competente ufficio centrale del bilancio.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_8" placement="bottom">
+                                <p> Note all'art. 15:
+ - Per il testo dell'<ref eId="content__ref_106" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com3">art. 2, comma 3, della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 4.
+ - Per completezza di informazione si riporta il testo vigente dell'<ref eId="content__ref_107" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1">art. 1 della legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse):
+ "Art. 1 (Casi di elargizione). - 1. A chiunque subisca un'invalidita' permanente, per effetto di ferite o lesioni riportate in conseguenza dello svolgersi nel territorio dello Stato di atti di terrorismo o di eversione dell'ordine democratico, a condizione che il soggetto leso non abbia concorso alla commissione degli atti medesimi ovvero di reati a questi connessi ai sensi dell'<ref eId="content__ref_108" href="/akn/it/act/codice.procedura.penale/presidente.repubblica/1988-09-22/447/!main#art_12">art. 12 del codice di procedura penale</ref>, e' corrisposta una elargizione fino a lire 150 milioni, in proporzione alla percentuale di invalidita' riscontrata, con riferimento alla capacita' lavorativa, in ragione di 1,5 milioni per ogni punto percentuale.
+ 2. L'elargizione di cui al comma 1 e' altresi' corrisposta a chiunque subisca un'invalidita' permanente, per effetto di ferite o lesioni riportate in conseguenza dello svolgersi nel territorio dello Stato di fatti delittuosi commessi per il perseguimento delle finalita' delle associazioni di cui all'<ref eId="content__ref_109" href="/akn/it/act/regioDecreto/stato/1930-10-19/1398/!main#art_416bis">art. 416-bis del codice penale</ref>, a condizione che:
+ a) il soggetto leso non abbia concorso alla commissione del fatto delittuoso lesivo ovvero di reati che con il medesimo siano connessi ai sensi dell'<ref eId="content__ref_110" href="/akn/it/act/codice.procedura.penale/presidente.repubblica/1988-09-22/447/!main#art_12">art. 12 del codice di procedura penale</ref>;
+ b) il soggetto leso risulti essere, al tempo dell'evento, del tutto estraneo ad ambienti e rapporti delinquenziali, salvo che si dimostri l'accidentalita' del suo coinvolgimento passivo nell'azione criminosa lesiva, ovvero risulti che il medesimo, al tempo dell'evento, si era gia' dissociato o comunque estraniato dagli ambienti e dai rapporti delinquenziali cui partecipava.
+ 3. La medesima elargizione e' corrisposta anche a chiunque subisca un'invalidita' permanente, per effetto di ferite o lesioni riportate in conseguenza dello svolgersi nel territorio dello Stato di operazioni di prevenzione o repressione dei fatti delittuosi di cui ai commi 1 e 2, a condizione che il soggetto leso sia del tutto estraneo alle attivita' criminose oggetto delle operazioni medesime.
+ 4. L'elargizione di cui al presente articolo e' inoltre corrisposta a chiunque, fuori dai casi di cui al comma 3, subisca un'invalidita' permanente, per effetto di ferite o lesioni riportate in conseguenza dell'assistenza prestata, e legalmente richiesta per iscritto ovvero verbalmente nei casi di flagranza di reato o di prestazione di soccorso, ad ufficiali ed agenti di polizia giudiziaria o ad autorita', ufficiali ed agenti di pubblica sicurezza, nel corso di azioni od operazioni di cui al presente articolo, svoltesi nel territorio dello Stato.
+ 5. Ai fini del presente articolo, l'invalidita' permanente che comporti la cessazione dell'attivita' lavorativa o del rapporto di impiego e' equilibrata all'invalidita' permanente pari a quattro quinti della capacita' lavorativa".
+ - Per l'argomento del <ref eId="content__ref_111" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main">decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>, v. nelle note all'art. 5.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_16">
+                <num>Art. 16.</num>
+                <heading>Esenzione IRPEF del trattamento speciale di riversibilita' e delle pensioni privilegiate dirette di prima categoria nei confronti dei destinatari dei benefici previsti dalla legge 23 novembre 1998, n. 407.</heading>
+                <paragraph eId="art_16__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>L'esenzione dall'IRPEF del trattamento speciale di riversibilita' corrisposto ai superstiti dei caduti e' applicata d'ufficio da parte degli ordinatori secondari di spesa, a decorrere dall'11 dicembre 1998. Le amministrazioni competenti a norma dell'articolo 2 del presente regolamento provvedono, a titolo ricognitivo, ad inviare apposita informazione ai cennati enti pagatori dei trattamenti speciali di riversibilita'.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_16__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>L'indennita' integrativa speciale e' corrisposta dai medesimi ordinatori secondari di spesa con decorrenza dalla data del trattamento speciale, osservando le modalita' stabilite dal <ref eId="content__ref_112" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com5">comma 5 dell'articolo 2 della legge 23 novembre 1998, n. 407</ref>, sempreche' tale indennita' non sia stata ricompresa nella liquidazione dello speciale trattamento di pensione in godimento.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_16__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>L'esenzione dall'IRPEF del trattamento privilegiato di prima categoria, con assegno di superinvalidita' di cui all'<ref eId="content__ref_113" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main#art_100">articolo 100 del decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref>, e successive modificazioni, erogato ai soggetti che abbiano subito un'invalidita' permanente per effetto di ferite o lesioni per gli atti di terrorismo e di eversione dell'ordine democratico di cui all'<ref eId="content__ref_114" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1">articolo 1 della legge 20 ottobre 1990, n. 302</ref>,
+ e' applicata d'ufficio da parte degli ordinatori secondari di spesa, a decorrere dall'11 dicembre 1998, per gli eventi verificatisi successivamente a detta data.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_16__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Per gli eventi verificatisi prima dell'11 dicembre 1998, si procede a domanda degli interessati.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_9" placement="bottom">
+                                <p> Note all'art. 16:
+ - Per il testo dell'<ref eId="content__ref_115" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com5">art. 2, comma 5, della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 4.
+ - Si riporta il testo vigente dell'<ref eId="content__ref_116" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1973-12-29/1092/!main#art_100">art. 100 del decreto del Presidente della Repubblica 29 dicembre 1973, n. 1092</ref> (per l'argomento v. nelle note all'art. 5):
+ "Art. 100 (Assenso di superinvalidita'). - Gli invalidi affetti da mutilazioni o infermita' elencate nella tabella E annessa alla <ref eId="content__ref_117" href="/akn/it/act/legge/stato/1968-03-18/313/!main">legge 18 marzo 1968, n. 313</ref>, hanno diritto a un assegno di superinvalidita', non riversibile, in una delle seguenti misure, secondo le indicazioni contenute in detta tabella:
+
+ lettera A .... annue L. 984.000".
+ lettera A-bis " " 840.000".
+ lettera B .... " " 667.400".
+ lettera C .... " " 412.900".
+ lettera D .... " " 384.000".
+ lettera E .... " " 344.600".
+ lettera F .... " " 264.100".
+ lettera G .... " " 227.400".
+
+ - Per il testo dell'<ref eId="content__ref_118" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1">art. 1 della legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 15.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_17">
+                <num>Art. 17.</num>
+                <heading> Rivalutazione degli assegni vitalizi</heading>
+                <paragraph eId="art_17__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_17__para_1__intro_1">
+                            <p>L'importo degli assegni vitalizi e' rivalutato annualmente dai dipartimenti provinciali del tesoro competente all'erogazione:
+ </p>
+                        </intro>
+                        <point eId="art_17__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>per l'assegno vitalizio, ai sensi degli <ref eId="content__ref_119" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_3">articoli 3</ref> e <ref eId="content__ref_120" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_5">5 della legge 20 ottobre 1990, n. 302</ref>, in misura pari al tasso dell'inflazione calcolato sulla base dei dati ufficiali dell'Istituto centrale di statistica;
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_17__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>per l'assegno vitalizio, ai sensi dell'<ref eId="content__ref_121" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com1">articolo 2, comma 1, della legge 23 novembre 1998, n. 407</ref>, secondo la perequazione automatica prevista dall'<ref eId="content__ref_122" href="/akn/it/act/decretoLegislativo/stato/1992-12-30/503/!main#art_11">articolo 11 del decreto legislativo 30 dicembre 1992, n. 503</ref>.
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_10" placement="bottom">
+                                <p> Note all'art. 17:
+ - Per il testo dell'<ref eId="content__ref_123" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_3">art. 3 della legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 4.
+ - Per il testo dell'<ref eId="content__ref_124" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_5">art. 5 della legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 14.
+ - Per il testo dell'<ref eId="content__ref_125" href="/akn/it/act/legge/stato/1998-11-23/407/!main#art_2-com1">art. 2, comma 1, della legge 23 novembre 1998, n. 407</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 4.
+ - Si riporta il testo dell'<ref eId="content__ref_126" href="/akn/it/act/decretoLegislativo/stato/1992-12-30/503/!main#art_11">art. 11 del decreto legislativo 30 dicembre 1992, n. 503</ref> (Norme per il riordinamento del sistema previdenziale dei lavoratori privati e pubblici, a norma dell'<ref eId="content__ref_127" href="/akn/it/act/legge/stato/1992-10-23/421/!main#art_3">art. 3 della legge 23 ottobre 1992, n. 421</ref>):
+ "Art. 11 (Perequazione automatica delle pensioni). - 1.
+ Gli aumenti a titolo di perequazione automatica delle pensioni previdenziali ed assistenziali si applicano, con decorrenza dal 1994, sulla base del solo adeguamento al costo vita con cadenza annuale ed effetto dal primo novembre di ogni anno. Tali aumenti sono calcolati applicando all'importo della pensione spettante alla fine di ciascun periodo la percentuale di variazione che si determina rapportando il valore medio dell'indice ISTAT dei prezzi al consumo per famiglie di operai ed impiegati, relativo all'anno precedente il mese di decorrenza dell'aumento, all'analogo valore medio relativo all'anno precedente. Si applicano i criteri e le modalita' di cui ai <ref eId="content__ref_128" href="/akn/it/act/legge/stato/1986-02-28/41/!main#art_24-com4">commi 4</ref> e <ref eId="content__ref_129" href="/akn/it/act/legge/stato/1986-02-28/41/!main#art_24-com5">5 dell'art. 24 della legge 28 febbraio 1986, n. 41</ref>.
+ 2. Ulteriori aumenti possono essere stabiliti con legge finanziaria in relazione all'andamento dell'economia e tenuto conto degli obiettivi rispetto al PIL indicati nell'<ref eId="content__ref_130" href="/akn/it/act/legge/stato/1992-10-23/421/!main#art_3-com1">art. 3, comma 1, della legge 23 ottobre 1992, n. 421</ref>, sentite le organizzazioni sindacali maggiormente rappresentative sul piano nazionale. Con effetto dal 1o gennaio 2009 i predetti aumenti saranno stabiliti nel limite di un punto percentuale della base imponibile a valere sulle fasce di pensione fino a lire dieci milioni annui".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_18">
+                <num>Art. 18.</num>
+                <heading> Applicazione dei benefici di guerra</heading>
+                <paragraph eId="art_18__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>All'attribuzione dei benefici previsti dalle disposizioni vigenti a favore degli invalidi civili di guerra e delle famiglie dei caduti civili di guerra, provvedono le amministrazioni competenti su domanda degli interessati, corredata dalla apposita certificazione del prefetto del luogo di residenza.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_18__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>All'erogazione delle somme eventualmente spettanti in via continuativa si provvede con le modalita' di cui agli articoli precedenti.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_19">
+                <num>Art. 19.</num>
+                <heading>Certificazioni attestanti le condizioni di invalido civile o di caduto a causa di atti di terrorismo o di criminalita' organizzata o comune.</heading>
+                <paragraph eId="art_19__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il prefetto del luogo di residenza rilascia la certificazione attestante la condizione di invalido o di caduto su domanda dell'interessato ovvero dei familiari superstiti aventi titolo.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_19__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Nella certificazione sono indicati, contestualmente alla qualifica di cui al comma 1, la data e il luogo dell'atto criminoso e dell'eventuale decesso, e, qualora si tratti di invalidita', la natura delle ferite e delle lesioni che l'hanno determinata, la patologia invalidante, la percentuale della invalidita'.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_19__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Ai fini delle certificazioni, le amministrazioni competenti danno comunicazione al prefetto della provincia di residenza dell'interessato dell'attribuzione, anche provvisoria, dei benefici, precisandone le patologie invalidanti.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_19__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Copia dell'atto deliberativo e', comunque, trasmessa dal Ministero dell'interno al prefetto competente.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_20">
+                <num>Art. 20.</num>
+                <heading> Modalita' e termini del procedimento relativo alle certificazioni</heading>
+                <paragraph eId="art_20__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il prefetto provvede, in ordine alle richieste delle certificazioni, sulla base del provvedimento di attribuzione, entro il termine di trenta giorni dal ricevimento della domanda, ovvero dalla data della ricevuta di comunicazione del provvedimento medesimo, se successiva.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_20__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Qualora il provvedimento di attribuzione dei benefici sia stato emanato in assenza di sentenza, il prefetto, entro trenta giorni dalla comunicazione della sentenza definitiva, conforma ad essa gli atti a suo tempo adottati.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_20__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Gli atti del prefetto, adottati sulla base dei provvedimenti ministeriali emanati in assenza di sentenza, devono contenere l'avvertenza della loro modificabilita' per effetto delle ulteriori fasi del processo.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_20__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Ai fini del collocamento obbligatorio il prefetto del luogo di residenza rilascia, su domanda, apposita certificazione, secondo le stesse modalita' previste dall'articolo 17, in quanto applicabili, intendendosi sostituite al Ministero dell'interno le altre amministrazioni eventualmente competenti in ordine alla concessione dei benefici in favore di chi abbia subito ferite o lesioni in conseguenza delle azioni od operazioni di cui all'<ref eId="content__ref_131" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1">articolo 1 della legge 20 ottobre 1990, n. 302</ref>.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_11" placement="bottom">
+                                <p> Nota all'art. 20:
+ - Per il testo dell'<ref eId="content__ref_132" href="/akn/it/act/legge/stato/1990-10-20/302/!main#art_1">art. 1 della legge 20 ottobre 1990, n. 302</ref> (per l'argomento v. nelle note alle premesse), v. nelle note all'art. 15.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_21">
+                <num>Art. 21.</num>
+                <heading> Contributi alle spese funerarie</heading>
+                <paragraph eId="art_21__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il contributo alle spese funerarie per il personale di cui all'<ref eId="content__ref_133" href="/akn/it/act/legge/stato/1980-08-13/466/!main#art_8">articolo 8 della legge 13 agosto 1980, n. 466</ref>, da corrispondere alla famiglia del dipendente deceduto, viene determinato nella misura vigente:
+ quota fissa di lire cinquecentomila;
+ lire centomila per ogni familiare convivente a carico del dipendente deceduto. Detto contributo non deve superare in ogni caso l'importo complessivo di lire un milione.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_21__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Per i decessi verificatisi prima dell'entrata in vigore della <ref eId="content__ref_134" href="/akn/it/act/legge/stato/1980-08-13/466/!main">legge 13 agosto 1980, n. 466</ref>, il beneficio e' corrisposto a domanda degli aventi diritto.
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_12" placement="bottom">
+                                <p> Nota all'art. 21:
+ - Per il testo dell'<ref eId="content__ref_135" href="/akn/it/act/legge/stato/1980-08-13/466/!main#art_8">art. 8 della legge 13 agosto 1980, n. 466</ref> (per l'argomento v. nelle note alle premesse):
+ "Art. 8. - Il contributo nelle spese funerarie per il personale del Corpo delle guardie di pubblica sicurezza deceduto in attivita' di servizio, previsto dall'art. 286 del vigente regolamento del Corpo, modificato con <ref eId="content__ref_136" href="/akn/it/act/decretoLegislativo/stato/1948-02-16/134/!main#art_2">decreto legislativo 16 febbraio 1948, n. 134, e con l'art. 2</ref> della <ref eId="content__ref_137" href="/akn/it/act/legge/stato/1968-02-22/101/!main">legge 22 febbraio 1968, n. 101</ref>, e' corrisposto fino a lire un milione".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_22">
+                <num>Art. 22.</num>
+                <heading> Verifiche periodiche. Termini</heading>
+                <paragraph eId="art_22__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>I Ministri competenti verificano periodicamente la funzionalita', la trasparenza e la speditezza dei procedimenti disciplinati dal presente regolamento e adottano tutte le misure di rispettiva competenza.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_23">
+                <num>Art. 23.</num>
+                <heading> Norme abrogate</heading>
+                <paragraph eId="art_23__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il presente decreto sostituisce le disposizioni di cui ai decreti ministeriali 30 ottobre 1980, 11 luglio 1983, <ref eId="content__ref_138" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1987-07-29/561/!main">29 luglio 1987, n. 561</ref>, <ref eId="content__ref_139" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1991-08-29/319/!main">29 agosto 1991, n. 319</ref>, <ref eId="content__ref_140" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1992-03-16/377/!main">16 marzo 1992, n. 377 ed al decreto del Presidente della Repubblica</ref> <ref eId="content__ref_141" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1994-04-19/364/!main">19 aprile 1994, n. 364</ref>, che sono contestualmente abrogate. 
+ </p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_13" placement="bottom">
+                                <p> Note all'art. 23:
+ - Per l'argomento dei decreti ministeriali 30 ottobre 1980, 11 luglio 1983, <ref eId="content__ref_142" href="/akn/it/act/decreto/ministero./1987-07-29/561/!main">29 luglio 1987, n. 561</ref>, <ref eId="content__ref_143" href="/akn/it/act/decreto/ministero./1991-08-29/319/!main">29 agosto 1991, n. 319</ref> e <ref eId="content__ref_144" href="/akn/it/act/decreto/ministero./1992-03-16/377/!main">16 marzo 1992, n. 377</ref>, v. nelle note alle premesse.
+ - Per l'argomento del <ref eId="content__ref_145" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1994-04-19/364/!main">decreto del Presidente della Repubblica 19 aprile 1994, n. 364</ref>, v. nelle note alle premesse.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+        </body>
+        <conclusions>
+            <formula name="formulaFinaleConclusioni">
+                <p>Il presente decreto, munito del sigillo dello Stato, sara' inserito nella Raccolta ufficiale degli atti normativi della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarlo e di farlo osservare. </p>
+            </formula>
+            <p> Dato a Roma, addi' 28 luglio 1999 </p>
+            <p>CIAMPI D'Alema, Presidente del Consiglio dei Ministri Russo Jervolino, Ministro dell'interno Dini, Ministro degli affari esteri Diliberto, Ministro di grazia e giustizia Visco, Ministro delle finanze Amato, Ministro del tesoro, del bilancio e della programmazione economica Scognamiglio Pasini, Ministro della difesa De Castro, Ministro delle politiche agricole Visto, il Guardasigilli: Diliberto Registrato alla Corte dei conti il 28 dicembre 1999 Atti di Governo, registro n. 118, foglio n. 11 Ammesso al visto e alla conseguente registrazione, ai sensi della deliberazione n. 45/E/99 adottata dalle sezioni riunite nell'adunanza del 6 dicembre 1999. --------------- Nota redazionale Il testo riportato e' gia' integrato con le correzioni apportate dall'errata-corrige pubblicato in G.U. 12/01/2000, n. 8 durante il periodo di "vacatio legis". E' possibile visualizzare il testo originario accedendo alla versione pdf della relativa Gazzetta di pubblicazione.</p>
+        </conclusions>
+    </act>
+</akomaNtoso>

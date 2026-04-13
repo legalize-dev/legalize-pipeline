@@ -257,6 +257,26 @@ countries:
       # that only commits the current state.
       include_history: true
 
+  it:
+    repo_path: "../countries/it"
+    data_dir: "../countries/data-it"
+    cache_dir: ".cache"
+    # Normattiva multivigenza: each law requires 1 HTML page visit to extract
+    # download params, then 1 AKN XML download per historical version.
+    # Average law has ~3-5 versions → ~4-6 requests per law.
+    # The caricaAKN endpoint requires a session (cookie) from the HTML visit.
+    # Rate limit: unknown (no documentation), tested 2 req/s without issues.
+    # Full bootstrap: ~200K laws × ~5 req/s = ~55h (fetch only, single worker).
+    # Recommended: 2 workers × 2 req/s = ~4 req/s effective → ~28h.
+    max_workers: 2
+    source:
+      base_url: "https://www.normattiva.it"
+      api_url: "https://api.normattiva.it/t/normattiva.api/bff-opendata/v1"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 2.0
+      include_history: true
+
   be:
     repo_path: "../countries/be"
     data_dir: "../countries/data-be"

@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/decreto/MINISTERO_DELL'UNIVERSITA'_E_DELLA_RICERCA/2022-07-20/170/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto/MINISTERO_DELL'UNIVERSITA'_E_DELLA_RICERCA/2022-07-20/170"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:ministero.universita.e.ricerca:decreto:2022-07-20;170"/>
+                    <FRBRalias name="eli" value="eli/id/2022/11/08/22G00177/ORIGINAL"/>
+                    <FRBRdate date="2022-07-20" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2022/11/08/22G00177/ORIGINAL" aknrelname="eli/id/2022/11/08/22G00177/ORIGINAL">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content="Regolamento recante le modalita' per l'approvazione e per l'aggiornamento del Piano nazionale di ricerche in Antartide, i soggetti attuatori e i meccanismi di coordinamento tra le amministrazioni pubbliche interessate. (22G00177)  " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="22G00177" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#DECRETO"/>
+                            <nrdfa:span content="2022-07-20" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/decreto/MINISTERO_DELL'UNIVERSITA'_E_DELLA_RICERCA/2022-07-20/170/ita@2022-11-23/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto/MINISTERO_DELL'UNIVERSITA'_E_DELLA_RICERCA/2022-07-20/170/ita@2022-11-23"/>
+                    <FRBRdate date="2022-11-23" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2022/11/08/22G00177/ORIGINAL/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/2022/11/08/22G00177/ORIGINAL"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/2022/11/08/22G00177/ORIGINAL/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/decreto/MINISTERO_DELL'UNIVERSITA'_E_DELLA_RICERCA/2022-07-20/170/ita@2022-11-23/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/decreto/MINISTERO_DELL'UNIVERSITA'_E_DELLA_RICERCA/2022-07-20/170/ita@2022-11-23.xml"/>
+                    <FRBRdate date="2022-07-20" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2022/11/08/22G00177/ORIGINAL/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="2022-11-08" name="" number="261" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="2022-11-08" eId="eventRef_0" source="ro1"/>
+            </lifecycle>
+            <analysis source=""/>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/DECRETO/MINISTERO_DELL'UNIVERSITA'_E_DELLA_RICERCA/2022-07-20/170/!main" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/2022/11/08/22G00177/ORIGINAL">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it">Regolamento recante le modalita' per l'approvazione e per l'aggiornamento del Piano nazionale di ricerche in Antartide, i soggetti attuatori e i meccanismi di coordinamento tra le amministrazioni pubbliche interessate. (22G00177)  </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>22G00177</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#DECRETO"/>
+                        <eli:date_document rdf:datatype="xsd:date">2022-07-20</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2022/11/08/22G00177/ORIGINAL/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/2022/11/08/22G00177/ORIGINAL"/>
+                        <eli:is_embodied_by rdf:resource="na:id/2022/11/08/22G00177/ORIGINAL/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2022/11/08/22G00177/ORIGINAL/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>DECRETO</docType>
+                <docDate date="2022-07-20">20 luglio 2022</docDate>
+                <docNumber>170</docNumber>
+                <docTitle>Regolamento recante le modalita' per l'approvazione e per l'aggiornamento del Piano nazionale di ricerche in Antartide, i soggetti attuatori e i meccanismi di coordinamento tra le amministrazioni pubbliche interessate. (22G00177) 
+</docTitle>
+            </p>
+            <p>
+                <authorialNote eId="atn1" placement="bottom">
+                    <p>Entrata in vigore del provvedimento: 23/11/2022</p>
+                </authorialNote>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="formulaInizialePreambolo">
+                <p>IL MINISTRO DELL'UNIVERSITA' E DELLA RICERCA</p>
+            </formula>
+            <p>di concerto con</p>
+            <p>IL MINISTRO DEGLI AFFARI ESTERI</p>
+            <p>E DELLA COOPERAZIONE INTERNAZIONALE</p>
+            <p>IL MINISTRO DELLA TRANSIZIONE ECOLOGICA</p>
+            <p>e</p>
+            <p>IL MINISTRO DELL'ECONOMIA</p>
+            <p>E DELLE FINANZE</p>
+            <citations eId="cits_1">
+                <citation eId="cits_1__cit_1">
+                    <p>Visto l'<ref eId="ref_1" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_117-com6">articolo 117, sesto comma, della Costituzione</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_2">
+                <citation eId="cits_2__cit_1">
+                    <p>Vista la <ref eId="ref_2" href="/akn/it/act/legge/stato/1988-08-23/400/!main">legge 23 agosto 1988, n. 400</ref>, recante «Disciplina dell'attivita' di Governo e ordinamento della Presidenza del Consiglio dei ministri», e in particolare l'articolo 17, comma 3;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_3">
+                <citation eId="cits_3__cit_1">
+                    <p>Vista la <ref eId="ref_3" href="/akn/it/act/legge/stato/2020-12-30/178/!main">legge 30 dicembre 2020, n. 178</ref>, recante «Bilancio di previsione dello Stato per l'anno finanziario 2021 e bilancio pluriennale per il triennio 2021-2023», articolo 1, comma 552, e in particolare il secondo e il terzo periodo;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_4">
+                <citation eId="cits_4__cit_1">
+                    <p>Visto il Trattato sull'Antartide firmato a Washington il 1° dicembre 1959, ratificato e reso esecutivo ai sensi della <ref eId="ref_4" href="/akn/it/act/legge/stato/1980-11-29/963/!main">legge 29 novembre 1980, n. 963</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_5">
+                <citation eId="cits_5__cit_1">
+                    <p>Vista la <ref eId="ref_5" href="/akn/it/act/legge/stato/1985-06-10/284/!main">legge 10 giugno 1985, n. 284</ref>, recante «Programma nazionale di ricerche in Antartide»;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_6">
+                <citation eId="cits_6__cit_1">
+                    <p>Visto il Protocollo sulla protezione ambientale relativo al Trattato sull'Antartide, concluso a Madrid il 4 ottobre 1991, ratificato e reso esecutivo ai sensi della <ref eId="ref_6" href="/akn/it/act/legge/stato/1995-02-15/54/!main">legge 15 febbraio 1995, n. 54</ref>, e i relativi annessi;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_7">
+                <citation eId="cits_7__cit_1">
+                    <p>Vista la <ref eId="ref_7" href="/akn/it/act/legge/stato/1991-11-27/380/!main">legge 27 novembre 1991, n. 380</ref>, recante «Norme sui programmi nazionali di ricerca scientifica e tecnologica in Antartide»;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_8">
+                <citation eId="cits_8__cit_1">
+                    <p>Vista la <ref eId="ref_8" href="/akn/it/act/legge/stato/1997-08-07/266/!main">legge 7 agosto 1997, n. 266</ref>, recante «Interventi urgenti per l'economia», e in particolare l'articolo 5, comma 3;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_9">
+                <citation eId="cits_9__cit_1">
+                    <p>Visto il <ref eId="ref_9" href="/akn/it/act/decretoLegislativo/stato/1998-06-05/204/!main">decreto legislativo 5 giugno 1998, n. 204</ref>, recante «Disposizioni per il coordinamento, la programmazione e la valutazione della politica nazionale relativa alla ricerca scientifica e tecnologica, a norma dell'<ref eId="ref_10" href="/akn/it/act/legge/stato/1997-03-15/59/!main#art_11-com1-letd">articolo 11, comma 1, lettera d), della legge 15 marzo 1997, n. 59</ref>», e in particolare l'articolo 7;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_10">
+                <citation eId="cits_10__cit_1">
+                    <p>Visto il <ref eId="ref_11" href="/akn/it/act/decretoLegislativo/stato/1999-07-30/300/!main">decreto legislativo 30 luglio 1999, n. 300</ref>, recante «Riforma dell'organizzazione del Governo, a norma dell'<ref eId="ref_12" href="/akn/it/act/legge/stato/1997-03-15/59/!main#art_11">articolo 11 della legge 15 marzo 1997, n. 59</ref>», e in particolare l'articolo 35;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_11">
+                <citation eId="cits_11__cit_1">
+                    <p>Visto il <ref eId="ref_13" href="/akn/it/act/decretoLegislativo/stato/1999-07-30/303/!main">decreto legislativo 30 luglio 1999, n. 303</ref>, recante «Ordinamento della Presidenza del Consiglio dei ministri, a norma dell'<ref eId="ref_14" href="/akn/it/act/legge/stato/1997-03-15/59/!main#art_11">articolo 11 della legge 15 marzo 1997, n. 59</ref>», e in particolare l'articolo 7, commi 1, 2 e 3;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_12">
+                <citation eId="cits_12__cit_1">
+                    <p>Vista la <ref eId="ref_15" href="/akn/it/act/legge/stato/2003-01-16/3/!main">legge 16 gennaio 2003, n. 3</ref>, recante «Disposizioni ordinamentali in materia di pubblica amministrazione», e in particolare l'articolo 11 e successive modificazioni;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_13">
+                <citation eId="cits_13__cit_1">
+                    <p>Visto il <ref eId="ref_16" href="/akn/it/act/decretoLegislativo/stato/2009-12-31/213/!main">decreto legislativo 31 dicembre 2009, n. 213</ref>, recante «Riordino degli enti di ricerca in attuazione dell'<ref eId="ref_17" href="/akn/it/act/legge/stato/2007-09-27/165/!main#art_1">articolo 1 della legge 27 settembre 2007, n. 165</ref>», e in particolare l'articolo 9, comma 2;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_14">
+                <citation eId="cits_14__cit_1">
+                    <p>Visto il <ref eId="ref_18" href="/akn/it/act/decretoLegislativo/stato/2011-12-29/229/!main">decreto legislativo 29 dicembre 2011, n. 229</ref>, recante «Attuazione dell'<ref eId="ref_19" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_30-com9-lete">articolo 30, comma 9, lettere e)</ref>, <ref eId="ref_20" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_30-com9-letf">f)</ref> e <ref eId="ref_21" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_30-com9-letg">g), della legge 31 dicembre 2009, n. 196</ref>, in materia di procedure di monitoraggio sullo stato di attuazione delle opere pubbliche, di verifica dell'utilizzo dei finanziamenti nei tempi previsti e costituzione del Fondo opere e del Fondo progetti»;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_15">
+                <citation eId="cits_15__cit_1">
+                    <p>Visto il <ref eId="ref_22" href="/akn/it/act/decretoLegislativo/stato/2016-11-25/218/!main">decreto legislativo 25 novembre 2016, n. 218</ref>, recante «Semplificazione delle attivita' degli enti pubblici di ricerca ai sensi dell'<ref eId="ref_23" href="/akn/it/act/legge/stato/2015-08-07/124/!main#art_13">articolo 13 della legge 7 agosto 2015, n. 124</ref>»;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_16">
+                <citation eId="cits_16__cit_1">
+                    <p>Visto il <ref eId="ref_24" href="/akn/it/act/decretoLegge/stato/2021-03-01/22/!main">decreto-legge 1° marzo 2021, n. 22</ref>, recante «Disposizioni urgenti in materia di riordino delle attribuzioni dei Ministeri», convertito, con modificazioni, dalla <ref eId="ref_25" href="/akn/it/act/legge/stato/2021-04-22/55/!main">legge 22 aprile 2021, n. 55</ref>, e in particolare l'articolo 2, comma 4;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_17">
+                <citation eId="cits_17__cit_1">
+                    <p>Visto il decreto del Presidente del Consiglio dei ministri 1° ottobre 2012, recante «Ordinamento delle strutture generali della Presidenza del Consiglio dei ministri», e in particolare l'articolo 24-ter;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_18">
+                <citation eId="cits_18__cit_1">
+                    <p>Visto il decreto del Ministro dell'istruzione, dell'universita' e della ricerca del 30 settembre 2010, pubblicato nella Gazzetta Ufficiale del 3 febbraio 2011, n. 27, recante «Rideterminazione dei soggetti incaricati dell'attuazione, delle strutture operative, dei compiti e degli organismi consultivi e di coordinamento, delle procedure del programma di ricerche in Antartide nonche' delle modalita' di attuazione e della disciplina dell'erogazione delle risorse finanziarie»;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_19">
+                <citation eId="cits_19__cit_1">
+                    <p>Visto il <ref eId="ref_26" href="/akn/it/act/decreto/ministero.universita.ricerca/2020-10-21/786/!main">decreto del Ministro dell'universita' e della ricerca del 21 ottobre 2020 (n. 786</ref>);</p>
+                </citation>
+            </citations>
+            <p>Dato atto della necessita' di procedere alla individuazione delle modalita' per l'approvazione e per l'aggiornamento del Programma nazionale di ricerche in Antartide (PNRA), all'individuazione dei soggetti incaricati dell'attuazione del PNRA e dei meccanismi di coordinamento tra le amministrazioni pubbliche interessate, al fine di assicurare un piu' efficace funzionamento del PNRA medesimo, anche nel quadro della piu' ampia strategia di programmazione della politica nazionale della ricerca;</p>
+            <p>Acquisiti i concerti del Ministro degli affari esteri e della cooperazione internazionale, del Ministro della transizione ecologica e del Ministro dell'economia e delle finanze;</p>
+            <p>Udito il parere del Consiglio di Stato n. 200/2022, espresso dalla sezione consultiva per gli atti normativi nell'adunanza del 25 gennaio 2022;</p>
+            <citations eId="cits_20">
+                <citation eId="cits_20__cit_1">
+                    <p>Vista la comunicazione al Presidente del Consiglio dei ministri, a norma dell'articolo 17, comma 3, della citata <ref eId="ref_27" href="/akn/it/act/legge/stato/1988/400/!main">legge n. 400 del 1988</ref>, con nota del 20 aprile 2022, prot. 525;</p>
+                </citation>
+            </citations>
+            <formula name="formulaFinalePreambolo">
+                <p>Adotta il seguente regolamento:</p>
+            </formula>
+        </preamble>
+        <body>
+            <article eId="art_1">
+                <num>Art. 1.</num>
+                <heading> Definizioni</heading>
+                <paragraph eId="art_1__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_1__para_1__intro_1">
+                            <p>Ai fini del presente regolamento, si intende: 
+ </p>
+                        </intro>
+                        <point eId="art_1__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>per «Ministro» e «Ministero», rispettivamente, il Ministro dell'universita' e della ricerca, e il Ministero dell'universita' e della ricerca; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_1__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>per «Trattato», il Trattato sull'Antartide firmato a Washington il 1° dicembre 1959, ratificato e reso esecutivo ai sensi della <ref eId="content__ref_28" href="/akn/it/act/legge/stato/1980-11-29/963/!main">legge 29 novembre 1980, n. 963</ref>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_1__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>per «Sistema del Trattato sull'Antartide», il Trattato sull'Antartide, firmato a Washington il 1° dicembre 1959, ratificato e reso esecutivo ai sensi della <ref eId="content__ref_29" href="/akn/it/act/legge/stato/1980-11-29/963/!main">legge 29 novembre 1980, n. 963</ref>; la Convenzione per la conservazione delle foche antartiche, con annesso, fatta a Londra il 1° giugno 1972, ratificata e resa esecutiva ai sensi della <ref eId="content__ref_30" href="/akn/it/act/legge/stato/1991-04-23/149/!main">legge 23 aprile 1991, n. 149</ref>; la Convenzione sulla conservazione delle risorse marine viventi in Antartide, adottata a Canberra il 20 maggio 1980, ratificata e resa esecutiva ai sensi della <ref eId="content__ref_31" href="/akn/it/act/legge/stato/1989-01-02/17/!main">legge 2 gennaio 1989, n. 17</ref> e il Protocollo sulla protezione ambientale al trattato antartico, con annessi ed atto finale, fatto a Madrid il 4 ottobre 1991, ratificato e reso esecutivo ai sensi della <ref eId="content__ref_32" href="/akn/it/act/legge/stato/1995-02-15/54/!main">legge 15 febbraio 1995, n. 54</ref>, nonche' i provvedimenti internazionali adottati in base a tali provvedimenti; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_1__para_1.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>per «PNRA», il Programma nazionale di ricerche in Antartide; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_1__para_1.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>per «CSNA», la Commissione scientifica nazionale per l'Antartide; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_1__para_1.__point_f">
+                            <num>f)</num>
+                            <content>
+                                <p>per «AEA», le Azioni esecutive annuali del PNRA. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_1" placement="bottom">
+                                <p> N O T E 
+ 
+ Avvertenza: 
+ Il testo delle note qui pubblicato e' stato redatto dall'amministrazione competente per materia, ai sensi dell'art. 10, comma 3, del testo unico delle disposizioni sulla promulgazione delle leggi, sull'emanazione dei decreti del Presidente della Repubblica e sulle pubblicazioni ufficiali della Repubblica italiana, approvato con <ref eId="content__ref_33" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1985-12-28/1092/!main">D.P.R. 28 dicembre 1985, n. 1092</ref>, al solo fine di facilitare la lettura delle disposizioni di legge modificate o alle quali e' operato il rinvio. Restano invariati il valore e l'efficacia degli atti legislativi qui trascritti. 
+ Note alle premesse: 
+ - Si riporta il testo dell'<ref eId="content__ref_34" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_117-com6">articolo 117, sesto comma, della Costituzione</ref>: 
+ «La potesta' regolamentare spetta allo Stato nelle materie di legislazione esclusiva, salva delega alle Regioni. La potesta' regolamentare spetta alle Regioni in ogni altra materia. I Comuni, le Province e le Citta' metropolitane hanno potesta' regolamentare in ordine alla disciplina dell'organizzazione e dello svolgimento delle funzioni loro attribuite.» 
+ - Si riporta il <ref eId="content__ref_35" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_17-com3">comma 3 dell'articolo 17 della legge 23 agosto 1988, n. 400</ref> (Disciplina dell'attivita' di Governo e ordinamento della Presidenza del Consiglio dei Ministri), pubblicata nella Gazzetta Ufficiale 12 settembre 1988, n. 214: 
+ «3. Con decreto ministeriale possono essere adottati regolamenti nelle materie di competenza del Ministro o di autorita' sottordinate al Ministro, quando la legge espressamente conferisca tale potere. Tali regolamenti, per materie di competenza di piu' ministri, possono essere adottati con decreti interministeriali, ferma restando la necessita' di apposita autorizzazione da parte della legge.
+ I regolamenti ministeriali ed interministeriali non possono dettare norme contrarie a quelle dei regolamenti emanati dal Governo. Essi debbono essere comunicati al Presidente del Consiglio dei ministri prima della loro emanazione.» 
+ - Si riporta il <ref eId="content__ref_36" href="/akn/it/act/legge/stato/2020-12-30/178/!main#art_1-com552">comma 552 dell'art. 1 della legge 30 dicembre 2020, n. 178</ref> (Bilancio di previsione dello Stato per l'anno finanziario 2021 e bilancio pluriennale per il triennio 2021-2023), pubblicata nella Gazzetta Ufficiale 30 dicembre 2020, n. 322: 
+ «552. Per consentire la prosecuzione del Programma nazionale di ricerche in Antartide (PNRA) e al fine di assicurare la partecipazione dell'Italia al Trattato antartico, firmato a Washington il 1° dicembre 1959, ai sensi di quanto disposto dall'articolo IX, paragrafo 2, del Trattato stesso, il Ministro dell'universita' e della ricerca con proprio decreto, a decorrere dall'anno 2021, assegna annualmente, agli enti pubblici di ricerca incaricati dell'attuazione del PNRA, un contributo di 23 milioni di euro. Con uno o piu' decreti del Ministro dell'universita' e della ricerca, adottati ai sensi dell'<ref eId="content__ref_37" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_17-com3">articolo 17, comma 3, della legge 23 agosto 1988, n. 400</ref>, di concerto con il Ministro degli affari esteri e della cooperazione internazionale, con il Ministro dello sviluppo economico e con il Ministro dell'economia e delle finanze, sono individuati le modalita' per l'approvazione e per l'aggiornamento del PNRA, i soggetti incaricati dell'attuazione del medesimo PNRA e i meccanismi di coordinamento tra le amministrazioni pubbliche interessate.
+ Il <ref eId="content__ref_38" href="/akn/it/act/legge/stato/1997-08-07/266/!main#art_5-com3">comma 3 dell'articolo 5 della legge 7 agosto 1997, n. 266</ref>, e' abrogato. Al secondo periodo del <ref eId="content__ref_39" href="/akn/it/act/decretoLegislativo/stato/1998-06-05/204/!main#art_7-com1">comma 1 dell'articolo 7 del decreto legislativo 5 giugno 1998, n. 204</ref>, le parole: « del Programma nazionale di ricerche in Antartide,» sono soppresse. Agli oneri derivanti dall'attuazione del presente comma, pari a 23 milioni di euro annui a decorrere dall'anno 2021, si provvede mediante corrispondente riduzione delle risorse del Fondo di cui al citato <ref eId="content__ref_40" href="/akn/it/act/decretoLegislativo/stato/1998/204/!main#art_7">articolo 7 del decreto legislativo n. 204 del 1998</ref>.» 
+ - La <ref eId="content__ref_41" href="/akn/it/act/legge/stato/1980-11-29/963/!main">legge 29 novembre 1980, n. 963</ref>, «Adesione al trattato sull'Antartide, firmato a Washington il 1 dicembre 1959, e sua esecuzione.», e' pubblicata nella Gazzetta Ufficiale 19 gennaio 1981, n. 17. 
+ - La <ref eId="content__ref_42" href="/akn/it/act/legge/stato/1985-06-10/284/!main">legge 10 giugno 1985, n. 284</ref>, «Programma nazionale di ricerche in Antartide.», e' pubblicata nella Gazzetta Ufficiale 21 giugno 1985, n. 145. 
+ - La <ref eId="content__ref_43" href="/akn/it/act/legge/stato/1995-02-15/54/!main">legge 15 febbraio 1995, n. 54</ref>, «Ratifica ed esecuzione del protocollo sulla protezione ambientale al trattato antartico, con annessi ed atto finale, fatto a Madrid il 4 ottobre 1991.», e' pubblicata nella Gazzetta Ufficiale 27 febbraio 1995, n. 48. 
+ - <ref eId="content__ref_44" href="/akn/it/act/legge/stato/1991-11-27/380/!main">Legge 27 novembre 1991, n. 380</ref>, «Norme sui programmi nazionali di ricerca scientifica e tecnologica in Antartide.», e' pubblicata nella Gazzetta Ufficiale 2 dicembre 1991, n. 282. 
+ - La <ref eId="content__ref_45" href="/akn/it/act/legge/stato/1997-08-07/266/!main">legge 7 agosto 1997, n. 266</ref>, «Interventi urgenti per l'economia.», e' pubblicata nella Gazzetta Ufficiale 11 agosto 1997, n. 186. 
+ - Si riporta il testo dell'<ref eId="content__ref_46" href="/akn/it/act/decretoLegislativo/stato/1998-06-05/204/!main#art_7">articolo 7 del decreto legislativo 5 giugno 1998, n. 204</ref> (Disposizioni per il coordinamento, la programmazione e la valutazione della politica nazionale relativa alla ricerca scientifica e tecnologica, a norma dell'<ref eId="content__ref_47" href="/akn/it/act/legge/stato/1997-03-15/59/!main#art_11-com1-letd">articolo 11, comma 1, lettera d), della L. 15 marzo 1997, n. 59</ref>), pubblicato nella Gazzetta Ufficiale 1° luglio 1998, n. 151: 
+ «Art. 7. - 1. A partire dal 1° gennaio 1999 gli stanziamenti da destinare al Consiglio nazionale delle ricerche (CNR), di cui all'<ref eId="content__ref_48" href="/akn/it/act/legge/stato/1977-12-22/951/!main#art_11">articolo 11 della legge 22 dicembre 1977, n. 951</ref>, all'Osservatorio geofisico sperimentale (OGS), di cui all'<ref eId="content__ref_49" href="/akn/it/act/legge/stato/1989-11-30/399/!main#art_16-com2">articolo 16, comma 2, della legge 30 novembre 1989, n. 399</ref>; agli enti finanziati dal MURST ai sensi dell'<ref eId="content__ref_50" href="/akn/it/act/legge/stato/1995-12-28/549/!main#art_1-com43">articolo 1, comma 43, della legge 28 dicembre 1995, n. 549</ref>, gia' concessi ai sensi dell'<ref eId="content__ref_51" href="/akn/it/act/legge/stato/1978-08-05/468/!main#art_11-com3-letd">articolo 11, terzo comma, lettera d), della legge 5 agosto 1978, n. 468</ref> e successive modificazioni, sono determinati con unica autorizzazione di spesa ed affluiscono ad apposito fondo ordinario per gli enti e le istituzioni di ricerca finanziati dal MURST, istituito nello stato di previsione del medesimo Ministero. Al medesimo fondo affluiscono, a partire dal 1° gennaio 1999, i contributi all'Istituto nazionale per la fisica della materia (INFM), di cui all'<ref eId="content__ref_52" href="/akn/it/act/decretoLegislativo/stato/1994-06-30/506/!main#art_11-com1">articolo 11, comma 1, del decreto legislativo 30 giugno 1994, n. 506</ref>, nonche' altri contributi e risorse finanziarie che saranno stabilite per legge in relazione alle attivita' dell'Istituto nazionale di fisica nucleare (INFN), dell'INFM e relativi laboratori di Trieste e di Grenoble, dell'Istituto nazionale per la ricerca scientifica e tecnologica sulla montagna. Il fondo e' determinato ai sensi dell'<ref eId="content__ref_53" href="/akn/it/act/legge/stato/1978-08-05/468/!main#art_11-com3-letd">articolo 11, terzo comma, lettera d), della legge 5 agosto 1978, n. 468</ref>, e successive modificazioni e integrazioni. Il Ministro del tesoro, del bilancio e della programmazione economica, e' autorizzato ad apportare, con propri decreti, le occorrenti variazioni di bilancio. 
+ 2. Il Fondo di cui al comma 1 e' ripartito annualmente tra gli enti e le istituzioni finanziati dal MURST con decreti del Ministro dell'universita' e della ricerca scientifica e tecnologica, comprensivi di indicazioni per i due anni successivi, emanati previo parere delle commissioni parlamentari competenti per materia, da esprimersi entro il termine perentorio di trenta giorni dalla richiesta. Nelle more del perfezionamento dei predetti decreti e al fine di assicurare l'ordinata prosecuzione delle attivita', il MURST e' autorizzato ad erogare acconti agli enti sulla base delle previsioni contenute negli schemi dei medesimi decreti, nonche' dei contributi assegnati come competenza nel precedente anno. 
+ 3. A decorrere dalla data di entrata in vigore del presente decreto legislativo il Consiglio nazionale della scienza e tecnologia (CNST), di cui all'<ref eId="content__ref_54" href="/akn/it/act/legge/stato/1989-05-09/168/!main#art_11">articolo 11 della legge 9 maggio 1989, n. 168</ref>, e' soppresso. Sono fatti salvi le deliberazioni e gli atti adottati dal predetto organo fino alla data di entrata in vigore del presente decreto. 
+ 4. Alla <ref eId="content__ref_55" href="/akn/it/act/legge/stato/1989-05-09/168/!main">legge 9 maggio 1989, n. 168</ref>, sono apportate le seguenti modificazioni ed integrazioni: 
+ a) ...; 
+ b) nella lettera c) del comma 1 dell'articolo 2, le parole «sentito il CNST» sono soppresse; 
+ c) ...; 
+ d) nelle lettere e) ed f) del comma 1 dell'articolo 2 le parole «sentito il CNST» sono soppresse; 
+ e) ...; 
+ f) il comma 3 dell'articolo 2 e' soppresso; 
+ g) i commi 1 e 2 dell'articolo 3 sono soppressi e nel comma 3 dell'articolo 3 le parole «sentito il CNST» sono soppresse; 
+ h) nel comma 2 dell'articolo 8 le parole da «il quale» fino a «richiesta» sono soppresse; 
+ i) l'articolo 11 e' soppresso. 
+ 5. Nel comma 9, secondo periodo, dell'<ref eId="content__ref_56" href="/akn/it/act/legge/stato/1997-12-27/449/!main#art_51">articolo 51 della legge 27 dicembre 1997, n. 449</ref>, le parole da «previo parere» fino a «n. 59» sono soppresse. 
+ 6. E' abrogata ogni altra vigente disposizione che determina competenze del CNST. 
+ 7. E' abrogato l'<ref eId="content__ref_57" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1980-07-11/382/!main#art_64">articolo 64 del decreto del Presidente della Repubblica 11 luglio 1980, n. 382</ref>, a partire dalla data di entrata in vigore del decreto di cui alla <ref eId="content__ref_58" href="/akn/it/act/legge/stato/1989-05-09/168/!main#art_2-com1-letg">lettera g) del comma 1 dell'articolo 2 della legge 9 maggio 1989, n. 168</ref>, come modificata dalla lettera e) del comma 4. 
+ 8. Fino alla data di insediamento dei CSN e dell'AST, l'articolo 4, comma 3, lettera a), non si applica nella parte in cui sono previste loro osservazioni e proposte preliminarmente all'approvazione del PNR. In sede di prima applicazione del presente decreto, in assenza di approvazione del PNR, il Fondo speciale puo' essere ripartito, con delibera del CIPE, finanziare interventi di ricerca di particolare rilevanza strategica. 
+ 9. I comitati nazionali di consulenza, il consiglio di presidenza e la giunta amministrativa del CNR sono prorogati fino alla data di entrata in vigore del decreto legislativo di riordino del CNR stesso, da emanarsi ai sensi degli articoli 11, comma 1, lettera d), 14 e 18 della <ref eId="content__ref_59" href="/akn/it/act/legge/stato/1997-03-15/59/!main">legge 15 marzo 1997, n. 59</ref>, e comunque non oltre il 31 dicembre 1998. 
+ 10. L'Istituto nazionale per la ricerca scientifica e tecnologica sulla montagna, di cui all'<ref eId="content__ref_60" href="/akn/it/act/legge/stato/1997-08-07/266/!main#art_5-com4">articolo 5, comma 4, della legge 7 agosto 1997, n. 266</ref>, e' inserito tra gli enti di ricerca a carattere non strumentale ed e' disciplinato dalle disposizioni di cui all'<ref eId="content__ref_61" href="/akn/it/act/legge/stato/1989-05-09/168/!main#art_8">articolo 8 della legge 9 maggio 1989, n. 168</ref>, e successive modificazioni e integrazioni, alle quali si uniforma il decreto del Ministro dell'universita' e della ricerca scientifica e tecnologica previsto dal predetto <ref eId="content__ref_62" href="/akn/it/act/legge/stato/1997/266/!main#art_5-com4">articolo 5, comma 4, della legge n. 266 del 1997</ref>.» 
+ - Si riporta il testo dell'<ref eId="content__ref_63" href="/akn/it/act/decretoLegislativo/stato/1999-07-30/300/!main#art_35">articolo 35 del decreto legislativo 30 luglio 1999, n. 300</ref> (Riforma dell'organizzazione del Governo, a norma dell'<ref eId="content__ref_64" href="/akn/it/act/legge/stato/1997-03-15/59/!main#art_11">articolo 11 della legge 15 marzo 1997, n. 59</ref>), pubblicato nella Gazzetta Ufficiale 30 agosto 1999, n. 203: 
+ «Art. 35. - 1. E' istituito il ministero della transizione ecologica. 
+ 2. Al Ministero della transizione ecologica sono attribuite le funzioni e i compiti spettanti allo Stato relativi allo sviluppo sostenibile, ferme restando le funzioni della Presidenza del Consiglio dei ministri, e alla tutela dell'ambiente, del territorio e dell'ecosistema, nelle seguenti materie: 
+ a) individuazione, conservazione e valorizzazione delle aree naturali protette, tutela della biodiversita' e della biosicurezza, della fauna e della flora, attuazione e gestione, fatte salve le competenze della Presidenza del Consiglio dei ministri, del Ministero delle politiche agricole alimentari e forestali e del Ministero degli affari esteri e della cooperazione internazionale, della Convenzione di Washington sul commercio internazionale delle specie animali e vegetali in via di estinzione, ratificata ai sensi della <ref eId="content__ref_65" href="/akn/it/act/legge/stato/1975-12-19/874/!main">legge 19 dicembre 1975, n. 874</ref>, e dei relativi regolamenti europei, della difesa del mare e dell'ambiente costiero e della comunicazione ambientale; 
+ b) definizione degli obiettivi e delle linee di politica energetica e mineraria nazionale e provvedimenti ad essi inerenti; autorizzazione di impianti di produzione di energia di competenza statale, compresi quelli da fonti rinnovabili, anche se ubicati in mare; rapporti con organizzazioni internazionali e rapporti con l'Unione europea nel settore dell'energia, ferme restando le competenze del Presidente del Consiglio dei ministri e del Ministero degli affari esteri e della cooperazione internazionale, compresi il recepimento e l'attuazione dei programmi e delle direttive sul mercato unico europeo in materia di energia, ferme restando le competenze del Presidente del Consiglio dei ministri e delle regioni e delle province autonome di Trento e di Bolzano; attuazione dei processi di liberalizzazione dei mercati energetici e promozione della concorrenza nei mercati dell'energia e tutela dell'economicita' e della sicurezza del sistema con garanzia di resilienza; individuazione e sviluppo delle reti nazionali di trasporto dell'energia elettrica e del gas naturale e definizione degli indirizzi per la loro gestione; politiche di ricerca, incentivazione e interventi nei settori dell'energia e delle miniere; ricerca e coltivazione di idrocarburi, riconversione, dismissione e chiusura mineraria delle infrastrutture di coltivazione di idrocarburi ubicate nella terraferma e in mare e ripristino in sicurezza dei siti; risorse geotermiche; normativa tecnica, area chimica, sicurezza mineraria, escluse le competenze in materia di servizio ispettivo per la sicurezza mineraria e di vigilanza sull'applicazione della legislazione attinente alla salute sui luoghi di lavoro, e servizi tecnici per l'energia; vigilanza su enti strumentali e collegamento con le societa' e gli istituti operanti nei settori dell'energia; gestione delle scorte energetiche nonche' predisposizione ed attuazione dei piani di emergenza energetica; sicurezza nucleare e disciplina dei sistemi di stoccaggio del combustibile irraggiato e dei rifiuti radioattivi; radioprotezione e radioattivita' ambientale; agro-energie; rilevazione, elaborazione, analisi e diffusione di dati statistici in materia energetica e mineraria, finalizzati alla programmazione energetica e mineraria; 
+ c) piani e misure in materia di combustibili alternativi e delle relative reti e strutture di distribuzione per la ricarica dei veicoli elettrici, qualita' dell'aria, politiche per il contrasto dei cambiamenti climatici e per la finanza climatica e sostenibile e il risparmio ambientale anche attraverso tecnologie per la riduzione delle emissioni dei gas ad effetto serra; 
+ d) pianificazione in materia di emissioni nei diversi settori dell'attivita' economica, ivi compreso quello dei trasporti; 
+ e) gestione, riuso e riciclo dei rifiuti ed economia circolare; 
+ f) tutela delle risorse idriche e relativa gestione, fatta salva la competenza del Ministero delle politiche agricole alimentari e forestali; 
+ g) promozione di politiche di sviluppo sostenibile, nazionali e internazionali; 
+ h) promozione di politiche per l'economia circolare e l'uso efficiente delle risorse, fatte salve le competenze del Ministero dello sviluppo economico; 
+ i) coordinamento delle misure di contrasto e contenimento del danno ambientale, nonche' di bonifica e di ripristino in sicurezza dei siti inquinati, ivi compresi i siti per i quali non e' individuato il responsabile della contaminazione e quelli per i quali i soggetti interessati non provvedono alla realizzazione degli interventi, nonche' esercizio delle relative azioni giurisdizionali; 
+ l) sorveglianza, monitoraggio e recupero delle condizioni ambientali conformi agli interessi fondamentali della collettivita' e alla riduzione dell'impatto delle attivita' umane sull'ambiente, con particolare riferimento alla prevenzione e repressione delle violazioni compiute in danno dell'ambiente; prevenzione e protezione dall'inquinamento atmosferico, acustico ed elettromagnetico e dai rischi industriali; 
+ m) difesa e assetto del territorio con riferimento ai valori naturali e ambientali. 
+ 3. Al ministero sono trasferite, con le inerenti risorse, le funzioni e i compiti dei ministeri dell'ambiente e dei lavori pubblici, eccettuate quelle attribuite, anche dal presente decreto, ad altri ministeri o agenzie e fatte in ogni caso salve le funzioni conferite alle regioni e agli enti locali.» 
+ - Si riporta il testo dell'<ref eId="content__ref_66" href="/akn/it/act/decretoLegislativo/stato/1999-07-30/303/!main#art_7-com1">articolo 7, commi 1</ref>, <ref eId="content__ref_67" href="/akn/it/act/decretoLegislativo/stato/1999-07-30/303/!main#art_7-com2">2</ref> e <ref eId="content__ref_68" href="/akn/it/act/decretoLegislativo/stato/1999-07-30/303/!main#art_7-com3">3 del decreto legislativo 30 luglio 1999, n. 303</ref> (Ordinamento della Presidenza del Consiglio dei Ministri, a norma dell'<ref eId="content__ref_69" href="/akn/it/act/legge/stato/1997-03-15/59/!main#art_11">articolo 11 della L. 15 marzo 1997, n. 59</ref>), pubblicato nella Gazzetta Ufficiale 1° settembre 1999, n. 205: 
+ «Art. 7. - 1. Per lo svolgimento delle funzioni istituzionali di cui all'articolo 2, e per i compiti di organizzazione e gestione delle occorrenti risorse umane e strumentali, il Presidente individua con propri decreti le aree funzionali omogenee da affidare alle strutture in cui si articola il Segretariato generale. 
+ 2. Con propri decreti, il Presidente determina le strutture della cui attivita' si avvalgono i Ministri o Sottosegretari da lui delegati. 
+ 3. I decreti di cui ai commi 1 e 2 indicano il numero massimo degli uffici in cui si articola ogni Dipartimento e dei servizi in cui si articola ciascun ufficio. Alla organizzazione interna delle strutture medesime provvedono, nell'ambito delle rispettive competenze, il Segretario generale ovvero il Ministro o Sottosegretario delegato.» 
+ - Si riporta il testo dell'<ref eId="content__ref_70" href="/akn/it/act/legge/stato/2003-01-16/3/!main#art_11">articolo 11 della legge 16 gennaio 2003, n. 3</ref> (Disposizioni ordinamentali in materia di pubblica amministrazione), pubblicata nella Gazzetta Ufficiale 20 gennaio 2003, n. 15: 
+ «Art. 11. - 1. A decorrere dal 1° gennaio 2003, per le finalita' di cui all'<ref eId="content__ref_71" href="/akn/it/act/legge/stato/1999-05-17/144/!main#art_1-com5">articolo 1, commi 5</ref> e <ref eId="content__ref_72" href="/akn/it/act/legge/stato/1999-05-17/144/!main#art_1-com6">6, della legge 17 maggio 1999, n. 144</ref>, e in particolare per la funzionalita' della rete di monitoraggio degli investimenti pubblici, ogni nuovo progetto di investimento pubblico, nonche' ogni progetto in corso di attuazione alla predetta data, e' dotato di un «Codice unico di progetto», che le competenti amministrazioni o i soggetti aggiudicatori richiedono in via telematica secondo la procedura definita dal CIPE. 
+ 2. Entro il 30 settembre 2002, il CIPE, acquisito il parere della Conferenza unificata di cui al <ref eId="content__ref_73" href="/akn/it/act/decretoLegislativo/stato/1997-08-28/281/!main">decreto legislativo 28 agosto 1997, n. 281</ref>, disciplina le modalita' e le procedure necessarie per l'attuazione del comma 1. 
+ 2-bis. Gli atti amministrativi anche di natura regolamentare adottati dalle Amministrazioni di cui all'<ref eId="content__ref_74" href="/akn/it/act/decretoLegislativo/stato/2001-03-30/165/!main#art_1-com2">articolo 1, comma 2, del decreto legislativo 30 marzo 2001, n. 165</ref>, che dispongono il finanziamento pubblico o autorizzano l'esecuzione di progetti di investimento pubblico, sono nulli in assenza dei corrispondenti codici di cui al comma 1 che costituiscono elemento essenziale dell'atto stesso. 
+ 2-ter. Le Amministrazioni che emanano atti amministrativi che dispongono il finanziamento pubblico o autorizzano l'esecuzione di progetti di investimento pubblico associano negli atti stessi il Codice unico di progetto dei progetti autorizzati al programma di spesa con l'indicazione dei finanziamenti concessi a valere su dette misure, della data di efficacia di detti finanziamenti e del valore complessivo dei singoli investimenti. A tal fine il Dipartimento per la programmazione e il coordinamento della politica economica, il Dipartimento della Ragioneria Generale dello Stato e il Dipartimento per le Politiche di Coesione concordano modalita' per fornire il necessario supporto tecnico per lo svolgimento dell'attivita' di cui al periodo precedente al fine di garantire la corretta programmazione e il monitoraggio della spesa di ciascun programma e dei relativi progetti finanziati. 
+ 2-quater. I soggetti titolari di progetti d'investimento pubblico danno notizia, con periodicita' annuale, in apposita sezione dei propri siti web istituzionali, dell'elenco dei progetti finanziati, indicandone il CUP, l'importo totale del finanziamento, le fonti finanziarie, la data di avvio del progetto e lo stato di attuazione finanziario e procedurale. 
+ 2-quinquies. Entro il 30 giugno di ogni anno, l'Autorita' politica delegata agli investimenti pubblici ove nominata, con il supporto del Dipartimento per la programmazione e il coordinamento della politica economica, presenta al Comitato Interministeriale per la Programmazione Economica un'informativa sullo stato di attuazione della programmazione degli investimenti pubblici, in base agli esiti dell'applicazione del presente articolo. Entro il medesimo termine, il Ministro per il Sud e la Coesione Territoriale, con il supporto del Dipartimento per le Politiche di Coesione, presenta al Comitato Interministeriale per la Programmazione Economica un'informativa sullo stato di attuazione della programmazione degli investimenti pubblici finanziati con le risorse nazionali e comunitarie per lo sviluppo e la coesione. A tal fine il Dipartimento della Ragioneria dello Stato mette a disposizione del Dipartimento per la programmazione e il coordinamento della politica economica e del Dipartimento per le Politiche di Coesione, in cooperazione applicativa, i corrispondenti dati rilevati dalle Amministrazioni pubbliche nella banca dati delle Amministrazioni pubbliche di cui alla <ref eId="content__ref_75" href="/akn/it/act/legge/stato/2009-12-31/196/!main">legge 31 dicembre 2009, n. 196</ref>, con le riconciliazioni, ove presenti, con i dati di pagamento del Sistema SIOPE PLUS, di cui all'<ref eId="content__ref_76" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_14">articolo 14 della legge 31 dicembre 2009, n. 196</ref>, e dal sistema della fatturazione elettronica, di cui alla <ref eId="content__ref_77" href="/akn/it/act/legge/stato/2007-12-24/244/!main">legge 24 dicembre 2007, n. 244</ref>. 
+ 2-sexies. All'attuazione del presente articolo le Amministrazioni provvedono nei limiti delle risorse umane finanziarie e strumentali disponibili allo scopo a legislazione vigente.» 
+ - Si riporta il <ref eId="content__ref_78" href="/akn/it/act/decretoLegislativo/stato/2009-12-31/213/!main#art_9-com2">comma 2 dell'articolo 9 del decreto legislativo 31 dicembre 2009, n. 213</ref> (Riordino degli enti di ricerca in attuazione dell'<ref eId="content__ref_79" href="/akn/it/act/legge/stato/2007-09-27/165/!main#art_1">articolo 1 della legge 27 settembre 2007, n. 165</ref>), pubblicato nella Gazzetta Ufficiale 1° febbraio 2010, n. 25: 
+ «2. Al fine di sostenere la competitivita' anche a livello internazionale delle competenze di ricerca, lo statuto del CNR assegna ai dipartimenti interni anche un ruolo centrale di riferimento e valorizzazione delle comunita' tematiche e disciplinari in ambito nazionale, nonche' nell'affidamento agli istituti dei programmi e progetti di ricerca ed assegnazione delle relative risorse, ferme restando le specifiche competenze e responsabilita' del consiglio di amministrazione. Il predetto statuto del CNR puo' altresi' prevedere una struttura organizzativa di programmazione e coordinamento delle attivita' polari.» 
+ - Il <ref eId="content__ref_80" href="/akn/it/act/decretoLegislativo/stato/2011-12-29/229/!main">decreto legislativo 29 dicembre 2011, n. 229</ref> (Attuazione dell'<ref eId="content__ref_81" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_30-com9-lete">articolo 30, comma 9, lettere e)</ref>, <ref eId="content__ref_82" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_30-com9-letf">f)</ref> e <ref eId="content__ref_83" href="/akn/it/act/legge/stato/2009-12-31/196/!main#art_30-com9-letg">g), della legge 31 dicembre 2009, n. 196</ref>, in materia di procedure di monitoraggio sullo stato di attuazione delle opere pubbliche, di verifica dell'utilizzo dei finanziamenti nei tempi previsti e costituzione del Fondo opere e del Fondo progetti), e' pubblicato nella Gazzetta Ufficiale 6 febbraio 2012, n. 30. 
+ - Il <ref eId="content__ref_84" href="/akn/it/act/decretoLegislativo/stato/2016-11-25/218/!main">decreto legislativo 25 novembre 2016, n. 218</ref> (Semplificazione delle attivita' degli enti pubblici di ricerca ai sensi dell'<ref eId="content__ref_85" href="/akn/it/act/legge/stato/2015-08-07/124/!main#art_13">articolo 13 della legge 7 agosto 2015, n. 124</ref>), e' pubblicato nella Gazzetta Ufficiale 25 novembre 2016, n. 276. 
+ - Si riporta il <ref eId="content__ref_86" href="/akn/it/act/decretoLegge/stato/2021-03-01/22/!main#art_2-com4">comma 4 dell'articolo 2 del decreto-legge 1° marzo 2021, n. 22</ref> (Disposizioni urgenti in materia di riordino delle attribuzioni dei Ministeri), pubblicato nella Gazzetta Ufficiale 1° marzo 2021, n. 51, convertito in legge, con modificazioni, dalla <ref eId="content__ref_87" href="/akn/it/act/legge/stato/2021-04-22/55/!main">legge 22 aprile 2021, n. 55</ref>, pubblicata nella Gazzetta Ufficiale 29 aprile 2021, n. 102: 
+ «4. Con riguardo alle funzioni di cui all'<ref eId="content__ref_88" href="/akn/it/act/decretoLegislativo/stato/1999/300/!main#art_35-com2-letb">articolo 35, comma 2, lettera b), del decreto legislativo n. 300 del 1999</ref>, come modificato dal presente decreto, le denominazioni "Ministro della transizione ecologica" e "Ministero della transizione ecologica" sostituiscono, ad ogni effetto e ovunque presenti, rispettivamente, le denominazioni "Ministro dello sviluppo economico" e "Ministero dello sviluppo economico"». 
+ - Si riporta il testo dell'articolo 24-ter del decreto del Presidente del Consiglio dei ministri 1° ottobre 2012 (Ordinamento delle strutture generali della Presidenza del Consiglio dei Ministri), pubblicato nella Gazzetta Ufficiale 11 dicembre 2012, n. 288: 
+ «Art. 24-ter. - 1. Il Dipartimento per la trasformazione digitale e' la struttura di supporto al Presidente per la promozione ed il coordinamento delle azioni del Governo finalizzate alla definizione di una strategia unitaria in materia di trasformazione digitale e di modernizzazione del Paese attraverso le tecnologie digitali. Esso da' attuazione alle direttive del Presidente in materia e assicura il coordinamento e l'esecuzione dei programmi di trasformazione digitale. 
+ 2. Per le finalita' di cui al comma 1, il Dipartimento fornisce supporto al Presidente per l'esercizio delle funzioni di cui all'<ref eId="content__ref_89" href="/akn/it/act/decretoLegge/stato/2018-12-14/135/!main#art_8-com1ter">art. 8, commi 1-ter</ref> e <ref eId="content__ref_90" href="/akn/it/act/decretoLegge/stato/2018-12-14/135/!main#art_8-com3">3, del decreto-legge 14 dicembre 2018, n. 135</ref>, per l'esercizio della vigilanza sulla societa' di cui <ref eId="content__ref_91" href="/akn/it/act/decretoLegge/stato/2018-12-14/135/!main#art_8-com2">art. 8, comma 2, del decreto-legge 14 dicembre 2018, n. 135</ref>, e nella partecipazione alle sedi istituzionali internazionali nelle quali si discute di innovazione tecnologica ed agenda digitale europea. 
+ 3. Il Dipartimento si articola in non piu' di due uffici e in non piu' di tre servizi. Il Dipartimento si avvale del contingente di esperti di cui all'<ref eId="content__ref_92" href="/akn/it/act/decretoLegge/stato/2018-12-14/135/!main#art_8-com1quater">art. 8, comma 1-quater, del decreto-legge 14 dicembre 2018, n. 135</ref>.» 
+ - Il decreto del Ministro dell'istruzione, dell'universita' e della ricerca 30 settembre 2010 (Rideterminazione dei soggetti incaricati dell'attuazione, delle strutture operative, dei compiti e degli organismi consultivi e di coordinamento, delle procedure del programma di ricerche in Antartide nonche' delle modalita' di attuazione e della disciplina dell'erogazione delle risorse finanziarie), e' pubblicato nella Gazzetta Ufficiale 3 febbraio 2011, n. 27. 
+ - Il <ref eId="content__ref_93" href="/akn/it/act/decreto/ministero.universita.ricerca/2020-10-21/786/!main">decreto del Ministro dell'universita' e della ricerca 21 ottobre 2020, (n. 786</ref>), reca: «Nomina della Commissione Scientifica Nazionale per l'Antartide CSNA». 
+ 
+ Note all'art. 1: 
+ - Per i riferimenti della <ref eId="content__ref_94" href="/akn/it/act/legge/stato/1980-11-29/963/!main">legge 29 novembre 1980, n. 963</ref> si veda nelle note alle premesse. 
+ - La <ref eId="content__ref_95" href="/akn/it/act/legge/stato/1991-04-23/149/!main">legge 23 aprile 1991, n. 149</ref> (Adesione della Repubblica italiana alla convenzione per la conservazione delle foche antartiche, con annesso, fatta a Londra il 1° giugno 1972, e sua esecuzione), e' pubblicata nella Gazzetta Ufficiale 10 maggio 1991, n. 108, Supplemento ordinario n. 32; 
+ - La <ref eId="content__ref_96" href="/akn/it/act/legge/stato/1989-01-02/17/!main">legge 2 gennaio 1989, n. 17</ref> (Adesione dell'Italia alla convenzione sulla conservazione delle risorse marine viventi in Antartide, adottata a Canberra il 20 maggio 1980, e sua esecuzione), e' pubblicata nella Gazzetta Ufficiale 28 gennaio 1989, n. 23, Supplemento ordinario n. 6. 
+ - La <ref eId="content__ref_97" href="/akn/it/act/legge/stato/1995-02-15/54/!main">legge 15 febbraio 1995, n. 54</ref> (Ratifica ed esecuzione del protocollo sulla protezione ambientale al trattato antartico, con annessi ed atto finale, fatto a Madrid il 4 ottobre 199)», e' pubblicata nella Gazzetta Ufficiale 27 febbraio 1995, n. 48, Supplemento ordinario n. 27. 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_2">
+                <num>Art. 2.</num>
+                <heading> Programma nazionale di ricerche in Antartide</heading>
+                <paragraph eId="art_2__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Al fine di assicurare la partecipazione dell'Italia alle attivita' regolate dal Sistema del Trattato sull'Antartide e in particolare da quanto disposto dall'articolo IX, paragrafo 2, del Trattato, e la prosecuzione del PNRA, con decreto del Ministro, in coerenza anche con il Programma nazionale delle ricerche, e' approvato il PNRA elaborato dalla CSNA di cui all'articolo 5. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il PNRA individua gli obiettivi e gli indirizzi strategici nonche' le AEA, e propone e motiva il relativo fabbisogno di risorse finanziarie e umane per ciascun anno di riferimento. Il PNRA e' articolato su base triennale e puo' essere aggiornato annualmente con decreto del Ministro, su proposta della CSNA ai sensi dell'articolo 5, comma 8, lettera b). 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Le AEA, indicate in apposita sezione del PNRA, individuano e specificano le attivita' di ricerca scientifica e tecnologica da svolgere in Antartide e in Italia, i supporti tecnico-logistici disponibili e necessari per l'attuazione del PNRA, le risorse umane e finanziarie occorrenti, con la puntuale indicazione delle spese, dei tempi e dei modi attuativi indicati in appositi cronogrammi delle attivita'. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_4">
+                    <num>4.</num>
+                    <list>
+                        <intro eId="art_2__para_4__intro_1">
+                            <p>Il Ministero finanzia le attivita' di ricerca scientifica e tecnologica di cui al comma 3 attraverso l'emanazione di bandi pubblici per progetti di ricerca rivolti alle universita' e agli enti di ricerca pubblici e privati nazionali. Fatti salvi ulteriori specifici criteri individuati dai singoli bandi, i progetti di ricerca di cui al presente comma sono valutati e selezionati sulla base dei seguenti criteri: 
+ </p>
+                        </intro>
+                        <point eId="art_2__para_4.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>adeguatezza scientifica, culturale e tecnica del progetto di ricerca; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_4.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>risorse umane e strumentali impiegate per la realizzazione dei progetti di ricerca; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_4.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>coerenza del progetto di ricerca con gli obiettivi degli interventi e dei programmi. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+            </article>
+            <article eId="art_3">
+                <num>Art. 3.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ 
+ Attivita' non comprese nel PNRA 
+ 
+ </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il Ministero puo' promuovere, sentito il parere della CSNA, in accordo con i soggetti attuatori, il supporto di specifiche attivita' in coerenza con gli obiettivi strategici del PNRA. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Le spedizioni o attivita' intraprese verso l'Antartide o all'interno di essa, non comprese nel PNRA, sono autorizzate dal Ministero degli affari esteri e della cooperazione internazionale, di concerto con il Ministero, previo accertamento dell'osservanza dei principi stabiliti dal Trattato, delle finalita' scientifiche dell'iniziativa, dell'esistenza di una idonea organizzazione logistica e di assistenza. L'autorizzazione di cui al presente comma indica le prescrizioni necessarie per l'esercizio della vigilanza sulle attivita' autorizzate. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_4">
+                <num>Art. 4.</num>
+                <heading> Finanziamento e controllo</heading>
+                <paragraph eId="art_4__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il Ministro, in sede di approvazione del PNRA, individua le quote di finanziamento annuali e triennali nei limiti degli stanziamenti disposti. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Con decreto del Ministero e' ripartito lo stanziamento annuale per il PNRA di cui all'articolo 9 tra i soggetti attuatori di cui all'articolo 6, sulla base delle quote previste dal PNRA approvato e delle AEA. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>L'atto amministrativo di attribuzione delle risorse reca, ove previsto per l'intervento oggetto di finanziamento, l'indicazione del codice unico di progetto, ai sensi della <ref eId="content__ref_98" href="/akn/it/act/legge/stato/2003-01-16/3/!main#art_11">legge 16 gennaio 2003, n. 3, articolo 11</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Con il decreto di cui all'articolo 2, comma 1, sono definite le modalita' di gestione, rendicontazione, monitoraggio, erogazione e controllo delle risorse per il funzionamento del PNRA. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Il Ministero puo' richiedere a ciascuno dei soggetti attuatori atti, informazioni e dati necessari ai fini della rendicontazione, del monitoraggio, del controllo e dell'utilizzo delle risorse erogate, fermo restando quanto previsto dall'articolo 7, comma 2, lettera d). 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_6">
+                    <num>6.</num>
+                    <list>
+                        <intro eId="art_4__para_6__intro_1">
+                            <p>Il Ministro: 
+ </p>
+                        </intro>
+                        <point eId="art_4__para_6.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>vigila sull'attuazione del PNRA nel rispetto delle norme previste dal Trattato; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_6.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>determina, di concerto con il Ministro dell'economia e delle finanze e il Ministro degli affari esteri e della cooperazione internazionale, il trattamento di missione spettante al personale impegnato in Antartide; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_6.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>emana direttive e disposizioni per l'attuazione e il controllo del PNRA. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_2" placement="bottom">
+                                <p> Note all'art. 4: 
+ - Per i riferimenti della <ref eId="content__ref_99" href="/akn/it/act/legge/stato/2003-01-16/3/!main">legge 16 gennaio 2003, n. 3</ref> si veda nelle note alle premesse. 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_5">
+                <num>Art. 5.</num>
+                <heading> Commissione scientifica nazionale per l'Antartide</heading>
+                <paragraph eId="art_5__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il Ministro, per la definizione e l'attuazione del PNRA, si avvale della Commissione scientifica nazionale per l'Antartide (CSNA). 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Con decreto del Ministro e' istituita, presso il Ministero, la CSNA. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>La CSNA e' composta da tredici componenti in possesso di comprovata esperienza maturata nelle aree scientifiche del PNRA, con competenza delle zone polari. I componenti di cui al presente comma sono nominati con decreto del Ministro e designati in numero di tre, compreso il presidente della CSNA, dal Ministro medesimo, e in numero di dieci, rispettivamente, dal Ministro della transizione ecologica, dal Ministro delegato per l'innovazione tecnologica e la transizione digitale, dal Ministro della difesa, dal Ministro degli affari esteri e della cooperazione internazionale, dalla Conferenza dei rettori delle universita' italiane (CRUI), dal Consiglio nazionale delle ricerche (CNR), dall'Agenzia nazionale per le nuove tecnologie, l'energia e lo sviluppo economico sostenibile (ENEA), dall'Istituto nazionale di geofisica e vulcanologia (INGV), dall'Istituto nazionale di astrofisica (INAF) e dall'Istituto nazionale di oceanografia e di geofisica sperimentale (OGS). 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>La CSNA nomina tra i suoi componenti il vicepresidente. I componenti della CSNA durano in carica quattro anni, rinnovabili per un ulteriore quadriennio. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Alle riunioni della CSNA possono essere invitati esperti delle amministrazioni dello Stato e di altri enti, di volta in volta interessati. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>Le regole di funzionamento della CSNA sono stabilite dalla CSNA medesima nel corso della prima riunione e sono rese pubbliche. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_7">
+                    <num>7.</num>
+                    <content>
+                        <p>La competente Direzione generale del Ministero assicura il necessario supporto amministrativo ai lavori della CSNA. Nell'ambito della convenzione di cui all'articolo 6, comma 1, e' individuata la segreteria della CSNA, a supporto della quale i soggetti attuatori mettono a disposizione proprio personale con contratto a tempo indeterminato o con specifici contratti a tempo determinato, nel numero massimo di uno per ciascun soggetto attuatore. Le spese del personale addetto alla segreteria sono a carico di ciascun soggetto attuatore. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_8">
+                    <num>8.</num>
+                    <list>
+                        <intro eId="art_5__para_8__intro_1">
+                            <p>Alla CSNA sono attribuiti i seguenti compiti: 
+ </p>
+                        </intro>
+                        <point eId="art_5__para_8.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>elaborare e proporre al Ministro, d'intesa con i soggetti attuatori di cui all'articolo 6, il PNRA, comprensivo delle AEA; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_5__para_8.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>elaborare e proporre al Ministro eventuali aggiornamenti annuali del PNRA ai sensi dell'articolo 2, comma 2; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_5__para_8.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>assicurare, anche attraverso esperti esterni all'uopo individuati, la valutazione scientifica ex ante, in itinere ed ex post, dei progetti di ricerca sulla base della adeguatezza scientifica, culturale e tecnica e delle risorse umane, strumentali e finanziarie impiegate per la loro realizzazione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_5__para_8.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>definire e proporre al Ministro idonee azioni di monitoraggio dello svolgimento delle AEA contenute nel PNRA; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_5__para_8.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>proporre al Ministro le nomine dei rappresentanti italiani componenti degli organismi scientifici internazionali riguardanti la ricerca in Antartide; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_5__para_8.__point_f">
+                            <num>f)</num>
+                            <content>
+                                <p>elaborare la relazione annuale del Ministro, ai sensi dell'<ref eId="content__ref_100" href="/akn/it/act/legge/stato/1989-05-09/168/!main#art_2-com1-letd">articolo 2, comma 1, lettera d), legge 9 maggio 1989, n. 168</ref>. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_5__para_9">
+                    <num>9.</num>
+                    <content>
+                        <p>Ai componenti della CSNA, ivi incluso il personale di segreteria di cui al comma 7, non spettano gettoni di presenza, indennita' o altri emolumenti comunque denominati. Agli eventuali oneri per rimborsi di spese di missione si provvede nell'ambito delle risorse di ciascuna amministrazione o ente designante disponibili a legislazione vigente. Gli eventuali rimborsi spese possono essere corrisposti nei limiti delle risorse a tal fine previste da ciascuna amministrazione interessata. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_3" placement="bottom">
+                                <p> Note all'art. 5: 
+ - Si riporta il testo dell'<ref eId="content__ref_101" href="/akn/it/act/legge/stato/1989-05-09/168/!main#art_2-com1-letd">articolo 2, comma 1, lettera d), della legge 9 maggio 1989, n. 168</ref> (Istituzione del Ministero dell'universita' e della ricerca scientifica e tecnologica), pubblicata nella Gazzetta Ufficiale 11 maggio 1989, n. 108: 
+ «Art. 2. - 1. Il Ministro: 
+ (Omissis). 
+ d) riferisce al Parlamento ogni anno in apposita audizione sull'attuazione del PNR e sullo stato della ricerca nazionale;» 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_6">
+                <num>Art. 6.</num>
+                <heading> Soggetti attuatori</heading>
+                <paragraph eId="art_6__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Sono soggetti attuatori del PNRA il Consiglio nazionale delle ricerche (CNR), l'Agenzia nazionale per le nuove tecnologie, l'energia e lo sviluppo sostenibile (ENEA) e l'Istituto nazionale di oceanografia e di geofisica sperimentale (OGS), secondo le modalita' e i termini stabiliti in apposita convenzione, di durata decennale e aggiornabile annualmente, sottoscritta dai medesimi soggetti attuatori. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>La convenzione di cui al comma 1, stipulata per la prima volta entro sessanta giorni dalla data di entrata in vigore del presente regolamento, e' adottata con decreto del Ministro, di concerto con il Ministro degli affari esteri e della cooperazione internazionale, con il Ministro della transizione ecologica e con il Ministro dell'economia e delle finanze, sentita la CSNA. Con le medesime modalita' di adozione della convenzione si procede all'eventuale aggiornamento della stessa. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>I soggetti attuatori possono avvalersi di altri enti e organismi pubblici e privati di ricerca, universita' ed esperti, secondo regole stabilite nella convenzione di cui al comma 1. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_7">
+                <num>Art. 7.</num>
+                <heading> Specifici compiti attribuiti a CNR, ENEA e OGS</heading>
+                <paragraph eId="art_7__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Con la convenzione di cui all'articolo 6 sono definiti i compiti specifici attribuiti al CNR, all'ENEA e all'OGS, i quali provvedono a eseguirli avvalendosi di proprie strutture dedicate. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_2">
+                    <num>2.</num>
+                    <list>
+                        <intro eId="art_7__para_2__intro_1">
+                            <p>In particolare, il CNR ha il compito di: 
+ </p>
+                        </intro>
+                        <point eId="art_7__para_2.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>assicurare il coordinamento scientifico delle attivita', delle strutture e delle unita' di ricerca; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_7__para_2.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>assicurare la raccolta dei risultati e dei dati scientifici, d'intesa con il Ministero e la CSNA; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_7__para_2.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>assicurare un costante raccordo con l'ENEA e l'OGS per gli aspetti tecnologici e tecnico-operativi; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_7__para_2.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>monitorare lo stato d'attuazione del PNRA e definire gli eventuali interventi correttivi riferendone annualmente al Ministero e alla CSNA; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_7__para_2.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>acquisire e organizzare, in un'apposita banca-dati pubblica accessibile gratuitamente e on-line, i risultati delle attivita' scientifiche derivanti dall'attuazione del PNRA, in conformita' alla disciplina relativa ai dati della ricerca ai sensi del <ref eId="content__ref_102" href="/akn/it/act/decretoLegislativo/stato/2006-01-24/36/!main">decreto legislativo 24 gennaio 2006, n. 36</ref>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_7__para_2.__point_f">
+                            <num>f)</num>
+                            <content>
+                                <p>curare le attivita' di informazione e comunicazione istituzionale per la diffusione dei risultati conseguiti attraverso le attivita' svolte in attuazione del PNRA, avvalendosi dei principali strumenti e canali di comunicazione. Le attivita' di informazione e di comunicazione istituzionale sono, in particolare, finalizzate a: illustrare le attivita' di ricerca svolte nell'ambito del PNRA; promuovere conoscenze allargate e approfondite sui temi della ricerca in Antartide; favorire la conoscenza dell'impegno italiano e internazionale nella ricerca antartica; promuovere la disseminazione, divulgazione e formazione permanente, con particolare riferimento alle scuole e ai cittadini, sull'importanza degli ambienti antartici. Le spese derivanti dalle attivita' di cui alla presente lettera non sono poste a carico delle risorse finanziarie destinate all'attuazione del PNRA. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_7__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>L'attuazione delle campagne, le azioni tecniche e logistiche e la responsabilita' dell'organizzazione nelle zone operative sono poste in capo all'ENEA, che provvede alla programmazione operativa, alla costruzione e alla gestione degli interventi, all'approvvigionamento dei materiali e dei servizi, e alla manutenzione degli impianti e degli strumenti installati presso le stazioni antartiche. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>In conseguenza di quanto previsto dall'<ref eId="content__ref_103" href="/akn/it/act/legge/stato/2017-12-27/205/!main#art_1-com649">articolo 1, comma 649, della legge 27 dicembre 2017, n. 205</ref>, allo scopo di sostenere la ricerca italiana nelle aree polari e a supporto delle stazioni antartiche, l'OGS e' responsabile della gestione tecnica e scientifica della nave rompighiaccio «Laura Bassi», al fine di dare sostegno alle campagne attuate da ENEA e da CNR, per quanto concerne la componente marittima, dal punto di vista scientifico e logistico. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Le spese del personale delle amministrazioni e degli enti partecipanti alle attivita' di laboratorio e alle campagne antartiche dell'ENEA, del CNR e dell'OGS sono poste a carico dei bilanci di ciascuna amministrazione o ente partecipante. Le spese relative alle missioni in Italia e all'estero sono poste a carico dei fondi destinati al PNRA, nei limiti delle risorse a tal fine destinate dal decreto di cui articolo 4, comma 2. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>Gravano, inoltre, sui fondi del PNRA i costi sostenuti per l'acquisto dei materiali e delle attrezzature destinati a essere trasportati in zone operative e ivi utilizzati. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_7">
+                    <num>7.</num>
+                    <content>
+                        <p>I soggetti attuatori richiedono al Ministero della difesa un contributo di personale militare per gli aspetti logistici, nel rispetto della disciplina vigente in materia e secondo le disponibilita' del medesimo Ministero della difesa. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_4" placement="bottom">
+                                <p> Note all'<ref eId="content__ref_104" href="/akn/it/act/decretoLegislativo/stato/2006-01-24/36/!main#art_7">art. 7: 
+ - Il decreto legislativo 24 gennaio 2006, n. 36</ref> (Attuazione della <ref eId="content__ref_105" href="/akn/it/act/direttivaUe/eu/2019/1024/!main">direttiva (UE) 2019/1024</ref> relativa all'apertura dei dati e al riutilizzo dell'informazione del settore pubblico che ha abrogato la <ref eId="content__ref_106" href="/akn/it/act/direttivaUe/eu/2003/98/!main">direttiva 2003/98/CE)</ref>, e' pubblicato nella Gazzetta Ufficiale 14 febbraio 2006, n. 37. 
+ - Si riporta il <ref eId="content__ref_107" href="/akn/it/act/legge/stato/2017-12-27/205/!main#art_com649">comma 649 della legge 27 dicembre 2017, n. 205</ref> (Bilancio di previsione dello Stato per l'anno finanziario 2018 e bilancio pluriennale per il triennio 2018-2020), pubblicata nella Gazzetta Ufficiale 29 dicembre 2017, n. 302: 
+ «649. In coerenza con gli obiettivi del Programma nazionale per la ricerca (PNR) 2015-2020 e del Programma nazionale di ricerche in Antartide, nonche' allo scopo di sostenere la ricerca italiana nelle aree polari, e' assegnato all'Istituto nazionale di oceanografia e di geofisica sperimentale un finanziamento, per l'anno 2018, di 12 milioni di euro per l'acquisto di una nave quale infrastruttura di ricerca scientifica e di supporto alla base antartica. All'onere derivante dall'applicazione del presente comma, pari a 12 milioni di euro per l'anno 2018, si provvede mediante corrispondente riduzione dell'autorizzazione di spesa di cui all'<ref eId="content__ref_108" href="/akn/it/act/legge/stato/1999-10-19/370/!main#art_10-com1-letd">articolo 10, comma 1, lettera d), della legge 19 ottobre 1999, n. 370</ref>.» 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_8">
+                <num>Art. 8.</num>
+                <heading> Patrimonio del PNRA</heading>
+                <paragraph eId="art_8__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>I beni acquisiti con i finanziamenti pubblici del PNRA sono iscritti in una specifica sezione dell'inventario dell'ENEA e costituiscono patrimonio del PNRA. I beni di cui al presente comma sono classificati in conto d'ordine nello stato patrimoniale dell'ENEA. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Gli adempimenti connessi all'iscrizione dei beni, delle infrastrutture e delle strumentazioni, che costituiscono il patrimonio del PNRA, sono posti a carico dei soggetti attuatori e del finanziamento del programma. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9">
+                <num>Art. 9.</num>
+                <heading> Finanziamento del PNRA</heading>
+                <paragraph eId="art_9__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Gli oneri derivanti dall'attuazione del presente regolamento, pari a ventitre' milioni di euro annui, a decorrere dall'anno 2021, ai sensi del <ref eId="content__ref_109" href="/akn/it/act/legge/stato/2020-12-30/178/!main#art_1-com552">comma 552 dell'articolo 1 della legge 30 dicembre 2020, n. 178</ref>, sono iscritti in apposito capitolo dello stato di previsione della spesa del Ministero. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Ulteriori risorse finanziarie destinate al sostegno e al funzionamento del PNRA possono essere acquisite dai soggetti attuatori e poste dalla CSNA a copertura del PNRA. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_5" placement="bottom">
+                                <p> Note all'art. 9: 
+ - Per i riferimenti della <ref eId="content__ref_110" href="/akn/it/act/legge/stato/2020-12-30/178/!main">legge 30 dicembre 2020, n. 178</ref> si veda nelle note alle premesse. 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_10">
+                <num>Art. 10.</num>
+                <heading> Disposizioni transitorie e finali</heading>
+                <paragraph eId="art_10__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>La CSNA, nella sua attuale composizione, rimane in carica sino alla nomina dei nuovi componenti, che ha luogo entro e non oltre quarantacinque giorni dalla data di entrata in vigore del presente regolamento. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_10__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>A decorrere dalla data di entrata in vigore del presente regolamento cessa l'efficacia delle disposizioni di cui al decreto del Ministro dell'istruzione, dell'universita' e della ricerca del 30 settembre 2010. 
+ Il presente regolamento e' trasmesso per il visto e la registrazione alla Corte dei conti. 
+ </p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_6" placement="bottom">
+                                <p> Note all'art. 10: 
+ - Per i riferimenti del decreto del Ministro dell'istruzione, dell'universita' e della ricerca 30 settembre 2010, si veda nelle note alle premesse. 
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+        </body>
+        <conclusions>
+            <formula name="formulaFinaleConclusioni">
+                <p>Il presente decreto, munito del sigillo dello Stato, sara' inserito nella Raccolta ufficiale degli atti normativi della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarlo e di farlo osservare. </p>
+            </formula>
+            <p> Roma, 20 luglio 2022 </p>
+            <p>Il Ministro dell'universita' e della ricerca Messa Il Ministro degli affari esteri e della cooperazione internazionale Di Maio Il Ministro della transizione ecologica Cingolani Il Ministro dell'economia e delle finanze Franco Visto, il Guardasigilli: Cartabia Registrato alla Corte dei conti l'11 ottobre 2022 Ufficio di controllo sugli atti del Ministero del lavoro e delle politiche sociali, del Ministero dell'istruzione, del Ministero dell'universita' e della ricerca, del Ministero della cultura, del Ministero della salute, reg.ne prev. n. 2635</p>
+        </conclusions>
+    </act>
+</akomaNtoso>

@@ -126,6 +126,12 @@ REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
         "text_parser": ("legalize.fetcher.be.parser", "JustelTextParser"),
         "metadata_parser": ("legalize.fetcher.be.parser", "JustelMetadataParser"),
     },
+    "it": {
+        "client": ("legalize.fetcher.it.client", "NormativaClient"),
+        "discovery": ("legalize.fetcher.it.discovery", "NormativaDiscovery"),
+        "text_parser": ("legalize.fetcher.it.parser", "NormativaTextParser"),
+        "metadata_parser": ("legalize.fetcher.it.parser", "NormativaMetadataParser"),
+    },
     # To add a new country:
     # 1. Create fetcher/{code}/ with client.py, discovery.py, parser.py
     # 2. Register here
