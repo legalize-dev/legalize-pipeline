@@ -144,6 +144,40 @@ countries:
       max_retries: 5
       requests_per_second: 2.0
 
+  lu:
+    repo_path: "../countries/lu"
+    data_dir: "../countries/data-lu"
+    cache_dir: ".cache"
+    # Legilux open data: SPARQL (discovery) + filestore (XML downloads).
+    # No documented rate limits. Benchmarked 2026-04-13: server handles
+    # 150+ req/s without errors. XML URLs derived deterministically from
+    # ELI (no per-norm SPARQL needed for download). Only consolidation
+    # queries hit SPARQL (~1,317 laws have history).
+    #
+    # Benchmark (50 laws, filestore GET):
+    #   1w  → 20 req/s (HTTP latency bound)
+    #   4w  → 67 req/s
+    #   8w  → 112 req/s
+    #  12w  → 153 req/s (zero errors at all levels)
+    #
+    # Settled on 8w × 10 req/s = polite but fast.
+    # Full bootstrap (~24K acts + ~4K consolidation XMLs):
+    #   downloads: ~28K files / ~80 eff req/s → ~6 min
+    #   SPARQL consolidation queries: ~24K / ~10 q/s → ~40 min
+    #   parsing + commits: ~30 min
+    #   Total: ~1.5h
+    max_workers: 8
+    source:
+      sparql_url: "https://data.legilux.public.lu/sparqlendpoint"
+      filestore_url: "https://data.legilux.public.lu/filestore"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 10.0
+      doc_types:
+        - "LOI"
+        - "RGD"
+        - "Constitution"
+
   pt:
     repo_path: "../countries/pt"
     data_dir: "../countries/data-pt"

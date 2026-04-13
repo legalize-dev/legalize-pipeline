@@ -32,6 +32,19 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "list_item": lambda t: f"{t}\n",
     "table_row": lambda t: f"{t}\n",
     "pre": lambda t: f"```\n{t}\n```\n",
+    # Generic heading classes used by multi-country parsers
+    "h1": lambda t: f"# {t}\n",
+    "h2": lambda t: f"## {t}\n",
+    "h3": lambda t: f"### {t}\n",
+    "h4": lambda t: f"#### {t}\n",
+    "h5": lambda t: f"##### {t}\n",
+    "h6": lambda t: f"###### {t}\n",
+    "signature": lambda t: f"**{t}**\n",
+    "preamble": lambda t: f"{t}\n",
+    "formula": lambda t: f"{t}\n",
+    "list": lambda t: f"{t}\n",
+    "quote": lambda t: f"{t}\n",
+    "num": lambda t: f"{t}\n",
 }
 
 # Classes requiring lookahead (combination with the next paragraph)

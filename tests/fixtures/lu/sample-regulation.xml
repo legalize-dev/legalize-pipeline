@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/CSD13" xmlns:scl="http://www.scl.lu">
+<act contains="originalVersion" name="" scl:page-proof="many">
+<meta>
+<identification source="#casemates">
+<FRBRWork>
+<FRBRthis value=""/>
+<FRBRuri value=""/>
+<FRBRdate date="2999-01-01" name=""/>
+<FRBRauthor as="#author" href="#mdda"/>
+<FRBRcountry value=""/>
+</FRBRWork>
+<FRBRExpression>
+<FRBRthis value=""/>
+<FRBRuri value=""/>
+<FRBRdate date="2999-01-01" name=""/>
+<FRBRauthor as="#editor" href="#somebody"/>
+<FRBRlanguage language=""/>
+</FRBRExpression>
+<FRBRManifestation>
+<FRBRthis value=""/>
+<FRBRuri value=""/>
+<FRBRdate date="2999-01-01" name=""/>
+<FRBRauthor as="#editor" href="#somebody"/>
+</FRBRManifestation>
+<scl:JOLUXWork>
+<scl:JOLUXComplexWork>
+<scl:jolux scl:name="uriThis"/>
+</scl:JOLUXComplexWork>
+<scl:JOLUXLegalResource><scl:jolux scl:name="baseAct">true</scl:jolux><scl:jolux scl:name="typeDocument">http://data.legilux.public.lu/resource/authority/resource-type/RGD</scl:jolux><scl:jolux scl:name="dateDocument">2026-04-02</scl:jolux><scl:jolux scl:name="publicationDate"/><scl:jolux scl:name="responsibilityOf"/><scl:jolux scl:name="responsibilityOf">http://data.legilux.public.lu/resource/authority/legal-institution/MTR</scl:jolux><scl:jolux scl:name="responsibilityOf">http://data.legilux.public.lu/resource/authority/legal-institution/MTP</scl:jolux><scl:jolux scl:name="urgentEvent">false</scl:jolux><scl:jolux scl:name="subjectLevel1">http://data.legilux.public.lu/resource/authority/legal-subject/728</scl:jolux><scl:jolux scl:name="subjectLevel2">http://data.legilux.public.lu/resource/authority/legal-subject/158</scl:jolux><scl:jolux scl:name="subjectLevel2">http://data.legilux.public.lu/resource/authority/legal-subject/3243</scl:jolux><scl:jolux xmlns:xopusAttr="http://www.xopus.com/xmlns/id/attr" xmlns:akoma="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/CSD13" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns="http://www.w3.org/1999/xhtml" scl:name="dateEntryInForce"/></scl:JOLUXLegalResource>
+</scl:JOLUXWork>
+<scl:JOLUXExpression>
+<scl:jolux scl:lg="fra" scl:name="title">Règlement grand-ducal du 2 avril 2026 concernant la réglementation temporaire de la circulation sur la N10 entre Gemünd et Untereisenbach à l’occasion de travaux routiers.</scl:jolux>
+<scl:jolux scl:name="language">http://publications.europa.eu/resource/authority/language/FRA</scl:jolux>
+<scl:jolux scl:name="basedOn">/eli/etat/leg/loi/1955/02/14/n3/jo</scl:jolux>
+<scl:jolux scl:name="basedOn">/eli/etat/leg/agd/1955/11/23/n1/jo</scl:jolux>
+<scl:jolux scl:name="cites">/eli/etat/leg/loi/2017/06/16/a592/jo</scl:jolux>
+</scl:JOLUXExpression>
+<scl:JOLUXManifestation>
+<scl:jolux scl:name="uriThis"/>
+</scl:JOLUXManifestation>
+</identification>
+</meta>
+<preface>
+<longTitle>
+<p>Règlement grand-ducal du 2 avril 2026 concernant la réglementation temporaire de la circulation sur la N10 entre Gemünd et Untereisenbach à l’occasion de travaux routiers.</p>
+</longTitle>
+</preface>
+<preamble>
+<container name="preamble">
+<p>Nous Guillaume, Grand-Duc de Luxembourg, Duc de Nassau,</p>
+<p>Vu la <ref href="/eli/etat/leg/loi/1955/02/14/n3/jo" id="8d0111e7-203c-4d62-91a4-87d497467c47" scl:verify="true">loi modifiée du 14 février 1955</ref> concernant la réglementation de la circulation sur toutes les voies publiques ;</p>
+<p>Vu l’<ref href="/eli/etat/leg/agd/1955/11/23/n1/jo" id="a89dc234-fda1-46ab-b0e0-a01fe2ce6e4d">arrêté grand-ducal modifié du 23 novembre 1955</ref> portant règlement de la circulation sur toutes les voies publiques ;</p>
+<p>Considérant qu’à l’occasion de travaux routiers, il y a lieu de réglementer la circulation sur la N10 entre Gemünd et Untereisenbach ;</p>
+<p>Vu l’article 1<sup>er</sup>, paragraphe 1<sup>er</sup>, de la <ref href="/eli/etat/leg/loi/2017/06/16/a592/jo" id="25568768-49cb-4195-8269-63c5723d5ab3" scl:verify="true">loi modifiée du 16 juin 2017</ref> sur l’organisation du Conseil d’État et considérant qu’il y a urgence ;</p>
+<p>Sur le rapport de la Ministre de la Mobilité et des Travaux publics et après délibération du Gouvernement en Conseil ;</p>
+</container>
+<formula name="">
+<p>Arrêtons :</p>
+</formula>
+</preamble>
+<body>
+<article id="art_1er">
+<num>Art. 1<sup>er</sup>. </num>
+<alinea>
+<content>
+<p>Pendant la phase d’exécution des travaux, la chaussée de la voie publique citée ci-dessous est rétrécie et la circulation sur cette voie est réglée par des signaux colorés lumineux conformément à l’article 109 de l’<ref href="/eli/etat/leg/agd/1955/11/23/n1/jo" id="12785bff-f076-4811-826a-8831782ae38b">arrêté grand-ducal modifié précité</ref> :</p>
+<ul scl:symbol="dash">
+<li>la N10 entre Gemünd et Untereisenbach (N10 PR94,50+430 - N10 PR96,50+350).</li>
+</ul>
+</content>
+</alinea>
+<alinea>
+<content>
+<p>En cas de non-fonctionnement des signaux colorés lumineux, les conducteurs doivent céder à la hauteur du passage étroit le passage aux conducteurs qui viennent en sens inverse et il leur est interdit de s’engager dans ce passage tant qu’il ne leur est pas possible de le traverser sans obliger les conducteurs en sens inverse à s’arrêter.</p>
+</content>
+</alinea>
+<alinea>
+<content>
+<p>La vitesse maximale sur cette voie est limitée progressivement à 70 km/h et à 50 km/h et il y est interdit aux conducteurs de véhicules automoteurs de dépasser des véhicules automoteurs autres que les motocycles à deux roues sans side-car et les cyclomoteurs à deux roues.</p>
+</content>
+</alinea>
+<alinea>
+<content>
+<p>Le chantier est à contourner conformément aux signaux mis en place.</p>
+</content>
+</alinea>
+<alinea>
+<content>
+<p>Ces dispositions sont indiquées par les injonctions des agents de l’Administration des ponts et chaussées, sinon par les signaux B,5 et B,6, et par les signaux C,14 portant l’inscription du chiffre de la vitesse maximale limitée, C,13aa et D,2.</p>
+</content>
+</alinea>
+</article>
+<article id="art_2">
+<num>Art. 2.</num>
+<alinea>
+<content>
+<p>Les infractions aux dispositions du présent règlement sont punies conformément à l’article 7 de la <ref href="/eli/etat/leg/loi/1955/02/14/n3/jo" id="6c459145-e2f6-4bdd-9f74-0f234072ea14" scl:verify="true">loi modifiée du 14 février 1955</ref> concernant la réglementation de la circulation sur toutes les voies publiques.</p>
+</content>
+</alinea>
+</article>
+<article id="art_3">
+<num>Art. 3.</num>
+<alinea>
+<content>
+<p>Le présent règlement reste en vigueur jusqu’à l’achèvement des travaux.</p>
+</content>
+</alinea>
+</article>
+<article id="art_4">
+<num>Art. 4.</num>
+<alinea>
+<content>
+<p>Le ministre ayant les Travaux publics dans ses attributions est chargé de l’exécution du présent règlement qui sera publié au Journal officiel du Grand-Duché de Luxembourg.</p>
+</content>
+</alinea>
+</article>
+</body>
+<conclusions>
+<p> <signature> <shortTitle> La Ministre de la Mobilité<br/> et des Travaux publics,</shortTitle> <person refersTo=""> Yuriko Backes </person> </signature> </p>
+<p> <signature> <docDate date="2999-01-01">Fait le 2 avril 2026. </docDate> <person refersTo="">Guillaume</person> </signature> </p>
+</conclusions>
+</act>
+</akomaNtoso>

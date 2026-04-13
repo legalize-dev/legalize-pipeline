@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/CSD13" xmlns:scl="http://www.scl.lu"><act contains="originalVersion" name="" scl:page-proof="many"><meta><identification source="#somebody">
+			<FRBRWork>
+			     <FRBRthis value="http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo"/>
+			     <FRBRuri value=""/>
+			     <FRBRdate date="2017-12-21" name="document"/>
+			     <FRBRauthor as="#author" href="http://data.legilux.public.lu/resource/authority/legal-institution/MAC"/>
+			     <FRBRauthor as="#author" href="http://data.legilux.public.lu/resource/authority/legal-institution/MI"/>
+			     <FRBRcountry value="http://publications.europa.eu/resource/authority/country/LUX"/>
+			</FRBRWork>
+			<FRBRExpression>
+			     <FRBRthis value="http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo/fr"/>
+			     <FRBRuri value=""/>
+			     <FRBRdate date="2017-12-21" name="document"/>
+			     <FRBRauthor as="#author" href=""/>
+			     <FRBRlanguage language="http://publications.europa.eu/resource/authority/language/FRA"/>
+			</FRBRExpression>
+			<FRBRManifestation>
+			     <FRBRthis value="http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo/fr/xml"/>
+			     <FRBRuri value=""/>
+			     <FRBRdate date="2017-12-21" name="document"/>
+			     <FRBRauthor as="#author" href=""/>
+			</FRBRManifestation>
+			<scl:JOLUXWork>
+				<scl:JOLUXComplexWork>
+					<scl:jolux scl:name="uriThis">http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116</scl:jolux>
+				</scl:JOLUXComplexWork>
+				<scl:JOLUXLegalResource>
+					<scl:jolux scl:name="uriThis">http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo</scl:jolux>
+					<scl:jolux scl:name="publicationDate">2017-12-22</scl:jolux>
+					<scl:jolux scl:name="typeDocument">http://data.legilux.public.lu/resource/authority/resource-type/LOI</scl:jolux>
+					<scl:jolux scl:name="dateDocument">2017-12-21</scl:jolux>
+					<scl:jolux scl:name="dateEntryInForce">2017-12-26</scl:jolux>
+					<scl:jolux scl:name="dateApplicability">2017-12-26</scl:jolux>
+					<scl:jolux scl:name="isMemberOf">http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116</scl:jolux>
+					<scl:jolux scl:name="isPartOf">http://data.legilux.public.lu/eli/etat/leg/memorial/2017/a1116</scl:jolux>
+					<scl:jolux scl:name="responsibilityOf">http://data.legilux.public.lu/resource/authority/legal-institution/MAC</scl:jolux>
+					<scl:jolux scl:name="responsibilityOf">http://data.legilux.public.lu/resource/authority/legal-institution/MI</scl:jolux>
+					<scl:jolux scl:name="subjectLevel1">http://data.legilux.public.lu/resource/authority/legal-subject/800</scl:jolux>
+					<scl:jolux scl:name="subjectLevel2">http://data.legilux.public.lu/resource/authority/legal-subject/5</scl:jolux>
+					<scl:jolux scl:name="subjectLevel2">http://data.legilux.public.lu/resource/authority/legal-subject/653</scl:jolux>
+					<scl:jolux scl:name="subjectLevel2">http://data.legilux.public.lu/resource/authority/legal-subject/21</scl:jolux>
+					<scl:jolux scl:name="modifies">http://data.legilux.public.lu/eli/etat/leg/loi/1998/04/28/n2/jo</scl:jolux>
+					<scl:jolux scl:name="cites">http://data.legilux.public.lu/eli/etat/leg/loi/1989/05/24/n1/jo</scl:jolux>
+					<scl:jolux scl:name="cites">http://data.legilux.public.lu/eli/etat/leg/loi/1963/06/22/n1/jo</scl:jolux>
+					<scl:jolux scl:name="draft">http://data.legilux.public.lu/eli/etat/proj/pl/20170174</scl:jolux>
+					<scl:rdf scl:name="type">http://data.legilux.public.lu/resource/ontology/jolux#BaseAct</scl:rdf>
+					<scl:rdf scl:name="type">http://data.legilux.public.lu/resource/ontology/jolux#Act</scl:rdf>
+					<scl:rdf scl:name="type">http://data.legilux.public.lu/resource/ontology/jolux#Work</scl:rdf>
+					<scl:rdf scl:name="type">http://data.legilux.public.lu/resource/ontology/jolux#LegalResource</scl:rdf>
+					<scl:rdf scl:name="type">http://data.legilux.public.lu/resource/ontology/jolux#NationalLegalResource</scl:rdf>
+				</scl:JOLUXLegalResource>
+			</scl:JOLUXWork>
+			<scl:JOLUXExpression>
+				<scl:jolux scl:name="uriThis">http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo/fr</scl:jolux>
+				<scl:jolux scl:name="realizes">http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo</scl:jolux>
+				<scl:jolux scl:name="language">http://publications.europa.eu/resource/authority/language/FRA</scl:jolux>
+				<scl:jolux scl:lg="fra" scl:name="title">Loi du 21 décembre 2017 portant modification de l'article 12 de la loi modifiée du 28 avril 1998 portant\na) harmonisation de l'enseignement musical dans le secteur communal;\nb) modification de l'article 5 de la loi modifiée du 24 mai 1989 sur le contrat de travail;\nc) modification de la loi modifiée du 22 juin 1963 fixant le régime des traitements des fonctionnaires de l'État.</scl:jolux>
+			</scl:JOLUXExpression>
+			<scl:JOLUXManifestation>
+				<scl:jolux scl:name="uriThis">http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo/fr/xml</scl:jolux>
+				<scl:jolux scl:name="embodies">http://data.legilux.public.lu/eli/etat/leg/loi/2017/12/21/a1116/jo/fr</scl:jolux>
+				<scl:jolux scl:name="publishedIn">http://data.legilux.public.lu/eli/etat/leg/memorial/2017/a1116/fr/pdf</scl:jolux>
+				<scl:jolux scl:name="memorialPage">1</scl:jolux>
+				<scl:jolux scl:name="memorialSequence">A</scl:jolux>
+				<scl:jolux scl:name="publisher">http://data.legilux.public.lu/authority/legal-institution/ME</scl:jolux>
+				<scl:jolux scl:lg="fra" scl:name="rights">Copyright : Ministère d’État du Grand-Duché de Luxembourg – Service central de législation</scl:jolux>
+				<scl:jolux scl:name="rightsHolder">http://data.legilux.public.lu/authority/legal-institution/ME</scl:jolux>
+				<scl:jolux scl:name="license">http://creativecommons.org/licenses/by/4.0/</scl:jolux>
+				<scl:jolux scl:name="userFormat">http://data.legilux.public.lu/resource/authority/user-format/xml-akomantoso</scl:jolux>
+				<scl:jolux scl:name="format">http://publications.europa.eu/resource/authority/file-type/XML</scl:jolux>
+				<scl:jolux scl:name="isExemplifiedBy">http://data.legilux.public.lu/file/eli-etat-leg-loi-2017-12-21-a1116-jo-fr-xml.xml</scl:jolux>
+			</scl:JOLUXManifestation>
+		</identification>
+<lifecycle source="#"><eventRef date="2017-12-15" id="e1" source="#ro1" type="generation"/></lifecycle><references source="#"><original href="/eli/etat/leg/loi/2017/12/15/n9/jo" id="ro1" showAs="Original"/></references></meta><preface><longTitle><p>Loi du 21 décembre 2017 portant modification de l'article 12 de la loi modifiée du 28 avril 1998 portant</p><ol xmlns:ns3727365="http://www.scl.lu" ns3727365:start="1" ns3727365:symbol="a)"><li>harmonisation de l'enseignement musical dans le secteur communal ;</li><li>modification de l'article 5 de la loi modifiée du 24 mai 1989 sur le contrat de travail ;</li><li>modification de la loi modifiée du 22 juin 1963 fixant le régime des traitements des fonctionnaires de l'État.</li></ol></longTitle></preface><preamble><container name="preamble"><p>Nous Henri, Grand-Duc de Luxembourg, Duc de Nassau,</p></container><container name="considerando"><p>Notre Conseil d’État entendu ;</p><p>De l’assentiment de la Chambre des Députés ;</p><p>Vu la décision de la Chambre des Députés du 6 décembre 2017 et celle du Conseil d'État du 15 décembre 2017 portant qu'il n'y a pas lieu à second vote ;</p></container><formula name=""><p>Avons ordonné et ordonnons :</p></formula></preamble><body><article id="article"><num>Article </num><heading><b>unique</b>.</heading><alinea><content><p>Le deuxième alinéa de l’article 12 de la <ref href="/eli/etat/leg/loi/1998/04/28/n2/jo" id="5af82cb2-848e-4397-a95b-3f53807f2882">loi modifiée du 28 avril 1998</ref> portant</p><ol xmlns:ns3727365="http://www.scl.lu" ns3727365:start="1" ns3727365:symbol="a)"><li>harmonisation de l’enseignement musical dans le secteur communal ;</li><li>modification de l’article 5 de la <ref href="/eli/etat/leg/loi/1989/05/24/n1/jo" id="6f30e828-e330-4cfb-aaab-bc78f1c31eb9">loi modifiée du 24 mai 1989</ref> sur le contrat de travail ;</li><li>modification de la <ref href="/eli/etat/leg/loi/1963/06/22/n1/jo" id="f1be9c48-fa9a-4fae-b75c-c8fd2b46115f">loi modifiée du 22 juin 1963</ref> fixant le régime des traitements des fonctionnaires de l’État</li></ol></content></alinea><alinea><content><p>est à remplacer par le texte libellé comme suit :<embeddedStructure><alinea><content><p>L’État participe au financement de l’enseignement musical à raison d’un tiers des rémunérations brutes du personnel enseignant de ces institutions. Cette participation ne peut pas dépasser la somme de quatorze millions cinq cent trente-quatre mille euros par exercice budgétaire à commencer par l’année 2018. Cette participation est adaptée annuellement sur la base de l’évolution de la masse salariale globale de l’État. Sont à considérer comme personnel enseignant au sens du présent article les agents ayant le statut de fonctionnaire communal ou d’employé communal ou engagés en qualité de salarié à tâche principalement intellectuelle, soit à durée déterminée, soit à durée indéterminée et affiliés en tant que tels auprès d’un régime de sécurité sociale.</p></content></alinea></embeddedStructure></p></content></alinea></article><clause><content><p><eop/>Mandons et ordonnons que la présente loi soit insérée au Journal officiel du Grand-Duché de Luxembourg pour être exécutée et observée par tous ceux que la chose concerne.</p></content></clause></body><conclusions><p><signature><shortTitle>Le Ministre de la Culture,</shortTitle><person refersTo="">Xavier Bettel</person></signature><signature><shortTitle>Le Ministre de l'Intérieur,</shortTitle><person refersTo="">Dan Kersch</person></signature></p><p><signature><docDate date="2999-01-01">Crans, le 21 décembre 2017.</docDate><person refersTo="">Henri</person></signature></p></conclusions><components><component><interstitial><p><ref href="/eli/etat/proj/pl/20170174" id="6f80f17c-48eb-4ba2-a4e6-1fe535b5c760">Doc. parl. 7202</ref> ; sess. ord. 2017-2018.</p></interstitial></component></components></act></akomaNtoso>
