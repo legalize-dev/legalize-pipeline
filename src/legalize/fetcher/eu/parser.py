@@ -86,6 +86,12 @@ def _clean(text: str) -> str:
     return text.strip()
 
 
+# Normalize list markers: ensure "(a) text" has exactly one space after marker.
+# OJ format has "(a) " with HTML space, consolidated has "(a)" with no space.
+# Also normalizes "1.   text" to "1. text".
+_LIST_MARKER_RE = re.compile(r"^(\(?(?:\d+|[a-z]+|[ivxlcdm]+|[A-Z])\)?[.):]?)\s+")
+
+
 def _strip_mod_markers(text: str) -> str:
     """Remove EUR-Lex modification markers (►M1, ◄, etc.) from text."""
     text = _MOD_MARKER_RE.sub("", text)
@@ -94,6 +100,15 @@ def _strip_mod_markers(text: str) -> str:
     text = text.replace("****", "").replace("** **", " ")
     text = _MULTI_SPACE_RE.sub(" ", text)
     return text.strip()
+
+
+def _normalize_list_marker(text: str) -> str:
+    """Normalize whitespace after list markers for cross-format consistency.
+
+    Ensures "(a) text", "(1) text", "1. text" always have exactly one space
+    after the marker regardless of source format.
+    """
+    return _LIST_MARKER_RE.sub(r"\1 ", text)
 
 
 def _extract_text(el: ET.Element) -> str:
@@ -141,8 +156,9 @@ def _extract_text(el: ET.Element) -> str:
             parts.append(child.tail)
 
     result = "".join(parts)
-    # Strip any remaining modification markers from raw text
-    return _strip_mod_markers(result)
+    # Strip modification markers and normalize list marker whitespace
+    result = _strip_mod_markers(result)
+    return _normalize_list_marker(result)
 
 
 def _parse_list(el: ET.Element) -> str:
@@ -429,8 +445,25 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
         return paragraphs
 
     # ─── Consolidated text format classes ───
-    # Normal text paragraphs
-    if tag == "p" and ("norm" in cls or "tbl-norm" in cls or "item-none" in cls):
+    # Indented divs with margin-left (old consolidated format for list items).
+    # Pattern: <div style="margin-left: 30pt; text-indent: -30pt"><p class="norm">(a) ...</p></div>
+    if tag == "div" and not cls:
+        style = el.get("style", "")
+        if "margin-left" in style and "text-indent" in style:
+            text = _extract_text(el).strip()
+            if text:
+                paragraphs.append(Paragraph("list", text))
+            return paragraphs
+
+    # <p class="list"> — old consolidated format for list items
+    if tag == "p" and cls == "list":
+        text = _extract_text(el).strip()
+        if text:
+            paragraphs.append(Paragraph("list", text))
+        return paragraphs
+
+    # Normal text paragraphs (norm, normal, tbl-norm, item-none)
+    if tag == "p" and ("norm" in cls or "tbl-norm" in cls or "item-none" in cls or cls == "normal"):
         text = _extract_text(el).strip()
         if text:
             paragraphs.append(Paragraph("abs", text))
