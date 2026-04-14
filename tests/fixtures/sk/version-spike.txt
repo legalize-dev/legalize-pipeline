@@ -1,0 +1,49 @@
+Version History Spike — Slovakia Constitution 460/1992 Zb.
+============================================================
+
+Source: https://static.slov-lex.sk/static/SK/ZZ/1992/460/
+Method: Parse effectivenessHistoryItem rows from HTML history page
+
+29 versions extracted:
+
+Version  1: Vyhlásené znenie (proclaimed text), no date range
+Version  2: 1992-10-01 → 1998-08-04 (original)
+Version  3: 1998-08-05 → 1999-01-26 (amendment: 244/1998 Z. z.)
+Version  4: 1999-01-27 → 2001-06-30 (amendment: 9/1999 Z. z.)
+Version  5: 2001-07-01 → 2001-12-31 (amendment: 90/2001 Z. z.)
+Version  6: 2002-01-01 → 2004-03-17 (amendment: 90/2001 Z. z.)
+Version  7: 2004-03-18 → 2004-05-31 (amendment: 140/2004 Z. z.)
+Version  8: 2004-06-01 → 2004-07-19 (amendment: 323/2004 Z. z.)
+Version  9: 2004-07-20 → 2005-12-31 (amendment: 323/2004 Z. z.)
+Version 10: 2006-01-01 → 2006-03-31 (amendment: 463/2005 Z. z.)
+Version 11: 2006-04-01 → 2006-04-30 (amendment: 92/2006 Z. z.)
+Version 12: 2006-05-01 → 2010-12-31 (amendment: 210/2006 Z. z.)
+Version 13: 2011-01-01 → 2011-10-24 (amendment: 100/2010 Z. z.)
+Version 14: 2011-10-25 → 2012-08-31 (amendment: 356/2011 Z. z.)
+Version 15: 2012-09-01 → 2014-08-31 (amendment: 232/2012 Z. z.)
+Version 16: 2014-09-01 → 2014-11-30 (amendment: 161/2014 Z. z.)
+Version 17: 2014-12-01 → 2015-12-31 (amendment: 306/2014 Z. z.)
+Version 18: 2016-01-01 → 2017-02-26 (amendment: 427/2015 Z. z.)
+Version 19: 2017-02-27 → 2017-04-03 (amendment: 44/2017 Z. z.)
+Version 20: 2017-04-04 → 2017-05-31 (amendment: 71/2017 Z. z.)
+Version 21: 2017-06-01 → 2019-02-22 (amendment: 137/2017 Z. z.)
+Version 22: 2019-02-23 → 2019-06-30 (amendment: 40/2019 Z. z.)
+Version 23: 2019-07-01 → 2020-12-31 (amendment: 99/2019 Z. z.)
+Version 24: 2021-01-01 → 2022-12-31 (amendment: 422/2020 Z. z.)
+Version 25: 2023-01-01 → 2023-01-25 (amendments: 422/2020, 378/2022 Z. z.)
+Version 26: 2023-01-26 → 2023-06-30 (amendment: 24/2023 Z. z.)
+Version 27: 2023-07-01 → 2024-12-31 (amendment: 241/2023 Z. z.)
+Version 28: 2025-01-01 → 2025-10-31 (amendment: 422/2020 Z. z.)
+Version 29: 2025-11-01 → (current)   (amendment: 255/2025 Z. z.)
+
+Gate PASS: 29 distinct versions with dates extracted from one law.
+Each version has:
+  - Full text accessible via .portal endpoint
+  - Effective date range (from/to)
+  - Amendment reference (which law caused this version)
+  - Stable identifier linking all versions to the same law
+
+Text verification:
+  - Version 28 (2025-01-01): 648KB HTML, starts with preamble
+    "My, národ slovenský, pamätajúc na politické a kultúrne dedičstvo..."
+  - Structural elements confirmed: hlava, oddiel, ustavnyclanok, odsek, pismeno
