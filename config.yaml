@@ -415,3 +415,27 @@ countries:
       request_timeout: 30
       max_retries: 5
       requests_per_second: 2.0
+
+  eu:
+    repo_path: "../countries/eu"
+    data_dir: "../countries/data-eu"
+    cache_dir: ".cache"
+    # CELLAR SPARQL + REST API. Public, no auth. Virtuoso backend
+    # with 60-second query timeout. No documented rate limits, but
+    # recommended to stay under 5 concurrent connections per IP.
+    # Discovery: ~16K in-force regulations via paged SPARQL (~16 pages × 400ms).
+    # Text: XHTML consolidated texts via CELLAR REST (~450KB-4.6MB each).
+    # Each regulation needs: 1 SPARQL (consolidations) + N XHTML downloads.
+    # Full bootstrap (~16K regs × ~2 consolidations avg): ~48K requests.
+    # At 4 workers × 2 req/s = 8 req/s → ~1.5-2h fetch time.
+    max_workers: 4
+    source:
+      sparql_url: "https://publications.europa.eu/webapi/rdf/sparql"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 2.0
+      reg_types:
+        - "REG"
+        - "REG_IMPL"
+        - "REG_DEL"
+        - "REG_FINANC"
