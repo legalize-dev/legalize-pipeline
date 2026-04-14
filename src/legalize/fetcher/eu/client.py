@@ -116,9 +116,7 @@ class EURLexClient(HttpClient):
         store CELEX as plain literals (no ``xsd:string`` type), and typed
         equality fails silently for those.
         """
-        # Try xhtml first, then html as fallback for older consolidations
-        for mtype in ("xhtml", "html"):
-            query = f"""PREFIX cdm: <{_CDM}>
+        query = f"""PREFIX cdm: <{_CDM}>
 SELECT DISTINCT ?consCelex ?consDate ?manifest WHERE {{
   ?baseWork cdm:resource_legal_id_celex ?bcelex .
   FILTER(STR(?bcelex) = "{celex}")
@@ -128,15 +126,10 @@ SELECT DISTINCT ?consCelex ?consDate ?manifest WHERE {{
   ?expr cdm:expression_belongs_to_work ?cons .
   ?expr cdm:expression_uses_language <{_LANG_ENG}> .
   ?manifest cdm:manifestation_manifests_expression ?expr .
-  ?manifest cdm:manifestation_type "{mtype}" .
+  ?manifest cdm:manifestation_type ?mtype .
+  FILTER(STR(?mtype) IN ("xhtml", "html"))
 }}
 ORDER BY ?consDate"""
-            result = self.sparql_query(query)
-            bindings = result.get("results", {}).get("bindings", [])
-            if bindings:
-                break
-        else:
-            return []
         result = self.sparql_query(query)
         versions = []
         seen_dates: set[str] = set()
@@ -158,23 +151,26 @@ ORDER BY ?consDate"""
     def get_html_manifest_uri(self, celex: str) -> str | None:
         """Get the XHTML or HTML manifest URI for a regulation's original text.
 
-        Tries xhtml first, falls back to html for older regulations.
+        Uses FILTER IN for manifestation type matching — plain literal
+        equality (``?manifest cdm:manifestation_type "xhtml"``) fails on
+        some old records where the type is stored with a different RDF literal
+        form. FILTER with STR() is more robust.
         """
-        for mtype in ("xhtml", "html"):
-            query = f"""PREFIX cdm: <{_CDM}>
+        query = f"""PREFIX cdm: <{_CDM}>
 SELECT ?manifest WHERE {{
   ?work cdm:resource_legal_id_celex ?celex .
   FILTER(STR(?celex) = "{celex}")
   ?expr cdm:expression_belongs_to_work ?work .
   ?expr cdm:expression_uses_language <{_LANG_ENG}> .
   ?manifest cdm:manifestation_manifests_expression ?expr .
-  ?manifest cdm:manifestation_type "{mtype}" .
+  ?manifest cdm:manifestation_type ?mtype .
+  FILTER(STR(?mtype) IN ("xhtml", "html"))
 }}
 LIMIT 1"""
-            result = self.sparql_query(query)
-            bindings = result.get("results", {}).get("bindings", [])
-            if bindings:
-                return bindings[0]["manifest"]["value"]
+        result = self.sparql_query(query)
+        bindings = result.get("results", {}).get("bindings", [])
+        if bindings:
+            return bindings[0]["manifest"]["value"]
         return None
 
     def get_metadata_sparql(self, celex: str) -> dict:

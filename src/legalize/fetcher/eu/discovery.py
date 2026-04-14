@@ -93,7 +93,7 @@ SELECT DISTINCT ?celex WHERE {{
   ?expr cdm:expression_uses_language <{_LANG_ENG}> .
   ?manifest cdm:manifestation_manifests_expression ?expr .
   ?manifest cdm:manifestation_type ?mtype .
-  FILTER (?mtype IN ("xhtml", "html"))
+  FILTER(STR(?mtype) IN ("xhtml", "html"))
   {cursor_filter}
   {year_filter}
 }}

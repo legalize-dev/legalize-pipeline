@@ -630,7 +630,13 @@ class EURLexTextParser(TextParser):
 
     def _parse_multi_version(self, data: bytes) -> list[Block]:
         """Parse a multi-version envelope into blocks with version history."""
-        root = ET.fromstring(data)
+        try:
+            root = ET.fromstring(data)
+        except ET.ParseError:
+            # Envelope contains old HTML (not valid XML) inside <version> tags.
+            # Extract each <version>...</version> block as raw bytes and parse
+            # them individually with the tolerant HTML parser.
+            return self._parse_multi_version_html_fallback(data)
         celex = root.get("celex", "")
 
         versions: list[Version] = []
@@ -679,6 +685,47 @@ class EURLexTextParser(TextParser):
 
         return [Block(id="main", block_type="content", title="", versions=tuple(versions))]
 
+    def _parse_multi_version_html_fallback(self, data: bytes) -> list[Block]:
+        """Fallback for multi-version envelopes containing old HTML.
+
+        Extracts each ``<version ...>...</version>`` block via regex,
+        parses the inner content with the tolerant HTML parser.
+        """
+        celex_match = re.search(rb"celex='([^']+)'", data[:200])
+        celex = celex_match.group(1).decode() if celex_match else ""
+
+        versions: list[Version] = []
+        # Split on <version> tags
+        for m in re.finditer(
+            rb"<version\s+type='(\w+)'\s*(?:effective-date='([^']*)')?\s*>(.*?)</version>",
+            data,
+            re.DOTALL,
+        ):
+            date_str = m.group(2).decode() if m.group(2) else ""
+            inner = m.group(3)
+
+            try:
+                effective_date = date.fromisoformat(date_str)
+            except (ValueError, TypeError):
+                effective_date = date.today()
+
+            paragraphs = _parse_xhtml_to_paragraphs(inner)
+
+            if paragraphs:
+                versions.append(
+                    Version(
+                        norm_id=celex,
+                        publication_date=effective_date,
+                        effective_date=effective_date,
+                        paragraphs=tuple(paragraphs),
+                    )
+                )
+
+        if not versions:
+            return []
+
+        return [Block(id="main", block_type="content", title="", versions=tuple(versions))]
+
     def extract_reforms(self, data: bytes) -> list[Any]:
         """Extract reform timeline from the multi-version envelope.
 
@@ -689,17 +736,16 @@ class EURLexTextParser(TextParser):
         if b"<eurlex-multi-version" not in data[:200]:
             return []
 
-        root = ET.fromstring(data)
-        celex = root.get("celex", "")
+        # Extract version dates via regex (works for both valid XML and
+        # envelopes containing old HTML that isn't valid XML).
+        celex_match = re.search(rb"celex='([^']+)'", data[:200])
+        celex = celex_match.group(1).decode() if celex_match else ""
         reforms: list[Reform] = []
 
-        for version_el in root:
-            if not version_el.tag.endswith("version") and version_el.tag != "version":
-                continue
-
-            effective_date_str = version_el.get("effective-date", "")
+        for m in re.finditer(rb"<version\s+[^>]*effective-date='([^']+)'", data):
+            date_str = m.group(1).decode()
             try:
-                effective_date = date.fromisoformat(effective_date_str)
+                effective_date = date.fromisoformat(date_str)
             except (ValueError, TypeError):
                 continue
 
