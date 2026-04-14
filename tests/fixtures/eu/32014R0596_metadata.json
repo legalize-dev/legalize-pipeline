@@ -1,0 +1,270 @@
+{
+  "results": {
+    "bindings": [
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0596"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/596/oj"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Regulation (EU) No\u00a0596/2014 of the European Parliament and of the Council of 16\u00a0April 2014 on market abuse (market abuse regulation) and repealing Directive 2003/6/EC of the European Parliament and of the Council and Commission Directives 2003/124/EC, 2003/125/EC and 2004/72/EC  Text with EEA relevance"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-04-16"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2016-07-03"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0596"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/596/oj"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Regulation (EU) No\u00a0596/2014 of the European Parliament and of the Council of 16\u00a0April 2014 on market abuse (market abuse regulation) and repealing Directive 2003/6/EC of the European Parliament and of the Council and Commission Directives 2003/124/EC, 2003/125/EC and 2004/72/EC  Text with EEA relevance"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-04-16"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2016-07-03"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0596"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/596/oj"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Regulation (EU) No\u00a0596/2014 of the European Parliament and of the Council of 16\u00a0April 2014 on market abuse (market abuse regulation) and repealing Directive 2003/6/EC of the European Parliament and of the Council and Commission Directives 2003/124/EC, 2003/125/EC and 2004/72/EC  Text with EEA relevance"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-04-16"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-07-02"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0596"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/596/oj"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Regulation (EU) No\u00a0596/2014 of the European Parliament and of the Council of 16\u00a0April 2014 on market abuse (market abuse regulation) and repealing Directive 2003/6/EC of the European Parliament and of the Council and Commission Directives 2003/124/EC, 2003/125/EC and 2004/72/EC  Text with EEA relevance"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-04-16"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-07-02"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0596"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/596/oj"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Regulation (EU) No\u00a0596/2014 of the European Parliament and of the Council of 16\u00a0April 2014 on market abuse (market abuse regulation) and repealing Directive 2003/6/EC of the European Parliament and of the Council and Commission Directives 2003/124/EC, 2003/125/EC and 2004/72/EC  Text with EEA relevance"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-04-16"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2018-01-03"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0596"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/596/oj"
+        },
+        "title": {
+          "type": "literal",
+          "value": "Regulation (EU) No\u00a0596/2014 of the European Parliament and of the Council of 16\u00a0April 2014 on market abuse (market abuse regulation) and repealing Directive 2003/6/EC of the European Parliament and of the Council and Commission Directives 2003/124/EC, 2003/125/EC and 2004/72/EC  Text with EEA relevance"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-04-16"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2018-01-03"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        }
+      }
+    ]
+  }
+}

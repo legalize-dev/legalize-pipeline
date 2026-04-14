@@ -1,0 +1,186 @@
+{
+  "results": {
+    "bindings": [
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0910"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/910/oj"
+        },
+        "title": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "Regulation (EU) No\u00a0910/2014 of the European Parliament and of the Council of 23\u00a0July 2014 on electronic identification and trust services for electronic transactions in the internal market and repealing Directive 1999/93/EC"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-07-23"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-09-17"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0910"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/910/oj"
+        },
+        "title": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "Regulation (EU) No\u00a0910/2014 of the European Parliament and of the Council of 23\u00a0July 2014 on electronic identification and trust services for electronic transactions in the internal market and repealing Directive 1999/93/EC"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-07-23"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-09-17"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0910"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/910/oj"
+        },
+        "title": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "Regulation (EU) No\u00a0910/2014 of the European Parliament and of the Council of 23\u00a0July 2014 on electronic identification and trust services for electronic transactions in the internal market and repealing Directive 1999/93/EC"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-07-23"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2016-07-01"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32014R0910"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2014/910/oj"
+        },
+        "title": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "Regulation (EU) No\u00a0910/2014 of the European Parliament and of the Council of 23\u00a0July 2014 on electronic identification and trust services for electronic transactions in the internal market and repealing Directive 1999/93/EC"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2014-07-23"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2016-07-01"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        }
+      }
+    ]
+  }
+}

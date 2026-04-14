@@ -1,0 +1,186 @@
+{
+  "results": {
+    "bindings": [
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32022R2065"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2022/2065/oj"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Regulation (EU) 2022/2065 of the European Parliament and of the Council of 19\u00a0October 2022 on a Single Market For Digital Services and amending Directive\u00a02000/31/EC (Digital Services Act) (Text with EEA relevance)"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-10-19"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-11-16"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32022R2065"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2022/2065/oj"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Regulation (EU) 2022/2065 of the European Parliament and of the Council of 19\u00a0October 2022 on a Single Market For Digital Services and amending Directive\u00a02000/31/EC (Digital Services Act) (Text with EEA relevance)"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-10-19"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-02-17"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32022R2065"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2022/2065/oj"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Regulation (EU) 2022/2065 of the European Parliament and of the Council of 19\u00a0October 2022 on a Single Market For Digital Services and amending Directive\u00a02000/31/EC (Digital Services Act) (Text with EEA relevance)"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-10-19"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-11-16"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+        }
+      },
+      {
+        "celex": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#string",
+          "value": "32022R2065"
+        },
+        "eli": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+          "value": "http://data.europa.eu/eli/reg/2022/2065/oj"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Regulation (EU) 2022/2065 of the European Parliament and of the Council of 19\u00a0October 2022 on a Single Market For Digital Services and amending Directive\u00a02000/31/EC (Digital Services Act) (Text with EEA relevance)"
+        },
+        "date": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-10-19"
+        },
+        "entryForce": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-02-17"
+        },
+        "endValidity": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "9999-12-31"
+        },
+        "force": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "rtype": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        },
+        "author": {
+          "type": "uri",
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+        }
+      }
+    ]
+  }
+}

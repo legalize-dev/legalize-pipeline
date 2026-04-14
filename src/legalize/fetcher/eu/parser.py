@@ -74,9 +74,24 @@ def _tag(el: ET.Element) -> str:
     return el.tag.split("}")[-1] if "}" in el.tag else el.tag
 
 
+# Modification markers inserted by EUR-Lex consolidated text system
+_MOD_MARKER_RE = re.compile(r"\[?\*{0,2}[►▼][A-Z]\d*\*{0,2}\]?")
+_MOD_END_RE = re.compile(r"\*{0,2}[◄▲]\*{0,2}")
+
+
 def _clean(text: str) -> str:
     """Clean text: strip control chars, normalize whitespace."""
     text = _CONTROL_RE.sub("", text)
+    text = _MULTI_SPACE_RE.sub(" ", text)
+    return text.strip()
+
+
+def _strip_mod_markers(text: str) -> str:
+    """Remove EUR-Lex modification markers (►M1, ◄, etc.) from text."""
+    text = _MOD_MARKER_RE.sub("", text)
+    text = _MOD_END_RE.sub("", text)
+    # Clean up leftover formatting artifacts
+    text = text.replace("****", "").replace("** **", " ")
     text = _MULTI_SPACE_RE.sub(" ", text)
     return text.strip()
 
@@ -105,11 +120,16 @@ def _extract_text(el: ET.Element) -> str:
         elif ctag == "span" and "no-parag" in cls:
             parts.append(child_text)
         elif ctag == "a" and child_text.strip():
-            href = child.get("href", "")
-            if href and not href.startswith("#"):
-                parts.append(f"[{child_text.strip()}]({href})")
+            # Skip modification marker links (►M1, ►B, ◄)
+            stripped = child_text.strip().replace("*", "")
+            if "►" in stripped or "◄" in stripped or "▼" in stripped or "▲" in stripped:
+                pass  # Skip
             else:
-                parts.append(child_text)
+                href = child.get("href", "")
+                if href and not href.startswith("#"):
+                    parts.append(f"[{child_text.strip()}]({href})")
+                else:
+                    parts.append(child_text)
         elif ctag == "br":
             parts.append("\n")
         elif ctag == "sup" and child_text.strip():
@@ -120,7 +140,9 @@ def _extract_text(el: ET.Element) -> str:
         if child.tail:
             parts.append(child.tail)
 
-    return "".join(parts)
+    result = "".join(parts)
+    # Strip any remaining modification markers from raw text
+    return _strip_mod_markers(result)
 
 
 def _parse_list(el: ET.Element) -> str:
@@ -153,8 +175,81 @@ def _parse_list(el: ET.Element) -> str:
     return content
 
 
+def _is_list_table(table_el: ET.Element) -> bool:
+    """Detect if a table is actually a layout-table used for lists (OJ format).
+
+    OJ texts use ``<table border="0">`` with 2 columns (narrow marker + wide
+    content) to lay out numbered lists and definitions. These should be parsed
+    as list items, not as Markdown pipe tables.
+    """
+    if table_el.get("border") != "0":
+        return False
+    cols = list(table_el.iter(_xh("col")))
+    if len(cols) != 2:
+        return False
+    # Check column widths: first column narrow (≤10%), second wide
+    first_width = cols[0].get("width", "")
+    if not first_width:
+        return False
+    try:
+        w = int(first_width.rstrip("%"))
+        return w <= 10
+    except ValueError:
+        return False
+
+
+def _parse_list_table(table_el: ET.Element) -> list[Paragraph]:
+    """Parse an OJ list-table into list Paragraphs.
+
+    Each row is one list item: first cell is the marker, second is the content.
+    The content cell may contain nested list-tables (sub-lists).
+    """
+    paragraphs: list[Paragraph] = []
+    for tr in table_el.iter(_xh("tr")):
+        cells = [c for c in tr if _tag(c) in ("td", "th")]
+        if len(cells) < 2:
+            continue
+        marker = _extract_text(cells[0]).strip()
+        # Process content cell — may have nested list-tables
+        content_parts: list[str] = []
+        nested_paras: list[Paragraph] = []
+        for child in cells[1]:
+            ctag = _tag(child)
+            if ctag == "table" and _is_list_table(child):
+                nested_paras.extend(_parse_list_table(child))
+            elif ctag == "p":
+                text = _extract_text(child).strip()
+                if text:
+                    content_parts.append(text)
+            elif ctag == "div":
+                # May contain nested structures
+                for sub in child:
+                    stag = _tag(sub)
+                    if stag == "table" and _is_list_table(sub):
+                        nested_paras.extend(_parse_list_table(sub))
+                    elif stag == "p":
+                        text = _extract_text(sub).strip()
+                        if text:
+                            content_parts.append(text)
+
+        content = "\n".join(content_parts)
+        if marker and content:
+            lines = content.split("\n")
+            first = f"{marker} {lines[0]}"
+            rest = [f"   {line}" if line.strip() else "" for line in lines[1:]]
+            text = "\n".join([first] + rest)
+            paragraphs.append(Paragraph("list", text))
+        elif content:
+            paragraphs.append(Paragraph("abs", content))
+
+        # Add nested list items
+        paragraphs.extend(nested_paras)
+
+    return paragraphs
+
+
 def _parse_table(table_el: ET.Element) -> str:
-    """Convert an HTML table to a Markdown pipe table."""
+    """Convert an HTML data table to a Markdown pipe table."""
     rows: list[list[str]] = []
     for tr in table_el.iter(_xh("tr")):
         cells: list[str] = []
@@ -271,11 +366,14 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
             paragraphs.append(Paragraph("list", text))
         return paragraphs
 
-    # Tables
+    # Tables — detect list-tables vs data tables
     if tag == "table":
-        text = _parse_table(el)
-        if text:
-            paragraphs.append(Paragraph("table", text))
+        if _is_list_table(el):
+            paragraphs.extend(_parse_list_table(el))
+        else:
+            text = _parse_table(el)
+            if text:
+                paragraphs.append(Paragraph("table", text))
         return paragraphs
 
     # ─── OJ (Official Journal) format classes ───
@@ -380,8 +478,8 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
             ctag = _tag(child)
             child_cls = child.get("class", "")
 
-            # Skip amendment header tables
-            if ctag == "table" and not _is_content_table(child):
+            # Skip amendment header tables (but keep list-tables and data tables)
+            if ctag == "table" and not _is_content_table(child) and not _is_list_table(child):
                 continue
 
             # Skip arrow markers
