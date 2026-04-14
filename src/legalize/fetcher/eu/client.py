@@ -111,20 +111,32 @@ class EURLexClient(HttpClient):
         - ``celex``: consolidated text CELEX (e.g., 02016R0679-20160504)
         - ``date``: effective date string (YYYY-MM-DD)
         - ``manifest_uri``: URI of the XHTML manifestation
+
+        Uses ``FILTER(STR(...))`` for CELEX matching because older records
+        store CELEX as plain literals (no ``xsd:string`` type), and typed
+        equality fails silently for those.
         """
-        query = f"""PREFIX cdm: <{_CDM}>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        # Try xhtml first, then html as fallback for older consolidations
+        for mtype in ("xhtml", "html"):
+            query = f"""PREFIX cdm: <{_CDM}>
 SELECT DISTINCT ?consCelex ?consDate ?manifest WHERE {{
-  ?baseWork cdm:resource_legal_id_celex "{celex}"^^xsd:string .
+  ?baseWork cdm:resource_legal_id_celex ?bcelex .
+  FILTER(STR(?bcelex) = "{celex}")
   ?cons cdm:act_consolidated_based_on_resource_legal ?baseWork .
   ?cons cdm:resource_legal_id_celex ?consCelex .
   ?cons cdm:work_date_document ?consDate .
   ?expr cdm:expression_belongs_to_work ?cons .
   ?expr cdm:expression_uses_language <{_LANG_ENG}> .
   ?manifest cdm:manifestation_manifests_expression ?expr .
-  ?manifest cdm:manifestation_type "xhtml" .
+  ?manifest cdm:manifestation_type "{mtype}" .
 }}
 ORDER BY ?consDate"""
+            result = self.sparql_query(query)
+            bindings = result.get("results", {}).get("bindings", [])
+            if bindings:
+                break
+        else:
+            return []
         result = self.sparql_query(query)
         versions = []
         seen_dates: set[str] = set()
@@ -143,22 +155,26 @@ ORDER BY ?consDate"""
             )
         return versions
 
-    def get_xhtml_manifest_uri(self, celex: str) -> str | None:
-        """Get the XHTML manifest URI for a regulation's original text."""
-        query = f"""PREFIX cdm: <{_CDM}>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    def get_html_manifest_uri(self, celex: str) -> str | None:
+        """Get the XHTML or HTML manifest URI for a regulation's original text.
+
+        Tries xhtml first, falls back to html for older regulations.
+        """
+        for mtype in ("xhtml", "html"):
+            query = f"""PREFIX cdm: <{_CDM}>
 SELECT ?manifest WHERE {{
-  ?work cdm:resource_legal_id_celex "{celex}"^^xsd:string .
+  ?work cdm:resource_legal_id_celex ?celex .
+  FILTER(STR(?celex) = "{celex}")
   ?expr cdm:expression_belongs_to_work ?work .
   ?expr cdm:expression_uses_language <{_LANG_ENG}> .
   ?manifest cdm:manifestation_manifests_expression ?expr .
-  ?manifest cdm:manifestation_type "xhtml" .
+  ?manifest cdm:manifestation_type "{mtype}" .
 }}
 LIMIT 1"""
-        result = self.sparql_query(query)
-        bindings = result.get("results", {}).get("bindings", [])
-        if bindings:
-            return bindings[0]["manifest"]["value"]
+            result = self.sparql_query(query)
+            bindings = result.get("results", {}).get("bindings", [])
+            if bindings:
+                return bindings[0]["manifest"]["value"]
         return None
 
     def get_metadata_sparql(self, celex: str) -> dict:
@@ -169,10 +185,9 @@ LIMIT 1"""
         """
         rtype_values = ", ".join(f"<{_RTYPE_BASE}{t}>" for t in self._reg_types)
         query = f"""PREFIX cdm: <{_CDM}>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT DISTINCT ?celex ?eli ?title ?date ?entryForce ?endValidity ?force ?rtype ?author WHERE {{
-  ?work cdm:resource_legal_id_celex "{celex}"^^xsd:string .
   ?work cdm:resource_legal_id_celex ?celex .
+  FILTER(STR(?celex) = "{celex}")
   ?work cdm:work_has_resource-type ?rtype .
   FILTER(?rtype IN ({rtype_values}))
   FILTER NOT EXISTS {{
@@ -285,7 +300,7 @@ SELECT DISTINCT ?celex ?eli ?title ?date ?entryForce ?endValidity ?force ?rtype 
             data = b"".join(pieces)
         else:
             # No consolidated versions — download the original text
-            manifest_uri = self.get_xhtml_manifest_uri(celex)
+            manifest_uri = self.get_html_manifest_uri(celex)
             if not manifest_uri:
                 raise ValueError(f"No XHTML available for {celex}")
             data = self.download_xhtml(manifest_uri)

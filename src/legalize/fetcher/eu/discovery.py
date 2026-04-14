@@ -20,6 +20,7 @@ from legalize.fetcher.eu.client import (
     DEFAULT_REG_TYPES,
     EURLexClient,
     _CDM,
+    _LANG_ENG,
     _RTYPE_BASE,
 )
 
@@ -35,8 +36,9 @@ _PAGE_SIZE = 1000
 class EURLexDiscovery(NormDiscovery):
     """Discover EU regulations via SPARQL queries on CELLAR."""
 
-    def __init__(self, reg_types: list[str] | None = None) -> None:
+    def __init__(self, reg_types: list[str] | None = None, year_start: int = 0) -> None:
         self._reg_types = reg_types or DEFAULT_REG_TYPES
+        self._year_start = year_start
 
     @classmethod
     def create(cls, source) -> EURLexDiscovery:
@@ -45,7 +47,8 @@ class EURLexDiscovery(NormDiscovery):
         else:
             source_dict = source or {}
         reg_types = source_dict.get("reg_types", DEFAULT_REG_TYPES)
-        return cls(reg_types=reg_types)
+        year_start = int(source_dict.get("year_start", 0))
+        return cls(reg_types=reg_types, year_start=year_start)
 
     def _build_rtype_filter(self) -> str:
         """Build a SPARQL FILTER clause for regulation types."""
@@ -68,7 +71,13 @@ class EURLexDiscovery(NormDiscovery):
         cursor = ""
 
         while True:
-            cursor_filter = f'FILTER (?celex > "{cursor}"^^xsd:string)' if cursor else ""
+            cursor_filter = f'FILTER (STR(?celex) > "{cursor}")' if cursor else ""
+            # Filter by year if configured (CELEX format: 3YYYYR...)
+            year_filter = ""
+            if self._year_start:
+                year_filter = f'FILTER (STR(?celex) >= "3{self._year_start}R")'
+            # Only include works that have an HTML or XHTML English expression
+            # (skip PDF-only old laws that we can't parse)
             query = f"""PREFIX cdm: <{_CDM}>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT DISTINCT ?celex WHERE {{
@@ -80,7 +89,13 @@ SELECT DISTINCT ?celex WHERE {{
   FILTER NOT EXISTS {{ ?work cdm:do_not_index "true"^^xsd:boolean . }}
   ?work cdm:resource_legal_in-force "true"^^xsd:boolean .
   ?work cdm:resource_legal_id_celex ?celex .
+  ?expr cdm:expression_belongs_to_work ?work .
+  ?expr cdm:expression_uses_language <{_LANG_ENG}> .
+  ?manifest cdm:manifestation_manifests_expression ?expr .
+  ?manifest cdm:manifestation_type ?mtype .
+  FILTER (?mtype IN ("xhtml", "html"))
   {cursor_filter}
+  {year_filter}
 }}
 ORDER BY ?celex
 LIMIT {_PAGE_SIZE}"""

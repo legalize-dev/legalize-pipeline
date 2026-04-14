@@ -498,11 +498,26 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
     if "reference" in cls:
         return paragraphs
 
-    # Empty paragraphs with just <br/>
+    # Plain paragraphs (no CSS class) — common in old HTML4 format.
+    # Detect "Article N" as headings for structural consistency.
     if tag == "p" and not cls:
         text = _extract_text(el).strip()
         if text:
-            paragraphs.append(Paragraph("abs", text))
+            if re.match(r"^Article\s+\d+\w*\s*$", text):
+                paragraphs.append(Paragraph("h4", text))
+            else:
+                paragraphs.append(Paragraph("abs", text))
+        return paragraphs
+
+    # <h1> tags in old HTML (CELEX number as title)
+    if tag == "h1":
+        return paragraphs  # Skip — CELEX is not the title
+
+    # <strong> as title in old HTML
+    if tag == "strong":
+        text = _extract_text(el).strip()
+        if text and len(text) > 20:
+            paragraphs.append(Paragraph("h1", text))
         return paragraphs
 
     # Container divs — recurse
@@ -549,17 +564,37 @@ def _is_amendment_table(table_el: ET.Element) -> bool:
 
 
 def _parse_xhtml_to_paragraphs(data: bytes) -> list[Paragraph]:
-    """Parse XHTML bytes into a flat list of Paragraphs."""
-    # Parse as XML (XHTML is valid XML)
-    root = ET.fromstring(data)
+    """Parse XHTML or HTML bytes into a flat list of Paragraphs.
+
+    Tries strict XML parsing first (for XHTML). Falls back to lxml.html
+    for old HTML4 documents that aren't valid XML.
+    """
+    try:
+        root = ET.fromstring(data)
+    except ET.ParseError:
+        # Old HTML4 — parse with lxml.html (permissive) and convert to ET
+        from lxml import html as lxml_html
+
+        doc = lxml_html.fromstring(data)
+        # lxml.html uses no namespace; _walk_body checks _tag() which strips ns
+        # Convert lxml tree to ET tree for uniform processing
+        raw_xml = lxml_html.tostring(doc, encoding="unicode", method="xml")
+        root = ET.fromstring(raw_xml)
 
     # Find the eli-container (main content area)
     container = root.find(f".//{_xh('div')}[@class='eli-container']")
     if container is not None:
         return _walk_body(container)
 
-    # Fallback: walk the body
+    # Fallback for old HTML: no namespace, look for plain tags
+    container = root.find(".//div[@class='eli-container']")
+    if container is not None:
+        return _walk_body(container)
+
+    # Fallback: walk the body (with or without namespace)
     body = root.find(f".//{_xh('body')}")
+    if body is None:
+        body = root.find(".//body")
     if body is not None:
         return _walk_body(body)
 
