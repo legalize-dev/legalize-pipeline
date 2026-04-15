@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       country:
-        description: "Country code (es, fr, at, se, pt, lv, ad, lt, ee, pl, gr, nl, be, cz, fi, it, lu)"
+        description: "Country code (es, fr, at, de, se, pt, lv, ad, lt, ee, pl, uy, gr, nl, be, cz, fi, it, lu, eu)"
         required: false
         type: string
         default: ""
@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","fr","at","se","pt","lv","ad","lt","ee","pl","gr","nl","be","cz","fi","it","lu"]') }}
+        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","fr","at","de","se","pt","lv","ad","lt","ee","pl","uy","gr","nl","be","cz","fi","it","lu","eu"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
