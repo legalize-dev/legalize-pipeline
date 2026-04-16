@@ -525,3 +525,31 @@ countries:
       request_timeout: 30
       max_retries: 5
       requests_per_second: 2.0
+
+  uk:
+    repo_path: "../countries/uk"
+    data_dir: "../countries/data-uk"
+    cache_dir: ".cache"
+    # legislation.gov.uk CLML + Atom. Public, OGL v3.0. robots.txt sets
+    # Crawl-delay: 5 but no hard rate limit is documented. We keep each
+    # worker at 1 req/s and run 4 workers — effective 4 req/s, well
+    # under what the service tolerates in practice.
+    # Phase 1 scope: primary legislation only (ukpga, asp, asc, anaw,
+    # mwa, nia) — ~3,971 Acts with ~15K point-in-time versions.
+    # Full bootstrap observed 2026-04-18: ~3h fetch + ~1h commits
+    # (fast-import), producing 38,004 commits across 4 jurisdictions.
+    max_workers: 4
+    source:
+      base_url: "https://www.legislation.gov.uk"
+      request_timeout: 45
+      max_retries: 4
+      requests_per_second: 1.0
+      # Primary-legislation type codes to discover. Secondary legislation
+      # (uksi/ssi/wsi/nisr) is deferred to phase 2.
+      types:
+        - "ukpga"
+        - "asp"
+        - "asc"
+        - "anaw"
+        - "mwa"
+        - "nia"
