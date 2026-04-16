@@ -1,0 +1,75 @@
+name: Monthly update (Switzerland)
+
+# Fedlex publishes batches of consolidations on most working days, but the
+# rhythm is irregular — large cross-act revisions cluster around Jan 1,
+# Apr 1, Jul 1 and Oct 1 (typical Swiss entry-into-force dates). A monthly
+# cadence is enough to keep the repo current without hammering the SPARQL
+# endpoint daily; the engine's idempotency layer skips commits that already
+# exist so re-running is safe and fast for unchanged norms.
+#
+# Scheduled for the 3rd of each month at 13:00 UTC (1h after the web sync
+# window), with manual dispatch for out-of-cycle runs.
+
+on:
+  schedule:
+    - cron: "0 13 3 * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force full re-bootstrap (ignore idempotency cache)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240  # 4h ceiling — actual run is ~1.5-2h
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-ch
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: legalize-dev/legalize-ch
+          path: repos/ch
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Configure git identity
+        working-directory: repos/ch
+        run: |
+          git config user.name "Legalize"
+          git config user.email "legalize@legalize.dev"
+
+      - name: Run CH bootstrap (idempotent — existing commits are skipped)
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          legalize bootstrap -c ch --repo-path repos/ch --data-dir data-ch
+
+      - name: Push updates
+        working-directory: repos/ch
+        run: |
+          if git diff --quiet HEAD origin/main; then
+            echo "No new commits to push."
+          else
+            git push origin HEAD:main
+          fi
