@@ -1,0 +1,430 @@
+<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DocumentURI="http://www.legislation.gov.uk/nia/2022/2" IdURI="http://www.legislation.gov.uk/id/nia/2022/2" NumberOfProvisions="7" xsi:schemaLocation="http://www.legislation.gov.uk/namespaces/legislation http://www.legislation.gov.uk/schema/legislation.xsd" SchemaVersion="1.0" RestrictExtent="N.I." RestrictStartDate="2022-02-03"><ukm:Metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:ukm="http://www.legislation.gov.uk/namespaces/metadata">
+					<dc:identifier>http://www.legislation.gov.uk/nia/2022/2</dc:identifier><dc:title>Horse Racing (Amendment) Act (Northern Ireland) 2022</dc:title><dc:description>Amend the Horse Racing (Northern Ireland) Order 1990 to allow for payments to be made from the Horse Racing Fund to horse racecourse operators; and for connected purposes.</dc:description><dc:publisher>Statute Law Database</dc:publisher><dc:modified>2022-08-01</dc:modified><dc:contributor>Expert Participation</dc:contributor><dct:valid>2022-02-03</dct:valid>
+					
+					<atom:link rel="self" href="http://www.legislation.gov.uk/nia/2022/2/data.xml" type="application/xml"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/resources" href="http://www.legislation.gov.uk/nia/2022/2/resources" title="More Resources"/>
+					
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/notes" href="http://www.legislation.gov.uk/id/nia/2022/2/notes" title="Explanatory Notes"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/notes/toc" href="http://www.legislation.gov.uk/nia/2022/2/notes/contents" title="Explanatory Notes Table of Contents"/>
+					
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/act" href="http://www.legislation.gov.uk/nia/2022/2" title="whole act"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/introduction" href="http://www.legislation.gov.uk/nia/2022/2/introduction" title="introduction"/>
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/body" href="http://www.legislation.gov.uk/nia/2022/2/body" title="body"/>
+					
+					
+										
+					
+					
+					
+					<atom:link rel="alternate" type="application/rdf+xml" href="http://www.legislation.gov.uk/nia/2022/2/data.rdf" title="RDF/XML"/><atom:link rel="alternate" type="application/akn+xml" href="http://www.legislation.gov.uk/nia/2022/2/data.akn" title="AKN"/><atom:link rel="alternate" type="application/xhtml+xml" href="http://www.legislation.gov.uk/nia/2022/2/data.xht" title="HTML snippet"/><atom:link rel="alternate" type="text/html" href="http://www.legislation.gov.uk/nia/2022/2/data.htm" title="Website (XHTML) Default View"/><atom:link rel="alternate" type="text/csv" href="http://www.legislation.gov.uk/nia/2022/2/data.csv" title="CSV"/><atom:link rel="alternate" type="application/pdf" href="http://www.legislation.gov.uk/nia/2022/2/data.pdf" title="PDF"/>
+					<atom:link rel="alternate" type="application/akn+xhtml" href="http://www.legislation.gov.uk/nia/2022/2/data.html" title="HTML5 snippet"/>
+
+					<atom:link rel="alternate" href="http://www.legislation.gov.uk/nia/2022/2/pdfs/nia_20220002_en.pdf" type="application/pdf" title="Original PDF"/>
+					<atom:link rel="http://purl.org/dc/terms/tableOfContents" hreflang="en" href="http://www.legislation.gov.uk/nia/2022/2/contents" title="Table of Contents"/>
+					
+					<atom:link rel="http://purl.org/dc/terms/hasVersion" href="http://www.legislation.gov.uk/nia/2022/2/enacted" title="enacted"/><atom:link rel="http://purl.org/dc/terms/hasVersion" href="http://www.legislation.gov.uk/nia/2022/2/2022-02-03" title="2022-02-03"/>
+					
+					
+					<ukm:PrimaryMetadata><ukm:DocumentClassification><ukm:DocumentCategory Value="primary"/><ukm:DocumentMainType Value="NorthernIrelandAct"/><ukm:DocumentStatus Value="revised"/></ukm:DocumentClassification><ukm:Year Value="2022"/><ukm:Number Value="2"/><ukm:EnactmentDate Date="2022-02-02"/><ukm:ISBN Value="9780105962519"/></ukm:PrimaryMetadata>
+					
+
+                    
+									<ukm:Notes><ukm:Note IdURI="http://www.legislation.gov.uk/id/nia/2022/2/notes" DocumentURI="http://www.legislation.gov.uk/nia/2022/2/notes"/><ukm:Alternatives><ukm:Alternative URI="http://www.legislation.gov.uk/nia/2022/2/pdfs/niaen_20220002_en.pdf" Date="2022-02-23" Title="Explanatory Note" Size="1840831"/></ukm:Alternatives>       
+								</ukm:Notes> 
+					<ukm:Alternatives><ukm:Alternative URI="http://www.legislation.gov.uk/nia/2022/2/pdfs/nia_20220002_en.pdf" Date="2022-02-08" Size="314077"/></ukm:Alternatives>
+					
+					<ukm:Statistics>
+									<ukm:TotalParagraphs Value="7"/>
+									<ukm:BodyParagraphs Value="7"/>
+									<ukm:ScheduleParagraphs Value="0"/>
+									<ukm:AttachmentParagraphs Value="0"/>
+									<ukm:TotalImages Value="0"/>
+								</ukm:Statistics>
+				</ukm:Metadata><Primary>
+<PrimaryPrelims DocumentURI="http://www.legislation.gov.uk/nia/2022/2/introduction" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/introduction" RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Horse Racing (Amendment) Act (Northern Ireland) 2022</Title>
+<Number>2022 Chapter 2</Number>
+<LongTitle>An Act to amend the Horse Racing (Northern Ireland) Order 1990 to allow for payments to be made from the Horse Racing Fund to horse racecourse operators; and for connected purposes.</LongTitle>
+<DateOfEnactment>
+<DateText>[2nd February 2022]</DateText>
+</DateOfEnactment>
+<PrimaryPreamble>
+<EnactingText>
+<Para>
+<Text>BE IT ENACTED by being passed by the Northern Ireland Assembly and assented to by Her Majesty as follows:</Text>
+</Para>
+</EnactingText>
+</PrimaryPreamble>
+</PrimaryPrelims>
+<Body DocumentURI="http://www.legislation.gov.uk/nia/2022/2/body" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/body" NumberOfProvisions="7" RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<P1group RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Horse racecourse operators</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/1" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/1" id="section-1">
+<Pnumber><CommentaryRef Ref="key-2a7d2332980d6c95f6c92a97877e81fe"/>1</Pnumber>
+<P1para>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/1/1" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/1/1" id="section-1-1">
+<Pnumber>1</Pnumber>
+<P2para>
+<Text>Article 2 of the 1990 Order (interpretation) is amended as follows.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/1/2" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/1/2" id="section-1-2">
+<Pnumber>2</Pnumber>
+<P2para>
+<Text>In paragraph (2)—</Text>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/1/2/a" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/1/2/a" id="section-1-2-a">
+<Pnumber>a</Pnumber>
+<P3para>
+<Text>omit the definition of “the Company”;</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/1/2/b" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/1/2/b" id="section-1-2-b">
+<Pnumber>b</Pnumber>
+<P3para>
+<Text>omit the definition of “the Corporation”;</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/1/2/c" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/1/2/c" id="section-1-2-c">
+<Pnumber>c</Pnumber>
+<P3para>
+<Text>at the appropriate place insert—</Text>
+<BlockAmendment Context="main" Format="default" TargetClass="secondary" TargetSubClass="order">
+<UnorderedList Class="Definition" Decoration="none">
+<ListItem>
+<Para>
+<Text>“horse racecourse operator” means any of the following—</Text>
+<OrderedList Type="roman" Decoration="parens">
+<ListItem>
+<Para>
+<Text>Downpatrick Race Club;</Text>
+</Para>
+</ListItem>
+<ListItem>
+<Para>
+<Text>Down Royal Park Racecourse Limited;</Text>
+</Para>
+</ListItem>
+</OrderedList>
+</Para>
+</ListItem>
+</UnorderedList>
+</BlockAmendment>
+<AppendText>.</AppendText>
+</P3para>
+</P3>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/1/3" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/1/3" id="section-1-3">
+<Pnumber>3</Pnumber>
+<P2para>
+<Text>After paragraph (2) add—</Text>
+<BlockAmendment Context="main" Format="default" TargetClass="secondary" TargetSubClass="order">
+<P2>
+<Pnumber>3</Pnumber>
+<P2para>
+<Text>The Department may by regulations make such amendment to the definition of “horse racecourse operator” as it thinks appropriate.</Text>
+</P2para>
+</P2>
+<P2>
+<Pnumber>4</Pnumber>
+<P2para>
+<Text>Regulations under paragraph (3) may not be made unless a draft of the regulations has been laid before and approved by a resolution of the Assembly.</Text>
+</P2para>
+</P2>
+</BlockAmendment>
+<AppendText>.</AppendText>
+</P2para>
+</P2>
+</P1para>
+</P1>
+</P1group>
+<P1group RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Horse Racing Fund</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2" id="section-2">
+<Pnumber><CommentaryRef Ref="key-2aa6437e53ae86ab76889341fb7c7432"/>2</Pnumber>
+<P1para>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/1" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/1" id="section-2-1">
+<Pnumber>1</Pnumber>
+<P2para>
+<Text>Article 3 of the 1990 Order (horse racing fund) is amended as follows.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/2" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/2" id="section-2-2">
+<Pnumber>2</Pnumber>
+<P2para>
+<Text>In paragraph (1), for “the Corporation and the Company” substitute <InlineAmendment>“horse racecourse operators”</InlineAmendment>.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/3" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/3" id="section-2-3">
+<Pnumber>3</Pnumber>
+<P2para>
+<Text>In paragraph (4)—</Text>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/3/a" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/3/a" id="section-2-3-a">
+<Pnumber>a</Pnumber>
+<P3para>
+<Text>for “The Corporation and the Company” in the first place where it occurs substitute <InlineAmendment>“Each horse racecourse operator”</InlineAmendment>;</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/3/b" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/3/b" id="section-2-3-b">
+<Pnumber>b</Pnumber>
+<P3para>
+<Text>for “the Corporation and the Company” in the second place where it occurs substitute <InlineAmendment>“the horse racecourse operator”</InlineAmendment>.</Text>
+</P3para>
+</P3>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/4" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/4" id="section-2-4">
+<Pnumber>4</Pnumber>
+<P2para>
+<Text>After paragraph (4) insert—</Text>
+<BlockAmendment Context="main" Format="default" TargetClass="secondary" TargetSubClass="order">
+<P2>
+<Pnumber>4A</Pnumber>
+<P2para>
+<Text>A horse racecourse operator may submit a statement under paragraph (4) either on its own or together with any other horse racecourse operator.</Text>
+</P2para>
+</P2>
+</BlockAmendment>
+<AppendText>.</AppendText>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/5" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/5" id="section-2-5">
+<Pnumber>5</Pnumber>
+<P2para>
+<Text>In paragraph (5)—</Text>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/5/a" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/5/a" id="section-2-5-a">
+<Pnumber>a</Pnumber>
+<P3para>
+<Text>in the words before sub-paragraph (a)—</Text>
+<P4 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/5/a/i" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/5/a/i" id="section-2-5-a-i">
+<Pnumber>i</Pnumber>
+<P4para>
+<Text>for “the statement” substitute <InlineAmendment>“a statement”</InlineAmendment>;</Text>
+</P4para>
+</P4>
+<P4 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/5/a/ii" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/5/a/ii" id="section-2-5-a-ii">
+<Pnumber>ii</Pnumber>
+<P4para>
+<Text>for “the Corporation or, as the case may be, the Company” substitute <InlineAmendment>“the horse racecourse operator”</InlineAmendment>;</Text>
+</P4para>
+</P4>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/5/b" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/5/b" id="section-2-5-b">
+<Pnumber>b</Pnumber>
+<P3para>
+<Text>in sub-paragraph (c), for “the Corporation or the Company” substitute <InlineAmendment>“the horse racecourse operator”</InlineAmendment>.</Text>
+</P3para>
+</P3>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/6" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/6" id="section-2-6">
+<Pnumber>6</Pnumber>
+<P2para>
+<Text>After paragraph (5) insert—</Text>
+<BlockAmendment Context="main" Format="default" TargetClass="secondary" TargetSubClass="order">
+<P2>
+<Pnumber>5A</Pnumber>
+<P2para>
+<Text>Where a horse racecourse operator submits a statement under paragraph (4) together with any other horse racecourse operator, any reference in paragraphs (4) or (5), or in Article 6 to either “the horse racecourse operator” or “a horse racecourse operator” is a reference to the horse racecourse operators in question.</Text>
+</P2para>
+</P2>
+</BlockAmendment>
+<AppendText>.</AppendText>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/2/7" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/2/7" id="section-2-7">
+<Pnumber>7</Pnumber>
+<P2para>
+<Text>Omit paragraph (6).</Text>
+</P2para>
+</P2>
+</P1para>
+</P1>
+</P1group>
+<P1group RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Minor and consequential amendments</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3" id="section-3">
+<Pnumber><CommentaryRef Ref="key-9b453637a87466360964c0244b86585c"/>3</Pnumber>
+<P1para>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/1" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/1" id="section-3-1">
+<Pnumber>1</Pnumber>
+<P2para>
+<Text>The 1990 Order is amended as follows.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/2" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/2" id="section-3-2">
+<Pnumber>2</Pnumber>
+<P2para>
+<Text>In Article 2(2) (interpretation), omit the definition of “modify”.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/3" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/3" id="section-3-3">
+<Pnumber>3</Pnumber>
+<P2para>
+<Text>In Article 6(1)(a) (power to enter land), for “the Corporation or the Company” substitute <InlineAmendment>“a horse racecourse operator”</InlineAmendment>.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/4" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/4" id="section-3-4">
+<Pnumber>4</Pnumber>
+<P2para>
+<Text>In Article 7 (returns or information to the Department), for “The Corporation and the Company” substitute <InlineAmendment>“Each horse racecourse operator”</InlineAmendment>.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/5" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/5" id="section-3-5">
+<Pnumber>5</Pnumber>
+<P2para>
+<Text>In Article 10 (accounts etc.)—</Text>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/5/a" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/5/a" id="section-3-5-a">
+<Pnumber>a</Pnumber>
+<P3para>
+<Text>in paragraph (1), for “The Corporation and the Company” substitute <InlineAmendment>“Each horse racecourse operator”</InlineAmendment>;</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/5/b" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/5/b" id="section-3-5-b">
+<Pnumber>b</Pnumber>
+<P3para>
+<Text>in paragraph (2), for “the Corporation or, as the case may be, the Company” substitute <InlineAmendment>“the horse racecourse operator”</InlineAmendment>.</Text>
+</P3para>
+</P3>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/6" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/6" id="section-3-6">
+<Pnumber>6</Pnumber>
+<P2para>
+<Text>Omit Article 11 (rules and bye-laws of the Corporation).</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/3/7" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/3/7" id="section-3-7">
+<Pnumber>7</Pnumber>
+<P2para>
+<Text>In Schedule 1 (amendments), omit paragraphs 5 and 6 and the cross-heading before paragraph 5.</Text>
+</P2para>
+</P2>
+</P1para>
+</P1>
+</P1group>
+<P1group RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Interpretation</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/4" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/4" id="section-4">
+<Pnumber><CommentaryRef Ref="key-dc1d68374cd89bc6819f83eb229f2a47"/>4</Pnumber>
+<P1para>
+<Text>In this Act “the 1990 Order” means the Horse Racing (Northern Ireland) Order 1990.</Text>
+</P1para>
+</P1>
+</P1group>
+<P1group RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Transitional and supplementary provision</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5" id="section-5">
+<Pnumber><CommentaryRef Ref="key-f54fb7bcd9caf869d103f481824f0e9b"/>5</Pnumber>
+<P1para>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/1" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/1" id="section-5-1">
+<Pnumber>1</Pnumber>
+<P2para>
+<Text>Down Royal Park Racecourse Limited must submit a statement of its expenditure for the year beginning with 1 January 2021 to the Department.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/2" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/2" id="section-5-2">
+<Pnumber>2</Pnumber>
+<P2para>
+<Text>Where a horse racecourse operator has not submitted a statement under Article 3(4) of the 1990 Order for the year beginning with 1 January 2022, the operator must submit a statement for the year to the Department.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/3" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/3" id="section-5-3">
+<Pnumber>3</Pnumber>
+<P2para>
+<Text>A statement submitted under subsection (2) must include—</Text>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/3/a" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/3/a" id="section-5-3-a">
+<Pnumber>a</Pnumber>
+<P3para>
+<Text>the expenditure of the horse racecourse operator for the period beginning with 1 January 2022 and ending on the day the operator submits the statement, and</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/3/b" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/3/b" id="section-5-3-b">
+<Pnumber>b</Pnumber>
+<P3para>
+<Text>the proposed budget and expenditure plans for the horse racecourse operator for the period beginning with the day after the day on which the statement is submitted and ending on 31 December 2022.</Text>
+</P3para>
+</P3>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/4" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/4" id="section-5-4">
+<Pnumber>4</Pnumber>
+<P2para>
+<Text>The statements referred to in subsections (1) and (2) must be submitted before the end of the period of two weeks beginning with the day after the day on which this Act receives Royal Assent.</Text>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/5" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/5" id="section-5-5">
+<Pnumber>5</Pnumber>
+<P2para>
+<Text>In the 1990 Order —</Text>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/5/a" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/5/a" id="section-5-5-a">
+<Pnumber>a</Pnumber>
+<P3para>
+<Text>Article 3(5) has effect as if the reference to the statement submitted under paragraph (4) of the Article included a statement submitted under subsection (1) or (2),</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/5/b" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/5/b" id="section-5-5-b">
+<Pnumber>b</Pnumber>
+<P3para>
+<Text>for the purposes of accounts prepared under Article 5 of the 1990 Order for the year ending on 31 December 2021, Article 5(2) has effect as if the reference to April were to June,</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/5/c" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/5/c" id="section-5-5-c">
+<Pnumber>c</Pnumber>
+<P3para>
+<Text>Article 6(1)(a) has effect as if the reference to works under Article 3(5)(b) or (c) proposed in any statement submitted under Article 3(4) included works under Article 3(5)(b) or (c) to which expenditure in a statement submitted under subsection (1) or (2) relates,</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/5/d" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/5/d" id="section-5-5-d">
+<Pnumber>d</Pnumber>
+<P3para>
+<Text>Article 10(1)(b) has effect as if the duty to prepare an annual statement of accounts for a period of 12 months ending on 31 December in each year included a duty for Down Royal Park Racecourse Limited to prepare such a statement for the year ending on 31 December 2021, and</Text>
+</P3para>
+</P3>
+<P3 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/5/e" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/5/e" id="section-5-5-e">
+<Pnumber>e</Pnumber>
+<P3para>
+<Text>for the purposes of accounts prepared under Article 10(1) of the 1990 Order for the year ending on 31 December 2021, Article 10(3) has effect as if the reference to April were to June.</Text>
+</P3para>
+</P3>
+</P2para>
+</P2>
+<P2 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/5/6" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/5/6" id="section-5-6">
+<Pnumber>6</Pnumber>
+<P2para>
+<Text>In this section—</Text>
+<UnorderedList Class="Definition" Decoration="none">
+<ListItem>
+<Para>
+<Text>“the Department” means the Department of Agriculture, Environment and Rural Affairs;</Text>
+</Para>
+</ListItem>
+<ListItem>
+<Para>
+<Text>“horse racecourse operator” has the meaning given by Article 2(2) of the 1990 Order.</Text>
+</Para>
+</ListItem>
+</UnorderedList>
+</P2para>
+</P2>
+</P1para>
+</P1>
+</P1group>
+<P1group RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Commencement</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/6" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" id="section-6">
+<Pnumber><CommentaryRef Ref="key-fae9ee147ff5d46a53324ac6452ba626"/>6</Pnumber>
+<P1para>
+<Text>This Act comes into operation on the day after the day on which this Act receives Royal Assent.</Text>
+</P1para>
+</P1>
+</P1group>
+<P1group RestrictExtent="N.I." RestrictStartDate="2022-02-03">
+<Title>Short title</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nia/2022/2/section/7" IdURI="http://www.legislation.gov.uk/id/nia/2022/2/section/7" id="section-7">
+<Pnumber><CommentaryRef Ref="key-55eaf865a9be391ac708f739ff233363"/>7</Pnumber>
+<P1para>
+<Text>This Act may be cited as the Horse Racing (Amendment) Act (Northern Ireland) 2022.</Text>
+</P1para>
+</P1>
+</P1group>
+</Body>
+</Primary><Commentaries><Commentary Type="I" id="key-2a7d2332980d6c95f6c92a97877e81fe"><Para><Text>S. 1 in operation at 3.2.2022, see <CitationSubRef id="nab6ba816b9852b7c" SectionRef="section-6" URI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" Operative="true">s. 6</CitationSubRef></Text></Para></Commentary><Commentary Type="I" id="key-2aa6437e53ae86ab76889341fb7c7432"><Para><Text>S. 2 in operation at 3.2.2022, see <CitationSubRef id="n2ea9db8a78b6a8e8" SectionRef="section-6" URI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" Operative="true">s. 6</CitationSubRef></Text></Para></Commentary><Commentary Type="I" id="key-9b453637a87466360964c0244b86585c"><Para><Text>S. 3 in operation at 3.2.2022, see <CitationSubRef id="n2225e73033d8fdfd" SectionRef="section-6" URI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" Operative="true">s. 6</CitationSubRef></Text></Para></Commentary><Commentary Type="I" id="key-dc1d68374cd89bc6819f83eb229f2a47"><Para><Text>S. 4 in operation at 3.2.2022, see <CitationSubRef id="nd23c323bfea4b63c" SectionRef="section-6" URI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" Operative="true">s. 6</CitationSubRef></Text></Para></Commentary><Commentary Type="I" id="key-f54fb7bcd9caf869d103f481824f0e9b"><Para><Text>S. 5 in operation at 3.2.2022, see <CitationSubRef id="n971a03b96daa51be" SectionRef="section-6" URI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" Operative="true">s. 6</CitationSubRef></Text></Para></Commentary><Commentary Type="I" id="key-fae9ee147ff5d46a53324ac6452ba626"><Para><Text>S. 6 in operation at 3.2.2022, see <CitationSubRef id="nb1f5759f7ef9ce1c" SectionRef="section-6" URI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" Operative="true">s. 6</CitationSubRef></Text></Para></Commentary><Commentary Type="I" id="key-55eaf865a9be391ac708f739ff233363"><Para><Text>S. 7 in operation at 3.2.2022, see <CitationSubRef id="ne80a994ee452706c" SectionRef="section-6" URI="http://www.legislation.gov.uk/id/nia/2022/2/section/6" Operative="true">s. 6</CitationSubRef></Text></Para></Commentary></Commentaries></Legislation>
