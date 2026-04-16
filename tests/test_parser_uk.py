@@ -166,7 +166,9 @@ class TestTextParser:
         blocks = UKTextParser().parse_text(data)
         assert len(blocks) > 5
         assert any(b.block_type == "section" for b in blocks)
-        assert any(b.block_type == "schedule" for b in blocks)
+        # Schedules are rendered as a heading block followed by their
+        # internal section blocks (same recursion as body).
+        assert any(b.block_type == "schedule-heading" for b in blocks)
 
     def test_single_snapshot_has_one_version_per_block(self):
         data = _read_fixture("sample-scot-asp-2021-11.xml")

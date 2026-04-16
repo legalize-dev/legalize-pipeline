@@ -168,11 +168,15 @@ def _inline_text(element: etree._Element) -> str:
             if inner:
                 parts.append(f"*{inner}*")
         elif localname == "Inferior":
+            # CLML overloads <Inferior> for (a) real subscripts like CO₂
+            # and (b) stylistic highlighting of entire table cells. Only
+            # translate when the inner text is short AND made of digits /
+            # operator glyphs — otherwise emit as plain text.
             inner = _inline_text(child)
-            parts.append(_unicode_subscript(inner))
+            parts.append(_maybe_subscript(inner))
         elif localname == "Superior":
             inner = _inline_text(child)
-            parts.append(_unicode_superscript(inner))
+            parts.append(_maybe_superscript(inner))
         elif localname in ("Citation", "CitationSubRef", "InternalLink"):
             inner = _inline_text(child).strip()
             href = _citation_href(child)
@@ -180,10 +184,24 @@ def _inline_text(element: etree._Element) -> str:
                 parts.append(f"[{inner}]({href})")
             elif inner:
                 parts.append(inner)
-        elif localname in ("InlineAmendment", "Quotation"):
+        elif localname == "InlineAmendment":
+            # Amending text inline — do NOT wrap in quotes here. The
+            # source almost always contains a nested <Quotation> or
+            # curly quotes that carry the quoting semantics; double-
+            # wrapping produced `"“…”"` artifacts in the review.
+            parts.append(_inline_text(child))
+        elif localname == "Quotation":
             inner = _inline_text(child).strip()
             if inner:
-                parts.append(f'"{inner}"')
+                # Only add straight quotes if the source did not already
+                # use curly ones — otherwise the reader ends up with
+                # `"“…”"`.
+                if inner.startswith(("\u201c", "\u2018", '"')) and inner.endswith(
+                    ("\u201d", "\u2019", '"')
+                ):
+                    parts.append(inner)
+                else:
+                    parts.append(f'"{inner}"')
         elif localname in ("Substitution", "Addition", "AppendText", "Repeal"):
             # Amendment provenance markers — render content inline; the
             # amendment history is captured in the reform timeline, not in
@@ -228,14 +246,32 @@ def _citation_href(element: etree._Element) -> str | None:
 _SUBSCRIPT = str.maketrans("0123456789+-=()n", "₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₙ")
 _SUPERSCRIPT = str.maketrans("0123456789+-=()n", "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ")
 
+# A real subscript (H₂O, CO₂, xⁿ) is 1-3 chars drawn from digits, basic
+# operators, parentheses, and the letter n. Anything else is likely
+# stylistic highlighting and must be passed through plain — CLML reuses
+# <Inferior>/<Superior> for visual emphasis in tax tables (Finance Act
+# 2020), not just for scientific notation.
+_SUB_SUP_ELIGIBLE = frozenset("0123456789+-=()n ")
 
-def _unicode_subscript(text: str) -> str:
-    """Best-effort Unicode subscript for digits/operators; passthrough otherwise."""
-    return text.translate(_SUBSCRIPT)
+
+def _eligible_for_translation(text: str) -> bool:
+    stripped = text.strip()
+    if not stripped or len(stripped) > 3:
+        return False
+    return all(ch in _SUB_SUP_ELIGIBLE for ch in stripped)
 
 
-def _unicode_superscript(text: str) -> str:
-    return text.translate(_SUPERSCRIPT)
+def _maybe_subscript(text: str) -> str:
+    """Best-effort Unicode subscript for short digit/operator runs; plain otherwise."""
+    if _eligible_for_translation(text):
+        return text.translate(_SUBSCRIPT)
+    return text
+
+
+def _maybe_superscript(text: str) -> str:
+    if _eligible_for_translation(text):
+        return text.translate(_SUPERSCRIPT)
+    return text
 
 
 # ─── Tables (XHTML inside CLML) ────────────────────────────────
@@ -379,20 +415,164 @@ def _gather_section_blocks(
                 (builder.block_id, builder.block_type, builder.title, builder.paragraphs, 0)
             )
 
-    # 2. Body sections — walk with ancestor Part/Chapter headings rolled in.
+    # 2. Body sections — walk in document order, emitting Part/Chapter
+    # headings as their own single-paragraph blocks exactly once.
     body = root.find(".//leg:Body", NS)
     if body is not None:
-        results.extend(_walk_body_with_headings(body))
+        _walk_recursive(body, results)
 
-    # 3. Schedules.
+    # 3. Schedules — each Schedule gets its own heading block, then its
+    # internal Part/Chapter/P1 structure is walked with the same recursion
+    # as the main body so sub-Parts get their own headings and sub-sections
+    # are individual blocks.
     schedules = root.find(".//leg:Schedules", NS)
     if schedules is not None:
         for sched in schedules.findall("leg:Schedule", NS):
-            block_id = sched.get("id") or "schedule"
-            builder = _BlockBuilder(block_id=block_id, block_type="schedule", title="")
-            _render_schedule(sched, builder)
-            if builder.paragraphs:
+            sched_heading = _schedule_heading_paragraph(sched)
+            if sched_heading is not None:
                 results.append(
+                    (
+                        sched.get("id") or f"schedule-{sched.sourceline or 0}",
+                        "schedule-heading",
+                        "",
+                        [sched_heading],
+                        0,
+                    )
+                )
+            sched_body = sched.find("leg:ScheduleBody", NS)
+            if sched_body is not None:
+                _walk_recursive(sched_body, results)
+            # Schedules sometimes put their introductory <Para> outside P1s.
+            intro_paras = _schedule_introductory_paragraphs(sched_body)
+            if intro_paras:
+                results.insert(
+                    -1 if sched_body is not None else len(results),
+                    (
+                        (sched.get("id") or "schedule") + "-intro",
+                        "schedule-intro",
+                        "",
+                        intro_paras,
+                        0,
+                    ),
+                )
+
+    # 4. Commentaries — editorial notes attached to provisions. Render as a
+    # footnote block at the end of the document so the text has context but
+    # the main body stays clean.
+    commentaries_block = _render_commentaries(root)
+    if commentaries_block is not None:
+        results.append(commentaries_block)
+
+    return results
+
+
+def _schedule_heading_paragraph(sched: etree._Element) -> Paragraph | None:
+    num_el = sched.find("leg:Number", NS)
+    title_el = sched.find("leg:Title", NS)
+    num = _clean_text(_inline_text(num_el)) if num_el is not None else ""
+    title = _clean_text(_inline_text(title_el)) if title_el is not None else ""
+    text = " — ".join(p for p in (num, title) if p)
+    if not text:
+        text = "SCHEDULE"
+    return Paragraph(css_class="h2", text=text)
+
+
+def _schedule_introductory_paragraphs(
+    sched_body: etree._Element | None,
+) -> list[Paragraph]:
+    """Schedule prose that sits outside any P1/Part (typical pattern)."""
+    if sched_body is None:
+        return []
+    out: list[Paragraph] = []
+    for para in sched_body.findall("leg:IntroductoryText/leg:Para", NS):
+        text = _clean_text(_inline_text(para))
+        if text:
+            out.append(Paragraph(css_class="parrafo", text=text))
+    return out
+
+
+def _render_commentaries(
+    root: etree._Element,
+) -> tuple[str, str, str, list[Paragraph], int] | None:
+    """Render the ``<Commentaries>`` block as footnote-style paragraphs."""
+    comm_root = root.find(".//leg:Commentaries", NS)
+    if comm_root is None:
+        return None
+    paragraphs: list[Paragraph] = []
+    for commentary in comm_root.findall("leg:Commentary", NS):
+        comm_id = commentary.get("id") or ""
+        body_pieces: list[str] = []
+        for text_el in commentary.iter(f"{{{NS['leg']}}}Text"):
+            piece = _clean_text(_inline_text(text_el))
+            if piece:
+                body_pieces.append(piece)
+        body = " ".join(body_pieces)
+        if not body:
+            continue
+        paragraphs.append(Paragraph(css_class="parrafo", text=f"[^{comm_id}]: {body}"))
+    if not paragraphs:
+        return None
+    # Heading ahead of the footnotes.
+    heading = Paragraph(css_class="h2", text="Editorial notes")
+    return ("commentaries", "commentaries", "", [heading, *paragraphs], 0)
+
+
+_HEADING_CSS = {
+    "Part": "h2",
+    "Chapter": "h3",
+    "Pblock": "h3",
+    "P1group": "h4",
+    "Group": "h4",
+}
+
+# Containers we MUST NOT descend into when walking structure: their contents
+# belong to an amending block already rendered by the parent section.
+_AMENDMENT_CONTAINERS = frozenset(
+    {"BlockAmendment", "InlineAmendment", "Substitution", "Addition", "Repeal", "AppendText"}
+)
+
+
+def _walk_recursive(
+    element: etree._Element,
+    out: list[tuple[str, str, str, list[Paragraph], int]],
+) -> None:
+    """Depth-first walk of body/schedule contents.
+
+    Each ``<Part>``/``<Chapter>``/``<P1group>``/``<Pblock>`` emits a single
+    heading block the first time it's encountered (by virtue of the document
+    walk hitting it exactly once). ``<P1>`` nodes become section blocks.
+    ``BlockAmendment`` and friends are skipped — their content is already
+    handled by the enclosing ``<P1>`` renderer, and emitting their nested
+    ``<P1>`` would duplicate text.
+    """
+    for child in element:
+        local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
+        if not local:
+            continue
+        if local in _AMENDMENT_CONTAINERS:
+            # Do not descend — parent section already quoted this.
+            continue
+        if local in _HEADING_CSS:
+            text = _render_heading_text(child)
+            if text:
+                heading_id = child.get("id") or f"heading-{local.lower()}-{child.sourceline or 0}"
+                css = _HEADING_CSS[local]
+                out.append(
+                    (
+                        heading_id,
+                        "heading",
+                        "",
+                        [Paragraph(css_class=css, text=text)],
+                        0,
+                    )
+                )
+            _walk_recursive(child, out)
+        elif local == "P1":
+            block_id = child.get("id") or _synthesize_block_id(child)
+            builder = _BlockBuilder(block_id=block_id, block_type="section", title="")
+            _render_section(child, builder)
+            if builder.paragraphs:
+                out.append(
                     (
                         builder.block_id,
                         builder.block_type,
@@ -401,53 +581,35 @@ def _gather_section_blocks(
                         builder.images_dropped,
                     )
                 )
-
-    return results
-
-
-def _walk_body_with_headings(body: etree._Element):
-    """Walk the body preserving Part/Chapter headings as leading paragraphs.
-
-    Emits one tuple per ``<P1>``; headings accumulated from ancestor Parts
-    that are new-to-this-block are prepended in hierarchy order.
-    """
-    out: list[tuple[str, str, str, list[Paragraph], int]] = []
-    seen_headings: set[int] = set()
-
-    for p1 in body.iter(f"{{{NS['leg']}}}P1"):
-        # Collect ancestor Part / Chapter / P1group titles not yet emitted.
-        pending: list[tuple[str, str]] = []
-        for ancestor in reversed(list(p1.iterancestors())):
-            local = etree.QName(ancestor.tag).localname if isinstance(ancestor.tag, str) else ""
-            if local not in ("Part", "Chapter", "P1group", "Pblock", "Group"):
-                continue
-            ident = id(ancestor)
-            if ident in seen_headings:
-                continue
-            seen_headings.add(ident)
-            css = {"Part": "h2", "Chapter": "h3", "P1group": "h4", "Pblock": "h4", "Group": "h4"}[
-                local
-            ]
-            text = _render_heading_text(ancestor)
-            if text:
-                pending.append((css, text))
-
-        block_id = p1.get("id") or _synthesize_block_id(p1)
-        builder = _BlockBuilder(block_id=block_id, block_type="section", title="")
-        for css, text in pending:
-            builder.add(css, text)
-        _render_section(p1, builder)
-        if builder.paragraphs:
-            out.append(
-                (
-                    builder.block_id,
-                    builder.block_type,
-                    builder.title,
-                    builder.paragraphs,
-                    builder.images_dropped,
+        elif local == "P":
+            # Unnumbered paragraph inside a grouping container (usually a
+            # P1group with an empty Title — common in schedule-nested
+            # Protocols of the Human Rights Act). Emit the body text as a
+            # standalone prose block so it lands in the Markdown output.
+            block_id = child.get("id") or f"p-{child.sourceline or 0}"
+            builder = _BlockBuilder(block_id=block_id, block_type="prose", title="")
+            _render_plain_paragraph(child, builder)
+            if builder.paragraphs:
+                out.append(
+                    (
+                        builder.block_id,
+                        builder.block_type,
+                        builder.title,
+                        builder.paragraphs,
+                        builder.images_dropped,
+                    )
                 )
-            )
-    return out
+        else:
+            # Anonymous wrapper (Body, Primary, Secondary, Tabular container…) — descend.
+            _walk_recursive(child, out)
+
+
+def _render_plain_paragraph(p_el: etree._Element, builder: _BlockBuilder) -> None:
+    """Render a ``<P>`` element's ``<Text>`` descendants as prose paragraphs."""
+    for text_el in p_el.findall("leg:Text", NS):
+        piece = _clean_text(_inline_text(text_el))
+        if piece:
+            builder.add("parrafo", piece)
 
 
 def _synthesize_block_id(p1: etree._Element) -> str:
@@ -458,28 +620,31 @@ def _synthesize_block_id(p1: etree._Element) -> str:
 
 
 def _render_heading_text(element: etree._Element) -> str:
-    """Render the heading of a Part/Chapter/P1group element.
+    """Render the heading of a Part/Chapter/Pblock/P1group element as plain text.
 
-    Combines ``<Number>`` and ``<Title>`` if present; falls back to the
-    first text-bearing child.
+    Headings must be inline-markdown-free: embedded ``<Strong>`` or
+    ``<Emphasis>`` would bleed ``**...**`` / ``*...*`` into the heading,
+    and ``<Substitution>`` / amendment markers would add braces the
+    reader has no context for. We therefore flatten via ``itertext``
+    rather than ``_inline_text``.
     """
     num = element.find("leg:Number", NS)
     title = element.find("leg:Title", NS)
     pieces: list[str] = []
     if num is not None:
-        piece = _clean_text(_inline_text(num))
+        piece = _clean_text("".join(num.itertext()))
         if piece:
             pieces.append(piece)
     if title is not None:
-        piece = _clean_text(_inline_text(title))
+        piece = _clean_text("".join(title.itertext()))
         if piece:
             pieces.append(piece)
     if pieces:
         return " — ".join(pieces)
-    # Fall back: first <Text> descendant
-    text = element.find(".//leg:Text", NS)
-    if text is not None:
-        return _clean_text(_inline_text(text))
+    # No explicit heading — the grouping is anonymous (empty <Title/>).
+    # Returning "" signals the caller to skip emitting a heading block;
+    # the body text (usually a <P><Text>…) is picked up by the normal
+    # body walk instead.
     return ""
 
 
@@ -505,77 +670,45 @@ def _render_section(p1: etree._Element, builder: _BlockBuilder) -> None:
 
 
 def _render_p_body(parent: etree._Element, builder: _BlockBuilder, *, depth: int) -> None:
-    """Recursively render CLML paragraph containers (P1para/P2para/P3para/P4para).
+    """Render a P{N}para container's children.
 
-    The depth controls indentation for nested sub-paragraphs (P2, P3, P4).
+    All the real work lives in ``_render_inline_child`` so Formulas,
+    BlockAmendments, lists and nested P{N} sub-paragraphs are handled the
+    same way at every depth.
     """
     for child in parent:
-        local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
-
-        if local == "Text":
-            builder.add("parrafo", _inline_text(child))
-        elif local == "Para":
-            # <Para> wraps <Text>, sometimes lists.
-            for sub in child:
-                sub_local = etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
-                if sub_local == "Text":
-                    builder.add("parrafo", _inline_text(sub))
-                elif sub_local == "UnorderedList":
-                    _render_list(sub, builder, ordered=False, depth=depth)
-                elif sub_local == "OrderedList":
-                    _render_list(sub, builder, ordered=True, depth=depth)
-                elif sub_local == "Tabular":
-                    _render_table(sub, builder)
-                elif sub_local == "BlockAmendment":
-                    _render_block_amendment(sub, builder, depth=depth)
-                elif sub_local == "Formula":
-                    builder.add("parrafo", _inline_text(sub))
-        elif local in ("P2", "P3", "P4", "P5"):
-            _render_sub_paragraph(child, builder, depth=depth + 1)
-        elif local == "UnorderedList":
-            _render_list(child, builder, ordered=False, depth=depth)
-        elif local == "OrderedList":
-            _render_list(child, builder, ordered=True, depth=depth)
-        elif local == "Tabular":
-            _render_table(child, builder)
-        elif local == "BlockAmendment":
-            _render_block_amendment(child, builder, depth=depth)
-        elif local == "BlockText":
-            for text_el in child.findall("leg:Text", NS):
-                builder.add("parrafo", _inline_text(text_el))
-        elif local == "Figure" or local == "Image":
-            builder.images_dropped += 1
-        elif local == "Commentary" or local == "CommentaryRef":
-            # Editorial amendment notes — keep as a footnote-style line.
-            text = _clean_text(_inline_text(child))
-            if text:
-                builder.add("parrafo", f"[^cm]: {text}")
-        # Anything else (Subheading, Formula in deep positions, …) — flatten.
-        else:
-            text = _inline_text(child)
-            if text.strip():
-                builder.add("parrafo", _clean_text(text))
+        _render_inline_child(child, builder, depth=depth)
 
 
 def _render_sub_paragraph(element: etree._Element, builder: _BlockBuilder, *, depth: int) -> None:
-    """Render a ``<P2>``/``<P3>``/``<P4>`` with its number prefix."""
+    """Render a ``<P2>``/``<P3>``/``<P4>`` with its number prefix.
+
+    Walks **all** children of the P{N} element (Pnumber, P{N}para, Formula,
+    nested P2/P3) in document order so that ``<Formula>`` siblings of
+    ``<P2para>`` — used in Finance Acts to insert tax equations between
+    narrative paragraphs — are not dropped. Likewise a P{N} element can
+    have multiple P{N}para children (quite common after repeals), and we
+    process each in order instead of stopping at the first one.
+    """
     num_el = element.find("leg:Pnumber", NS)
     num = _clean_text(_inline_text(num_el)) if num_el is not None else ""
     indent_prefix = "    " * max(depth - 1, 0)
-    # Get the *para container child (P2para, P3para, etc.)
-    inner = None
+
+    # Find the first <Text> at the head of the first *para so the opening
+    # bullet can carry the "(N) body" shape readers expect.
+    first_para = None
     for child in element:
         local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
-        if local.endswith("para") and local.startswith("P"):
-            inner = child
+        if local and local.startswith("P") and local.endswith("para"):
+            first_para = child
             break
 
     first_text = ""
-    if inner is not None:
-        # Find the first <Text> at this level for the number+text line.
-        text_el = inner.find("leg:Text", NS)
-        if text_el is not None:
-            first_text = _inline_text(text_el)
+    first_text_el = None
+    if first_para is not None:
+        first_text_el = first_para.find("leg:Text", NS)
+        if first_text_el is not None:
+            first_text = _inline_text(first_text_el)
 
     if num and first_text:
         builder.add("list_item", f"{indent_prefix}- ({num}) {_clean_text(first_text)}")
@@ -584,30 +717,76 @@ def _render_sub_paragraph(element: etree._Element, builder: _BlockBuilder, *, de
     elif num:
         builder.add("list_item", f"{indent_prefix}- ({num})")
 
-    # Render the rest of the sub-paragraph body. The first <Text> child has
-    # already been folded into the "- (N) …" line above, so skip it.
-    if inner is not None:
-        skipped = False
-        for child in inner:
-            local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
-            if local == "Text":
-                if not skipped:
-                    skipped = True
+    # Walk the rest of the P{N} in document order: every *para, Formula,
+    # BlockAmendment, Table at this level becomes its own rendered piece.
+    first_text_used = first_text_el is not None
+    for child in element:
+        local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
+        if not local or local == "Pnumber":
+            continue
+        if local and local.startswith("P") and local.endswith("para"):
+            # Skip only the single <Text> already consumed for the header.
+            for sub in child:
+                slocal = etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
+                if slocal == "Text" and first_text_used and sub is first_text_el:
+                    first_text_used = False
                     continue
-                builder.add("parrafo", _inline_text(child))
-                continue
-            if local in ("P2", "P3", "P4", "P5"):
-                _render_sub_paragraph(child, builder, depth=depth + 1)
-            elif local == "UnorderedList":
-                _render_list(child, builder, ordered=False, depth=depth)
-            elif local == "OrderedList":
-                _render_list(child, builder, ordered=True, depth=depth)
-            elif local == "Tabular":
-                _render_table(child, builder)
-            elif local == "BlockAmendment":
-                _render_block_amendment(child, builder, depth=depth)
-            elif local in ("Figure", "Image"):
-                builder.images_dropped += 1
+                _render_inline_child(sub, builder, depth=depth)
+        else:
+            _render_inline_child(child, builder, depth=depth)
+
+
+def _render_inline_child(
+    child: etree._Element, builder: _BlockBuilder, *, depth: int
+) -> None:
+    """Render one content-bearing child of a P{N} or P{N}para.
+
+    Shared by ``_render_sub_paragraph`` and ``_render_p_body`` so that the
+    same tag coverage — including Formula — applies at every depth.
+    """
+    local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
+    if not local:
+        return
+    if local == "Text":
+        piece = _inline_text(child)
+        if _clean_text(piece):
+            builder.add("parrafo", piece)
+    elif local == "Formula":
+        piece = _clean_text(_inline_text(child))
+        if piece:
+            # Wrap in $ … $ so Markdown math renderers pick it up; the
+            # fallback still reads naturally as plain text.
+            if not (piece.startswith("$") and piece.endswith("$")):
+                piece = f"${piece}$"
+            builder.add("parrafo", piece)
+    elif local in ("P2", "P3", "P4", "P5"):
+        _render_sub_paragraph(child, builder, depth=depth + 1)
+    elif local == "Para":
+        # Plain <Para> wrapper — treat its children as inline content.
+        for sub in child:
+            _render_inline_child(sub, builder, depth=depth)
+    elif local == "UnorderedList":
+        _render_list(child, builder, ordered=False, depth=depth)
+    elif local == "OrderedList":
+        _render_list(child, builder, ordered=True, depth=depth)
+    elif local == "Tabular":
+        _render_table(child, builder)
+    elif local == "BlockAmendment":
+        _render_block_amendment(child, builder, depth=depth)
+    elif local == "BlockText":
+        for text_el in child.findall("leg:Text", NS):
+            builder.add("parrafo", _inline_text(text_el))
+    elif local in ("Figure", "Image"):
+        if local == "Figure":
+            builder.images_dropped += 1
+    elif local in ("Commentary", "CommentaryRef"):
+        piece = _clean_text(_inline_text(child))
+        if piece:
+            builder.add("parrafo", f"[^cm]: {piece}")
+    else:
+        piece = _clean_text(_inline_text(child))
+        if piece:
+            builder.add("parrafo", piece)
 
 
 def _render_list(
@@ -629,34 +808,179 @@ def _render_table(element: etree._Element, builder: _BlockBuilder) -> None:
 
 
 def _render_block_amendment(element: etree._Element, builder: _BlockBuilder, *, depth: int) -> None:
-    """Render a ``<BlockAmendment>`` — a chunk of amending legislation.
+    """Render a ``<BlockAmendment>`` preserving P1/P2/P3 numbering and tables.
 
-    Walks the subtree in document order, emitting blockquoted lines for
-    running text and separate pre-formatted paragraphs for tables. This
-    preserves tables that amendments insert into other Acts (common in
-    Finance Acts, which is where most of the formulas and tables live).
+    The amending text is shown as a blockquote whose internal structure
+    mirrors the amended Act: section numbers on their own opening line,
+    nested sub-paragraphs indented with two extra spaces per level, and
+    tables (which often sit inside amendment packages in Finance Acts)
+    broken out into real pipe tables flanked by the blockquote.
     """
     buffer: list[str] = []
 
-    def flush_buffer() -> None:
+    def flush() -> None:
         if buffer:
             builder.add_pre("quote", "\n".join(buffer))
             buffer.clear()
 
-    for node in element.iter():
-        localname = etree.QName(node.tag).localname if isinstance(node.tag, str) else ""
-        if localname == "Tabular":
-            flush_buffer()
-            md = _xhtml_table_to_markdown(node)
-            if md:
-                builder.add_pre("table", md)
-        elif localname == "Text":
-            piece = _clean_text(_inline_text(node))
-            if piece:
-                buffer.append(f"> {piece}")
-        elif localname in ("Figure", "Image"):
-            builder.images_dropped += 1
-    flush_buffer()
+    def quote_prefix(level: int) -> str:
+        return "> " + ("  " * level)
+
+    def emit_numbered(numbered_el: etree._Element, level: int) -> None:
+        """Render a single ``<P1>``/``<P2>``/... element as a numbered
+        blockquote item, recursing into all children (including siblings of
+        the *para container: Formula, Tabular, nested P{N}, lists)."""
+        num_el = numbered_el.find("leg:Pnumber", NS)
+        num = _clean_text(_inline_text(num_el)) if num_el is not None else ""
+        para_el = _first_pseudo_para_child(numbered_el)
+        first_text_el = None
+        first_text = ""
+        if para_el is not None:
+            first_text_el = para_el.find("leg:Text", NS)
+            if first_text_el is not None:
+                first_text = _clean_text(_inline_text(first_text_el))
+        prefix = quote_prefix(level)
+        if num and first_text:
+            buffer.append(f"{prefix}({num}) {first_text}")
+        elif first_text:
+            buffer.append(f"{prefix}{first_text}")
+        elif num:
+            buffer.append(f"{prefix}({num})")
+
+        def render_sub(sub: etree._Element, sub_level: int) -> None:
+            slocal = etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
+            if not slocal or slocal == "Pnumber":
+                return
+            if slocal == "Text":
+                piece = _clean_text(_inline_text(sub))
+                if piece:
+                    buffer.append(f"{quote_prefix(sub_level)}{piece}")
+            elif slocal == "Formula":
+                piece = _clean_text(_inline_text(sub))
+                if piece:
+                    if not (piece.startswith("$") and piece.endswith("$")):
+                        piece = f"${piece}$"
+                    buffer.append(f"{quote_prefix(sub_level)}{piece}")
+            elif slocal == "Tabular":
+                flush()
+                md = _xhtml_table_to_markdown(sub)
+                if md:
+                    builder.add_pre("table", md)
+            elif slocal in ("P1", "P2", "P3", "P4", "P5"):
+                emit_numbered(sub, sub_level + 1)
+            elif slocal in ("UnorderedList", "OrderedList"):
+                emit_list(sub, sub_level + 1, ordered=slocal == "OrderedList")
+            elif slocal in ("Figure", "Image"):
+                if slocal == "Figure":
+                    builder.images_dropped += 1
+            else:
+                walk(sub, sub_level + 1)
+
+        # Walk every child of the P{N} in document order so siblings of
+        # the *para container (Formula, Tabular, other P{N}) are visited.
+        for sibling in numbered_el:
+            sib_local = (
+                etree.QName(sibling.tag).localname if isinstance(sibling.tag, str) else ""
+            )
+            if not sib_local or sib_local == "Pnumber":
+                continue
+            if sibling is para_el:
+                # Expand the *para container inline so that its own
+                # children (after the already-consumed first Text) are
+                # rendered at the SAME indent level as the header line.
+                seen_first = first_text_el is None
+                for sub in para_el:
+                    slocal = (
+                        etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
+                    )
+                    if slocal == "Text" and not seen_first and sub is first_text_el:
+                        seen_first = True
+                        continue
+                    render_sub(sub, level)
+            else:
+                render_sub(sibling, level)
+
+    def emit_list(list_el: etree._Element, level: int, *, ordered: bool) -> None:
+        """Render a ``<OrderedList>``/``<UnorderedList>`` inside an amendment,
+        one line per item, preserving nested lists."""
+        prefix = quote_prefix(level)
+        for idx, item in enumerate(list_el.findall("leg:ListItem", NS), start=1):
+            # Gather the item's leading text (before any nested list).
+            leading_bits: list[str] = []
+            for sub in item:
+                slocal = etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
+                if slocal in ("UnorderedList", "OrderedList"):
+                    break
+                leading_bits.append(_inline_text(sub))
+            head = _clean_text((item.text or "") + "".join(leading_bits))
+            bullet = f"{idx}." if ordered else "-"
+            if head:
+                buffer.append(f"{prefix}{bullet} {head}")
+            # Recurse into nested lists with a deeper indent.
+            for sub in item:
+                slocal = etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
+                if slocal == "UnorderedList":
+                    emit_list(sub, level + 1, ordered=False)
+                elif slocal == "OrderedList":
+                    emit_list(sub, level + 1, ordered=True)
+
+    def walk(node: etree._Element, level: int) -> None:
+        for child in node:
+            local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
+            if not local:
+                continue
+            if local == "Tabular":
+                flush()
+                md = _xhtml_table_to_markdown(child)
+                if md:
+                    builder.add_pre("table", md)
+            elif local in ("P1", "P2", "P3", "P4", "P5"):
+                emit_numbered(child, level)
+            elif local in ("UnorderedList", "OrderedList"):
+                emit_list(child, level, ordered=local == "OrderedList")
+            elif local == "Text":
+                piece = _clean_text(_inline_text(child))
+                if piece:
+                    buffer.append(f"{quote_prefix(level)}{piece}")
+            elif local == "Schedule":
+                # A whole Schedule inserted wholesale (e.g. "SCHEDULE 4B"
+                # in Finance Act amendments). Emit its label first so the
+                # reader sees what is being inserted, then walk its body.
+                num_el = child.find("leg:Number", NS)
+                title_el = child.find("leg:Title", NS)
+                num = _clean_text("".join(num_el.itertext())) if num_el is not None else ""
+                title = (
+                    _clean_text("".join(title_el.itertext())) if title_el is not None else ""
+                )
+                label = " — ".join(p for p in (num, title) if p)
+                if label:
+                    buffer.append(f"{quote_prefix(level)}**{label}**")
+                body = child.find("leg:ScheduleBody", NS)
+                if body is not None:
+                    walk(body, level + 1)
+            elif local == "Formula":
+                piece = _clean_text(_inline_text(child))
+                if piece:
+                    if not (piece.startswith("$") and piece.endswith("$")):
+                        piece = f"${piece}$"
+                    buffer.append(f"{quote_prefix(level)}{piece}")
+            elif local in ("Figure", "Image"):
+                if local == "Figure":
+                    builder.images_dropped += 1
+            else:
+                walk(child, level)
+
+    walk(element, 0)
+    flush()
+
+
+def _first_pseudo_para_child(element: etree._Element) -> etree._Element | None:
+    """Return the ``<P{N}para>`` child of a ``<P{N}>`` element, if any."""
+    for c in element:
+        local = etree.QName(c.tag).localname if isinstance(c.tag, str) else ""
+        if local and local.startswith("P") and local.endswith("para"):
+            return c
+    return None
 
 
 def _render_schedule(sched: etree._Element, builder: _BlockBuilder) -> None:
@@ -768,8 +1092,24 @@ class UKMetadataParser(MetadataParser):
                     key = _camel_to_snake(field)
                     stats_pairs.append((f"stats_{key}", el.get("Value")))
 
+        images_dropped = _count_images(root)
+        long_title = _clean_text(description)
+        pdf_url = (
+            f"https://www.legislation.gov.uk/{type_code}/{year}/{number}"
+            f"/pdfs/{type_code}_{year:04d}{number:04d}_en.pdf"
+        )
+        modified_iso = modified.isoformat() if modified else ""
+
+        # The frontmatter renderer emits the generic dataclass fields plus
+        # whatever lives in ``extra``. Fields like long_title, pdf_url,
+        # last_modified_tna and images_dropped are not part of the generic
+        # dataclass output yet, so we surface them here so nothing the
+        # source publishes gets lost.
         extra: list[tuple[str, str]] = []
         for key, value in (
+            ("long_title", long_title),
+            ("pdf_url", pdf_url),
+            ("last_modified_tna", modified_iso),
             ("type_code", type_code),
             ("year", str(year)),
             ("number", str(number)),
@@ -782,6 +1122,7 @@ class UKMetadataParser(MetadataParser):
             ("restrict_extent", root.get("RestrictExtent") or ""),
             ("restrict_start_date", root.get("RestrictStartDate") or ""),
             ("number_of_provisions", root.get("NumberOfProvisions") or ""),
+            ("images_dropped", str(images_dropped) if images_dropped else ""),
         ):
             if value:
                 extra.append((key, value[:500]))
@@ -1000,6 +1341,19 @@ def _infer_status(doc_status: str, root: etree._Element) -> NormStatus:
         if repealed > len(statuses) * 0.5:
             return NormStatus.PARTIALLY_REPEALED
     return NormStatus.IN_FORCE
+
+
+def _count_images(root: etree._Element) -> int:
+    """Count Figure elements we will drop from the output.
+
+    In CLML every Figure contains exactly one Image, so counting only
+    Figures avoids double-counting while still being accurate.
+    """
+    return sum(
+        1
+        for el in root.iter()
+        if isinstance(el.tag, str) and etree.QName(el.tag).localname == "Figure"
+    )
 
 
 def _camel_to_snake(name: str) -> str:
