@@ -1140,17 +1140,94 @@ Report format:
 
 ### 7.3 Iterate until 5/5 PASS
 
-Every FAIL points at a parser bug. Fix, re-fetch with `--force`, re-render, and
-re-run the review. Typical iteration loop:
+Every FAIL points at a parser bug. Fix, re-render the 5 MDs, and re-run the
+review with **delta feedback** so the agent doesn't repeat hallazgos already
+resolved. The pattern that has shipped 27 countries:
 
-```bash
-# Edit fetcher/xx/parser.py
-legalize fetch -c xx --id LAW-2024-1 --id LAW-2024-42 ... --force
-legalize reprocess -c xx --reason "parser fix" LAW-2024-1 LAW-2024-42 ...
-# (or simpler: rm -rf ../countries/xx && re-init and re-bootstrap --limit 5)
+**Round 1 prompt** — use the canned template from §7.2 verbatim. Expect a
+handful of FAILs; that's the first real signal of what the parser is missing.
+
+**Round 2+ prompt** — prepend a "## Fixes applied this round" block that
+lists what you changed in parser.py since the last review, so the agent
+verifies the fixes landed AND grades everything fresh. Example:
+
+```text
+## Fixes applied this round (so you can verify they landed)
+
+1. Duplicate Part/Chapter headings — rewrote _walk_recursive to iterate
+   in document order, emitting each heading container as its own block
+   exactly once. Finance Act: 166 bogus PART 1 headings → 6 legitimate.
+2. <Inferior>/<Superior> corrupted whole table cells → added length guard.
+   Finance Act: 87 corrupted cells → 0.
+...
 ```
 
+This cuts review cycles: the agent confirms resolved issues in one line
+each and focuses its attention on regressions and remaining bugs.
+
+**Two efficiency tricks before invoking the agent**:
+
+(a) **Reusable render script** — don't hand-render 5 MDs each round.
+    Drop this in `scripts/render_sample.py` (one-time setup per country):
+
+    ```python
+    #!/usr/bin/env python3
+    """Render the 5 Step-7 fixtures to /tmp/{code}-sandbox/*.md."""
+    import gzip, sys
+    from pathlib import Path
+
+    sys.path.insert(0, "src")
+    from legalize.countries import get_text_parser, get_metadata_parser
+    from legalize.transformer.markdown import render_norm_at_date
+
+    CODE = "xx"  # replace
+    SAMPLES = [
+        ("LAW-2024-1",  "tests/fixtures/xx/sample-a.xml"),
+        ("LAW-2024-42", "tests/fixtures/xx/sample-b.xml"),
+        # ...
+    ]
+    out = Path(f"/tmp/{CODE}-sandbox"); out.mkdir(exist_ok=True)
+    mp, tp = get_metadata_parser(CODE), get_text_parser(CODE)
+    for norm_id, path in SAMPLES:
+        p = Path(path)
+        data = p.read_bytes() if p.exists() else gzip.decompress(
+            Path(str(p) + ".gz").read_bytes()
+        )
+        meta = mp.parse(data, norm_id)
+        blocks = tp.parse_text(data)
+        md = render_norm_at_date(meta, blocks, meta.publication_date, include_all=True)
+        (out / f"{norm_id}.md").write_text(md)
+        print(f"{norm_id}: {len(md)} chars, {len(blocks)} blocks")
+    ```
+
+    Between rounds: `python scripts/render_sample.py` and you have fresh MDs
+    under `/tmp/xx-sandbox/` in two seconds.
+
+(b) **Numeric sanity checks before the subagent** — cheap `grep -c`
+    counts filter obvious regressions so you don't spend agent tokens on
+    them. Examples that caught regressions during UK iteration:
+
+    ```bash
+    # Table count (source has N tables → expect N-ish pipe tables)
+    grep -c "^| ---" /tmp/xx-sandbox/LAW-WITH-TABLES.md
+
+    # Formula count (if the Act has maths)
+    grep -c '\$[^$]' /tmp/xx-sandbox/LAW-WITH-FORMULAS.md
+
+    # Heading duplication smell test — should show unique counts
+    grep "^## " /tmp/xx-sandbox/LAW.md | sort | uniq -c | sort -rn | head
+
+    # Any leftover XML?
+    grep -E "<[a-zA-Z:]+[> /]" /tmp/xx-sandbox/*.md | head
+    ```
+
+    Run these after every parser edit. Only invoke the subagent when the
+    numbers look reasonable — saves rounds.
+
 Do not move on until the reviewer returns `SUMMARY: 5/5 laws fully PASS`.
+UK took 4 rounds (0/5 → 1/5 → 4/5 → 5/5). Some countries take 2. None
+should take more than 5 — if you are on round 6 something structural is
+wrong with the parser's model of the source and you should step back.
 
 ### 7.4 Manual spot-check (2 minutes)
 
