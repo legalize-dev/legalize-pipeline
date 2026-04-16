@@ -1,0 +1,6 @@
+
+{ "head": { "link": [], "vars": ["consol", "dateAppl", "url"] },
+  "results": { "distinct": false, "ordered": true, "bindings": [
+    { "consol": { "type": "uri", "value": "https://fedlex.data.admin.ch/eli/cc/1999/404/20240303" }	, "dateAppl": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#date", "value": "2024-03-03" }	, "url": { "type": "uri", "value": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1999/404/20240303/de/xml/fedlex-data-admin-ch-eli-cc-1999-404-20240303-de-xml-10.xml" }},
+    { "consol": { "type": "uri", "value": "https://fedlex.data.admin.ch/eli/cc/1999/404/20240101" }	, "dateAppl": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#date", "value": "2024-01-01" }	, "url": { "type": "uri", "value": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1999/404/20240101/de/xml/fedlex-data-admin-ch-eli-cc-1999-404-20240101-de-xml-19.xml" }},
+    { "consol": { "type": "uri", "value": "https://fedlex.data.admin.ch/eli/cc/1999/404/20220213" }	, "dateAppl": { "type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#date", "value": "2022-02-13" }	, "url": { "type": "uri", "value": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1999/404/20220213/de/xml/fedlex-data-admin-ch-eli-cc-1999-404-20220213-de-xml-14.xml" }} ] } }

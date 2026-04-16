@@ -1,0 +1,66 @@
+Version history spike (§0.5 GATE) — Swiss Federal Constitution
+================================================================
+
+Target law: Bundesverfassung der Schweizerischen Eidgenossenschaft (BV)
+ConsolidationAbstract URI: https://fedlex.data.admin.ch/eli/cc/1999/404
+Total jolux:Consolidation nodes linked to this Abstract: 37
+  (covers Jan 2000 through March 2024, one per point-in-time change)
+
+DE manifestation format coverage (reported via SPARQL):
+  pdf-a  = 37 versions (all)
+  doc    = 31 versions
+  xml    = 6 versions     <-- Akoma Ntoso only since 2021-01-01
+  html   =  6 versions
+  docx   =  6 versions
+
+Versions extracted via SPARQL + filestore GET (DE, XML manifestation):
+
+version 1: date 2022-02-13, 2468 <p> elements, 231 <article> elements
+  URL: https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1999/404/20220213/de/xml/fedlex-data-admin-ch-eli-cc-1999-404-20220213-de-xml-14.xml
+  FRBRdate jolux:dateApplicability = 2022-02-13
+  FRBRdate jolux:dateEntryInForce  = 2000-01-01
+  FRBRdate jolux:dateDocument       = 1999-04-18
+
+version 2: date 2024-03-03, 2510 <p> elements, 232 <article> elements
+  URL: https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1999/404/20240303/de/xml/fedlex-data-admin-ch-eli-cc-1999-404-20240303-de-xml-10.xml
+  FRBRdate jolux:dateApplicability = 2024-03-03
+  FRBRdate jolux:dateEntryInForce  = 2000-01-01
+  FRBRdate jolux:dateDocument       = 1999-04-18
+
+Delta between the two: +42 paragraphs, +1 article (new body content).
+
+GATE RESULT: PASS — we can extract ≥2 distinct point-in-time versions of
+a single law, each with a stable effective date (jolux:dateApplicability
+from the Consolidation node, mirrored on FRBRdate in the XML itself) and
+full parsed text.
+
+IMPORTANT LIMITATION DISCOVERED
+-------------------------------
+Akoma Ntoso XML is NOT available for all 37 historical consolidations of
+the Constitution, only for the 6 most recent (since 2021-01-01). The 31
+older consolidations only exist as pdf-a + doc. The same ratio holds for
+the Swiss Civil Code (ZGB, cc/24/233_245_233): 44 consolidations total
+but only 11 with XML (earliest 2011-01-01).
+
+This means: **version-history coverage for legalize-ch will be truncated
+at the point where XML manifestations become available for each law**
+(typically around 2011 for older laws and around 2021 for laws that
+received late Akoma Ntoso conversion, with newer laws naturally full).
+
+Options, ranked:
+  A. XML-only (recommended for v1). Skip pre-XML consolidations entirely
+     and document the history window per law in extra.history_since.
+     Losing pre-2021 history for long-running laws is acceptable for v1
+     because (i) DOC parsing is fragile, (ii) PDF parsing violates the
+     "no PDF scraping except last resort" rule, (iii) newly-enacted
+     laws (post-2022-05-30) are fully covered.
+  B. XML for consolidations that have it, DOCX fallback for the rest.
+     Far more engineering (parse two formats), but would unlock more
+     history for old laws. Can be added later in a v2 pass.
+  C. XML for current + all prior reforms reconstructed from FGA (Federal
+     Gazette) amending acts. FGA is Akoma Ntoso from 2022-05-30 only, so
+     this only helps for reforms enacted after that date.
+
+Recommendation: ship v1 with Option A, explicitly record in
+extra.history_from the earliest jolux:dateApplicability for which an XML
+manifestation exists. Add a GitHub issue for Option B as a follow-up.

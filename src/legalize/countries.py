@@ -198,6 +198,12 @@ REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
         "text_parser": ("legalize.fetcher.li.parser", "LilexTextParser"),
         "metadata_parser": ("legalize.fetcher.li.parser", "LilexMetadataParser"),
     },
+    "ch": {
+        "client": ("legalize.fetcher.ch.client", "FedlexClient"),
+        "discovery": ("legalize.fetcher.ch.discovery", "FedlexDiscovery"),
+        "text_parser": ("legalize.fetcher.ch.parser", "FedlexTextParser"),
+        "metadata_parser": ("legalize.fetcher.ch.parser", "FedlexMetadataParser"),
+    },
     # To add a new country:
     # 1. Create fetcher/{code}/ with client.py, discovery.py, parser.py
     # 2. Register here

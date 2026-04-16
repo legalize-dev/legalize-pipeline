@@ -496,3 +496,32 @@ countries:
         - "REG_IMPL"
         - "REG_DEL"
         - "REG_FINANC"
+
+  ch:
+    repo_path: "../countries/ch"
+    data_dir: "../countries/data-ch"
+    cache_dir: ".cache"
+    # Fedlex JOLux SPARQL + filestore. Same stack as Luxembourg.
+    # Public, no auth, public domain per URG Art. 5 (Swiss federal law).
+    # Scope v1: Classified Compilation (eli/cc/, ~5,139 laws with DE XML).
+    # Akoma Ntoso 3.0 XML available only for ~5,454 consolidations
+    # (earliest 2011-01-01 for old codes, 2021-01-01 for most laws);
+    # older consolidations exist as PDF/DOC only — tracked via
+    # extra.history_from. DOCX fallback is a v2 follow-up.
+    #
+    # Discovery: paginated SPARQL on jolux:ConsolidationAbstract, cursor-
+    # based paging because Virtuoso caps OFFSET at 10K rows.
+    # Daily discovery: jolux:dateApplicability = target_date.
+    #
+    # At 4 workers x 2 req/s = 8 req/s, full bootstrap projection:
+    #   - ~5,139 SPARQL queries (consolidation listings)
+    #   - ~5,454 XML downloads (~100 KB avg = ~500 MB total)
+    #   - ~10,600 requests → ~22 min raw HTTP, ~1h with parse + commits.
+    max_workers: 4
+    source:
+      sparql_url: "https://fedlex.data.admin.ch/sparqlendpoint"
+      filestore_url: "https://fedlex.data.admin.ch/filestore"
+      language: "de"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 2.0
