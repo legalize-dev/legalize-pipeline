@@ -28,6 +28,9 @@ from legalize.fetcher.ch.client import (
     eli_url_to_norm_id,
 )
 
+__all__ = ["FedlexDiscovery"]
+_ = USER_FORMAT_XML  # re-exported for daily query
+
 if TYPE_CHECKING:
     from legalize.fetcher.base import LegislativeClient
 
@@ -51,12 +54,20 @@ class FedlexDiscovery(NormDiscovery):
         return cls(language=(source_dict or {}).get("language", "de"))
 
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
-        """Yield all ``cc/`` norm IDs that have a language-specific XML.
+        """Yield all ``cc/`` norm IDs, regardless of XML availability.
 
-        Uses cursor pagination (``FILTER (STR(?cca) > "<last>")``) because
-        Virtuoso rejects ``OFFSET`` values with ``n + LIMIT > 10000``.
-        Only abstracts that have at least one XML consolidation in the
-        target language are yielded; the rest are skipped silently.
+        Uses cursor pagination (``FILTER (STR(?cca) > "<last>")``) on a
+        simple single-triple query — adding the ``isRealizedBy → userFormat``
+        join to this query made Virtuoso time out above the first page
+        (90s+ for page 2). We therefore discover the full universe of
+        ConsolidationAbstracts cheaply and let ``FedlexClient.get_text``
+        skip laws that have no DE XML (it calls ``get_consolidations``,
+        which is the per-law filter).
+
+        This is a pragmatic trade: discovery returns ~17K CCAs instead of
+        the ~5,139 that actually have DE XML, but the total bootstrap cost
+        is unchanged because ``get_consolidations`` runs one cheap SPARQL
+        per law either way.
         """
         if not isinstance(client, FedlexClient):
             raise TypeError(f"Expected FedlexClient, got {type(client).__name__}")
@@ -72,12 +83,6 @@ SELECT DISTINCT ?cca WHERE {{
     ?cca a jolux:ConsolidationAbstract .
     FILTER (CONTAINS(STR(?cca), "/eli/cc/"))
     {cursor_filter}
-    ?consol a jolux:Consolidation .
-    ?consol jolux:isMemberOf ?cca .
-    ?consol jolux:isRealizedBy ?expr .
-    ?expr jolux:language <{self._language_uri}> .
-    ?expr jolux:isEmbodiedBy ?manif .
-    ?manif jolux:userFormat <{USER_FORMAT_XML}> .
   }}
 }} ORDER BY ?cca LIMIT {SPARQL_PAGE_SIZE}"""
 
