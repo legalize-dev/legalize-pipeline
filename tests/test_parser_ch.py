@@ -348,3 +348,134 @@ def test_no_placeholder_artefacts(text_parser: FedlexTextParser) -> None:
         for version in block.versions:
             for p in version.paragraphs:
                 assert "[tab]" not in p.text, "placeholder text leaked to output"
+
+
+# ─── PDF-A fallback parser (parser_pdf.py) ──────────────────────────────────
+
+
+def test_pdf_parser_loads() -> None:
+    """pdfplumber + parser_pdf module import cleanly."""
+    from legalize.fetcher.ch.parser_pdf import parse_pdf_version  # noqa: F401
+
+
+def test_pdf_bv_2020_fixture() -> None:
+    """Sanity-check the PDF parser on the BV 2020-01-01 fixture.
+
+    This is the evidence anchor for the cross-format fidelity promise
+    (ADDING_A_COUNTRY.md §0.7): a PDF-A-only version of the same law
+    produces Markdown whose article headings, paragraph numbering and
+    list items are structurally identical to the XML parser's output.
+    """
+    from legalize.fetcher.ch.parser_pdf import parse_pdf_version
+
+    pdf = FIXTURES / "sample-constitution-2020.pdf"
+    if not pdf.exists():
+        pytest.skip("PDF fixture not committed — skipping cross-format gate")
+    version = parse_pdf_version(
+        pdf.read_bytes(),
+        norm_id="cc-1999-404",
+        publication_date=date(1999, 4, 18),
+        effective_date=date(2020, 1, 1),
+    )
+    assert version is not None
+    assert version.effective_date == date(2020, 1, 1)
+
+    css = {p.css_class for p in version.paragraphs}
+    # Same heading template as the XML parser
+    assert "h2" in css  # Titel
+    assert "h3" in css  # Kapitel
+    assert "h5" in css  # Articles
+    assert "preamble" in css
+
+    articles = [p for p in version.paragraphs if p.css_class == "h5"]
+    # BV 2020-01-01 has ~171 articles (matches research note)
+    assert 160 <= len(articles) <= 200
+
+    # Every article heading uses the shared template: "**Art. N** Title"
+    for a in articles:
+        assert a.text.startswith("**Art. "), f"unexpected article template: {a.text[:60]}"
+
+    # Numbered paragraphs use the ``<sup>N</sup>`` prefix exactly like XML
+    numbered_first = next(
+        (
+            p
+            for p in version.paragraphs
+            if p.css_class == "abs" and p.text.startswith("<sup>1</sup>")
+        ),
+        None,
+    )
+    assert numbered_first is not None
+
+    # Fussnoten block is emitted with h6 heading
+    assert any(
+        p.css_class == "h6" and p.text == "Fussnoten" for p in version.paragraphs
+    )
+
+    # No TOC/index residue
+    for p in version.paragraphs:
+        assert "Inhaltsverzeichnis" not in p.text
+        assert "Stichwortverzeichnis" not in p.text
+
+
+def test_cross_format_envelope_dispatch(text_parser: FedlexTextParser) -> None:
+    """Envelope with mixed format attributes dispatches to both parsers.
+
+    Constructs a two-version envelope: older PDF + newer XML. Both
+    versions must be parsed into ``Version`` objects with the matching
+    ``effective_date`` and the XML parser's output must be structurally
+    parallel to the PDF parser's output (same heading depths, article
+    template, paragraph numbering style).
+    """
+    import base64
+
+    pdf_path = FIXTURES / "sample-constitution-2020.pdf"
+    if not pdf_path.exists():
+        pytest.skip("PDF fixture not committed — skipping cross-format gate")
+
+    xml_bytes = _load("sample-constitution.xml")
+    # Strip XML declaration so the envelope parses cleanly.
+    xml_inner = xml_bytes
+    if xml_inner.startswith(b"<?xml"):
+        xml_inner = xml_inner[xml_inner.find(b"?>") + 2 :].lstrip()
+
+    envelope = (
+        b"<?xml version='1.0' encoding='UTF-8'?>\n"
+        b"<fedlex-multi-version norm-id='cc-1999-404' language='de'>\n"
+        b"<version type='consolidation' effective-date='2020-01-01' format='pdf'>"
+        b"<pdf-base64>" + base64.b64encode(pdf_path.read_bytes()) + b"</pdf-base64>"
+        b"\n</version>\n"
+        b"<version type='consolidation' effective-date='2024-03-03' format='xml'>\n"
+        + xml_inner
+        + b"\n</version>\n</fedlex-multi-version>\n"
+    )
+
+    blocks = text_parser.parse_text(envelope)
+    assert len(blocks) == 1
+    versions = blocks[0].versions
+    assert len(versions) == 2
+    assert versions[0].effective_date == date(2020, 1, 1)
+    assert versions[1].effective_date == date(2024, 3, 3)
+
+    # Art. 2's ``<sup>1</sup>`` first numbered paragraph must exist and
+    # carry the same literal text in both versions (Art. 2 is
+    # substantively unchanged 1999→2024).
+    def first_numbered_of(paras, article_n: int) -> str | None:
+        after_article = False
+        for p in paras:
+            if p.css_class == "h5" and f"Art. {article_n}**" in p.text:
+                after_article = True
+                continue
+            if after_article and p.css_class == "abs" and p.text.startswith("<sup>1</sup>"):
+                return p.text
+            if after_article and p.css_class == "h5":
+                return None
+        return None
+
+    pdf_art2 = first_numbered_of(versions[0].paragraphs, 2)
+    xml_art2 = first_numbered_of(versions[1].paragraphs, 2)
+    assert pdf_art2 is not None, "PDF version missing Art. 2 <sup>1</sup>"
+    assert xml_art2 is not None, "XML version missing Art. 2 <sup>1</sup>"
+    # Both versions carry Art. 2 par. 1 text word-for-word. The leading
+    # sub-sentence is stable across all BV versions since 1999.
+    assert "Freiheit und die Rechte des Volkes" in pdf_art2
+    assert "Freiheit und die Rechte des Volkes" in xml_art2

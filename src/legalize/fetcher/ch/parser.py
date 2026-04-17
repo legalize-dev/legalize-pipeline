@@ -662,12 +662,24 @@ class FedlexTextParser(TextParser):
                 if _tag(vel) != "version":
                     continue
                 effective = _parse_date(vel.get("effective-date"))
-                akn = vel.find(_akn("akomaNtoso"))
-                if akn is None:
-                    akn = vel.find("akomaNtoso")
-                if akn is None:
-                    continue
-                version = self._parse_single(akn, norm_id=norm_id, effective=effective)
+                pub = _parse_date(vel.get("publication-date")) or effective
+                fmt = vel.get("format", "xml")
+
+                if fmt == "pdf":
+                    version = self._parse_pdf_inline(
+                        vel,
+                        norm_id=norm_id,
+                        publication_date=pub,
+                        effective_date=effective,
+                    )
+                else:
+                    akn = vel.find(_akn("akomaNtoso"))
+                    if akn is None:
+                        akn = vel.find("akomaNtoso")
+                    if akn is None:
+                        continue
+                    version = self._parse_single(akn, norm_id=norm_id, effective=effective)
+
                 if version is not None:
                     versions.append(version)
             if not versions:
@@ -754,6 +766,50 @@ class FedlexTextParser(TextParser):
             publication_date=pub_date,
             effective_date=eff_date,
             paragraphs=tuple(paragraphs),
+        )
+
+    def _parse_pdf_inline(
+        self,
+        version_el: ET.Element,
+        norm_id: str,
+        publication_date: date | None,
+        effective_date: date | None,
+    ) -> Version | None:
+        """Decode a base64-wrapped PDF version and parse it.
+
+        The client bundles PDF manifestations inside ``<pdf-base64>`` so
+        the envelope stays valid XML. We decode the bytes and hand them
+        to ``parser_pdf.parse_pdf_version`` which produces the same
+        ``Block/Version/Paragraph`` shape the XML parser emits.
+        """
+        import base64
+
+        # Locate the base64 payload.
+        pdf_node = version_el.find("pdf-base64")
+        if pdf_node is None:
+            logger.warning("PDF version for %s missing <pdf-base64>", norm_id)
+            return None
+        encoded = (pdf_node.text or "").strip()
+        if not encoded:
+            return None
+        try:
+            pdf_bytes = base64.b64decode(encoded)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Invalid base64 PDF payload for %s: %s", norm_id, exc)
+            return None
+
+        eff = effective_date or date(1900, 1, 1)
+        pub = publication_date or eff
+
+        # Delayed import — parser_pdf pulls in pdfplumber which is
+        # heavier than the XML path.
+        from legalize.fetcher.ch.parser_pdf import parse_pdf_version
+
+        return parse_pdf_version(
+            pdf_bytes,
+            norm_id=norm_id,
+            publication_date=pub,
+            effective_date=eff,
         )
 
 

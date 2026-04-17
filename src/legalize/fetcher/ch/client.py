@@ -32,6 +32,7 @@ domain under URG Art. 5.
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import threading
@@ -67,8 +68,9 @@ EU_LANG = {
     "rm": "ROH",
 }
 
-# User-format vocabulary — XML manifestations
+# User-format vocabulary
 USER_FORMAT_XML = f"{VOCAB_BASE}/user-format/xml"
+USER_FORMAT_PDF = f"{VOCAB_BASE}/user-format/pdf-a"
 
 # Cap historical versions per law to bound bootstrap cost. Most laws have
 # 0-5 XML consolidations; a very few may have 50+ once back-fill catches up.
@@ -184,14 +186,22 @@ class FedlexClient(HttpClient):
         return json.loads(data)
 
     def get_consolidations(self, cca_uri: str) -> list[dict]:
-        """Return all consolidations of one law with an XML manifestation.
+        """Return all consolidations of one law with the best-format URL.
 
-        Each result is ``{uri, date_applicability, date_end, xml_url}``,
-        ordered oldest → newest. Consolidations without an XML manifestation
-        in the requested language are filtered out server-side.
+        Each result is
+        ``{uri, date_applicability, date_end, url, format}``, ordered
+        oldest → newest. Format is ``"xml"`` when an Akoma Ntoso
+        manifestation exists in the requested language for that
+        consolidation, otherwise ``"pdf"`` when only a PDF-A exists.
+        Consolidations that have NEITHER XML nor PDF-A in the requested
+        language are filtered out.
+
+        A single SPARQL query pulls both formats per version with
+        ``OPTIONAL`` clauses; we pick XML at aggregation time so the
+        client only does one round-trip per law.
         """
         query = f"""PREFIX jolux: <{JOLUX_NS}>
-SELECT DISTINCT ?consol ?dateAppl ?dateEnd ?url WHERE {{
+SELECT DISTINCT ?consol ?dateAppl ?dateEnd ?xmlUrl ?pdfUrl WHERE {{
   GRAPH ?g {{
     ?consol a jolux:Consolidation .
     ?consol jolux:isMemberOf <{cca_uri}> .
@@ -199,24 +209,38 @@ SELECT DISTINCT ?consol ?dateAppl ?dateEnd ?url WHERE {{
     OPTIONAL {{ ?consol jolux:dateEndApplicability ?dateEnd }}
     ?consol jolux:isRealizedBy ?expr .
     ?expr jolux:language <{self._language_uri}> .
-    ?expr jolux:isEmbodiedBy ?manif .
-    ?manif jolux:userFormat <{USER_FORMAT_XML}> .
-    ?manif jolux:isExemplifiedBy ?url .
+    OPTIONAL {{
+      ?expr jolux:isEmbodiedBy ?xmlManif .
+      ?xmlManif jolux:userFormat <{USER_FORMAT_XML}> .
+      ?xmlManif jolux:isExemplifiedBy ?xmlUrl .
+    }}
+    OPTIONAL {{
+      ?expr jolux:isEmbodiedBy ?pdfManif .
+      ?pdfManif jolux:userFormat <{USER_FORMAT_PDF}> .
+      ?pdfManif jolux:isExemplifiedBy ?pdfUrl .
+    }}
   }}
 }}
 ORDER BY ?dateAppl"""
         result = self.sparql_query(query)
         out: list[dict] = []
         for binding in result.get("results", {}).get("bindings", []):
-            url = binding.get("url", {}).get("value")
-            if not url:
+            xml_url = binding.get("xmlUrl", {}).get("value")
+            pdf_url = binding.get("pdfUrl", {}).get("value")
+            # Prefer XML; fall back to PDF-A; skip versions with neither.
+            if xml_url:
+                url, fmt = xml_url, "xml"
+            elif pdf_url:
+                url, fmt = pdf_url, "pdf"
+            else:
                 continue
             out.append(
                 {
                     "uri": binding["consol"]["value"],
                     "date_applicability": binding.get("dateAppl", {}).get("value"),
                     "date_end_applicability": binding.get("dateEnd", {}).get("value"),
-                    "xml_url": url,
+                    "url": url,
+                    "format": fmt,
                 }
             )
         return out
@@ -310,15 +334,14 @@ SELECT ?s ?label WHERE {{
     # ─────────────────────────────────────────
 
     def download_xml(self, file_url: str) -> bytes:
-        """Download an XML manifestation from the Fedlex filestore.
-
-        The SPARQL endpoint may return an ``http://`` URL; the filestore
-        only serves HTTPS, so we upgrade the scheme transparently.
-        """
+        """Download an XML manifestation from the Fedlex filestore."""
         url = file_url.replace("http://", "https://")
-        # Filestore returns Content-Type: application/xml — override our
-        # session-level JSON Accept header just for this request.
         return self._get(url, headers={"Accept": "application/xml, */*"})
+
+    def download_pdf(self, file_url: str) -> bytes:
+        """Download a PDF-A manifestation from the Fedlex filestore."""
+        url = file_url.replace("http://", "https://")
+        return self._get(url, headers={"Accept": "application/pdf, */*"})
 
     # ─────────────────────────────────────────
     # LegislativeClient interface
@@ -327,15 +350,26 @@ SELECT ?s ?label WHERE {{
     def get_text(self, norm_id: str) -> bytes:
         """Fetch the full history of a law as a multi-version envelope.
 
-        Returns a ``<fedlex-multi-version>`` XML document whose children are
-        ``<version>`` elements wrapping the Akoma Ntoso root of each
-        consolidated state, annotated with ``effective-date`` and optional
-        ``end-date``. Versions are ordered oldest → newest.
+        Returns a ``<fedlex-multi-version>`` XML document. Each child
+        ``<version>`` carries:
 
-        If the law has no XML consolidation at all we raise ``ValueError``
-        — the caller (pipeline) will skip it and the discovery filter
-        already excludes these, so this should be rare (race conditions
-        only).
+        - ``format="xml"`` or ``format="pdf"`` — the underlying
+          manifestation for that consolidation.
+        - ``effective-date="YYYY-MM-DD"`` — ``jolux:dateApplicability``.
+        - ``end-date="YYYY-MM-DD"`` (optional) — ``jolux:dateEndApplicability``.
+
+        For ``format="xml"`` versions the Akoma Ntoso root is inlined
+        directly. For ``format="pdf"`` versions the raw PDF bytes are
+        base64-encoded inside the ``<version>`` element (PDFs are
+        binary and cannot be inlined as XML text). The parser decodes
+        them and hands them to the pdfplumber-based PDF parser.
+
+        Versions are ordered oldest → newest. We mix XML and PDF freely
+        so the git history of a single law walks seamlessly across
+        format boundaries.
+
+        If the law has NO consolidation with either format we raise
+        ``ValueError`` — the pipeline catches it and skips the norm.
         """
         with self._bundle_lock:
             cached = self._bundle_cache.get(norm_id)
@@ -346,7 +380,9 @@ SELECT ?s ?label WHERE {{
         consolidations = self.get_consolidations(cca_uri)
 
         if not consolidations:
-            raise ValueError(f"No DE XML consolidations for {norm_id} ({cca_uri})")
+            raise ValueError(
+                f"No DE XML or PDF consolidations for {norm_id} ({cca_uri})"
+            )
 
         if len(consolidations) > MAX_VERSIONS_PER_LAW:
             logger.info(
@@ -366,11 +402,19 @@ SELECT ?s ?label WHERE {{
         ]
         for consol in consolidations:
             date_str = consol.get("date_applicability") or "unknown"
+            fmt = consol.get("format") or "xml"
+            url = consol.get("url")
+            if not url:
+                continue
             try:
-                consol_xml = self.download_xml(consol["xml_url"])
+                if fmt == "pdf":
+                    payload = self.download_pdf(url)
+                else:
+                    payload = self.download_xml(url)
             except Exception as exc:  # noqa: BLE001
                 logger.warning(
-                    "Failed to download consolidation %s of %s: %s",
+                    "Failed to download %s consolidation %s of %s: %s",
+                    fmt,
                     date_str,
                     norm_id,
                     exc,
@@ -380,16 +424,24 @@ SELECT ?s ?label WHERE {{
             if consol.get("date_end_applicability"):
                 end_attr = f" end-date='{consol['date_end_applicability']}'"
             pieces.append(
-                f"<version type='consolidation' effective-date='{date_str}'{end_attr}>\n".encode(
-                    "utf-8"
-                )
+                f"<version type='consolidation' effective-date='{date_str}'"
+                f" format='{fmt}'{end_attr}>\n".encode("utf-8")
             )
-            inner = consol_xml
-            if inner.startswith(b"<?xml"):
-                idx = inner.find(b"?>")
-                if idx >= 0:
-                    inner = inner[idx + 2 :].lstrip()
-            pieces.append(inner)
+            if fmt == "pdf":
+                # Wrap binary PDFs in a base64 element. The parser
+                # decodes this back to raw bytes and feeds it to
+                # pdfplumber. Non-base64 elements in the envelope are
+                # XML content inlined verbatim.
+                pieces.append(b"<pdf-base64>")
+                pieces.append(base64.b64encode(payload))
+                pieces.append(b"</pdf-base64>")
+            else:
+                inner = payload
+                if inner.startswith(b"<?xml"):
+                    idx = inner.find(b"?>")
+                    if idx >= 0:
+                        inner = inner[idx + 2 :].lstrip()
+                pieces.append(inner)
             pieces.append(b"\n</version>\n")
         pieces.append(b"</fedlex-multi-version>\n")
         data = b"".join(pieces)
