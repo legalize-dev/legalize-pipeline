@@ -175,9 +175,7 @@ def _dominant_size(words: list[dict]) -> float:
     return max(counts.items(), key=lambda kv: kv[1])[0]
 
 
-def _group_into_lines(
-    words: list[dict], y_tol: float = 2.0
-) -> list[list[dict]]:
+def _group_into_lines(words: list[dict], y_tol: float = 2.0) -> list[list[dict]]:
     """Group words into visual lines based on their ``top`` coordinate.
 
     Words are already ordered left-to-right top-to-bottom by pdfplumber
@@ -234,12 +232,7 @@ def _wrap_inline_sups(line: str, sup_words: set[str]) -> str:
         return line
     out_tokens: list[str] = []
     for i, tok in enumerate(line.split(" ")):
-        if (
-            i > 0
-            and tok
-            and tok in sup_words
-            and tok.isdigit()
-        ):
+        if i > 0 and tok and tok in sup_words and tok.isdigit():
             out_tokens.append(f"<sup>{tok}</sup>")
         else:
             out_tokens.append(tok)
@@ -354,9 +347,7 @@ def _extract_page(page, running_header: str | None) -> _ExtractedPage:
 _SR_TOKEN_RE = re.compile(r"\b\d{1,4}(?:\.\d{1,4})?\b")
 
 
-def _looks_like_running_header(
-    line: str, running_header: str | None
-) -> bool:
+def _looks_like_running_header(line: str, running_header: str | None) -> bool:
     """Heuristic: is this a page-running header to strip?"""
     stripped = line.strip()
     if not stripped:
@@ -399,9 +390,7 @@ def _detect_running_header(pages: list[_ExtractedPage]) -> str | None:
 # ─────────────────────────────────────────────
 
 
-def _emit_structural(
-    match: re.Match, level: int, prefix: str | None
-) -> Paragraph:
+def _emit_structural(match: re.Match, level: int, prefix: str | None) -> Paragraph:
     num = match.group(1).strip()
     title = match.group(2).strip()
     text = f"{num}. {prefix}: {title}" if prefix else f"{num} {title}"
@@ -415,7 +404,6 @@ def _parse_body_lines(
     """Pass 2: classify each body line and emit Paragraphs."""
     paragraphs: list[Paragraph] = []
     in_toc = False
-    in_preamble = False
     current_buffer: list[str] = []
     current_css = "preamble"  # before the first article we are in preamble
 
@@ -452,7 +440,6 @@ def _parse_body_lines(
             flush()
             paragraphs.append(_emit_structural(m, 2, "Titel"))
             current_css = "abs"
-            in_preamble = False
             continue
         m = _STRUCT_H3_RE.match(line)
         if m:
@@ -478,7 +465,6 @@ def _parse_body_lines(
         # that and the first structural heading as preamble body.
         if line == "Präambel":
             flush()
-            in_preamble = True
             current_css = "preamble"
             continue
 
@@ -486,7 +472,6 @@ def _parse_body_lines(
         m = _ARTICLE_RE.match(line)
         if m:
             flush()
-            in_preamble = False
             num, title = m.group(1), (m.group(2) or "").strip()
             header = f"**Art. {num}** {title}".rstrip()
             paragraphs.append(Paragraph(css_class="h5", text=header))
@@ -567,9 +552,7 @@ def _parse_footnote_lines(
     if collected:
         paragraphs.append(Paragraph(css_class="h6", text="Fussnoten"))
         for num, body in collected:
-            paragraphs.append(
-                Paragraph(css_class="abs", text=f"[^{num}]: {body}")
-            )
+            paragraphs.append(Paragraph(css_class="abs", text=f"[^{num}]: {body}"))
     return paragraphs
 
 
@@ -608,7 +591,7 @@ def parse_pdf_version(
                         first_line
                         and abs(
                             round(float(first_line[0].get("size", 0.0)), 1)
-                            - _HEADER_SIZE
+                            - _FOOTNOTE_OR_HEADER_SIZE
                         )
                         <= _SIZE_TOL
                     ):
@@ -657,9 +640,7 @@ def parse_pdf_version(
                 break
 
         body_pages = pdf.pages[:cutoff_idx] if cutoff_idx is not None else pdf.pages
-        extracted: list[_ExtractedPage] = [
-            _extract_page(p, running_header) for p in body_pages
-        ]
+        extracted: list[_ExtractedPage] = [_extract_page(p, running_header) for p in body_pages]
     finally:
         pdf.close()
 

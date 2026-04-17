@@ -380,9 +380,7 @@ SELECT ?s ?label WHERE {{
         consolidations = self.get_consolidations(cca_uri)
 
         if not consolidations:
-            raise ValueError(
-                f"No DE XML or PDF consolidations for {norm_id} ({cca_uri})"
-            )
+            raise ValueError(f"No DE XML or PDF consolidations for {norm_id} ({cca_uri})")
 
         if len(consolidations) > MAX_VERSIONS_PER_LAW:
             logger.info(

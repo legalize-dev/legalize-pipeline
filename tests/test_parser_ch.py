@@ -407,9 +407,7 @@ def test_pdf_bv_2020_fixture() -> None:
     assert numbered_first is not None
 
     # Fussnoten block is emitted with h6 heading
-    assert any(
-        p.css_class == "h6" and p.text == "Fussnoten" for p in version.paragraphs
-    )
+    assert any(p.css_class == "h6" and p.text == "Fussnoten" for p in version.paragraphs)
 
     # No TOC/index residue
     for p in version.paragraphs:
