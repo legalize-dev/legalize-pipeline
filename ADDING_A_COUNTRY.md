@@ -30,7 +30,13 @@ Step 0: Research
   │       │ GATE: ≥2 versions extracted with dates from 1 law.  │
   │       │ If not → stop and investigate. Do not write parser.  │
   │       └──────────────────────────────────────────────────────┘
-  └─ 0.6 Estimate scope           → paragraph in RESEARCH-{CC}.md
+  ├─ 0.6 Estimate scope           → paragraph in RESEARCH-{CC}.md
+  └─ 0.7 Format-coverage table    → table in RESEARCH-{CC}.md + skip justification
+          ┌──────────────────────────────────────────────────────┐
+          │ GATE: every format carrying >1% of unique laws or    │
+          │ unique versions is covered by the fetcher.           │
+          │ If not → either extend scope or justify in writing.  │
+          └──────────────────────────────────────────────────────┘
 
 Step 1: Fetcher       → src/legalize/fetcher/{code}/ (client, discovery, parser)
 Step 2: Register      → countries.py entry
@@ -70,9 +76,9 @@ Step 9: Production
 Each step produces a specific artifact (listed after `→`). The next step may
 depend on that artifact. **If a gate fails, do not proceed — fix and re-check.**
 
-## The four non-negotiable priorities
+## The five non-negotiable priorities
 
-Every country we add must meet four requirements. They are listed in order of
+Every country we add must meet five requirements. They are listed in order of
 how expensive they are to fix after the fact — the first is the hardest to
 retrofit, the last is the easiest. **Do not ship a country that fails any of
 them unless the exception is documented and justified in `RESEARCH-{CC}.md`.**
@@ -151,6 +157,64 @@ alphabetical) as long as each individual law's commits are written oldest-first.
 Why this distinction matters: trying to sort commits globally across all laws
 is fragile (ties on the same date, interleaved reforms) and provides no value.
 The web's `sync_from_git.py` reads history per-file, not per-repo.
+
+### 5. Multi-format coverage — process every format the source offers
+
+If the official source publishes the same law in several file formats (e.g.
+Switzerland's Fedlex serves the same consolidation as XML, DOCX, DOC and
+PDF-A depending on the vintage), **the fetcher MUST support every format
+that unlocks laws or versions the others do not**. Not just the cleanest one.
+
+Why: picking "only XML" is a very easy trap — you end up shipping a country
+with 30-60% of the classified compilation in the repo, and the missing laws
+tend to be the older, most-consolidated, highest-value codes. A user who
+finds that a landmark 1911 statute is absent loses trust permanently, and
+bolting a second format on after bootstrap means rewriting every commit for
+every law that format touches.
+
+Concrete rule:
+
+1. In Step 0.1, run a COUNT per format against the source (SPARQL, catalog
+   scan, whatever is cheapest). Tabulate: total norms, norms reachable via
+   each format, norms reachable only via a given format (`format N \ format M`).
+2. The fetcher covers **every format that contributes > 1% of unique laws
+   or unique versions**. Marginal formats (< 1%, or ones whose engineering
+   cost dwarfs the gain — e.g. scanned-image PDFs with OCR) may be skipped,
+   but the skip is justified in writing in `RESEARCH-{CC}.md`.
+3. When a single law has versions across multiple formats, **the transition
+   must be as seamless as the formats allow**. One version being XML and
+   the next being PDF MUST NOT look like the text was rewritten — same
+   article numbering, same heading depth, same paragraph numbering style,
+   same footnote conventions. Before/after review is mandatory (see §7).
+
+How to design for that:
+
+- Make the parser format-dispatched inside a single country package. The
+  envelope the client returns lists every version with an explicit
+  `format="xml|docx|doc|pdf"` attribute; the parser walks each version with
+  the format-appropriate extractor and emits the **same** `Block/Version/Paragraph`
+  shape regardless of input.
+- Normalize the output so that format-specific quirks do not leak: article
+  headings use one template (`##### Art. N Title`), paragraph numbers use
+  one style (`<sup>N</sup>`), tables always become Markdown pipe tables,
+  footnotes always become `[^N]` + a Fussnoten/Footnotes/… block.
+- For lossy formats (PDF, scanned DOC), keep the promise that **structure
+  matches**, even if inline formatting (e.g. the italics in a preamble) may
+  be lost. The engine rule "no artifacts" still applies — PDF output must
+  not leak page headers, page numbers, "Seite 17 von 42" footers, or the
+  date stamp Fedlex injects into every PDF-A.
+- Cross-format fidelity is validated in Step 7 with a **before/after diff
+  on a law that straddles formats**. Render version N-1 (older format) and
+  version N (newer format) for the same law, diff them, iterate the parsers
+  until a reader cannot tell from the Markdown which format the underlying
+  manifestation was. This analysis lives in `RESEARCH-{CC}.md` under a new
+  §0.7 "Cross-format fidelity check".
+
+Countries where this matters as of 2026-04: Switzerland (XML since ~2021,
+DOC/PDF for older vintages), Luxembourg (XML back to the 1950s, occasional
+HTML gaps), Ireland (XML + Revised Acts HTML overlays), Estonia (PDF via
+Lisa for appendices). If your country only ships one format, say so in
+`RESEARCH-{CC}.md §0.1` and move on.
 
 ## Prerequisites
 
@@ -309,6 +373,54 @@ Before writing code, write a one-paragraph summary in `RESEARCH-{CC}.md`:
 
 This estimate informs the `max_workers` tuning in Step 8 and sets expectations
 for bootstrap runtime.
+
+### 0.7 Format-coverage table — GATE
+
+If the source serves laws in a single file format (e.g. France's LEGI XML
+dump), skip this step and note it: `"Single-format source (XML only); §0.7
+N/A."`
+
+Otherwise — and this is most modern open-data portals — produce a table
+showing how much of the catalogue each format reaches. Use the source's
+own index (SPARQL, REST, catalog dump) to get hard numbers, not guesses:
+
+| Format | Total laws with ≥1 version in this format | Unique (no other format covers them) | % of catalogue |
+|---|---|---|---|
+| XML (Akoma Ntoso) | 5,139 | 0 | 29.8% |
+| DOCX | 5,141 | 2 | 29.8% |
+| DOC (legacy binary) | 5,166 | 27 | 30.0% |
+| PDF-A | 6,791 | 1,652 | 39.4% |
+| HTML | 5,140 | 1 | 29.8% |
+
+For historical versions (not just current text), produce the same table
+counting versions rather than laws — the answer can differ by an order of
+magnitude (Fedlex: Constitution has 6 XML versions but 37 PDF-A versions).
+
+**Gate:** every format that contributes `> 1%` of unique laws **or** unique
+versions MUST be covered by the fetcher. Any format you skip requires a
+written justification that cites either (a) < 1% coverage contribution, or
+(b) engineering cost dramatically exceeding the gain — e.g. scanned-image
+PDFs needing OCR, DOC binary formats without a clean reader.
+
+**The parser must be format-dispatched.** The client bundles all versions
+into a single envelope with an explicit `format` attribute on each
+`<version>`; the parser emits the **same** `Block/Version/Paragraph`
+structure regardless of input. Article headings use one template, paragraph
+numbers use one style, tables always become pipe tables, footnotes always
+become `[^N]` with a footnotes block. Format-specific quirks (PDF page
+headers, "Stand am …" stamps, Word-style revision markers) are stripped so
+the output cannot betray which format the underlying manifestation was.
+
+**Cross-format before/after check**: pick one law that has versions in both
+the "richest" format (usually XML) and a fallback format (usually PDF).
+Render the two adjacent versions across the format boundary, diff the
+Markdown, and iterate both parsers until a casual reader cannot tell which
+format came from which. Save the before/after evidence in
+`RESEARCH-{CC}.md §0.7` so Step 7 has a baseline to compare against.
+
+This work is painful, but skipping it means shipping a country that
+permanently misses 30-60% of its corpus and creates format-boundary
+scars in every git log. Do it up front.
 
 ## Step 1: Create the fetcher package
 
