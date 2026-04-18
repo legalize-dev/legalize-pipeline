@@ -736,9 +736,7 @@ def _render_sub_paragraph(element: etree._Element, builder: _BlockBuilder, *, de
             _render_inline_child(child, builder, depth=depth)
 
 
-def _render_inline_child(
-    child: etree._Element, builder: _BlockBuilder, *, depth: int
-) -> None:
+def _render_inline_child(child: etree._Element, builder: _BlockBuilder, *, depth: int) -> None:
     """Render one content-bearing child of a P{N} or P{N}para.
 
     Shared by ``_render_sub_paragraph`` and ``_render_p_body`` so that the
@@ -879,9 +877,7 @@ def _render_block_amendment(element: etree._Element, builder: _BlockBuilder, *, 
         # Walk every child of the P{N} in document order so siblings of
         # the *para container (Formula, Tabular, other P{N}) are visited.
         for sibling in numbered_el:
-            sib_local = (
-                etree.QName(sibling.tag).localname if isinstance(sibling.tag, str) else ""
-            )
+            sib_local = etree.QName(sibling.tag).localname if isinstance(sibling.tag, str) else ""
             if not sib_local or sib_local == "Pnumber":
                 continue
             if sibling is para_el:
@@ -890,9 +886,7 @@ def _render_block_amendment(element: etree._Element, builder: _BlockBuilder, *, 
                 # rendered at the SAME indent level as the header line.
                 seen_first = first_text_el is None
                 for sub in para_el:
-                    slocal = (
-                        etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
-                    )
+                    slocal = etree.QName(sub.tag).localname if isinstance(sub.tag, str) else ""
                     if slocal == "Text" and not seen_first and sub is first_text_el:
                         seen_first = True
                         continue
@@ -949,9 +943,7 @@ def _render_block_amendment(element: etree._Element, builder: _BlockBuilder, *, 
                 num_el = child.find("leg:Number", NS)
                 title_el = child.find("leg:Title", NS)
                 num = _clean_text("".join(num_el.itertext())) if num_el is not None else ""
-                title = (
-                    _clean_text("".join(title_el.itertext())) if title_el is not None else ""
-                )
+                title = _clean_text("".join(title_el.itertext())) if title_el is not None else ""
                 label = " — ".join(p for p in (num, title) if p)
                 if label:
                     buffer.append(f"{quote_prefix(level)}**{label}**")
@@ -1182,13 +1174,58 @@ class UKTextParser(TextParser):
 
         return _generic_extract(blocks)
 
+    def parse_suvestine(
+        self, suvestine_data: bytes, norm_id: str
+    ) -> tuple[list[Block], list[Reform]]:
+        """Parse a multi-version UK suvestine blob into versioned Blocks + Reforms.
+
+        The pipeline detects ``hasattr(text_parser, "parse_suvestine")`` and
+        uses this method to override the single-snapshot parse with the
+        full per-effective-date history captured by
+        ``LegislationGovUkClient.get_suvestine``. Without this method the
+        pipeline silently falls back to the latest-revised text only.
+
+        Returns ``(blocks, reforms)``:
+
+        * ``blocks`` have one ``Version`` per distinct snapshot date the
+          blob contained; dedup of identical consecutive versions happens
+          inside ``_parse_multiversion``.
+        * ``reforms`` is a sorted list of ``Reform`` records, one per
+          distinct effective date across the blob (bootstrap date first,
+          followed by every applied amendment in chronological order).
+        """
+        data = _decode_maybe_gzipped(suvestine_data)
+        if not data or not data.lstrip().startswith(b"{"):
+            return [], []
+        try:
+            blob = json.loads(data)
+        except json.JSONDecodeError as exc:
+            logger.warning("parse_suvestine: %s has malformed blob (%s)", norm_id, exc)
+            return [], []
+        blocks = _parse_multiversion(blob)
+        from legalize.transformer.xml_parser import extract_reforms as _generic_extract
+
+        reforms = _generic_extract(blocks)
+        return blocks, reforms
+
 
 def _parse_single_snapshot(xml_bytes: bytes) -> list[Block]:
-    """Parse one CLML XML into Blocks, each with a single Version."""
+    """Parse one CLML XML into Blocks, each with a single Version.
+
+    Pre-1988 Acts often expose a **metadata-only** CLML document (no
+    ``<Body>``, ``NumberOfProvisions="0"``). TNA hosts the full text as
+    an original PDF only — the XML exists to surface title, dates and
+    publisher info. For those we synthesise a single placeholder Block
+    containing a link to the PDF so the law is still represented in git
+    with its enactment date, title, and a pointer the reader can follow.
+    """
     root = etree.fromstring(xml_bytes)
     norm_id = _norm_id_from_root(root) or "uk"
     eff_date = _effective_date_from_root(root)
     entries = _gather_section_blocks(root)
+
+    if not entries and _is_metadata_only(root):
+        entries = [_pdf_only_placeholder_block(root, norm_id)]
 
     total_images_dropped = sum(img for *_, img in entries)
     if total_images_dropped:
@@ -1204,6 +1241,71 @@ def _parse_single_snapshot(xml_bytes: bytes) -> list[Block]:
         )
         blocks.append(Block(id=block_id, block_type=block_type, title=title, versions=(version,)))
     return blocks
+
+
+def _is_metadata_only(root: etree._Element) -> bool:
+    """True when the CLML document has no renderable body / schedules.
+
+    TNA uses this shape for pre-1988 Acts whose consolidated text has
+    never been digitally typed — the XML carries `<ukm:Metadata>` and
+    nothing else, usually with ``NumberOfProvisions="0"``.
+    """
+    has_body = root.find(".//leg:Body", NS) is not None
+    has_schedules = root.find(".//leg:Schedules", NS) is not None
+    has_prelims = root.find(".//leg:PrimaryPrelims", NS) is not None
+    if has_body or has_schedules or has_prelims:
+        return False
+    provisions = root.get("NumberOfProvisions")
+    return provisions is None or provisions == "0"
+
+
+def _pdf_only_placeholder_block(
+    root: etree._Element, norm_id: str
+) -> tuple[str, str, str, list[Paragraph], int]:
+    """Build a synthetic Block pointing at the PDF for metadata-only Acts."""
+    type_code, year, number = (None, None, None)
+    try:
+        type_code, year, number = split_norm_id(norm_id)
+    except ValueError:
+        pass
+    pdf_url = None
+    for link in root.findall(".//atom:link", NS):
+        href = link.get("href") or ""
+        if href.endswith(".pdf"):
+            pdf_url = href.replace(
+                "http://www.legislation.gov.uk/",
+                "https://www.legislation.gov.uk/",
+                1,
+            )
+            break
+    if pdf_url is None and type_code and year is not None and number is not None:
+        pdf_url = (
+            f"https://www.legislation.gov.uk/{type_code}/{year}/{number}/pdfs/"
+            f"{type_code}_{year:04d}{number:04d}_en.pdf"
+        )
+
+    title_el = root.find(".//dc:title", NS)
+    title = _clean_text(title_el.text) if title_el is not None and title_el.text else ""
+
+    paragraphs: list[Paragraph] = [
+        Paragraph(
+            css_class="parrafo",
+            text=(
+                "The full text of this Act has not been digitally typed by The "
+                "National Archives and is available only as the original PDF. "
+                "legislation.gov.uk serves a metadata-only CLML document for "
+                "Acts of this vintage, so the body could not be rendered here."
+            ),
+        ),
+    ]
+    if pdf_url:
+        paragraphs.append(
+            Paragraph(
+                css_class="parrafo",
+                text=f"Original Act (PDF): [{title or norm_id}]({pdf_url})",
+            )
+        )
+    return ("enacted-text", "enacted-pdf-only", title, paragraphs, 0)
 
 
 def _parse_multiversion(blob: dict[str, Any]) -> list[Block]:

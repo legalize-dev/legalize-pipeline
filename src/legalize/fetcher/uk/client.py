@@ -118,6 +118,10 @@ class LegislationGovUkClient(HttpClient):
     def year_feed_url(self, type_code: str, year: int, page: int = 1) -> str:
         return f"{self._base_url}/{type_code}/{year}/data.feed?page={page}&results-count=100"
 
+    def type_feed_url(self, type_code: str, page: int = 1) -> str:
+        """Aggregate Atom feed for a single type code (all years, paged)."""
+        return f"{self._base_url}/{type_code}/data.feed?page={page}&results-count=100"
+
     def update_feed_url(self, target_date: date) -> str:
         iso = target_date.isoformat()
         return (
@@ -126,13 +130,21 @@ class LegislationGovUkClient(HttpClient):
 
     # ─── LegislativeClient contract ─────────────────────────────
 
-    def get_text(self, norm_id: str) -> bytes:
-        """Fetch the latest revised CLML XML for a law."""
+    def get_text(self, norm_id: str, meta_data: bytes | None = None) -> bytes:
+        """Fetch the latest revised CLML XML for a law.
+
+        The pipeline calls ``get_metadata`` first and then ``get_text``; for
+        UK both resolve to the same ``/data.xml`` so we accept the already-
+        fetched ``meta_data`` and return it as-is. That saves one HTTP
+        request per law across the whole bootstrap (~3,970 requests).
+        """
+        if meta_data is not None:
+            return meta_data
         return self._get(self._law_url(norm_id))
 
     def get_metadata(self, norm_id: str) -> bytes:
         """Metadata is embedded in the same XML document."""
-        return self.get_text(norm_id)
+        return self._get(self._law_url(norm_id))
 
     # ─── UK-specific fetchers ───────────────────────────────────
 
@@ -174,6 +186,10 @@ class LegislationGovUkClient(HttpClient):
     def get_year_feed(self, type_code: str, year: int, page: int = 1) -> bytes:
         """Fetch a per-year Atom feed (discovery)."""
         return self._get(self.year_feed_url(type_code, year, page))
+
+    def get_type_feed(self, type_code: str, page: int = 1) -> bytes:
+        """Fetch the aggregate Atom feed for a type code."""
+        return self._get(self.type_feed_url(type_code, page))
 
     def get_update_feed(self, target_date: date) -> bytes:
         """Fetch the publication log feed for a single day (daily discovery)."""
@@ -221,6 +237,17 @@ class LegislationGovUkClient(HttpClient):
                 raise
             logger.warning("%s: no enacted XML available, falling back to latest", norm_id)
             enacted_xml = self.get_text(norm_id)
+
+        # CloudFront WAF issues HTTP 202 with an empty body for Acts it
+        # considers too expensive to render on-demand (e.g. Companies Act
+        # 2006, 1,300+ sections). Treat that as a retryable failure so the
+        # pipeline flags the law for a reprocess instead of committing an
+        # empty snapshot.
+        if not enacted_xml or len(enacted_xml) == 0:
+            raise ValueError(
+                f"{norm_id}: empty response from legislation.gov.uk "
+                "(likely CloudFront 202 challenge or WAF hold)"
+            )
 
         enacted_date = _extract_enacted_date(enacted_xml)
 
@@ -271,6 +298,9 @@ class LegislationGovUkClient(HttpClient):
                     logger.warning("%s: no PIT XML for %s (404), skipping", norm_id, eff_date)
                     continue
                 raise
+            if not pit_xml:
+                logger.warning("%s: empty PIT body for %s (WAF hold?), skipping", norm_id, eff_date)
+                continue
             # Deduplicate "noop" PIT responses: if the PIT XML byte-for-byte
             # matches the previous version's, the server rendered an empty
             # diff. Skip to keep the commit log clean.

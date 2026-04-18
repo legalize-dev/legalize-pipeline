@@ -76,52 +76,44 @@ class LegislationGovUkDiscovery(NormDiscovery):
     # ─── Required contract ──────────────────────────────────────
 
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
+        """Yield every norm ID across every configured type.
+
+        Uses the aggregate Atom feed ``/{type}/data.feed?page=N&results-count=100``
+        which returns all Acts of a type across all years — much faster than
+        iterating per-year feeds (the aggregate feed skips the dozens of
+        empty historical years that each type has to its name).
+        """
         uk: LegislationGovUkClient = client  # type: ignore[assignment]
-        max_year = self._max_year or date.today().year
         total = 0
 
         for type_code in self._types:
             type_total = 0
-            for year in range(self._min_year, max_year + 1):
-                page = 1
-                while True:
-                    try:
-                        body = uk.get_year_feed(type_code, year, page=page)
-                    except Exception as exc:
-                        logger.warning(
-                            "Discovery failed for %s/%d page %d: %s",
-                            type_code,
-                            year,
-                            page,
-                            exc,
-                        )
-                        break
-                    try:
-                        root = etree.fromstring(body)
-                    except etree.XMLSyntaxError:
-                        break
-                    entries = root.findall("atom:entry", NS)
-                    if not entries:
-                        break
-                    for entry in entries:
-                        eid = entry.find("atom:id", NS)
-                        if eid is None or not eid.text:
-                            continue
-                        norm_id = _entry_to_norm_id(eid.text)
-                        if norm_id:
-                            type_total += 1
-                            total += 1
-                            yield norm_id
-                    # Stop paging when we've consumed all entries.
-                    total_results = root.find(".//os:totalResults", NS)
-                    if total_results is None:
-                        break
-                    try:
-                        if type_total >= int(total_results.text or "0"):
-                            break
-                    except ValueError:
-                        break
-                    page += 1
+            page = 1
+            while True:
+                try:
+                    body = uk.get_type_feed(type_code, page=page)
+                except Exception as exc:
+                    logger.warning("Discovery failed for %s page %d: %s", type_code, page, exc)
+                    break
+                try:
+                    root = etree.fromstring(body)
+                except etree.XMLSyntaxError:
+                    break
+                entries = root.findall("atom:entry", NS)
+                if not entries:
+                    break
+                for entry in entries:
+                    eid = entry.find("atom:id", NS)
+                    if eid is None or not eid.text:
+                        continue
+                    norm_id = _entry_to_norm_id(eid.text)
+                    if norm_id:
+                        type_total += 1
+                        total += 1
+                        yield norm_id
+                if len(entries) < 100:
+                    break
+                page += 1
             logger.info("Discovered %d %s Acts", type_total, type_code)
         logger.info("UK discovery complete: %d laws across %d types", total, len(self._types))
 
