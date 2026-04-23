@@ -33,7 +33,7 @@ from legalize.models import (
     Reform,
 )
 from legalize.state.store import StateStore, resolve_dates_to_process
-from legalize.storage import load_norma_from_json, save_structured_json
+from legalize.storage import json_path_for, load_norma_from_json, save_structured_json
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
 from legalize.transformer.xml_parser import extract_reforms, parse_text_xml
@@ -244,12 +244,15 @@ def generic_fetch_one(
     from legalize.countries import get_client_class, get_metadata_parser, get_text_parser
 
     cc = config.get_country(country)
-    safe_id = norm_id.replace(":", "-").replace("/", "-").replace(" ", "")
-    json_path = Path(cc.data_dir) / "json" / f"{safe_id}.json"
 
-    if json_path.exists() and not force:
+    # Legacy flat-path check — for countries where ``identifier`` doesn't
+    # collide with other jurisdictions, this is the correct cache path
+    # and we can skip cheaply without touching the client at all.
+    safe_id = norm_id.replace(":", "-").replace("/", "-").replace(" ", "")
+    legacy_flat_path = Path(cc.data_dir) / "json" / f"{safe_id}.json"
+    if legacy_flat_path.exists() and not force:
         console.print(f"  [dim]{norm_id} already processed, skipping[/dim]")
-        return load_norma_from_json(json_path)
+        return load_norma_from_json(legacy_flat_path)
 
     client_cls = get_client_class(country)
     text_parser = get_text_parser(country)
@@ -262,6 +265,15 @@ def generic_fetch_one(
             meta_data = client.get_metadata(norm_id)
             metadata = meta_parser.parse(meta_data, norm_id)
 
+            # Multi-jurisdiction aware skip: re-check using the canonical
+            # ``{jurisdiction}/{identifier}.json`` path. This catches
+            # countries like CA where two norms (EN + FR) share the same
+            # ``identifier`` but land in different ``jurisdiction`` dirs.
+            json_path = json_path_for(cc.data_dir, metadata)
+            if json_path.exists() and not force:
+                console.print(f"  [dim]{norm_id} already processed, skipping[/dim]")
+                return load_norma_from_json(json_path)
+
             # Pass pre-fetched metadata to avoid redundant API call
             get_text_kwargs = {}
             if hasattr(client, "get_text") and "meta_data" in client.get_text.__code__.co_varnames:
@@ -270,8 +282,28 @@ def generic_fetch_one(
             blocks = text_parser.parse_text(text_data)
             reforms = _extract_reforms_generic(text_parser, client, norm_id, blocks, text_data)
 
-            # Suvestine: replace blocks + reforms with versioned historical data
-            if hasattr(text_parser, "parse_suvestine") and hasattr(client, "get_suvestine"):
+            # Suvestine: replace blocks + reforms with versioned historical data.
+            # Prefer the streaming interface (iter_suvestine + parse_suvestine_stream)
+            # when the client and parser expose it — that path avoids building
+            # the full multi-version JSON blob in memory, which on laws with
+            # 100+ versions (e.g. CA Criminal Code) peaked at ~2.5 GB per
+            # worker in the bytes-based path.
+            if hasattr(text_parser, "parse_suvestine_stream") and hasattr(client, "iter_suvestine"):
+                try:
+                    entry_iter = client.iter_suvestine(norm_id)
+                    sv_blocks, sv_reforms = text_parser.parse_suvestine_stream(entry_iter, norm_id)
+                    if sv_reforms:
+                        blocks = sv_blocks
+                        reforms = sv_reforms
+                        console.print(
+                            f"    [dim]Suvestine (stream): {len(sv_reforms)} versions[/dim]"
+                        )
+                except Exception:
+                    logger.warning(
+                        "Streaming suvestine unavailable for %s, falling back",
+                        norm_id,
+                    )
+            elif hasattr(text_parser, "parse_suvestine") and hasattr(client, "get_suvestine"):
                 try:
                     suvestine_data = client.get_suvestine(norm_id)
                     sv_blocks, sv_reforms = text_parser.parse_suvestine(suvestine_data, norm_id)

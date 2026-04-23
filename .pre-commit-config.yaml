@@ -18,7 +18,7 @@ repos:
 
       - id: country-dispatch
         name: verify country dispatch
-        entry: python3 scripts/check-dispatch.py
+        entry: uv run python scripts/check-dispatch.py
         language: system
         pass_filenames: false
         types: [python]
@@ -52,7 +52,7 @@ repos:
     hooks:
       - id: pytest
         name: full test suite
-        entry: python3 -m pytest tests/ --tb=short -q
+        entry: uv run python -m pytest tests/ --tb=short -q
         language: system
         pass_filenames: false
         types: [python]

@@ -1,0 +1,56 @@
+Version History Spike — Canada Federal (Access to Information Act, A-1)
+=======================================================================
+
+Source: justicecanada/laws-lois-xml GitHub repository
+Method: git history of eng/acts/A-1.xml across commits
+
+The Justice Canada XML API (https://laws-lois.justice.gc.ca/eng/XML/A-1.xml)
+does NOT support historical versions via ?pit= parameter. All requests return
+the current consolidated text regardless of the pit value.
+
+However, the official GitHub repository (justicecanada/laws-lois-xml) maintains
+version history through git commits. Each "Laws Site Update" commit represents
+a new consolidated snapshot.
+
+Version 1: 2024-11-01 (Laws Site Update)
+  Commit: d88024435e65b0f56dd545212826945be0b5babe
+  File: eng/acts/A-1.xml
+  Size: 485,914 bytes
+  pit-date in XML: corresponds to consolidation as of 2024-10
+
+Version 2: 2026-03-18 (Laws Site Update)
+  Commit: 364726c551e1ecd1466511e8545a03759c0babd0
+  File: eng/acts/A-1.xml
+  Size: 485,447 bytes
+  pit-date in XML: 2025-06-02
+
+Full commit history for A-1.xml (10 versions observed via GitHub API):
+  2026-03-18: Laws Site Update 2026-03-18
+  2025-07-31: Laws Site Update 2025-07-31
+  2025-06-24: Laws Site Update 2025-06-24
+  2025-06-12: Laws Site Update 2025-06-12
+  2025-04-17: Laws Site Update 2025-04-17
+  2025-03-07: Laws Site Update 2025-03-07
+  2025-02-06: Laws Site Update 2025-02-06
+  2024-11-25: Laws Site Update 2024-11-25
+  2024-11-13: Laws Site Update 2024-11-13
+  2024-11-01: Laws Site Update 2024-11-01
+
+Differences:
+  Sizes differ: YES (485,914 vs 485,447 = 467 bytes difference)
+  Stable identifier: A-1 (ConsolidatedNumber) across all versions
+  Dates extractable: pit-date and lastAmendedDate in XML root attributes
+
+Version history strategy:
+  - Clone justicecanada/laws-lois-xml with full history
+  - Walk git log per file to extract versions
+  - Each commit's version of a file = one version of the law
+  - Use commit date as effective_date for GIT_AUTHOR_DATE
+  - Section-level lastAmendedDate and inforce-start-date provide
+    finer granularity within each snapshot
+
+Conclusion: GATE PASS
+  - 2+ distinct versions extracted with dates from git history
+  - Stable identifiers link versions (ConsolidatedNumber / InstrumentNumber)
+  - Git-based version access is reliable and complete
+  - No API rate limits for git clone/pull

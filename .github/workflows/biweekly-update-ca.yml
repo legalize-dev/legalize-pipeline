@@ -1,0 +1,83 @@
+name: Biweekly update (Canada)
+
+# Justice Canada publishes a "Laws Site Update" commit to
+# justicecanada/laws-lois-xml roughly every 2 weeks. A biweekly run on the
+# 2nd and 16th of each month catches each update within a few days of it
+# landing upstream.
+#
+# The run clones the upstream XML repo (200 MB, full history), then calls
+# `legalize bootstrap -c ca`. Bootstrap is idempotent: it re-walks the
+# upstream git log per file and calls `parse_suvestine`, producing one
+# Version per upstream commit. The committer skips commits whose
+# (Source-Id, Norm-Id) pair already exists in legalize-ca, so only genuine
+# new revisions create new output commits.
+#
+# Scheduled for the 2nd and 16th at 14:00 UTC (1h after the web sync
+# window). Manual dispatch available for out-of-cycle runs.
+
+on:
+  schedule:
+    - cron: "0 14 2,16 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240  # 4h ceiling — steady-state run is far shorter
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547  # v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-ca
+
+      - name: Checkout upstream XML repo (full history — needed for version walk)
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          repository: justicecanada/laws-lois-xml
+          path: data-ca/laws-lois-xml
+          fetch-depth: 0
+
+      - name: Checkout output repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          repository: legalize-dev/legalize-ca
+          path: repos/ca
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Configure git identity
+        working-directory: repos/ca
+        run: |
+          git config user.name "Legalize"
+          git config user.email "legalize@legalize.dev"
+
+      - name: Run CA bootstrap (idempotent — existing commits are skipped)
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          legalize bootstrap -c ca --repo-path repos/ca --data-dir data-ca
+
+      - name: Push updates
+        working-directory: repos/ca
+        run: |
+          if git diff --quiet HEAD origin/main; then
+            echo "No new commits to push."
+          else
+            git push origin HEAD:main
+          fi

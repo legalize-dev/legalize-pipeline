@@ -473,6 +473,45 @@ countries:
       max_retries: 5
       requests_per_second: 2.0
 
+  ca:
+    repo_path: "../countries/ca"
+    data_dir: "../countries/data-ca"
+    cache_dir: ".cache"
+    # Justice Canada publishes consolidated XML in a public GitHub repo
+    # (justicecanada/laws-lois-xml). Primary mode: local clone scan —
+    # both bootstrap and historical versions come from walking its git log.
+    # Fallback: per-file HTTP download at ~1 req/s when the clone is absent.
+    # Bilingual: English (~5,800 norms in ca-en/) + French (~5,800 in ca-fr/).
+    # Total ~11,600 norms × ~5–50 versions each on average.
+    # xml_dir defaults to {data_dir}/laws-lois-xml; CI overrides via --data-dir.
+    # Local filesystem + no rate limits → parallelize the git log walk aggressively.
+    max_workers: 8
+    source:
+      base_url: "https://laws-lois.justice.gc.ca"
+      request_timeout: 30
+      max_retries: 3
+      requests_per_second: 1.0
+
+  us:
+    repo_path: "../countries/us"
+    data_dir: "../countries/data-us"
+    cache_dir: ".cache"
+    # OLRC publishes title ZIPs at release points (snapshots through a
+    # specific Public Law). Each ZIP contains one USLM XML per title.
+    # Pipeline works at section granularity (~60K sections across 54 titles).
+    # Downloads are large (5-50 MB per title ZIP) but infrequent — only on
+    # new release points (every ~6 months). OLRC geo-blocks non-US IPs;
+    # Wayback Machine is the fallback.
+    # Full bootstrap: 54 title ZIPs × 12 release points = 648 downloads.
+    # At 1 req/s → ~11 min per release point, ~2h total for all history.
+    max_workers: 1
+    source:
+      base_url: "https://uscode.house.gov"
+      release_tag: "119-73"
+      request_timeout: 120
+      max_retries: 5
+      requests_per_second: 1.0
+
   eu:
     repo_path: "../countries/eu"
     data_dir: "../countries/data-eu"

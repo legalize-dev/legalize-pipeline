@@ -28,6 +28,28 @@ from legalize.models import (
 logger = logging.getLogger(__name__)
 
 
+def json_path_for(data_dir: str | Path, metadata: NormMetadata) -> Path:
+    """Return the canonical JSON path for a norm.
+
+    Multi-jurisdiction countries (CA ca-en/ca-fr, ES autonomous
+    communities, etc.) must NOT collide on ``identifier`` alone — EN and
+    FR mirrors of the same Canadian act share ``A-1`` as identifier. The
+    path therefore nests under ``{jurisdiction}`` when the metadata
+    carries one, mirroring the output markdown layout
+    (``{jurisdiction}/{identifier}.md``) so operators can correlate the
+    cache JSON and the committed MD by path shape.
+
+    Countries without ``jurisdiction`` keep the legacy flat layout
+    (``data/json/{identifier}.json``) so existing caches remain valid.
+    """
+    jurisdiction = (metadata.jurisdiction or "").strip()
+    safe_ident = metadata.identifier.replace("/", "-").replace(" ", "_")
+    root = Path(data_dir) / "json"
+    if jurisdiction:
+        return root / jurisdiction / f"{safe_ident}.json"
+    return root / f"{safe_ident}.json"
+
+
 def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
     """Save structured data as DB-ready JSON.
 
@@ -62,7 +84,7 @@ def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
     }
     """
     data = _norm_to_dict(norm)
-    path = Path(data_dir) / "json" / f"{norm.metadata.identifier}.json"
+    path = json_path_for(data_dir, norm.metadata)
     path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(path, "w", encoding="utf-8") as f:

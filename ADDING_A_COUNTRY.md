@@ -39,6 +39,15 @@ Step 0: Research
           └──────────────────────────────────────────────────────┘
 
 Step 1: Fetcher       → src/legalize/fetcher/{code}/ (client, discovery, parser)
+        ┌──────────────────────────────────────────────────────┐
+        │ GATE: no `git` subprocess anywhere in the fetcher.   │
+        │ Fetch = download + parse. Commit is a separate phase.│
+        │ If your client spawns `git log`/`git show`/`git      │
+        │ cat-file` per norm you are re-running a 70K-process  │
+        │ subprocess storm — batch the whole upstream at fetch │
+        │ startup instead. See "Fetch and commit are separate  │
+        │ phases" below.                                        │
+        └──────────────────────────────────────────────────────┘
 Step 2: Register      → countries.py entry
 Step 3: Config        → config.yaml section
 Step 4: Repo plan     → (no artifact — planning only)
@@ -215,6 +224,62 @@ DOC/PDF for older vintages), Luxembourg (XML back to the 1950s, occasional
 HTML gaps), Ireland (XML + Revised Acts HTML overlays), Estonia (PDF via
 Lisa for appendices). If your country only ships one format, say so in
 `RESEARCH-{CC}.md §0.1` and move on.
+
+### 6. Fetch and commit are separate phases
+
+**The fetcher MUST NOT shell out to ``git``.** Zero ``subprocess.run(["git",
+…])``, ``Popen(["git", …])``, or equivalents — not per norm, not batched
+at startup, not anywhere in the fetcher path. If you need to read history
+from a git source, use a native library (``pygit2`` / libgit2) that talks
+to the object database in-process.
+
+Why this is a hard rule:
+
+- The fetch phase runs 11,000+ times on a typical country. Even at 200
+  ms per subprocess spawn (fork + exec + git's own startup), that's 37
+  minutes of pure overhead for one ``git log`` call per norm. With two
+  calls (``log`` + ``show`` per version), 11K norms × 5 versions = 55K
+  subprocesses = over 3 hours wasted on process creation alone.
+- Even a single persistent ``git cat-file --batch`` subprocess shared
+  across workers still serialises: it has one pair of stdin/stdout
+  pipes, so every worker queues behind the same lock. Under 8 workers
+  the bootstrap tail falls back to ~6 norms/min while CPU sits idle.
+- Python's GIL is held for the wait on each subprocess, so the thread
+  pool can't do other useful work during those micro-stalls.
+
+What the fetcher IS allowed to do:
+
+- **Read the upstream clone's working tree** (direct file I/O on
+  ``{data_dir}/some-clone/``). That's a filesystem read, not a git
+  command.
+- **Walk the object database via ``pygit2``**, with a per-thread
+  ``pygit2.Repository`` instance. Build an upfront ``{path →
+  [(commit_sha, iso_date, blob_oid), …]}`` cache once at startup
+  (``diff.deltas`` iteration, no patch materialisation — the full
+  Justice Canada walk is ~2 s), then resolve every per-norm blob via
+  ``repo[blob_oid].data``. No subprocess, no cross-thread locks.
+- **Emit data for the committer**. The committer is a separate downstream
+  phase (``commit_all`` / ``fast-import``). It's the ONLY place allowed
+  to shell out to git in bulk, and it already streams everything through
+  a single ``git fast-import`` process.
+
+Translated to a mental model: ``fetch`` is **download + parse**, writing
+to ``{data_dir}/{code}/json/*.json``. ``commit`` is a separate step that
+**reads those JSON files** and produces the git history. Wiring the two
+together inline — "fetch this norm, then ask git about it, then fetch
+another norm, then ask git again" — is the anti-pattern. It's what made
+the CA bootstrap's tail take 12+ hours instead of 1-2.
+
+Reference implementations:
+
+- **In-memory dump (good)**: ``fetcher/fr/client.py`` reads the LEGI
+  tar.gz dump once at startup, holds the dated snapshots in memory,
+  serves each norm from that cache.
+- **In-process git via pygit2 (good)**: ``fetcher/ca/client.py`` uses
+  ``pygit2.Repository`` to walk the Justice Canada clone at startup and
+  resolves blobs directly from the object database on worker threads —
+  no ``git`` subprocess ever runs inside the fetcher path. Copy this
+  pattern for any new country whose history lives in a git repo.
 
 ## Prerequisites
 
@@ -493,6 +558,14 @@ The `create()` classmethod is how the pipeline instantiates your client. It rece
 - Add retry with backoff for 429/503 errors
 - Set a descriptive `User-Agent`
 - The client is a context manager (`with MyClient.create(cfg) as client:`)
+- **No `git` subprocess per norm.** The client's hot loop (``get_text``,
+  ``get_metadata``, ``get_suvestine`` / ``iter_suvestine``) must never
+  spawn ``git log`` / ``git show`` / ``git cat-file`` for an individual
+  norm. If your version-history source is a git repository, **build the
+  (norm_id → commits) index ONCE** at client construction via a single
+  batched ``git log --all --name-only`` + one streaming
+  ``git cat-file --batch``, then serve each norm from that in-memory
+  index. See priority #6 ("Fetch and commit are separate phases").
 
 **Reference:** `fetcher/es/client.py` (HTTP API with ETag caching, rate limiting — primary), `fetcher/fr/client.py` (reads from local XML dump)
 
