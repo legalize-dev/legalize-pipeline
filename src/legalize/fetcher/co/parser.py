@@ -473,6 +473,22 @@ def _status_from_text(value: str) -> tuple[NormStatus, tuple[tuple[str, str], ..
     return NormStatus.IN_FORCE, ()
 
 
+def _pick_publication_date(fields: dict[str, str]) -> date:
+    """Pick the first plausible publication date from SUIN fields.
+
+    SUIN's `fecha_diario_oficial` is usually correct, but the field is
+    hand-typed by editors and occasionally contains future years (e.g.
+    `29/12/2029` for a 2010 decree). When the primary candidate sits in
+    the implausibly far future, fall back to other date fields.
+    """
+    future_ceiling = date.today().replace(year=date.today().year + 1)
+    for key in ("fecha_diario_oficial", "fecha_vigencia", "fecha_expedicion", "fecha"):
+        candidate = _parse_date(fields.get(key, ""))
+        if candidate and candidate <= future_ceiling:
+            return candidate
+    return date(1900, 1, 1)
+
+
 def _extract_norm_id_and_pub_date(tree) -> tuple[str, date]:
     fields = _extract_fields(tree)
     norm_id = "0"
@@ -483,13 +499,7 @@ def _extract_norm_id_and_pub_date(tree) -> tuple[str, date]:
             norm_id = match.group(1)
             break
 
-    publication_date = (
-        _parse_date(fields.get("fecha_diario_oficial", ""))
-        or _parse_date(fields.get("fecha_vigencia", ""))
-        or _parse_date(fields.get("fecha", ""))
-        or date(1900, 1, 1)
-    )
-    return norm_id, publication_date
+    return norm_id, _pick_publication_date(fields)
 
 
 def _is_hidden_or_note(el) -> bool:
@@ -766,12 +776,7 @@ class SuinMetadataParser(MetadataParser):
         subjects = tuple(
             subject.strip() for subject in fields.get("materia", "").split("|") if subject.strip()
         )
-        publication_date = (
-            _parse_date(fields.get("fecha_diario_oficial", ""))
-            or _parse_date(fields.get("fecha_vigencia", ""))
-            or _parse_date(fields.get("fecha", ""))
-            or date(1900, 1, 1)
-        )
+        publication_date = _pick_publication_date(fields)
 
         modification_items = tree.xpath(
             '//div[contains(@id, "ResumenNotasVigencia")]//li[contains(@class, "referencia")]'

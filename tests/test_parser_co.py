@@ -128,6 +128,19 @@ class TestOutputFidelity:
                 break
 
 
+class TestFutureDateFallback:
+    def test_future_fecha_diario_oficial_falls_back_to_fecha_vigencia(self):
+        from legalize.fetcher.co.parser import _pick_publication_date
+
+        # DECRETO 4816 DE 2010: SUIN typed fecha_diario_oficial as "29/12/2029"
+        # but fecha_vigencia is correct. Parser must reject the future date.
+        fields = {
+            "fecha_diario_oficial": "29/12/2029",
+            "fecha_vigencia": "29/12/2010",
+        }
+        assert _pick_publication_date(fields).year == 2010
+
+
 class TestMetadataCompleteness:
     def test_captures_all_known_extras(self):
         data = (FIXTURES / "sample-ley-1887.html").read_bytes()
