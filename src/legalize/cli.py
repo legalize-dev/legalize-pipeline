@@ -146,6 +146,8 @@ def fetch(
     "--batch", default=None, type=int, help="Process N norms at a time, push after each batch."
 )
 @click.option("--dry-run", is_flag=True, help="Simulate without creating commits.")
+@click.option("--repo-path", default=None, type=str, help="Override output repo directory.")
+@click.option("--data-dir", default=None, type=str, help="Override data directory.")
 @click.pass_context
 def commit(
     ctx: click.Context,
@@ -157,6 +159,8 @@ def commit(
     offset: int,
     batch: int | None,
     dry_run: bool,
+    repo_path: str | None,
+    data_dir: str | None,
 ) -> None:
     """Generate git commits from local data in data/ (does not download anything).
 
@@ -170,6 +174,12 @@ def commit(
     from legalize.pipeline import commit_all, commit_all_fast, commit_one
 
     config = ctx.obj["config"]
+    if repo_path or data_dir:
+        cc = config.get_country(country)
+        if repo_path:
+            cc.repo_path = repo_path
+        if data_dir:
+            cc.data_dir = data_dir
 
     if commit_all_flag:
         if batch:

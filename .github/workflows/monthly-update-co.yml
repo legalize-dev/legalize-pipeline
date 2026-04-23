@@ -1,0 +1,83 @@
+name: Monthly update (Colombia)
+
+# SUIN-Juriscol has no daily feed and no Last-Modified headers, so we
+# can't cheaply ask "what changed today?". Instead, once a month we
+# re-fetch every known valid ID (cached in discovery_ids.txt) and
+# re-commit; the engine's idempotency layer skips commits that already
+# exist, and only emits fresh [reforma] entries where SUIN has added a
+# new LEGISLACIÓN ANTERIOR block since the last run.
+#
+# Runtime: ~3h fetch (75K IDs × ~7 req/s sustained) + ~20min commit.
+# Scheduled on the 5th (SUIN typically publishes monthly edits by then).
+
+on:
+  schedule:
+    - cron: "0 12 5 * *"
+  workflow_dispatch:
+    inputs:
+      force_fetch:
+        description: "Force re-fetch even if JSON cache is fresh (default: true for monthly)"
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        id: app-token
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-co
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          repository: legalize-dev/legalize-co
+          path: repos/co
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Configure git identity
+        working-directory: repos/co
+        run: |
+          git config user.name "Legalize"
+          git config user.email "legalize@legalize.dev"
+
+      - name: Re-fetch the known corpus
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          mkdir -p data-co
+          legalize fetch -c co --all --force --data-dir data-co
+
+      - name: Commit only new reforms (idempotent)
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          legalize commit -c co --all --no-fast \
+            --repo-path repos/co --data-dir data-co
+
+      - name: Push updates
+        working-directory: repos/co
+        run: |
+          if git diff --quiet HEAD origin/main; then
+            echo "No new reforms this month."
+          else
+            git push origin HEAD:main
+          fi
