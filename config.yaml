@@ -43,7 +43,7 @@ countries:
       base_url: "https://www.boe.es/datosabiertos"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 4.0
       user_agent: "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
 
   fr:
