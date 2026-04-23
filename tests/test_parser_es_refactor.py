@@ -198,7 +198,7 @@ class TestDiarioXml:
             "<texto>"
             '<p class="articulo">Artículo 1</p>'
             '<p class="parrafo">Contenido del artículo.</p>'
-            '<table><tr><td><p>hola</p></td></tr></table>'
+            "<table><tr><td><p>hola</p></td></tr></table>"
             '<p class="imagen"><img alt="1" src="/datos/imagenes/disp/2017/296/14334_46947.png"/></p>'
             "</texto>"
             "</documento>"
