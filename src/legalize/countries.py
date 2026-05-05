@@ -216,6 +216,13 @@ REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
         "text_parser": ("legalize.fetcher.uk.parser", "UKTextParser"),
         "metadata_parser": ("legalize.fetcher.uk.parser", "UKMetadataParser"),
     },
+
+    "gt": {
+        "client": ("legalize.fetcher.gt.client", "GTFixtureClient"),
+        "discovery": ("legalize.fetcher.gt.discovery", "GTFixtureDiscovery"),
+        "text_parser": ("legalize.fetcher.gt.parser", "GTTextParser"),
+        "metadata_parser": ("legalize.fetcher.gt.parser", "GTMetadataParser"),
+    },
     # To add a new country:
     # 1. Create fetcher/{code}/ with client.py, discovery.py, parser.py
     # 2. Register here
@@ -235,9 +242,11 @@ def _get(country_code: str, component: str):
     """Get a component class for a country."""
     if country_code not in REGISTRY:
         available = ", ".join(sorted(REGISTRY.keys()))
-        raise ValueError(f"Country '{country_code}' not registered. Available: {available}")
+        raise ValueError(
+            f"Country '{country_code}' not registered. Available: {available}")
     if component not in REGISTRY[country_code]:
-        raise ValueError(f"Component '{component}' not registered for country '{country_code}'")
+        raise ValueError(
+            f"Component '{component}' not registered for country '{country_code}'")
     module_path, class_name = REGISTRY[country_code][component]
     return _import_class(module_path, class_name)
 
