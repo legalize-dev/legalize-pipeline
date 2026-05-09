@@ -151,7 +151,7 @@ class InfoLEGClient(HttpClient):
         with the original encoding intact — the parser is responsible
         for decoding via cp1252.
         """
-        row = self.catalog.get(norm_id)
+        row = self.catalog.get(norm_id) or self.catalog.get_by_slug(norm_id)
         if row is None:
             # Catalog miss — try texact directly anyway
             return self._get(url_for(norm_id, "texact"))
@@ -181,7 +181,7 @@ class InfoLEGClient(HttpClient):
         catalog CSV. We serialize the matching row so the
         :class:`InfoLEGMetadataParser` can consume it.
         """
-        row = self.catalog.get(norm_id)
+        row = self.catalog.get(norm_id) or self.catalog.get_by_slug(norm_id)
         if row is None:
             raise ValueError(f"Norm {norm_id} not found in InfoLEG catalog")
         payload = {
@@ -220,7 +220,7 @@ class InfoLEGClient(HttpClient):
         from legalize.fetcher.ar.reforms import ModificationKind, extract_modifications
         from legalize.models import Block, Paragraph, Reform, Version
 
-        row = self.catalog.get(norm_id)
+        row = self.catalog.get(norm_id) or self.catalog.get_by_slug(norm_id)
         if row is None:
             return initial_blocks, []
 

@@ -28,6 +28,8 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Iterator, Optional
 
+from legalize.transformer import slug
+
 logger = logging.getLogger(__name__)
 
 
@@ -140,6 +142,19 @@ class InfoLEGCatalog:
     def reforms_for(self, id_norma: str) -> list[ModificationEdge]:
         """Get the chronologically-ordered list of modifications to a norm."""
         return self.modifications_of.get(id_norma, [])
+    
+    def get_by_slug(self, slug: str) -> Optional[InfoLEGRow]:
+        """Look up a row by its pipeline slug (e.g. 'LEY-24430').
+
+        The slug is built as tipo_norma.upper() + '-' + numero_norma.
+        Builds a lazy reverse index on first call.
+        """
+        if not hasattr(self, "_slug_index"):
+            self._slug_index = {
+                f"{r.tipo_norma.upper()}-{r.numero_norma}": r
+                for r in self.by_id.values()
+            }
+        return self._slug_index.get(slug)
 
 
 def _open_csv(path: Path) -> Iterator[dict[str, str]]:
