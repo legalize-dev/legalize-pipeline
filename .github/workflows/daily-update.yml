@@ -30,7 +30,10 @@ jobs:
         #       fetcher, so the daily always clamps to the last 10 days and
         #       finds nothing. Re-enable once a modern reform source lands.
         #   ro: bootstrap only, not yet wired for daily updates.
-        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","fr","at","de","se","pt","lv","ad","lt","ee","pl","gr","nl","be","cz","fi","it","lu","eu","uk"]') }}
+        #   uk: paused — UK maintainer (@florinungur) is running the SI bulk
+        #       bootstrap (~150K commits) locally onto legalize-uk. Re-enable
+        #       once he confirms the push has landed.
+        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","fr","at","de","se","pt","lv","ad","lt","ee","pl","gr","nl","be","cz","fi","it","lu","eu"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
