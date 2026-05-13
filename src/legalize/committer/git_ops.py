@@ -225,6 +225,14 @@ class FastImporter:
     Streams commits directly to git fast-import via stdin pipe,
     so memory usage stays constant regardless of commit count.
 
+    Additive on non-empty repos: if ``refs/heads/main`` already
+    points somewhere, the first emitted commit anchors on that tip
+    so the stream extends history instead of orphaning it. Assumes
+    the caller is the exclusive writer to ``refs/heads/main`` for
+    the duration of the session — concurrent pushes (e.g. a daily
+    cron) racing the importer would silently lose their commits
+    because the captured parent SHA goes stale.
+
     Usage:
         with FastImporter(repo_path, committer_name, committer_email) as fi:
             fi.commit(file_path, content, message, author_date, env_overrides)
@@ -249,21 +257,19 @@ class FastImporter:
 
     def __enter__(self) -> FastImporter:
         self._ensure_repo()
-        try:
-            self._initial_parent = (
-                subprocess.run(
-                    ["git", "rev-parse", "--verify", "refs/heads/main"],
-                    cwd=self._path,
-                    capture_output=True,
-                    check=True,
-                    env=_clean_git_env(),
-                )
-                .stdout.decode()
-                .strip()
-                or None
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", "refs/heads/main"],
+            cwd=self._path,
+            capture_output=True,
+            check=False,
+            env=_clean_git_env(),
+        )
+        if result.returncode == 0:
+            self._initial_parent = result.stdout.decode().strip()
+            logger.info(
+                "FastImporter: extending refs/heads/main from %s",
+                self._initial_parent[:12],
             )
-        except subprocess.CalledProcessError:
-            self._initial_parent = None
         self._proc = subprocess.Popen(
             ["git", "fast-import", "--quiet"],
             cwd=self._path,
@@ -393,6 +399,10 @@ class FastImporter:
         HEAD already points to main, so we reset the whole tree state
         atomically — this works for both empty bootstraps and additive
         runs on top of an existing branch.
+
+        ``reset --hard`` overwrites any uncommitted local changes in the
+        working tree. FastImporter is meant for bootstrap workflows on
+        otherwise-clean repos; do not run it on a checkout with WIP.
         """
         subprocess.run(
             ["git", "reset", "--hard", "refs/heads/main"],
