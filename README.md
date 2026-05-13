@@ -205,7 +205,10 @@ Want to add your country? See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
 
 ## Contributing
 
-We welcome contributions, especially new country parsers. See [CONTRIBUTING.md](CONTRIBUTING.md) and [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
+We welcome contributions, especially new country parsers. See
+[CONTRIBUTING.md](CONTRIBUTING.md) and [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
+If you want to look after a country long-term, [MAINTAINERS.md](MAINTAINERS.md)
+explains the federated model.
 
 ## License
 

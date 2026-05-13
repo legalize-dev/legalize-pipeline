@@ -1,2 +1,13 @@
-# Require explicit approval for CI/CD workflow changes
-.github/workflows/ @EnriqueLop
+# Project lead — fallback owner for anything not matched below.
+# Shared pipeline (committer/, transformer/, fetcher/base.py, pipeline.py,
+# countries.py, config.py, cli.py) is implicitly covered here.
+*                                       @EnriqueLop
+
+# CI/CD workflows — explicit because it's high-blast-radius even though
+# the default would cover it.
+/.github/workflows/                     @EnriqueLop
+
+# Country fetchers — owned by the country maintainer.
+# See MAINTAINERS.md. Add a line here when a country gets a dedicated
+# maintainer; otherwise the default (project lead) applies.
+/src/legalize/fetcher/uk/               @florinungur

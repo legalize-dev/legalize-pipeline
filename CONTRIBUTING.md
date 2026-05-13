@@ -32,6 +32,12 @@ For new country PRs, include:
 - Tests that parse the fixtures
 - A note on the data source's license/terms of use
 
+## Becoming a maintainer
+
+If you want to look after the country you're shipping (not just hand it
+off), say so in the PR body. See [MAINTAINERS.md](MAINTAINERS.md) for the
+federated model, the scope of country ownership, and the ground rules.
+
 ## Questions?
 
 Open an issue or start a discussion.
