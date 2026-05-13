@@ -241,9 +241,29 @@ class FastImporter:
         self._commit_count: int = 0
         # Track current tree state: rel_path -> mark number
         self._tree: dict[str, int] = {}
+        # Existing refs/heads/main tip captured at enter-time. When set, the
+        # first emitted commit references it as its parent so we extend
+        # history instead of producing an orphan that fast-import refuses to
+        # fast-forward onto main.
+        self._initial_parent: str | None = None
 
     def __enter__(self) -> FastImporter:
         self._ensure_repo()
+        try:
+            self._initial_parent = (
+                subprocess.run(
+                    ["git", "rev-parse", "--verify", "refs/heads/main"],
+                    cwd=self._path,
+                    capture_output=True,
+                    check=True,
+                    env=_clean_git_env(),
+                )
+                .stdout.decode()
+                .strip()
+                or None
+            )
+        except subprocess.CalledProcessError:
+            self._initial_parent = None
         self._proc = subprocess.Popen(
             ["git", "fast-import", "--quiet"],
             cwd=self._path,
@@ -323,9 +343,13 @@ class FastImporter:
         self._write(message_bytes)
         self._write(b"\n")
 
-        # Reference parent (all commits after the first)
+        # Reference parent. After the first commit we chain by mark; for the
+        # first commit we anchor on the pre-existing branch tip when one
+        # exists, so this stream extends history instead of orphaning it.
         if self._commit_count > 0:
             self._write(f"from :{commit_mark - 2}\n".encode())
+        elif self._initial_parent is not None:
+            self._write(f"from {self._initial_parent}\n".encode())
 
         # File modification
         self._write(f"M 100644 :{blob_mark} {rel_path}\n".encode())
@@ -362,9 +386,16 @@ class FastImporter:
             )
 
     def _checkout(self) -> None:
-        """Checkout main to populate the working tree after fast-import."""
+        """Sync index + working tree with the new main tip after fast-import.
+
+        ``git fast-import`` advances refs but never touches the index or
+        the working tree. A plain ``git checkout main`` is a no-op when
+        HEAD already points to main, so we reset the whole tree state
+        atomically — this works for both empty bootstraps and additive
+        runs on top of an existing branch.
+        """
         subprocess.run(
-            ["git", "checkout", "main"],
+            ["git", "reset", "--hard", "refs/heads/main"],
             cwd=self._path,
             capture_output=True,
             check=True,

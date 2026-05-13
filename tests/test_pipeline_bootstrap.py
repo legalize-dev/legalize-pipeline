@@ -274,3 +274,73 @@ class TestFastImporter:
 
         md_path = Path(cc.repo_path) / "es" / "BOE-A-1978-31229.md"
         assert md_path.exists()
+
+    def test_seeds_from_existing_main_tip(self, bootstrap_config, constitucion_metadata):
+        """FastImporter should extend an existing branch instead of orphaning it.
+
+        Regression: without an explicit ``from`` clause on the first commit,
+        git fast-import refuses to fast-forward refs/heads/main onto an
+        unrelated tip and the imported commits become unreachable.
+        """
+        xml_path = FIXTURES_DIR / "constitucion-sample.xml"
+        xml_bytes = xml_path.read_bytes()
+        blocks = parse_text_xml(xml_bytes)
+        reforms = extract_reforms(blocks)
+
+        from legalize.transformer.markdown import render_norm_at_date
+
+        cc = bootstrap_config.get_country("es")
+
+        # Seed the repo with a baseline commit on refs/heads/main.
+        repo = Path(cc.repo_path)
+        repo.mkdir(parents=True, exist_ok=True)
+        for cmd in (
+            ["git", "init", "-q", "-b", "main"],
+            ["git", "config", "user.email", "test@test"],
+            ["git", "config", "user.name", "test"],
+        ):
+            subprocess.run(cmd, cwd=repo, check=True, capture_output=True)
+        (repo / "baseline.md").write_text("baseline\n")
+        subprocess.run(["git", "add", "baseline.md"], cwd=repo, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "commit", "-q", "-m", "baseline"],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+        )
+        baseline_sha = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+
+        with FastImporter(cc.repo_path, "Test", "test@test.com") as fi:
+            for i, reform in enumerate(reforms):
+                is_first = i == 0
+                commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
+                markdown = render_norm_at_date(
+                    constitucion_metadata, blocks, reform.date, include_all=is_first
+                )
+                file_path = norm_to_filepath(constitucion_metadata)
+                info = build_commit_info(
+                    commit_type, constitucion_metadata, reform, blocks, file_path, markdown
+                )
+                fi.commit(file_path, markdown, info)
+
+        # Total commits = baseline + reforms; baseline must still be reachable.
+        log = subprocess.run(
+            ["git", "rev-list", "HEAD"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.split()
+        assert len(log) == fi.commit_count + 1
+        assert baseline_sha in log
+        assert log[-1] == baseline_sha  # oldest = baseline
+
+        # The baseline file survives alongside the new norm file.
+        assert (repo / "baseline.md").exists()
+        assert (repo / "es" / "BOE-A-1978-31229.md").exists()
