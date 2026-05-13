@@ -199,6 +199,7 @@ See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md) for the full walkthrough.
 | Sweden | Live | [Riksdag](https://www.riksdagen.se/) | — | [legalize-se](https://github.com/legalize-dev/legalize-se) |
 | Ukraine | Live | [Rada](https://data.rada.gov.ua/) | — | [legalize-ua](https://github.com/legalize-dev/legalize-ua) |
 | United Kingdom | Live | [legislation.gov.uk](https://www.legislation.gov.uk/) | [@florinungur](https://github.com/florinungur) | [legalize-uk](https://github.com/legalize-dev/legalize-uk) |
+| United States | Live | [OLRC](https://uscode.house.gov/) | — | [legalize-us](https://github.com/legalize-dev/legalize-us) |
 | Uruguay | Live | [IMPO](https://www.impo.com.uy/) | — | [legalize-uy](https://github.com/legalize-dev/legalize-uy) |
 
 Want to add your country? See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
