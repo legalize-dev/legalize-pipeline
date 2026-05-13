@@ -1,13 +1,14 @@
 """Norm discovery for the United Kingdom.
 
 Two entry points:
-- discover_all: iterate every primary-legislation type code × every year,
-  reading the per-year Atom feed. Yields ``{type}-{year}-{number}`` IDs.
+- discover_all: iterate every configured type code via the aggregate Atom
+  feed. Yields ``{type}-{year}-{number}`` IDs.
 - discover_daily: poll /update/data.feed filtered to a single date and keep
   only entries whose type is in our tracked set.
 
-Starting year is 1988 (ukpga), 1999 (asp), 2000 (nia), 2008 (mwa), 2012 (anaw),
-2020 (asc). The feed returns an empty page for years before a type existed,
+Covers both primary legislation (Acts/Measures: ukpga, asp, asc, anaw, mwa,
+nia) and secondary legislation (Statutory Instruments: uksi, ssi, wsi, nisr,
+nisro). The feed returns an empty page for years before a type existed,
 which is cheap (one HTTP request that 200s with zero entries), so we don't
 hard-code type→start-year mappings.
 """
@@ -23,7 +24,7 @@ from typing import TYPE_CHECKING
 from lxml import etree
 
 from legalize.fetcher.base import LegislativeClient, NormDiscovery
-from legalize.fetcher.uk.client import NS, PRIMARY_TYPES
+from legalize.fetcher.uk.client import NS, LEGISLATION_TYPES
 
 if TYPE_CHECKING:
     from legalize.fetcher.uk.client import LegislationGovUkClient
@@ -50,17 +51,17 @@ def _entry_to_norm_id(entry_id: str) -> str | None:
     if not match:
         return None
     type_code = match.group("type")
-    if type_code not in PRIMARY_TYPES:
+    if type_code not in LEGISLATION_TYPES:
         return None
     return f"{type_code}-{int(match.group('year'))}-{int(match.group('number'))}"
 
 
 class LegislationGovUkDiscovery(NormDiscovery):
-    """Discover UK Acts via the legislation.gov.uk Atom feeds."""
+    """Discover UK legislation via the legislation.gov.uk Atom feeds."""
 
     def __init__(
         self,
-        types: tuple[str, ...] = PRIMARY_TYPES,
+        types: tuple[str, ...] = LEGISLATION_TYPES,
         min_year: int = _MIN_YEAR,
         max_year: int | None = None,
     ) -> None:
@@ -72,7 +73,7 @@ class LegislationGovUkDiscovery(NormDiscovery):
     def create(cls, source: dict) -> LegislationGovUkDiscovery:
         src = source or {}
         return cls(
-            types=tuple(src.get("types", PRIMARY_TYPES)),
+            types=tuple(src.get("types", LEGISLATION_TYPES)),
             min_year=int(src.get("min_year", _MIN_YEAR)),
             max_year=src.get("max_year"),
         )
@@ -83,7 +84,7 @@ class LegislationGovUkDiscovery(NormDiscovery):
         """Yield every norm ID across every configured type.
 
         Uses the aggregate Atom feed ``/{type}/data.feed?page=N&results-count=100``
-        which returns all Acts of a type across all years — much faster than
+        which returns all norms of a type across all years — much faster than
         iterating per-year feeds (the aggregate feed skips the dozens of
         empty historical years that each type has to its name).
         """
@@ -118,7 +119,7 @@ class LegislationGovUkDiscovery(NormDiscovery):
                 if len(entries) < 100:
                     break
                 page += 1
-            logger.info("Discovered %d %s Acts", type_total, type_code)
+            logger.info("Discovered %d %s norms", type_total, type_code)
         logger.info("UK discovery complete: %d laws across %d types", total, len(self._types))
 
     def discover_daily(

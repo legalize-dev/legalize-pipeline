@@ -1,0 +1,109 @@
+<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DocumentURI="http://www.legislation.gov.uk/nisr/1996/267/enacted" IdURI="http://www.legislation.gov.uk/id/nisr/1996/267" NumberOfProvisions="2" xml:lang="en" xsi:schemaLocation="http://www.legislation.gov.uk/namespaces/legislation http://www.legislation.gov.uk/schema/legislation.xsd" SchemaVersion="1.0"><ukm:Metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:ukm="http://www.legislation.gov.uk/namespaces/metadata">
+					<dc:identifier>http://www.legislation.gov.uk/nisr/1996/267/enacted</dc:identifier><dc:title>The Juries (1996 Order) (Commencement) Order (Northern Ireland) 1996</dc:title><dc:subject>Local Government</dc:subject><dc:publisher>Government Printer for Northern Ireland</dc:publisher><dc:modified>2013-06-13</dc:modified><dc:subject scheme="SIheading">JURIES</dc:subject>
+					<dc:description>This Order appoints 31st July 1996 for the coming into operation of the Juries (Northern Ireland) Order 1996.</dc:description>
+					<atom:link rel="self" href="http://www.legislation.gov.uk/nisr/1996/267/enacted/data.xml" type="application/xml"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/resources" href="http://www.legislation.gov.uk/nisr/1996/267/resources" title="More Resources"/>
+					
+					
+					
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/act" href="http://www.legislation.gov.uk/nisr/1996/267/enacted" title="whole act"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/introduction" href="http://www.legislation.gov.uk/nisr/1996/267/introduction/enacted" title="introduction"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/signature" href="http://www.legislation.gov.uk/nisr/1996/267/signature/enacted" title="signature"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/note" href="http://www.legislation.gov.uk/nisr/1996/267/note/enacted" title="note"/>
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/body" href="http://www.legislation.gov.uk/nisr/1996/267/body/enacted" title="body"/>
+					
+					
+										
+					
+					
+					<atom:link rel="alternate" type="application/rdf+xml" href="http://www.legislation.gov.uk/nisr/1996/267/enacted/data.rdf" title="RDF/XML"/><atom:link rel="alternate" type="application/akn+xml" href="http://www.legislation.gov.uk/nisr/1996/267/enacted/data.akn" title="AKN"/><atom:link rel="alternate" type="application/xhtml+xml" href="http://www.legislation.gov.uk/nisr/1996/267/enacted/data.xht" title="HTML snippet"/><atom:link rel="alternate" type="application/pdf" href="http://www.legislation.gov.uk/nisr/1996/267/enacted/data.pdf" title="PDF"/>
+					<atom:link rel="alternate" type="application/akn+xhtml" href="http://www.legislation.gov.uk/nisr/1996/267/enacted/data.html" title="HTML5 snippet"/>
+
+					
+					<atom:link rel="http://purl.org/dc/terms/tableOfContents" hreflang="en" href="http://www.legislation.gov.uk/nisr/1996/267/contents/enacted" title="Table of Contents"/>
+					
+					
+					
+					
+					<ukm:SecondaryMetadata><ukm:DocumentClassification>
+<ukm:DocumentCategory Value="secondary"/>
+<ukm:DocumentMainType Value="NorthernIrelandStatutoryRule"/>
+<ukm:DocumentStatus Value="final"/>
+<ukm:DocumentMinorType Value="order"/>
+</ukm:DocumentClassification><ukm:Year Value="1996"/><ukm:Number Value="267"/><ukm:AlternativeNumber Category="C" Value="12"/><ukm:Made Date="1996-07-02"/><ukm:ISBN Value="0337922276"/></ukm:SecondaryMetadata>
+					
+
+                    
+									 
+					
+					
+					<ukm:Statistics>
+									<ukm:TotalParagraphs Value="2"/>
+									<ukm:BodyParagraphs Value="2"/>
+									<ukm:ScheduleParagraphs Value="0"/>
+									<ukm:AttachmentParagraphs Value="0"/>
+									<ukm:TotalImages Value="0"/>
+								</ukm:Statistics>
+				</ukm:Metadata><Secondary>
+<SecondaryPrelims DocumentURI="http://www.legislation.gov.uk/nisr/1996/267/introduction/enacted" IdURI="http://www.legislation.gov.uk/id/nisr/1996/267/introduction">
+<Number>1996 No. 267 (C. 12)</Number>
+<SubjectInformation><Subject>
+<Title>JURIES</Title>
+</Subject>
+</SubjectInformation>
+<Title>The Juries (1996 Order) (Commencement) Order (Northern Ireland) 1996</Title>
+<MadeDate>
+<Text>Made</Text>
+<DateText>2nd July 1996</DateText>
+</MadeDate>
+<SecondaryPreamble>
+<EnactingText>
+<Para>
+<Text>In exercise of the powers conferred on me by Article 1 of the Juries (Northern Ireland) Order 1996<FootnoteRef Ref="f00001"/>, I hereby make the following Order:—</Text>
+</Para>
+</EnactingText>
+</SecondaryPreamble>
+</SecondaryPrelims>
+<Body DocumentURI="http://www.legislation.gov.uk/nisr/1996/267/body/enacted" IdURI="http://www.legislation.gov.uk/id/nisr/1996/267/body" NumberOfProvisions="2" NumberFormat="default">
+<P1group>
+<Title>Citation</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nisr/1996/267/article/1/enacted" IdURI="http://www.legislation.gov.uk/id/nisr/1996/267/article/1" id="article-1">
+<Pnumber>1</Pnumber>
+<P1para>
+<Text>This Order may be cited as the Juries (1996 Order) (Commencement) Order (Northern Ireland) 1996.</Text>
+</P1para>
+</P1>
+</P1group>
+<P1group>
+<Title>Appointed day</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nisr/1996/267/article/2/enacted" IdURI="http://www.legislation.gov.uk/id/nisr/1996/267/article/2" id="article-2">
+<Pnumber>2</Pnumber>
+<P1para>
+<Text>The day appointed for the coming into operation of the Juries (Northern Ireland) Order 1996 shall be 31st July 1996.</Text>
+</P1para>
+</P1>
+</P1group>
+<SignedSection DocumentURI="http://www.legislation.gov.uk/nisr/1996/267/signature/enacted" IdURI="http://www.legislation.gov.uk/id/nisr/1996/267/signature">
+<Signatory>
+<Signee>
+<PersonName>Mackay of Clashfern, <Emphasis>C.</Emphasis></PersonName>
+<DateSigned>
+<DateText>Dated 2nd July 1996</DateText>
+</DateSigned>
+</Signee>
+</Signatory>
+</SignedSection>
+</Body>
+<ExplanatoryNotes DocumentURI="http://www.legislation.gov.uk/nisr/1996/267/note/enacted" IdURI="http://www.legislation.gov.uk/id/nisr/1996/267/note">
+<Comment>
+<Para>
+<Text>(This note is not part of the Order.)</Text>
+</Para>
+</Comment>
+<P>
+<Text>This Order appoints 31st July 1996 for the coming into operation of the Juries (Northern Ireland) Order 1996.</Text>
+</P>
+</ExplanatoryNotes>
+</Secondary><Footnotes><Footnote id="f00001">
+<FootnoteText>
+<Para>
+<Text><Acronym Expansion="Statutory Instrument">S.I.</Acronym> <Citation URI="http://www.legislation.gov.uk/id/nisi/1966/1141" id="c00001" Class="NorthernIrelandOrderInCouncil" AlternativeNumber="N.I. 6" Year="1966" Number="1141">1966/1141 (N.I. 6)</Citation></Text>
+</Para>
+</FootnoteText>
+</Footnote></Footnotes></Legislation>

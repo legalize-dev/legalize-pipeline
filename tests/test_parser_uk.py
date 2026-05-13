@@ -80,9 +80,19 @@ class TestNormId:
             _entry_to_norm_id("http://www.legislation.gov.uk/id/ukpga/2018/12") == "ukpga-2018-12"
         )
 
+    def test_entry_to_norm_id_accepts_si_types(self):
+        assert _entry_to_norm_id("http://www.legislation.gov.uk/id/uksi/2024/1") == "uksi-2024-1"
+        assert _entry_to_norm_id("http://www.legislation.gov.uk/id/ssi/2020/55") == "ssi-2020-55"
+        assert _entry_to_norm_id("http://www.legislation.gov.uk/id/wsi/2019/51") == "wsi-2019-51"
+        assert (
+            _entry_to_norm_id("http://www.legislation.gov.uk/id/nisr/1996/267") == "nisr-1996-267"
+        )
+        assert (
+            _entry_to_norm_id("http://www.legislation.gov.uk/id/nisro/1968/218") == "nisro-1968-218"
+        )
+
     def test_entry_to_norm_id_filters_unknown_type(self):
-        # uksi is deferred to phase 2 → discovery must skip it.
-        assert _entry_to_norm_id("http://www.legislation.gov.uk/id/uksi/2024/1") is None
+        assert _entry_to_norm_id("http://www.legislation.gov.uk/id/eudr/2024/1") is None
 
 
 # ─── Metadata parser ───────────────────────────────────────────
@@ -291,3 +301,111 @@ class TestSuvestine:
     def test_extract_enacted_date(self):
         enacted = _read_fixture("sample-dpa-2018-enacted.xml")
         assert _extract_enacted_date(enacted) == "2018-05-23"
+
+    def test_extract_made_date_for_si(self):
+        """SIs use <ukm:Made Date="..."> instead of <ukm:EnactmentDate>."""
+        data = _read_fixture("sample-si-uksi-2020-52.xml")
+        assert _extract_enacted_date(data) == "2020-01-20"
+
+
+# ─── Statutory instruments ────────────────────────────────────
+
+
+class TestSIMetadata:
+    """Metadata parsing for all five SI types."""
+
+    def test_uksi_metadata(self):
+        data = _read_fixture("sample-si-uksi-2020-52.xml")
+        meta = UKMetadataParser().parse(data, "uksi-2020-52")
+        assert (
+            meta.title
+            == "The Veterinary Surgeons (Recognition of University Degree) (Surrey) Order of Council 2020"
+        )
+        assert meta.country == "uk"
+        assert meta.jurisdiction is None  # state-level
+        assert meta.rank == "statutory-instrument"
+        assert meta.publication_date.isoformat() == "2020-01-20"
+        assert meta.source == "https://www.legislation.gov.uk/uksi/2020/52"
+
+    def test_ssi_metadata(self):
+        data = _read_fixture("sample-si-ssi-2002-519.xml")
+        meta = UKMetadataParser().parse(data, "ssi-2002-519")
+        assert meta.jurisdiction == "uk-sct"
+        assert meta.rank == "scottish-statutory-instrument"
+        assert meta.publication_date.isoformat() == "2002-11-25"
+
+    def test_wsi_metadata(self):
+        data = _read_fixture("sample-si-wsi-2026-14.xml")
+        meta = UKMetadataParser().parse(data, "wsi-2026-14")
+        assert meta.jurisdiction == "uk-wls"
+        assert meta.rank == "welsh-statutory-instrument"
+
+    def test_nisr_metadata(self):
+        data = _read_fixture("sample-si-nisr-1996-267.xml")
+        meta = UKMetadataParser().parse(data, "nisr-1996-267")
+        assert meta.jurisdiction == "uk-nir"
+        assert meta.rank == "ni-statutory-rule"
+
+    def test_nisro_metadata(self):
+        data = _read_fixture("sample-si-nisro-1968-218.xml")
+        meta = UKMetadataParser().parse(data, "nisro-1968-218")
+        assert meta.jurisdiction == "uk-nir"
+        assert meta.rank == "ni-statutory-rule-or-order"
+        assert meta.title == "The Criminal Appeal (Northern Ireland) Rules 1968"
+
+    def test_si_filepath_routing(self):
+        """SIs route to the same jurisdiction directories as Acts."""
+        uksi = UKMetadataParser().parse(_read_fixture("sample-si-uksi-2020-52.xml"), "uksi-2020-52")
+        ssi = UKMetadataParser().parse(_read_fixture("sample-si-ssi-2002-519.xml"), "ssi-2002-519")
+        wsi = UKMetadataParser().parse(_read_fixture("sample-si-wsi-2026-14.xml"), "wsi-2026-14")
+        nisr = UKMetadataParser().parse(
+            _read_fixture("sample-si-nisr-1996-267.xml"), "nisr-1996-267"
+        )
+        nisro = UKMetadataParser().parse(
+            _read_fixture("sample-si-nisro-1968-218.xml"), "nisro-1968-218"
+        )
+        assert norm_to_filepath(uksi) == "uk/uksi-2020-52.md"
+        assert norm_to_filepath(ssi) == "uk-sct/ssi-2002-519.md"
+        assert norm_to_filepath(wsi) == "uk-wls/wsi-2026-14.md"
+        assert norm_to_filepath(nisr) == "uk-nir/nisr-1996-267.md"
+        assert norm_to_filepath(nisro) == "uk-nir/nisro-1968-218.md"
+
+
+class TestSITextParser:
+    def test_uksi_parses_sections(self):
+        data = _read_fixture("sample-si-uksi-2020-52.xml")
+        blocks = UKTextParser().parse_text(data)
+        assert len(blocks) >= 2
+        assert all(len(b.versions) == 1 for b in blocks)
+
+    def test_nisro_parses_schedules(self):
+        """nisro-1968-218 has 3 schedules."""
+        data = _read_fixture("sample-si-nisro-1968-218.xml")
+        blocks = UKTextParser().parse_text(data)
+        assert len(blocks) >= 10
+        assert any(b.block_type == "schedule-heading" for b in blocks)
+
+    def test_si_with_tables_parses_without_error(self):
+        """uksi-2013-488 has 20 XHTML tables in ScheduleBody.
+
+        Standalone tables (outside P1group) are not yet rendered as pipe
+        tables — they live at the schedule body level, which the section
+        walker doesn't enter. This test confirms the SI still parses
+        cleanly and the schedule headings are captured.
+        """
+        data = _read_fixture("sample-si-uksi-2013-488-tables.xml")
+        blocks = UKTextParser().parse_text(data)
+        assert len(blocks) >= 3
+        assert any(b.block_type == "schedule-heading" for b in blocks)
+        assert any(b.block_type == "section" for b in blocks)
+
+    def test_si_no_leftover_clml_tags(self):
+        """Rendered SI output must not leak raw XML."""
+        data = _read_fixture("sample-si-uksi-2020-52.xml")
+        meta = UKMetadataParser().parse(data, "uksi-2020-52")
+        blocks = UKTextParser().parse_text(data)
+        md = render_norm_at_date(meta, blocks, meta.publication_date, include_all=True)
+        assert md.startswith("---\n")
+        assert "<Legislation" not in md
+        assert "<ukm:" not in md
+        assert "xmlns:" not in md

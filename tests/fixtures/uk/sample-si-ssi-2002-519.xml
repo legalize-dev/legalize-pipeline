@@ -1,0 +1,118 @@
+<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DocumentURI="http://www.legislation.gov.uk/ssi/2002/519/enacted" IdURI="http://www.legislation.gov.uk/id/ssi/2002/519" NumberOfProvisions="2" xsi:schemaLocation="http://www.legislation.gov.uk/namespaces/legislation http://www.legislation.gov.uk/schema/legislation.xsd" SchemaVersion="1.0"><ukm:Metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:ukm="http://www.legislation.gov.uk/namespaces/metadata">
+					<dc:identifier>http://www.legislation.gov.uk/ssi/2002/519/enacted</dc:identifier><dc:title>The Fur Farming (Prohibition) (Scotland) Act 2002 (Commencement) Order 2002</dc:title><dc:subject>Farming</dc:subject><dc:publisher>Queen's Printer for Scotland</dc:publisher><dc:modified>2011-07-04</dc:modified><dc:subject scheme="SIheading">ANIMALS</dc:subject><dc:subject scheme="SIheading">COUNTRYSIDE</dc:subject>
+					<dc:description>This Order appoints 1st January 2003 as the date for coming into force of sections 1 to 5 of the Fur Farming (Prohibition) (Scotland) Act 2002.</dc:description>
+					<atom:link rel="self" href="http://www.legislation.gov.uk/ssi/2002/519/enacted/data.xml" type="application/xml"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/resources" href="http://www.legislation.gov.uk/ssi/2002/519/resources" title="More Resources"/>
+					
+					
+					
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/act" href="http://www.legislation.gov.uk/ssi/2002/519/enacted" title="whole act"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/introduction" href="http://www.legislation.gov.uk/ssi/2002/519/introduction/enacted" title="introduction"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/signature" href="http://www.legislation.gov.uk/ssi/2002/519/signature/enacted" title="signature"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/note" href="http://www.legislation.gov.uk/ssi/2002/519/note/enacted" title="note"/>
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/body" href="http://www.legislation.gov.uk/ssi/2002/519/body/enacted" title="body"/>
+					
+					
+										
+					
+					
+					<atom:link rel="alternate" type="application/rdf+xml" href="http://www.legislation.gov.uk/ssi/2002/519/enacted/data.rdf" title="RDF/XML"/><atom:link rel="alternate" type="application/akn+xml" href="http://www.legislation.gov.uk/ssi/2002/519/enacted/data.akn" title="AKN"/><atom:link rel="alternate" type="application/xhtml+xml" href="http://www.legislation.gov.uk/ssi/2002/519/enacted/data.xht" title="HTML snippet"/><atom:link rel="alternate" type="application/pdf" href="http://www.legislation.gov.uk/ssi/2002/519/enacted/data.pdf" title="PDF"/>
+					<atom:link rel="alternate" type="application/akn+xhtml" href="http://www.legislation.gov.uk/ssi/2002/519/enacted/data.html" title="HTML5 snippet"/>
+
+					<atom:link rel="alternate" href="http://www.legislation.gov.uk/ssi/2002/519/pdfs/ssi_20020519_en.pdf" type="application/pdf" title="Print Version"/>
+					<atom:link rel="http://purl.org/dc/terms/tableOfContents" hreflang="en" href="http://www.legislation.gov.uk/ssi/2002/519/contents/enacted" title="Table of Contents"/>
+					
+					
+					
+					
+					<ukm:SecondaryMetadata><ukm:DocumentClassification>
+<ukm:DocumentCategory Value="secondary"/>
+<ukm:DocumentMainType Value="ScottishStatutoryInstrument"/>
+<ukm:DocumentStatus Value="final"/>
+<ukm:DocumentMinorType Value="order"/>
+</ukm:DocumentClassification><ukm:Year Value="2002"/><ukm:Number Value="519"/><ukm:AlternativeNumber Category="C" Value="27"/><ukm:Made Date="2002-11-25"/><ukm:ISBN Value="0110617290"/></ukm:SecondaryMetadata>
+					
+
+                    
+									 
+					<ukm:Alternatives>
+      <ukm:Alternative Date="2008-11-26" URI="http://www.legislation.gov.uk/ssi/2002/519/pdfs/ssi_20020519_en.pdf" Title="Print Version"/>
+   </ukm:Alternatives>
+					
+					<ukm:Statistics>
+									<ukm:TotalParagraphs Value="2"/>
+									<ukm:BodyParagraphs Value="2"/>
+									<ukm:ScheduleParagraphs Value="0"/>
+									<ukm:AttachmentParagraphs Value="0"/>
+									<ukm:TotalImages Value="0"/>
+								</ukm:Statistics>
+				</ukm:Metadata><Secondary>
+<SecondaryPrelims DocumentURI="http://www.legislation.gov.uk/ssi/2002/519/introduction/enacted" IdURI="http://www.legislation.gov.uk/id/ssi/2002/519/introduction">
+<Number>2002 No. 519 (C. 27)</Number>
+<SubjectInformation><Subject>
+<Title>ANIMALS</Title>
+</Subject>
+<Subject>
+<Title>COUNTRYSIDE</Title>
+</Subject>
+</SubjectInformation>
+<Title>The Fur Farming (Prohibition) (Scotland) Act 2002 (Commencement) Order 2002</Title>
+<MadeDate>
+<Text>Made</Text>
+<DateText>25th November 2002</DateText>
+</MadeDate>
+<SecondaryPreamble>
+<EnactingText>
+<Para>
+<Text>The Scottish Ministers, in exercise of the powers conferred by section 6(1) of the Fur Farming Prohibition (Scotland) Act 2002<FootnoteRef Ref="f00001"/>, hereby make the following Order:</Text>
+</Para>
+</EnactingText>
+</SecondaryPreamble>
+</SecondaryPrelims>
+<Body DocumentURI="http://www.legislation.gov.uk/ssi/2002/519/body/enacted" IdURI="http://www.legislation.gov.uk/id/ssi/2002/519/body" NumberOfProvisions="2" NumberFormat="default">
+<P1group>
+<Title>Citation</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/ssi/2002/519/article/1/enacted" IdURI="http://www.legislation.gov.uk/id/ssi/2002/519/article/1" id="article-1">
+<Pnumber>1</Pnumber>
+<P1para>
+<Text>This Order may be cited as the Fur Farming (Prohibition) (Scotland) Act 2002 (Commencement) Order 2002.</Text>
+</P1para>
+</P1>
+</P1group>
+<P1group>
+<Title>Appointed day</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/ssi/2002/519/article/2/enacted" IdURI="http://www.legislation.gov.uk/id/ssi/2002/519/article/2" id="article-2">
+<Pnumber>2</Pnumber>
+<P1para>
+<Text>The day appointed for the coming into force of the Fur Farming (Prohibition) (Scotland) Act 2002 is 1st January 2003.</Text>
+</P1para>
+</P1>
+</P1group>
+<SignedSection DocumentURI="http://www.legislation.gov.uk/ssi/2002/519/signature/enacted" IdURI="http://www.legislation.gov.uk/id/ssi/2002/519/signature">
+<Signatory>
+<Signee>
+<PersonName>ROSS FINNIE</PersonName>
+<JobTitle>A member of the Scottish Executive</JobTitle>
+<Address>
+<AddressLine>St Andrew’s House,</AddressLine>
+<AddressLine>Edinburgh</AddressLine></Address>
+<DateSigned Date="2002-11-25">
+<DateText>25th November 2002</DateText>
+</DateSigned>
+</Signee>
+</Signatory>
+</SignedSection>
+</Body>
+<ExplanatoryNotes DocumentURI="http://www.legislation.gov.uk/ssi/2002/519/note/enacted" IdURI="http://www.legislation.gov.uk/id/ssi/2002/519/note">
+<Comment>
+<Para>
+<Text>(This note is not part of the Order)</Text>
+</Para>
+</Comment>
+<P>
+<Text>This Order appoints 1st January 2003 as the date for coming into force of sections 1 to 5 of the Fur Farming (Prohibition) (Scotland) Act 2002.</Text>
+</P>
+</ExplanatoryNotes>
+</Secondary><Footnotes><Footnote id="f00001">
+<FootnoteText>
+<Para>
+<Text><Citation URI="http://www.legislation.gov.uk/id/asp/2002/10" id="c00001" Class="ScottishAct" Year="2002" Number="0010">2002 asp 10</Citation>.</Text>
+</Para>
+</FootnoteText>
+</Footnote></Footnotes></Legislation>

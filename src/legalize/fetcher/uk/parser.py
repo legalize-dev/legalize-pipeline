@@ -79,11 +79,12 @@ TYPE_TO_JURISDICTION_RANK: dict[str, tuple[str | None, str]] = {
     "WelshNationalAssemblyMeasure": ("uk-wls", "measure-of-senedd-cymru"),
     "NorthernIrelandAct": ("uk-nir", "act-of-northern-ireland-assembly"),
     "NorthernIrelandOldAct": ("uk-nir", "act-of-northern-ireland-assembly-old"),
-    # Secondary legislation (phase 2 — carried here for completeness):
+    # Secondary legislation (Statutory Instruments):
     "UnitedKingdomStatutoryInstrument": (None, "statutory-instrument"),
     "ScottishStatutoryInstrument": ("uk-sct", "scottish-statutory-instrument"),
     "WelshStatutoryInstrument": ("uk-wls", "welsh-statutory-instrument"),
     "NorthernIrelandStatutoryRule": ("uk-nir", "ni-statutory-rule"),
+    "NorthernIrelandStatutoryRuleOrOrder": ("uk-nir", "ni-statutory-rule-or-order"),
 }
 
 # Type-code fallback when DocumentMainType is missing (defensive — all real
@@ -98,6 +99,12 @@ TYPE_CODE_TO_JURISDICTION_RANK: dict[str, tuple[str | None, str]] = {
     "anaw": ("uk-wls", "act-of-senedd-cymru"),
     "mwa": ("uk-wls", "measure-of-senedd-cymru"),
     "nia": ("uk-nir", "act-of-northern-ireland-assembly"),
+    # Secondary legislation type-code fallbacks:
+    "uksi": (None, "statutory-instrument"),
+    "ssi": ("uk-sct", "scottish-statutory-instrument"),
+    "wsi": ("uk-wls", "welsh-statutory-instrument"),
+    "nisr": ("uk-nir", "ni-statutory-rule"),
+    "nisro": ("uk-nir", "ni-statutory-rule-or-order"),
 }
 
 # Strip C0 and C1 control characters. We do this at paragraph boundaries
@@ -1036,6 +1043,9 @@ class UKMetadataParser(MetadataParser):
         ) or TYPE_CODE_TO_JURISDICTION_RANK.get(type_code, (None, "act"))
 
         enactment_date_el = meta.find(".//ukm:EnactmentDate", NS)
+        if enactment_date_el is None:
+            # Statutory instruments use <ukm:Made Date="..."> instead.
+            enactment_date_el = meta.find(".//ukm:Made", NS)
         enactment_date_raw = (
             enactment_date_el.get("Date") if enactment_date_el is not None else None
         )
@@ -1404,6 +1414,9 @@ def _effective_date_from_root(root: etree._Element) -> date:
     if parsed is not None:
         return parsed
     enact = root.find(".//ukm:EnactmentDate", NS)
+    if enact is None:
+        # Statutory instruments use <ukm:Made Date="..."> instead.
+        enact = root.find(".//ukm:Made", NS)
     if enact is not None:
         parsed = _parse_iso_date(enact.get("Date"))
         if parsed is not None:

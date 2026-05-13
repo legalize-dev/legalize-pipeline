@@ -36,15 +36,23 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "https://www.legislation.gov.uk"
 
-# Type codes published as primary legislation on legislation.gov.uk.
-# Secondary legislation (uksi/ssi/wsi/nisr) is explicitly deferred to phase 2.
-PRIMARY_TYPES: tuple[str, ...] = (
+# Legislation type codes supported by the UK fetcher.
+# Primary legislation (Acts/Measures):
+#   ukpga, asp, asc, anaw, mwa, nia
+# Secondary legislation (Statutory Instruments):
+#   uksi, ssi, wsi, nisr, nisro
+LEGISLATION_TYPES: tuple[str, ...] = (
     "ukpga",  # UK Public General Acts
     "asp",  # Acts of the Scottish Parliament
     "asc",  # Acts of Senedd Cymru (2020-)
     "anaw",  # Welsh Assembly Acts (2012-2020)
     "mwa",  # Welsh Assembly Measures (2008-2011)
     "nia",  # Acts of the Northern Ireland Assembly
+    "uksi",  # UK Statutory Instruments
+    "ssi",  # Scottish Statutory Instruments
+    "wsi",  # Welsh Statutory Instruments
+    "nisr",  # Northern Ireland Statutory Rules
+    "nisro",  # Northern Ireland Statutory Rules and Orders (pre-devolution)
 )
 
 # Namespaces that appear in every CLML / feed response.
@@ -322,12 +330,20 @@ class LegislationGovUkClient(HttpClient):
 
 
 def _extract_enacted_date(xml_bytes: bytes) -> str | None:
-    """Return the EnactmentDate from an enacted CLML XML (ISO string)."""
+    """Return the enacted/made date from a CLML XML (ISO string).
+
+    Primary legislation uses ``<ukm:EnactmentDate>``.  Secondary legislation
+    (statutory instruments) uses ``<ukm:Made Date="...">``.
+    """
     try:
         root = etree.fromstring(xml_bytes)
     except etree.XMLSyntaxError:
         return None
     el = root.find(".//ukm:EnactmentDate", NS)
+    if el is not None:
+        return el.get("Date")
+    # Fallback for statutory instruments.
+    el = root.find(".//ukm:Made", NS)
     return el.get("Date") if el is not None else None
 
 

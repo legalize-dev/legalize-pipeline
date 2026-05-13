@@ -1,0 +1,116 @@
+<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DocumentURI="http://www.legislation.gov.uk/wsi/2026/14/enacted" IdURI="http://www.legislation.gov.uk/id/wsi/2026/14" NumberOfProvisions="2" xsi:schemaLocation="http://www.legislation.gov.uk/namespaces/legislation http://www.legislation.gov.uk/schema/legislation.xsd" SchemaVersion="2.0"><ukm:Metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:ukm="http://www.legislation.gov.uk/namespaces/metadata">
+					<dc:identifier>http://www.legislation.gov.uk/wsi/2026/14/enacted</dc:identifier><dc:title>The Local Government Finance (Wales) Act 2024 (Commencement No. 1) Order 2026</dc:title><dc:language>en</dc:language><dc:publisher>King's Printer of Acts of Parliament</dc:publisher><dc:modified>2026-01-26</dc:modified><dc:subject scheme="SIheading">COUNCIL TAX, WALES</dc:subject>
+					<dc:description>This Order is the first commencement order made under the Local Government Finance (Wales) Act 2024 (“the Act”).</dc:description>
+					<atom:link rel="self" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.xml" type="application/xml"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/resources" href="http://www.legislation.gov.uk/wsi/2026/14/resources" title="More Resources"/>
+					
+					
+					
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/act" href="http://www.legislation.gov.uk/wsi/2026/14/enacted" title="whole act"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/introduction" href="http://www.legislation.gov.uk/wsi/2026/14/introduction/enacted" title="introduction"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/signature" href="http://www.legislation.gov.uk/wsi/2026/14/signature/enacted" title="signature"/><atom:link rel="http://www.legislation.gov.uk/def/navigation/note" href="http://www.legislation.gov.uk/wsi/2026/14/note/enacted" title="note"/>
+					<atom:link rel="http://www.legislation.gov.uk/def/navigation/body" href="http://www.legislation.gov.uk/wsi/2026/14/body/enacted" title="body"/>
+					
+					
+										
+					
+					
+					<atom:link rel="alternate" hreflang="cy" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/welsh"/><atom:link rel="http://purl.org/dc/terms/tableOfContents" hreflang="cy" href="http://www.legislation.gov.uk/wsi/2026/14/contents/enacted/welsh" title="Table of Contents"/>
+					<atom:link rel="alternate" type="application/rdf+xml" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.rdf" title="RDF/XML"/><atom:link rel="alternate" type="application/akn+xml" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.akn" title="AKN"/><atom:link rel="alternate" type="application/xhtml+xml" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.xht" title="HTML snippet"/><atom:link rel="alternate" type="text/html" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.htm" title="Website (XHTML) Default View"/><atom:link rel="alternate" type="text/csv" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.csv" title="CSV"/><atom:link rel="alternate" type="application/pdf" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.pdf" title="PDF"/>
+					<atom:link rel="alternate" type="application/akn+xhtml" href="http://www.legislation.gov.uk/wsi/2026/14/enacted/data.html" title="HTML5 snippet"/>
+
+					<atom:link rel="alternate" href="http://www.legislation.gov.uk/wsi/2026/14/pdfs/wsi_20260014_mi.pdf" type="application/pdf" title="Original PDF"/>
+					<atom:link rel="http://purl.org/dc/terms/tableOfContents" hreflang="en" href="http://www.legislation.gov.uk/wsi/2026/14/contents/enacted" title="Table of Contents"/>
+					
+					
+					
+					
+					<ukm:SecondaryMetadata><ukm:DocumentClassification>
+<ukm:DocumentCategory Value="secondary"/>
+<ukm:DocumentMainType Value="WelshStatutoryInstrument"/>
+<ukm:DocumentStatus Value="final"/>
+<ukm:DocumentMinorType Value="order"/>
+</ukm:DocumentClassification><ukm:Year Value="2026"/><ukm:Number Value="14"/><ukm:AlternativeNumber Value="3" Category="C"/><ukm:Made Date="2026-01-22"/><ukm:ISBN Value="9780348397826"/></ukm:SecondaryMetadata>
+					
+
+                    
+									 
+					<ukm:Alternatives><ukm:Alternative URI="http://www.legislation.gov.uk/wsi/2026/14/pdfs/wsi_20260014_mi.pdf" Date="2026-01-26" Size="618272" Language="Mixed" Print="true"/></ukm:Alternatives>
+					
+					<ukm:Statistics>
+									<ukm:TotalParagraphs Value="2"/>
+									<ukm:BodyParagraphs Value="2"/>
+									<ukm:ScheduleParagraphs Value="0"/>
+									<ukm:AttachmentParagraphs Value="0"/>
+									<ukm:TotalImages Value="0"/>
+								</ukm:Statistics>
+				</ukm:Metadata><Secondary>
+<SecondaryPrelims DocumentURI="http://www.legislation.gov.uk/wsi/2026/14/introduction/enacted" IdURI="http://www.legislation.gov.uk/id/wsi/2026/14/introduction">
+<Number>2026 No. 14 (C. 3)</Number>
+<SubjectInformation>
+<Subject>
+<Title> Council tax, wales </Title>
+</Subject>
+</SubjectInformation>
+<Title>The Local Government Finance (Wales) Act 2024 (Commencement No. 1) Order 2026</Title>
+<MadeDate>
+<Text>Made</Text>
+<DateText>22 January 2026</DateText>
+</MadeDate>
+<SecondaryPreamble>
+<EnactingText>
+<Para>
+<Text>The Welsh Ministers make the following Order in exercise of the powers conferred on them by section 23(5) of the Local Government Finance (Wales) Act 2024<FootnoteRef Ref="f00001"/>.</Text>
+</Para>
+</EnactingText>
+</SecondaryPreamble>
+</SecondaryPrelims>
+<Body DocumentURI="http://www.legislation.gov.uk/wsi/2026/14/body/enacted" IdURI="http://www.legislation.gov.uk/id/wsi/2026/14/body" NumberOfProvisions="2">
+<P1group>
+<Title>Title</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/wsi/2026/14/article/1/enacted" IdURI="http://www.legislation.gov.uk/id/wsi/2026/14/article/1" id="article-1">
+<Pnumber>1</Pnumber>
+<P1para>
+<Text>The title of this Order is the Local Government Finance (Wales) Act 2024 (Commencement No. 1) Order 2026.</Text>
+</P1para>
+</P1>
+</P1group>
+<P1group>
+<Title>Provision coming into force on 1 April 2026</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/wsi/2026/14/article/2/enacted" IdURI="http://www.legislation.gov.uk/id/wsi/2026/14/article/2" id="article-2">
+<Pnumber>2</Pnumber>
+<P1para>
+<Text>Section 18 (discounts) of the Local Government Finance (Wales) Act 2024 comes into force on 1 April 2026, in so far as the section is not already in force.</Text>
+</P1para>
+</P1>
+</P1group>
+<SignedSection DocumentURI="http://www.legislation.gov.uk/wsi/2026/14/signature/enacted" IdURI="http://www.legislation.gov.uk/id/wsi/2026/14/signature">
+<Signatory>
+<Signee>
+<PersonName>Mark Drakeford</PersonName>
+<JobTitle>Cabinet Secretary for Finance and Welsh Language, one of the Welsh Ministers</JobTitle>
+<DateSigned Date="2026-01-22">
+<DateText>22 January 2026</DateText>
+</DateSigned>
+</Signee>
+</Signatory>
+</SignedSection>
+</Body>
+<ExplanatoryNotes DocumentURI="http://www.legislation.gov.uk/wsi/2026/14/note/enacted" IdURI="http://www.legislation.gov.uk/id/wsi/2026/14/note">
+<Title>EXPLANATORY NOTE</Title>
+<Comment>
+<Para>
+<Text>(This note is not part of the Order)</Text>
+</Para>
+</Comment>
+<P>
+<Text>This Order is the first commencement order made under the Local Government Finance (Wales) Act 2024 (“<Term>the Act</Term>”).</Text>
+</P>
+<P>
+<Text>This Order brings the remaining provisions of section 18 of the Act into force on 1 April 2026. Section 18(2)(c) and (5) are already in force for the purposes specified in section 23(6) of the Act.</Text>
+</P>
+</ExplanatoryNotes>
+</Secondary><Footnotes><Footnote id="f00001">
+<FootnoteText>
+<Para>
+<Text><Citation URI="http://www.legislation.gov.uk/id/asc/2024/6" id="c00001" Year="2024" Number="6" Class="WelshParliamentAct">2024 asc 6</Citation>.</Text>
+</Para>
+</FootnoteText>
+</Footnote></Footnotes></Legislation>
