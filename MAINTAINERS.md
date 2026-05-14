@@ -64,8 +64,8 @@ You do not own:
   project lead.
 - **The output format.** Filenames (= official ID), commit author
   (`Legalize <legalize@legalize.dev>`), commit trailers (`Source-Id`,
-  `Source-Date`, `Norm-Id`), commit types (`[bootstrap]`, `[reforma]`,
-  `[nueva]`, `[derogacion]`, `[correccion]`, `[fix-pipeline]`), and the
+  `Source-Date`, `Norm-Id`), commit types (`[bootstrap]`, `[reform]`,
+  `[new]`, `[repeal]`, `[correction]`, `[fix-pipeline]`), and the
   FLAT directory layout are locked. Changing any of this requires
   regenerating every country's history. Don't touch them without
   explicit approval.
