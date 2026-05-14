@@ -409,3 +409,101 @@ class TestSITextParser:
         assert "<Legislation" not in md
         assert "<ukm:" not in md
         assert "xmlns:" not in md
+
+    def test_uksi_1996_690_p_body_with_p2_regulations_renders(self):
+        """SI body uses ``<P><Text/><P2>regulation</P2>+</P>`` (fee amender).
+
+        Regression: before PR #1, this shape produced 0 blocks because
+        ``_render_plain_paragraph`` only read direct ``<Text>`` children of
+        ``<P>``. uksi-1996-690 has an empty ``<Text/>`` at the head and the
+        regulations live in ``<P2>`` siblings inside the same ``<P>``.
+        """
+        data = _read_fixture("sample-si-uksi-1996-690.xml")
+        blocks = UKTextParser().parse_text(data)
+        assert blocks, "0 blocks would crash the bootstrap"
+        text = " ".join(p.text for b in blocks for v in b.versions for p in v.paragraphs)
+        assert "These Regulations may be cited as" in text
+        assert "£53.00" in text and "£58.00" in text
+
+    def test_uksi_2012_1866_p_body_with_block_amendment_renders(self):
+        """SI body is ``<P><BlockAmendment>…</BlockAmendment><AppendText>.</AppendText></P>``.
+
+        Regression: before PR #1, this shape produced 0 blocks. The
+        BlockAmendment is the entire substantive content of the
+        resolution; ``AppendText`` is just a trailing "." that we now
+        suppress.
+        """
+        data = _read_fixture("sample-si-uksi-2012-1866.xml")
+        blocks = UKTextParser().parse_text(data)
+        assert blocks, "0 blocks would crash the bootstrap"
+        text = " ".join(p.text for b in blocks for v in b.versions for p in v.paragraphs)
+        assert "relevant percentage to be applied each April" in text
+        # The trailing "." AppendText must not surface as its own paragraph.
+        for b in blocks:
+            for v in b.versions:
+                for p in v.paragraphs:
+                    assert p.text.strip() != ".", f"orphan AppendText '.' in block {b.id}"
+
+    def test_si_secondary_preamble_renders_in_preamble_block(self):
+        """SIs use ``<SecondaryPreamble>`` not ``<Preamble>``.
+
+        The enacting text / resolution must end up in the preamble block.
+        """
+        data = _read_fixture("sample-si-uksi-1996-690.xml")
+        blocks = UKTextParser().parse_text(data)
+        preamble = next((b for b in blocks if b.block_type == "preamble"), None)
+        assert preamble is not None
+        text = " ".join(p.text for v in preamble.versions for p in v.paragraphs)
+        assert "Secretary of State for Trade and Industry" in text
+        # SI prelim dates land in the preamble.
+        assert "Made: 7th March 1996" in text
+        assert "Laid before Parliament: 11th March 1996" in text
+        assert "Coming into force: 8th April 1996" in text
+
+    def test_si_signed_section_emits_dedicated_block(self):
+        """`<SignedSection>` becomes a separate block with signee details."""
+        data = _read_fixture("sample-si-uksi-1996-690.xml")
+        blocks = UKTextParser().parse_text(data)
+        signed = next((b for b in blocks if b.block_type == "signatory"), None)
+        assert signed is not None
+        text = " ".join(p.text for v in signed.versions for p in v.paragraphs)
+        assert "John M Taylor" in text
+        assert "Parliamentary Under Secretary of State" in text
+        assert "5th March 1996" in text
+        # Multi-signatory: the Treasury lead-in and the Lords Commissioners.
+        assert "We consent," in text
+        assert "Derek Conway" in text
+
+    def test_si_explanatory_notes_emit_dedicated_block(self):
+        """`<ExplanatoryNotes>` becomes a block with the disclaimer + summary."""
+        data = _read_fixture("sample-si-uksi-1996-690.xml")
+        blocks = UKTextParser().parse_text(data)
+        notes = next((b for b in blocks if b.block_type == "explanatory-notes"), None)
+        assert notes is not None
+        text = " ".join(p.text for v in notes.versions for p in v.paragraphs)
+        assert "(This note is not part of the Regulations)" in text
+        assert "These Regulations amend the fees" in text
+
+    def test_si_footnotes_emit_dedicated_block(self):
+        """Top-level `<Footnotes>` become a footnote-definition block."""
+        data = _read_fixture("sample-si-uksi-2012-1866.xml")
+        blocks = UKTextParser().parse_text(data)
+        footnotes = next((b for b in blocks if b.block_type == "footnotes"), None)
+        assert footnotes is not None
+        text = " ".join(p.text for v in footnotes.versions for p in v.paragraphs)
+        # GitHub-style footnote definitions, one per ukm:Footnote id.
+        assert "[^f00001]:" in text
+        assert "[^f00002]:" in text
+        assert "[^f00003]:" in text
+
+    def test_si_with_zero_p1_blocks_still_emits_content(self):
+        """Regression: SI with no `<P1>` and no schedules must still parse.
+
+        Both fixtures here have ``NumberOfProvisions="0"``, no schedules,
+        and no ``<P1>`` elements. Before PR #1 they returned 0 blocks
+        and crashed the bootstrap at ``bootstrap.py:225``.
+        """
+        for fixture in ("sample-si-uksi-1996-690.xml", "sample-si-uksi-2012-1866.xml"):
+            data = _read_fixture(fixture)
+            blocks = UKTextParser().parse_text(data)
+            assert blocks, f"{fixture}: 0 blocks would crash the bootstrap"

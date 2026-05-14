@@ -407,9 +407,21 @@ def _gather_section_blocks(
         if long_title is not None:
             for para in long_title.findall("leg:Para", NS):
                 builder.add("parrafo", _inline_text(para))
+        # SI prelim dates: MadeDate / LaidDate / ComingIntoForce. Primary
+        # legislation has no equivalents, so this loop is a no-op for ukpga.
+        for date_tag in ("MadeDate", "LaidDate", "ComingIntoForce"):
+            for el in prelims.findall(f"leg:{date_tag}", NS):
+                _emit_si_date_paragraph(el, builder)
         preamble = prelims.find(".//leg:Preamble", NS)
         if preamble is not None:
             for para in preamble.findall(".//leg:Para", NS):
+                builder.add("parrafo", _inline_text(para))
+        # SIs use <SecondaryPreamble> wrapping <EnactingText> / <Resolution>
+        # rather than the primary-legislation <Preamble> element. Without
+        # this lookup, SI preambles silently disappear from the rendered MD.
+        sec_preamble = prelims.find(".//leg:SecondaryPreamble", NS)
+        if sec_preamble is not None:
+            for para in sec_preamble.findall(".//leg:Para", NS):
                 builder.add("parrafo", _inline_text(para))
         intro = prelims.find(".//leg:IntroductoryText", NS)
         if intro is not None:
@@ -463,14 +475,60 @@ def _gather_section_blocks(
                     ),
                 )
 
-    # 4. Commentaries — editorial notes attached to provisions. Render as a
+    # 4. Signed section — SIs end with one or more Signatory blocks
+    # ("Made by the Secretary of State for X on Y"). Sits inside <Body>
+    # for SIs, but the body walker doesn't know its shape, so render it
+    # separately. No-op for primary legislation (Acts don't use this).
+    signed_block = _render_signed_section(root)
+    if signed_block is not None:
+        results.append(signed_block)
+
+    # 5. Commentaries — editorial notes attached to provisions. Render as a
     # footnote block at the end of the document so the text has context but
     # the main body stays clean.
     commentaries_block = _render_commentaries(root)
     if commentaries_block is not None:
         results.append(commentaries_block)
 
+    # 6. Explanatory notes — SI prose appended after the operative
+    # provisions ("(This note is not part of the Regulations)"). Sibling
+    # of <Body> inside <Secondary>; missed by the body walker. No-op for
+    # primary legislation.
+    notes_block = _render_explanatory_notes(root)
+    if notes_block is not None:
+        results.append(notes_block)
+
+    # 7. Footnotes — document-level citation references. Both primary
+    # and secondary legislation put them in a top-level <Footnotes>
+    # sibling of <Primary>/<Secondary>. Without this block the
+    # <FootnoteRef> markers in the body have nothing to resolve to.
+    footnotes_block = _render_footnotes(root)
+    if footnotes_block is not None:
+        results.append(footnotes_block)
+
     return results
+
+
+def _emit_si_date_paragraph(date_el: etree._Element, builder: _BlockBuilder) -> None:
+    """Render an SI prelim date element (MadeDate / LaidDate / ComingIntoForce).
+
+    Two shapes occur:
+
+    * ``<X><Text>Label</Text><DateText>2nd Jan 2024</DateText></X>`` —
+      label plus formatted date.
+    * ``<X><Text>Coming into force in accordance with…</Text></X>`` —
+      conditional commencement, no DateText. The Text *is* the value.
+    """
+    label_el = date_el.find("leg:Text", NS)
+    date_text_el = date_el.find("leg:DateText", NS)
+    label = _clean_text(label_el.text) if label_el is not None and label_el.text else ""
+    date_text = (
+        _clean_text(date_text_el.text) if date_text_el is not None and date_text_el.text else ""
+    )
+    if label and date_text:
+        builder.add("parrafo", f"{label}: {date_text}")
+    elif label:
+        builder.add("parrafo", label)
 
 
 def _schedule_heading_paragraph(sched: etree._Element) -> Paragraph | None:
@@ -522,6 +580,129 @@ def _render_commentaries(
     # Heading ahead of the footnotes.
     heading = Paragraph(css_class="h2", text="Editorial notes")
     return ("commentaries", "commentaries", "", [heading, *paragraphs], 0)
+
+
+def _render_signed_section(
+    root: etree._Element,
+) -> tuple[str, str, str, list[Paragraph], int] | None:
+    """Render the ``<SignedSection>`` of an SI as a free-standing block.
+
+    SIs end with one or more ``<Signatory>`` entries naming who made the
+    instrument (Minister, Lord Commissioner, …) and when. Each Signatory
+    optionally carries a lead-in ``<Para>`` (e.g., "We consent,") plus
+    one or more ``<Signee>`` records with PersonName / JobTitle /
+    Department / DateSigned. Without this rendering, the legal
+    provenance is silently dropped — the body walker doesn't recognise
+    the SignedSection shape and produces no output from it.
+    """
+    signed = root.find(".//leg:SignedSection", NS)
+    if signed is None:
+        return None
+    paragraphs: list[Paragraph] = []
+    for sig in signed.findall("leg:Signatory", NS):
+        for para in sig.findall("leg:Para", NS):
+            text = _clean_text(_inline_text(para))
+            if text:
+                paragraphs.append(Paragraph(css_class="parrafo", text=text))
+        for signee in sig.findall("leg:Signee", NS):
+            pieces: list[str] = []
+            for tag in ("PersonName", "JobTitle", "Department"):
+                for el in signee.findall(f"leg:{tag}", NS):
+                    text = _clean_text(_inline_text(el))
+                    if text:
+                        pieces.append(text)
+            date_el = signee.find("leg:DateSigned", NS)
+            if date_el is not None:
+                date_text_el = date_el.find("leg:DateText", NS)
+                if date_text_el is not None and date_text_el.text:
+                    pieces.append(_clean_text(date_text_el.text))
+            if pieces:
+                paragraphs.append(Paragraph(css_class="parrafo", text=" — ".join(pieces)))
+    if not paragraphs:
+        return None
+    heading = Paragraph(css_class="h2", text="Signed")
+    return ("signed-section", "signatory", "", [heading, *paragraphs], 0)
+
+
+def _render_explanatory_notes(
+    root: etree._Element,
+) -> tuple[str, str, str, list[Paragraph], int] | None:
+    """Render the ``<ExplanatoryNotes>`` element of an SI as a block.
+
+    SIs publish a plain-English summary of what the regulations do,
+    prefixed by the disclaimer "(This note is not part of the
+    Regulations)" inside a ``<Comment>`` element. The notes sit as a
+    sibling of ``<Body>`` inside ``<Secondary>`` so the body walker
+    never sees them. Capture the comment + the substantive body of the
+    notes (``<P>`` / ``<P2>`` children) as a dedicated block so the
+    editorial summary survives in the rendered Markdown.
+    """
+    notes = root.find(".//leg:ExplanatoryNotes", NS)
+    if notes is None:
+        return None
+    builder = _BlockBuilder(block_id="explanatory-notes", block_type="explanatory-notes", title="")
+    # Disclaimer comment(s) first so the "(not part of the Regulations)"
+    # warning lands at the top of the rendered note.
+    for comment in notes.findall("leg:Comment", NS):
+        for para in comment.findall("leg:Para", NS):
+            text = _clean_text(_inline_text(para))
+            if text:
+                builder.add("parrafo", text)
+    for child in notes:
+        local = etree.QName(child.tag).localname if isinstance(child.tag, str) else ""
+        if not local or local == "Comment":
+            continue
+        if local == "P":
+            _render_plain_paragraph(child, builder)
+        elif local in ("P1", "P2", "P3", "P4", "P5"):
+            _render_inline_child(child, builder, depth=0)
+        else:
+            text = _clean_text(_inline_text(child))
+            if text:
+                builder.add("parrafo", text)
+    if not builder.paragraphs:
+        return None
+    heading = Paragraph(css_class="h2", text="Explanatory note")
+    return (
+        "explanatory-notes",
+        "explanatory-notes",
+        "",
+        [heading, *builder.paragraphs],
+        builder.images_dropped,
+    )
+
+
+def _render_footnotes(
+    root: etree._Element,
+) -> tuple[str, str, str, list[Paragraph], int] | None:
+    """Render the document-level ``<Footnotes>`` as a footnote block.
+
+    Both primary legislation and SIs put citation references in a
+    top-level ``<Footnotes>`` sibling of ``<Primary>`` / ``<Secondary>``.
+    Each ``<Footnote id="…">`` holds a ``<FootnoteText>`` with one or
+    more ``<Para><Text>`` entries. Rendered as GitHub-style footnote
+    definitions (``[^id]: text``) so MD renderers can link them back
+    to the ``<FootnoteRef Ref="…">`` markers in the body.
+    """
+    fns = root.find(".//leg:Footnotes", NS)
+    if fns is None:
+        return None
+    paragraphs: list[Paragraph] = []
+    for fn in fns.findall("leg:Footnote", NS):
+        fn_id = fn.get("id") or ""
+        body_pieces: list[str] = []
+        for text_el in fn.iter(f"{{{NS['leg']}}}Text"):
+            piece = _clean_text(_inline_text(text_el))
+            if piece:
+                body_pieces.append(piece)
+        body = " ".join(body_pieces)
+        if not body:
+            continue
+        paragraphs.append(Paragraph(css_class="parrafo", text=f"[^{fn_id}]: {body}"))
+    if not paragraphs:
+        return None
+    heading = Paragraph(css_class="h2", text="Footnotes")
+    return ("footnotes", "footnotes", "", [heading, *paragraphs], 0)
 
 
 _HEADING_CSS = {
@@ -612,11 +793,36 @@ def _walk_recursive(
 
 
 def _render_plain_paragraph(p_el: etree._Element, builder: _BlockBuilder) -> None:
-    """Render a ``<P>`` element's ``<Text>`` descendants as prose paragraphs."""
+    """Render a body-level ``<P>`` element.
+
+    Two shapes occur in practice:
+
+    1. **Prose paragraph** — ``<P><Text>…</Text></P>``. Common in
+       schedule narrative (HRA Protocols nested in schedule containers
+       are the canonical case). Render the direct ``<Text>`` children
+       as ``parrafo`` paragraphs.
+    2. **Section-like envelope** — ``<P><P2>…</P2>+</P>`` or
+       ``<P><BlockAmendment>…</BlockAmendment><AppendText>.</AppendText></P>``.
+       Common in SI bodies that omit the ``<P1>`` envelope around
+       regulations (fee amendments like uksi-1996-690, House of Commons
+       resolutions like uksi-2012-1866, single-purpose block-amender
+       SIs). The ``<P>`` itself carries no own prose; its children are
+       the substantive content.
+
+    Try (1) first; if it produces nothing, fall back to walking the
+    children with the same inline renderer used inside ``<P1para>``.
+    That renderer already knows ``P{N}``, ``BlockAmendment``,
+    ``Tabular``, ``Formula``, and lists — so the SI case picks up the
+    nested regulations / quoted amendment for free without changing
+    behaviour for the prose case.
+    """
     for text_el in p_el.findall("leg:Text", NS):
         piece = _clean_text(_inline_text(text_el))
         if piece:
             builder.add("parrafo", piece)
+    if builder.paragraphs:
+        return
+    _render_p_body(p_el, builder, depth=0)
 
 
 def _synthesize_block_id(p1: etree._Element) -> str:
@@ -788,6 +994,15 @@ def _render_inline_child(child: etree._Element, builder: _BlockBuilder, *, depth
         piece = _clean_text(_inline_text(child))
         if piece:
             builder.add("parrafo", f"[^cm]: {piece}")
+    elif local == "AppendText":
+        # Trailing connector that finishes the sentence after a sibling
+        # <BlockAmendment>/<Substitution>. Typically just "." or ",".
+        # Emit only when it carries substantive prose, not when it's
+        # pure punctuation — the amendment quote already captures the
+        # substance and a "." paragraph after it reads as noise.
+        piece = _clean_text(_inline_text(child))
+        if piece and not all(c in ".,;:()-" for c in piece):
+            builder.add("parrafo", piece)
     else:
         piece = _clean_text(_inline_text(child))
         if piece:
