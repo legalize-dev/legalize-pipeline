@@ -27,7 +27,11 @@ git init -b main
 shopt -s extglob
 cp -r "$tmp/seed"/es*/ .
 
-printf '{"last_summary_date": "%s", "runs": []}\n' "$(date -I)" > state.json
+# The legalize CLI infers the daily cursor from the most recent commit that
+# carries a "Source-Date:" trailer (see legalize.state.store.infer_last_date_from_git).
+# We embed it in the seed commit message so the very first `daily` run can
+# pick up from SEED_DATE+1 instead of failing with "No last summary found".
+SEED_DATE="$(date -I)"
 
 cat > README.md <<'EOF'
 # opolex-laws-es
@@ -41,9 +45,9 @@ on a GitHub Action.
 EOF
 
 git add .
-GIT_AUTHOR_DATE='2026-05-07T00:00:00Z' GIT_COMMITTER_DATE='2026-05-07T00:00:00Z' \
+GIT_AUTHOR_DATE="${SEED_DATE}T00:00:00Z" GIT_COMMITTER_DATE="${SEED_DATE}T00:00:00Z" \
   git -c user.name=opolex-bot -c user.email=bot@opolex.app \
-  commit -m '[bootstrap] seed from BOE via legalize-pipeline'
+  commit -m "$(printf '[bootstrap] seed from BOE via legalize-pipeline\n\nSource-Date: %s\n' "$SEED_DATE")"
 
 git remote add origin "git@github.com:${slug}.git"
 git push -u origin main
