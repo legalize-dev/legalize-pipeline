@@ -542,8 +542,22 @@ def _emit_si_date_paragraph(date_el: etree._Element, builder: _BlockBuilder) -> 
 
 
 def _schedule_heading_paragraph(sched: etree._Element) -> Paragraph | None:
+    """Render the schedule heading from either flat or TitleBlock layout.
+
+    Newer CLML nests Number/Title under ``<TitleBlock>`` (uksi-2013-488
+    is the canonical case — ``<Schedule><TitleBlock><Title>Designated
+    Bodies</Title></TitleBlock>…``). Older documents put Number/Title
+    directly on the Schedule. Check both so the schedule subtitle is
+    never silently dropped.
+    """
     num_el = sched.find("leg:Number", NS)
     title_el = sched.find("leg:Title", NS)
+    title_block = sched.find("leg:TitleBlock", NS)
+    if title_block is not None:
+        if num_el is None:
+            num_el = title_block.find("leg:Number", NS)
+        if title_el is None:
+            title_el = title_block.find("leg:Title", NS)
     num = _clean_text(_inline_text(num_el)) if num_el is not None else ""
     title = _clean_text(_inline_text(title_el)) if title_el is not None else ""
     text = " — ".join(p for p in (num, title) if p)
@@ -626,6 +640,13 @@ def _render_signed_section(
                 date_text_el = date_el.find("leg:DateText", NS)
                 if date_text_el is not None and date_text_el.text:
                     pieces.append(_clean_text(date_text_el.text))
+                else:
+                    # Attribute-only form: <DateSigned Date="2012-03-26"/>.
+                    # Fall back to the ISO date so the signature stamp
+                    # isn't silently dropped.
+                    date_attr = date_el.get("Date")
+                    if date_attr:
+                        pieces.append(date_attr)
             if pieces:
                 paragraphs.append(Paragraph(css_class="parrafo", text=" — ".join(pieces)))
     if not paragraphs:
@@ -729,6 +750,112 @@ _AMENDMENT_CONTAINERS = frozenset(
     {"BlockAmendment", "InlineAmendment", "Substitution", "Addition", "Repeal", "AppendText"}
 )
 
+# Trailing-connector punctuation suppressed inside <AppendText>. ASCII forms
+# (`. , ; : ( ) -`) plus typographic dashes / ellipsis / brackets that
+# legislation.gov.uk uses around amendment quotations. Curly quotes are
+# excluded — they wrap quoted prose worth keeping.
+_APPEND_TEXT_PUNCT = frozenset(".,;:()-—–…[]{}")
+
+
+def _has_sectional_content(element: etree._Element) -> bool:
+    """True when an element contains nested section/prose content.
+
+    CLML occasionally uses ``<Tabular>`` or ``<Form>`` as layout
+    containers wrapping sectional content (``<P1>``) or stand-alone
+    prose paragraphs (``<P>``). When that's the case the container
+    is not really a table or form template; descending preserves
+    the inner sections instead of collapsing them into a single
+    flattened block.
+    """
+    return element.find(".//leg:P1", NS) is not None or element.find(".//leg:P", NS) is not None
+
+
+def _stable_block_id_for(element: etree._Element, kind: str, *, text: str | None = None) -> str:
+    """Build a fallback block id that stays stable across multi-version snapshots.
+
+    Multi-version SIs replay the same structural element across many
+    point-in-time XMLs. A fallback id derived from ``sourceline`` drifts
+    when the surrounding markup shifts, so the same logical element ends
+    up under different block ids and the version timeline splinters.
+
+    Use the nearest ancestor's ``id`` attribute plus this element's
+    position among same-named siblings — both invariant across versions
+    when the structure itself doesn't change. A text-derived suffix
+    disambiguates anonymous headings that share a parent.
+    """
+    parent = element.getparent()
+    anchor = ""
+    while parent is not None:
+        pid = parent.get("id") if isinstance(parent.tag, str) else None
+        if pid:
+            anchor = pid
+            break
+        parent = parent.getparent()
+    direct = element.getparent()
+    idx = 1
+    if direct is not None:
+        local = etree.QName(element.tag).localname
+        siblings = [
+            c for c in direct if isinstance(c.tag, str) and etree.QName(c.tag).localname == local
+        ]
+        if element in siblings:
+            idx = siblings.index(element) + 1
+    suffix = ""
+    if text:
+        slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:40]
+        if slug:
+            suffix = f"-{slug}"
+    prefix = anchor or "root"
+    return f"{prefix}-{kind}-{idx}{suffix}"
+
+
+def _render_form(form: etree._Element, block_id: str) -> _BlockBuilder:
+    """Render a ``<Form>`` template (standalone schedule attachment).
+
+    Forms appear in procedural SIs (court rules, regulatory templates)
+    as figure-backed standalone pages: a Number heading, one or more
+    Title lines wrapped in a TitleBlock, an optional Reference to the
+    rule they accompany, and a Figure with the printed-form image.
+    Without explicit handling they fell through ``_walk_recursive``'s
+    descend path and emitted nothing — nisro-1968-218's 21 forms
+    disappeared on the first bootstrap attempt.
+    """
+    number_el = form.find("leg:Number", NS)
+    number_text = _clean_text(_inline_text(number_el)) if number_el is not None else ""
+    builder = _BlockBuilder(block_id=block_id, block_type="form", title=number_text)
+    if number_text:
+        builder.add("h3", number_text)
+    title_block = form.find("leg:TitleBlock", NS)
+    if title_block is not None:
+        for title_el in title_block.findall("leg:Title", NS):
+            piece = _clean_text(_inline_text(title_el))
+            if piece:
+                builder.add("h4", piece)
+    direct_title = form.find("leg:Title", NS)
+    if direct_title is not None and title_block is None:
+        piece = _clean_text(_inline_text(direct_title))
+        if piece:
+            builder.add("h4", piece)
+    reference_el = form.find("leg:Reference", NS)
+    if reference_el is not None:
+        piece = _clean_text(_inline_text(reference_el))
+        if piece:
+            builder.add("parrafo", piece)
+    for child in form:
+        if not isinstance(child.tag, str):
+            continue
+        local = etree.QName(child.tag).localname
+        if local in ("Number", "TitleBlock", "Title", "Reference"):
+            continue
+        if local == "Figure":
+            builder.images_dropped += 1
+            continue
+        if local == "P":
+            _render_plain_paragraph(child, builder)
+        else:
+            _render_inline_child(child, builder, depth=0)
+    return builder
+
 
 def _walk_recursive(
     element: etree._Element,
@@ -753,7 +880,9 @@ def _walk_recursive(
         if local in _HEADING_CSS:
             text = _render_heading_text(child)
             if text:
-                heading_id = child.get("id") or f"heading-{local.lower()}-{child.sourceline or 0}"
+                heading_id = child.get("id") or _stable_block_id_for(
+                    child, f"heading-{local.lower()}", text=text
+                )
                 css = _HEADING_CSS[local]
                 out.append(
                     (
@@ -784,7 +913,7 @@ def _walk_recursive(
             # P1group with an empty Title — common in schedule-nested
             # Protocols of the Human Rights Act). Emit the body text as a
             # standalone prose block so it lands in the Markdown output.
-            block_id = child.get("id") or f"p-{child.sourceline or 0}"
+            block_id = child.get("id") or _stable_block_id_for(child, "p")
             builder = _BlockBuilder(block_id=block_id, block_type="prose", title="")
             _render_plain_paragraph(child, builder)
             if builder.paragraphs:
@@ -797,6 +926,60 @@ def _walk_recursive(
                         builder.images_dropped,
                     )
                 )
+        elif local == "Tabular":
+            # Bare table inside a ScheduleBody (or other container) that
+            # carries no enclosing <P1>. Uksi-2013-488 has 20 such tables;
+            # without this branch _walk_recursive's else clause descended
+            # into the table looking for sections, found none, and the
+            # table never reached _render_table.
+            #
+            # Exception: CLML occasionally uses ``<Tabular>`` as a layout
+            # container for nested ``<P1>`` sections (uksi-2005-250 has
+            # 593 such sections inside one Tabular). When the table
+            # contains sectional content, fall through to the recursive
+            # walk so the inner sections still emit.
+            if _has_sectional_content(child):
+                _walk_recursive(child, out)
+            else:
+                block_id = child.get("id") or _stable_block_id_for(child, "table")
+                builder = _BlockBuilder(block_id=block_id, block_type="schedule-table", title="")
+                _render_table(child, builder)
+                if builder.paragraphs:
+                    out.append(
+                        (
+                            builder.block_id,
+                            builder.block_type,
+                            builder.title,
+                            builder.paragraphs,
+                            builder.images_dropped,
+                        )
+                    )
+        elif local == "Form":
+            # Standalone form template inside a ScheduleBody (typically a
+            # judicial-procedure form attached to a procedural SI).
+            # Nisro-1968-218 carries 21 such forms — without this branch
+            # they fell through to the else descend, which had nothing
+            # to do with their Number/Title/Reference/Figure children
+            # so the forms disappeared entirely.
+            #
+            # Same caveat as Tabular: if a Form wraps sectional content
+            # (rare but possible for form templates with embedded
+            # regulations), descend instead of collapsing.
+            if _has_sectional_content(child):
+                _walk_recursive(child, out)
+            else:
+                block_id = child.get("id") or _stable_block_id_for(child, "form")
+                builder = _render_form(child, block_id)
+                if builder.paragraphs:
+                    out.append(
+                        (
+                            builder.block_id,
+                            builder.block_type,
+                            builder.title,
+                            builder.paragraphs,
+                            builder.images_dropped,
+                        )
+                    )
         else:
             # Anonymous wrapper (Body, Primary, Secondary, Tabular container…) — descend.
             _walk_recursive(child, out)
@@ -1027,7 +1210,7 @@ def _render_inline_child(child: etree._Element, builder: _BlockBuilder, *, depth
         # pure punctuation — the amendment quote already captures the
         # substance and a "." paragraph after it reads as noise.
         piece = _clean_text(_inline_text(child))
-        if piece and not all(c in ".,;:()-" for c in piece):
+        if piece and not all(c in _APPEND_TEXT_PUNCT for c in piece):
             builder.add("parrafo", piece)
     else:
         piece = _clean_text(_inline_text(child))
@@ -1668,6 +1851,18 @@ def _effective_date_from_root(root: etree._Element) -> date:
         parsed = _parse_iso_date(valid.text)
         if parsed is not None:
             return parsed
+    # Pre-1988 SIs published only as PDF carry <ukm:Year Value="…"/> with
+    # no Made/Laid/EnactmentDate. Falling through to date.today() stamps
+    # "last updated" as today across the whole pre-1988 SI corpus, which
+    # leaks build-time into the git history. January 1st of the recorded
+    # year is at least within the right ballpark.
+    year_el = root.find(".//ukm:Year", NS)
+    if year_el is not None:
+        try:
+            year_value = int(year_el.get("Value") or "")
+            return date(year_value, 1, 1)
+        except (TypeError, ValueError):
+            pass
     return date.today()
 
 
