@@ -214,6 +214,16 @@ def _inline_text(element: etree._Element) -> str:
             # amendment history is captured in the reform timeline, not in
             # visual decoration.
             parts.append(_inline_text(child))
+        elif localname == "FootnoteRef":
+            # Emit a GitHub-style footnote marker so the body text links
+            # back to the corresponding definition in the document-level
+            # <Footnotes> block (rendered as `[^id]: …` by
+            # ``_render_footnotes``). Without this branch the body would
+            # silently drop the reference and leave the definitions
+            # dangling at the end of the document.
+            ref = child.get("Ref")
+            if ref:
+                parts.append(f"[^{ref}]")
         elif localname in ("Figure", "Image"):
             parts.append("[image omitted]")
         else:
@@ -795,7 +805,7 @@ def _walk_recursive(
 def _render_plain_paragraph(p_el: etree._Element, builder: _BlockBuilder) -> None:
     """Render a body-level ``<P>`` element.
 
-    Two shapes occur in practice:
+    Three shapes occur in practice:
 
     1. **Prose paragraph** — ``<P><Text>…</Text></P>``. Common in
        schedule narrative (HRA Protocols nested in schedule containers
@@ -808,21 +818,37 @@ def _render_plain_paragraph(p_el: etree._Element, builder: _BlockBuilder) -> Non
        resolutions like uksi-2012-1866, single-purpose block-amender
        SIs). The ``<P>`` itself carries no own prose; its children are
        the substantive content.
+    3. **Mixed lead-in + envelope** —
+       ``<P><Text>lead-in</Text><P2>…</P2><P2>…</P2></P>``. Common in
+       SI explanatory notes whose first sentence introduces the fee
+       table that follows (uksi-1996-690 is the canonical case).
 
-    Try (1) first; if it produces nothing, fall back to walking the
-    children with the same inline renderer used inside ``<P1para>``.
-    That renderer already knows ``P{N}``, ``BlockAmendment``,
-    ``Tabular``, ``Formula``, and lists — so the SI case picks up the
-    nested regulations / quoted amendment for free without changing
-    behaviour for the prose case.
+    Decide structurally per-``<P>``: if any non-``<Text>`` content
+    child is present (``P{N}``, ``P{N}group``, ``BlockAmendment``,
+    ``Tabular``, ``Formula``, list, ``BlockText``, …), walk all
+    children in document order via the same inline renderer used
+    inside ``<P1para>``. Otherwise emit only ``<Text>`` children.
+
+    The structural decision is local to this element — it must not
+    consult ``builder.paragraphs`` because the builder is shared across
+    every sibling ``<P>`` in containers like ``<ExplanatoryNotes>``.
     """
+    has_structural = False
+    for child in p_el:
+        if not isinstance(child.tag, str):
+            continue
+        local = etree.QName(child.tag).localname
+        if local not in ("Text", "Pnumber"):
+            has_structural = True
+            break
+    if has_structural:
+        for child in p_el:
+            _render_inline_child(child, builder, depth=0)
+        return
     for text_el in p_el.findall("leg:Text", NS):
         piece = _clean_text(_inline_text(text_el))
         if piece:
             builder.add("parrafo", piece)
-    if builder.paragraphs:
-        return
-    _render_p_body(p_el, builder, depth=0)
 
 
 def _synthesize_block_id(p1: etree._Element) -> str:

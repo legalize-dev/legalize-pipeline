@@ -475,7 +475,15 @@ class TestSITextParser:
         assert "Derek Conway" in text
 
     def test_si_explanatory_notes_emit_dedicated_block(self):
-        """`<ExplanatoryNotes>` becomes a block with the disclaimer + summary."""
+        """`<ExplanatoryNotes>` becomes a block with the disclaimer, summary,
+        and every nested sub-paragraph that explains the regulation changes.
+
+        Regression: previously the body-level ``<P>`` carrying a lead-in
+        ``<Text>`` followed by ``<P2>`` siblings only emitted the lead-in,
+        silently dropping every fee-change sub-paragraph. The structural
+        decision in ``_render_plain_paragraph`` must be local to each
+        ``<P>``, not based on the shared builder's accumulated state.
+        """
         data = _read_fixture("sample-si-uksi-1996-690.xml")
         blocks = UKTextParser().parse_text(data)
         notes = next((b for b in blocks if b.block_type == "explanatory-notes"), None)
@@ -483,6 +491,11 @@ class TestSITextParser:
         text = " ".join(p.text for v in notes.versions for p in v.paragraphs)
         assert "(This note is not part of the Regulations)" in text
         assert "These Regulations amend the fees" in text
+        # Sub-paragraphs nested under the lead-in `<P><Text>…</Text><P2>…</P2>` envelope.
+        assert "£58.00 per hour" in text
+        assert "£70.00 per hour" in text
+        assert "£11.50 per hour" in text
+        assert "for examination staff" in text
 
     def test_si_footnotes_emit_dedicated_block(self):
         """Top-level `<Footnotes>` become a footnote-definition block."""
@@ -495,6 +508,30 @@ class TestSITextParser:
         assert "[^f00001]:" in text
         assert "[^f00002]:" in text
         assert "[^f00003]:" in text
+
+    def test_si_footnote_refs_render_in_body(self):
+        """`<FootnoteRef Ref="…"/>` markers must survive inline in body text.
+
+        Without the inline marker the body silently drops the reference and
+        leaves the `[^id]: …` definitions in the Footnotes block dangling
+        with nothing tying them back. Lawyer-visible regression that
+        ``_render_footnotes`` alone (PR #61's original scope) cannot fix.
+        """
+        data = _read_fixture("sample-si-uksi-2012-1866.xml")
+        blocks = UKTextParser().parse_text(data)
+        # The body of this SI is a single `<Resolution>` carrying three
+        # FootnoteRefs against citations of the 1948 Act, the 1981 Act,
+        # and the 7 March 2005 Resolution.
+        body_text = " ".join(
+            p.text
+            for b in blocks
+            if b.block_type not in ("footnotes",)
+            for v in b.versions
+            for p in v.paragraphs
+        )
+        assert "[^f00001]" in body_text
+        assert "[^f00002]" in body_text
+        assert "[^f00003]" in body_text
 
     def test_si_with_zero_p1_blocks_still_emits_content(self):
         """Regression: SI with no `<P1>` and no schedules must still parse.
