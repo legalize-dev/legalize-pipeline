@@ -385,19 +385,57 @@ class TestSITextParser:
         assert len(blocks) >= 10
         assert any(b.block_type == "schedule-heading" for b in blocks)
 
-    def test_si_with_tables_parses_without_error(self):
+    def test_si_with_tables_renders_schedule_tables(self):
         """uksi-2013-488 has 20 XHTML tables in ScheduleBody.
 
-        Standalone tables (outside P1group) are not yet rendered as pipe
-        tables — they live at the schedule body level, which the section
-        walker doesn't enter. This test confirms the SI still parses
-        cleanly and the schedule headings are captured.
+        Bare ``<Tabular>`` children of ``<ScheduleBody>`` (outside the
+        usual ``<P1>`` envelope) must each render as a pipe-table block;
+        previously the section walker descended into them looking for
+        sections, found none, and the schedule body was lost.
         """
         data = _read_fixture("sample-si-uksi-2013-488-tables.xml")
         blocks = UKTextParser().parse_text(data)
-        assert len(blocks) >= 3
-        assert any(b.block_type == "schedule-heading" for b in blocks)
-        assert any(b.block_type == "section" for b in blocks)
+        schedule_tables = [b for b in blocks if b.block_type == "schedule-table"]
+        # 20 tables in the fixture's single Schedule.
+        assert len(schedule_tables) == 20
+        # Each table should carry pipe-table syntax (``| col | col |``).
+        first = schedule_tables[0]
+        rendered = " ".join(p.text for v in first.versions for p in v.paragraphs)
+        assert "|" in rendered
+
+    def test_si_schedule_titleblock_subtitle_renders(self):
+        """uksi-2013-488 nests Schedule's Title under ``<TitleBlock>``.
+
+        Newer CLML wraps Number/Title inside ``<TitleBlock>``. The
+        schedule heading must still pick up "Designated Bodies" even
+        though it sits one element deeper than the flat layout.
+        """
+        data = _read_fixture("sample-si-uksi-2013-488-tables.xml")
+        blocks = UKTextParser().parse_text(data)
+        schedule_heading = next((b for b in blocks if b.block_type == "schedule-heading"), None)
+        assert schedule_heading is not None
+        text = " ".join(p.text for v in schedule_heading.versions for p in v.paragraphs)
+        assert "Designated Bodies" in text
+
+    def test_si_forms_in_schedule_body_render(self):
+        """nisro-1968-218 attaches 21 court-procedure forms to its Schedule.
+
+        Each ``<Form>`` carries Number / TitleBlock / Reference / Figure.
+        Previously the parser descended into the Form via the else
+        clause of ``_walk_recursive``, found no ``<P1>``, and emitted
+        nothing — losing every form.
+        """
+        data = _read_fixture("sample-si-nisro-1968-218.xml")
+        blocks = UKTextParser().parse_text(data)
+        forms = [b for b in blocks if b.block_type == "form"]
+        assert len(forms) == 21
+        first = forms[0]
+        text = " ".join(p.text for v in first.versions for p in v.paragraphs)
+        assert "FORM 1" in text
+        # TitleBlock subtitles should render at h4 (## not # so we look at
+        # the underlying paragraph css class).
+        title_paragraphs = [p for v in first.versions for p in v.paragraphs if p.css_class == "h4"]
+        assert title_paragraphs, "Form's TitleBlock subtitle should produce h4 paragraphs"
 
     def test_si_no_leftover_clml_tags(self):
         """Rendered SI output must not leak raw XML."""
@@ -544,3 +582,68 @@ class TestSITextParser:
             data = _read_fixture(fixture)
             blocks = UKTextParser().parse_text(data)
             assert blocks, f"{fixture}: 0 blocks would crash the bootstrap"
+
+    def test_pre_1988_made_date_falls_back_to_year(self):
+        """Pre-1988 SIs carry only `<ukm:Year>` — no Made/Laid/EnactmentDate.
+
+        Previously the publication date fell back to ``date.today()``,
+        stamping every pre-1988 SI's ``last_updated`` field with the
+        build date and leaking it into the git history.
+        """
+        from datetime import date
+
+        from legalize.fetcher.uk.parser import _effective_date_from_root
+        from lxml import etree
+
+        data = _read_fixture("sample-si-nisro-1968-218.xml")
+        root = etree.fromstring(data)
+        assert _effective_date_from_root(root) == date(1968, 1, 1)
+
+    def test_si_block_id_stable_across_multi_version_snapshots(self):
+        """Anonymous P/heading blocks must share an id across version XMLs.
+
+        Multi-version SIs replay the same logical block across several
+        point-in-time XMLs. A fallback id derived from ``sourceline``
+        drifts when surrounding markup shifts, splintering the version
+        timeline into multiple single-version blocks. The fallback must
+        be derived from stable structure (ancestor id + sibling index),
+        not file-line position.
+        """
+        # Synthesise two version XMLs where the same logical <P> appears
+        # at different sourcelines. Both wrap the <P> inside a Schedule
+        # with a stable id, so the per-version block ids must collide.
+        v1 = (
+            '<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation">'
+            '<Secondary><Body><Schedule id="schedule-1"><ScheduleBody>'
+            "<P><Text>Shared paragraph.</Text></P>"
+            "</ScheduleBody></Schedule></Body></Secondary></Legislation>"
+        ).encode()
+        v2 = (
+            '<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation">'
+            '<Secondary>\n\n\n<Body>\n\n<Schedule id="schedule-1">\n<ScheduleBody>\n'
+            "<P><Text>Shared paragraph.</Text></P>\n"
+            "</ScheduleBody></Schedule></Body></Secondary></Legislation>"
+        ).encode()
+        blob = {
+            "norm_id": "uksi-2020-1",
+            "versions": [
+                {
+                    "effective_date": "2020-01-01",
+                    "affecting_uri": None,
+                    "xml_b64": base64.b64encode(v1).decode("ascii"),
+                },
+                {
+                    "effective_date": "2021-01-01",
+                    "affecting_uri": "http://example/affecting",
+                    "xml_b64": base64.b64encode(v2).decode("ascii"),
+                },
+            ],
+        }
+        blocks = UKTextParser().parse_text(json.dumps(blob).encode())
+        prose_blocks = [b for b in blocks if b.block_type == "prose"]
+        # Both snapshots carry the same logical paragraph → one block, two
+        # versions (collapsed to one if content is identical).
+        assert len(prose_blocks) == 1, (
+            f"expected one prose block across versions, got {len(prose_blocks)}: "
+            f"{[b.id for b in prose_blocks]}"
+        )
