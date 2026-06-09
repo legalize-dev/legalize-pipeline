@@ -145,9 +145,7 @@ class IsraelTextParser(TextParser):
         original_text = pkg.get("original_text", "")
         reforms_text = pkg.get("reforms_text", [])
 
-        # We need the publication date for versioning.
-        # It is passed down or can be derived. Defaulting to 1950-01-01 for fallback.
-        pub_date = date(1950, 1, 1)
+        pub_date = parse_gregorian_date(pkg.get("publication_date")) or date(1950, 1, 1)
 
         blocks: list[Block] = []
 

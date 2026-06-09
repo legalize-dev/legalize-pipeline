@@ -110,7 +110,6 @@ class IsraelClient(HttpClient):
             request_timeout=request_timeout,
             max_retries=max_retries,
             requests_per_second=requests_per_second,
-            extra_headers={"Accept": "application/json"},
         )
 
     def _get_odata(self, path: str) -> bytes:
@@ -238,7 +237,15 @@ class IsraelClient(HttpClient):
                 except Exception as e:
                     logger.warning("Error fetching documents for amending bill %s: %s", bill_id, e)
 
-        package = {"original_text": original_text, "reforms_text": reforms_text}
+        # Extract publication date for versioning
+        law = metadata_pkg.get("law", {})
+        pub_date_str = law.get("PublicationDate") or law.get("LastUpdatedDate")
+
+        package = {
+            "original_text": original_text,
+            "reforms_text": reforms_text,
+            "publication_date": pub_date_str,
+        }
 
         return json.dumps(package, ensure_ascii=False).encode("utf-8")
 
@@ -253,14 +260,12 @@ class IsraelClient(HttpClient):
             file_path = doc.get("FilePath")
             if not file_path:
                 continue
-            # Correct path slashes
+            # Correct path slashes and collapse double slashes
             url = file_path.replace("\\", "/")
+            url = re.sub(r"(https?://)/+", r"\1", url)
             try:
-                # File paths are on fs.knesset.gov.il
-                resp = self._session.get(url, timeout=self._timeout)
-                resp.raise_for_status()
-
-                content = resp.content
+                # File paths are on fs.knesset.gov.il; use _get to respect rate limit
+                content = self._get(url)
                 if is_reblaze_content(content):
                     logger.warning("Reblaze challenge page returned for file: %s", url)
                     continue

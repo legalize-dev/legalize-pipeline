@@ -65,7 +65,7 @@ countries:
       max_retries: 5
       requests_per_second: 1.0
       user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-      is_basic_law_only: false
+      is_basic_law_only: true
 
   se:
     repo_path: "../countries/se"
