@@ -7,6 +7,7 @@ import json
 import logging
 import re
 import time
+import unicodedata
 from typing import Any
 
 import pdfplumber
@@ -14,6 +15,36 @@ import pdfplumber
 from legalize.fetcher.base import HttpClient
 
 logger = logging.getLogger(__name__)
+
+# Zero-width / BOM / bidirectional control characters that pollute Hebrew PDF text.
+_ZERO_WIDTH = (
+    "\ufeff"  # zero-width no-break space / BOM
+    "\u200b"  # zero-width space
+    "\u200c\u200d"  # ZWNJ / ZWJ
+    "\u200e\u200f"  # LRM / RLM
+    "\u202a\u202b\u202c\u202d\u202e"  # bidi embedding/override
+)
+_ZERO_WIDTH_RE = re.compile(f"[{_ZERO_WIDTH}]")
+_SOFT_HYPHEN_RE = re.compile(r"\s*\u00ad\s*")
+
+
+def clean_extracted_text(text: str) -> str:
+    """Normalize text extracted from Hebrew PDF/DOC documents.
+
+    Replaces the soft hyphen (used as a maqaf/hyphen across line breaks) with a real
+    hyphen, drops zero-width/bidi control characters and other C0/C1 control codes
+    (keeping newlines and tabs), and collapses runs of spaces. UTF-8 throughout.
+    """
+    if not text:
+        return text
+    text = _SOFT_HYPHEN_RE.sub("-", text)
+    text = _ZERO_WIDTH_RE.sub("", text)
+    text = "".join(
+        c for c in text if c in ("\n", "\t") or unicodedata.category(c) not in ("Cc", "Cf")
+    )
+    text = re.sub(r"[ \t]+", " ", text)
+    return "\n".join(line.strip() for line in text.splitlines())
+
 
 # Common Hebrew words reversed for visual Hebrew detection
 REVERSED_WORDS = {"קוח", "ףיעס", "קרפ", "תסנכ", "תנידמ", "לארשי"}
@@ -309,7 +340,7 @@ class IsraelClient(HttpClient):
                                 ]
                                 t = "\n".join(reversed_lines)
                             text_pages.append(t)
-                        return "\n\n".join(text_pages)
+                        return clean_extracted_text("\n\n".join(text_pages))
                 else:
                     # Old .doc or .docx: python-docx can only parse .docx easily.
                     # Fallback to plain text decoding or skipping if not supported
@@ -317,7 +348,7 @@ class IsraelClient(HttpClient):
                         from docx import Document
 
                         d = Document(io.BytesIO(content))
-                        return "\n\n".join(p.text for p in d.paragraphs)
+                        return clean_extracted_text("\n\n".join(p.text for p in d.paragraphs))
                     except Exception:
                         # Can decode as raw string just in case there is ASCII/UTF-8
                         pass

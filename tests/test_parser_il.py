@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 from datetime import date
+from pathlib import Path
 
 from legalize.fetcher.il.client import (
     IsraelClient,
+    clean_extracted_text,
     is_visual_hebrew,
     reverse_visual_line,
     is_reblaze_content,
@@ -14,6 +16,12 @@ from legalize.fetcher.il.client import (
 from legalize.fetcher.il.dates_il import hebrew_year_to_gregorian, parse_gregorian_date
 from legalize.fetcher.il.parser import IsraelMetadataParser, IsraelTextParser
 from legalize.models import NormStatus
+
+FIXTURES = Path(__file__).parent / "fixtures" / "il"
+
+
+def _load_fixture(name: str) -> dict:
+    return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
 
 
 # ─────────────────────────────────────────────
@@ -236,3 +244,84 @@ class TestCorrectionDateMap:
     def test_skips_missing_bill_id(self):
         corrections = [{"KNS_LawCorrection": {"PublicationDate": "2000-01-01"}}, {}]
         assert IsraelClient._build_correction_date_map(corrections) == {}
+
+
+# ─────────────────────────────────────────────
+# Extracted-text cleaning tests
+# ─────────────────────────────────────────────
+
+
+class TestCleanExtractedText:
+    def test_soft_hyphen_becomes_hyphen_and_joins(self):
+        # Soft hyphen (U+00AD), optionally surrounded by spaces, is a maqaf/hyphen.
+        assert clean_extracted_text("חוק \u00adיסוד") == "חוק-יסוד"
+        assert clean_extracted_text("על\u00adפי") == "על-פי"
+        assert clean_extracted_text("צבא\u00adהגנה\u00adלישראל") == "צבא-הגנה-לישראל"
+
+    def test_strips_zero_width_and_bom(self):
+        dirty = "\ufeffמבקר\u200bהמדינה\u200f"
+        assert clean_extracted_text(dirty) == "מבקרהמדינה"
+
+    def test_collapses_spaces_and_trims_lines(self):
+        assert clean_extracted_text("מבקר   המדינה  \n  שורה   שנייה") == "מבקר המדינה\nשורה שנייה"
+
+    def test_empty(self):
+        assert clean_extracted_text("") == ""
+
+
+# ─────────────────────────────────────────────
+# Article-marker detection (visual-order PDFs)
+# ─────────────────────────────────────────────
+
+
+class TestArticleDetection:
+    def test_visual_marginal_markers_segment_articles(self):
+        # Reproduces the visual-order layout: ".N" / "heading ,N" / "heading .N (".
+        text_dict = {
+            "original_text": (
+                ".1 ביקורת המדינה נתונה בידי מבקר המדינה.\n"
+                "ביקורת המדינה .2 (א) מבקר המדינה יקיים ביקורת על המשק.\n"
+                "מהות ,3 צבא הגנה לישראל הוא צבאה של המדינה.\n"
+            ),
+            "publication_date": "1988-02-24T00:00:00+02:00",
+        }
+        parser = IsraelTextParser()
+        blocks = parser.parse_text(json.dumps(text_dict).encode("utf-8"))
+        articles = [b for b in blocks if b.block_type == "article"]
+        assert len(articles) == 3
+        # The body excludes the marker; the marginal heading becomes the title.
+        assert articles[1].title == "ביקורת המדינה"
+        assert articles[1].versions[0].paragraphs[0].text.startswith("(א)")
+
+    def test_subsections_are_not_markers(self):
+        text_dict = {
+            "original_text": "1. פתיח\n(א) משנה ראשונה\n(2) משנה שנייה\nטקסט המשך",
+            "publication_date": "1990-01-01",
+        }
+        parser = IsraelTextParser()
+        blocks = parser.parse_text(json.dumps(text_dict).encode("utf-8"))
+        # Only one article ("1."); "(א)" and "(2)" stay inside it, not new blocks.
+        assert len([b for b in blocks if b.block_type == "article"]) == 1
+
+
+# ─────────────────────────────────────────────
+# Fixture-driven tests against real Knesset OData responses (offline)
+# ─────────────────────────────────────────────
+
+
+class TestRealFixtures:
+    def test_correction_dates_from_real_response(self):
+        data = _load_fixture("corrections_for_law.json")
+        result = IsraelClient._build_correction_date_map(data["value"])
+        # Every mapped bill resolves to a real (non-placeholder) ISO date string.
+        assert result
+        assert all(d and not d.startswith("2000-01-01") for d in result.values())
+
+    def test_bill_fixture_exposes_publication_date_and_docs(self):
+        bill = _load_fixture("bill_with_docs.json")["value"][0]
+        assert bill["PublicationDate"].startswith("1950-08-09")
+        assert any(d.get("FilePath") for d in bill.get("KNS_DocumentBill", []))
+
+    def test_law_name_fixture_has_titles(self):
+        names = _load_fixture("KNS_IsraelLawName.json")["value"]
+        assert names and all("Name" in n for n in names)

@@ -42,8 +42,9 @@ The committed offline test fixtures used by `tests/test_parser_il.py` are inline
 | `KNS_SecondaryLaw`, `KNS_DocumentSecondaryLaw` | `recon/KNS_SecondaryLaw.json`, `recon/KNS_DocumentSecondaryLaw.json` | Secondary legislation (not yet bootstrapped) |
 | Sample law documents | `recon/sample_law_1.pdf`, `recon/sample_law_1.doc` | Inspected for Decision Gate 1 |
 
-**Known gap (vs. playbook Step 0.2):** fixtures are not yet copied to committed
-`tests/fixtures/il/`; the tests use inline data instead. Follow-up to commit canonical fixtures.
+Committed offline fixtures now live under `tests/fixtures/il/` (`corrections_for_law.json`,
+`bill_with_docs.json`, `KNS_IsraelLawName.json`, `KNS_LawBinding.json`, `KNS_Status.json`) and
+drive `TestRealFixtures` in `tests/test_parser_il.py`; the remaining cases use inline data.
 
 ## 0.3 Metadata Inventory
 
@@ -87,12 +88,13 @@ PDF/DOC extraction rather than by markup richness.
 
 | Construct | Present in source | Handled |
 |---|---|---|
-| Article markers (`סעיף N` / `N.` / `אות.`) | Yes | Yes — detected as `article` blocks |
+| Article markers (`סעיף N`, `N.`, and visual-order `.N` / `,N` with marginal heading) | Yes | Yes — detected as `article` blocks; the marginal side-note becomes the block title |
 | Chapter markers (`פרק`) | Yes | Yes — detected as `section` blocks |
 | Preamble / opening text | Yes | Yes — `preamble` block |
 | Right-to-left text | Yes | Paragraphs emitted with generic `parrafo` CSS class (RTL display handled by the website repo) |
 | Visual (reversed) Hebrew in legacy PDFs | Yes | Detected and reversed; **heuristic** — can mis-handle mixed LTR/numeric runs |
-| Tables (tax schedules, annexes) | Occasionally | **Not handled** — no pipe-table extraction yet |
+| Soft hyphen / zero-width / BOM / bidi control chars | Yes (pervasive) | Normalized — soft hyphen → maqaf; control/zero-width chars stripped (`clean_extracted_text`) |
+| Tables (tax schedules, annexes) | Occasionally | **Not handled** — no pipe-table extraction yet (deferred to the primary-legislation phase) |
 | Bold / italic | Rare in extracted text | Not preserved (lost in PDF/DOC text extraction) |
 | Niqqud / gershayim (`"` / `׳`) | Yes | Preserved (UTF-8) |
 | Scanned-image documents (`ApplicationDesc = PIC`, `.TIF`) | Yes (older laws) | **Skipped** — would require OCR |
@@ -100,6 +102,19 @@ PDF/DOC extraction rather than by markup richness.
 Confirmed parser behavior (`IsraelTextParser`):
 - Document preference order in `_download_and_extract_text`: PDF → DOC/DOCX. PIC/TIF skipped.
 - PDF text via `pdfplumber`, per-page, with visual-Hebrew reversal applied per line when detected.
+- Extracted text is normalized by `clean_extracted_text` (soft-hyphen → maqaf, strip
+  zero-width/BOM/bidi/C0-C1 controls, collapse spaces). On the 18 Basic Laws this removed
+  ~21k junk code points (≈19.5k `U+FEFF` + ~1.3k soft hyphens) and lifted article segmentation
+  dramatically (e.g. Basic Law: The Army 1 → 7 blocks, Basic Law: The Knesset 59 → 90 blocks).
+
+### Residual fidelity limitations (legacy scanned-PDF text layer)
+
+These are inherent to the source document text layer and are **not** fully correctable without
+the official clean text; they are documented rather than silently patched:
+- **Two-column marginal layout:** the side-note heading column occasionally wraps to a second
+  line, leaving a stray fragment as a body line (e.g. `האזרחית`, `הכללי`).
+- **OCR-quality typos in pre-1990 scans:** e.g. `הכטחון`/`הבטחון`, `כצבא` (should be `בצבא`),
+  `ראשהמטה` (lost space). The text comes from the PDF text layer as published.
 
 ## 0.5 Version History Spike
 

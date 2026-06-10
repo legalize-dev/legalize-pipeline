@@ -44,6 +44,36 @@ def clean_title(title: str) -> str:
     return title
 
 
+# Article/section markers. Hebrew laws number sections as "N." (logical order) or, in
+# visual-order legacy PDFs, as ".N" / ",N" optionally preceded by a short marginal heading
+# (the side-note title of the section). Subsections like "(א)" / "(2)" are NOT markers.
+_ARTICLE_SEIF = re.compile(r"^סעיף\s+(\d{1,3})")
+_ARTICLE_NUM_DOT = re.compile(r"^(\d{1,3})[.)]\s")
+_ARTICLE_MARGIN = re.compile(r"^([\u05d0-\u05ea\"'’״׳\- ]{0,40}?)\s*[.,](\d{1,3})(?=[\s(])")
+
+
+def _detect_marker(line: str) -> tuple[str, str, str, str] | None:
+    """Detect a chapter/article marker in a line.
+
+    Returns ``(kind, marker, title, remainder)`` where ``kind`` is ``"chapter"`` or
+    ``"article"``, ``marker`` is the section number, ``title`` is the heading to use, and
+    ``remainder`` is the body text after the marker. Returns ``None`` for ordinary lines.
+    """
+    if line.startswith("פרק "):
+        return ("chapter", "", line, "")
+
+    m = _ARTICLE_SEIF.match(line) or _ARTICLE_NUM_DOT.match(line)
+    if m:
+        return ("article", m.group(1), f"סעיף {m.group(1)}", line[m.end() :].strip())
+
+    m = _ARTICLE_MARGIN.match(line)
+    if m:
+        head, num = m.group(1).strip(), m.group(2)
+        return ("article", num, head or f"סעיף {num}", line[m.end() :].strip())
+
+    return None
+
+
 class IsraelMetadataParser(MetadataParser):
     """Parses Israel law metadata from compiled OData JSON."""
 
@@ -161,13 +191,10 @@ class IsraelTextParser(TextParser):
         current_block_type = "preamble"
 
         for p in lines:
-            is_chapter = p.startswith("פרק ") or p.startswith("פרק\t")
-            is_article = (
-                re.match(r"^סעיף\s+\d+", p) or re.match(r"^\d+\.", p) or re.match(r"^([א-ת]+)\.", p)
-            )
+            marker = _detect_marker(p)
 
-            if is_chapter or is_article:
-                if current_block_paragraphs:
+            if marker:
+                if current_block_paragraphs or current_block_type != "preamble":
                     blocks.append(
                         Block(
                             id=current_block_id,
@@ -188,18 +215,21 @@ class IsraelTextParser(TextParser):
                     )
                     current_block_paragraphs = []
 
-                if is_chapter:
+                kind, num, title, remainder = marker
+                if kind == "chapter":
                     current_block_id = f"chapter_{len(blocks)}"
-                    current_block_title = p
+                    current_block_title = title
                     current_block_type = "section"
                 else:
-                    current_block_id = f"article_{len(blocks)}"
-                    current_block_title = p[:50]
+                    current_block_id = f"article_{num}_{len(blocks)}"
+                    current_block_title = title[:50]
                     current_block_type = "article"
+                if remainder:
+                    current_block_paragraphs.append(remainder)
+            else:
+                current_block_paragraphs.append(p)
 
-            current_block_paragraphs.append(p)
-
-        if current_block_paragraphs:
+        if current_block_paragraphs or current_block_type != "preamble":
             blocks.append(
                 Block(
                     id=current_block_id,
