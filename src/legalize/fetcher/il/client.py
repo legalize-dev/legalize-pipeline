@@ -210,17 +210,16 @@ class IsraelClient(HttpClient):
 
         original_bill_id = original_binding.get("LawID") if original_binding else norm_id
 
-        # Get document list for the original bill
-        doc_bill_data = json.loads(
-            self._get_odata(f"KNS_DocumentBill?$filter=BillID eq {original_bill_id}")
-        )
-        docs = doc_bill_data.get("value", [])
+        # Resolve the original bill: its PublicationDate is the original version date and its
+        # expanded KNS_DocumentBill rows are the document candidates.
+        original_pub_date, original_docs = self._get_bill_with_docs(original_bill_id)
+        original_text = self._download_and_extract_text(original_docs)
 
-        original_text = ""
-        # Find PDF or DOC to download
-        original_text = self._download_and_extract_text(docs)
+        # Amendment dates: KNS_LawCorrection carries a real PublicationDate per amending bill.
+        # Build a {bill_id: date} map as a fallback when a bill's own date is missing.
+        correction_dates = self._build_correction_date_map(metadata_pkg.get("corrections", []))
 
-        # Get text for any amending laws as well (Case B snapshot timeline reconstruction)
+        # Get text + real effective date for each amending law (Case B timeline reconstruction).
         reforms_text = []
         for b in bindings:
             if b.get("BindingTypeDesc") == "מתקן":
@@ -228,18 +227,17 @@ class IsraelClient(HttpClient):
                 if not bill_id:
                     continue
                 try:
-                    b_docs = json.loads(
-                        self._get_odata(f"KNS_DocumentBill?$filter=BillID eq {bill_id}")
-                    ).get("value", [])
+                    bill_date, b_docs = self._get_bill_with_docs(bill_id)
                     txt = self._download_and_extract_text(b_docs)
+                    reform_date = bill_date or correction_dates.get(bill_id)
                     if txt:
-                        reforms_text.append({"bill_id": bill_id, "text": txt})
+                        reforms_text.append({"bill_id": bill_id, "text": txt, "date": reform_date})
                 except Exception as e:
                     logger.warning("Error fetching documents for amending bill %s: %s", bill_id, e)
 
-        # Extract publication date for versioning
+        # Original version date: prefer the law's PublicationDate, then the original bill's date.
         law = metadata_pkg.get("law", {})
-        pub_date_str = law.get("PublicationDate") or law.get("LastUpdatedDate")
+        pub_date_str = law.get("PublicationDate") or original_pub_date or law.get("LastUpdatedDate")
 
         package = {
             "original_text": original_text,
@@ -248,6 +246,35 @@ class IsraelClient(HttpClient):
         }
 
         return json.dumps(package, ensure_ascii=False).encode("utf-8")
+
+    def _get_bill_with_docs(self, bill_id: Any) -> tuple[str | None, list[dict]]:
+        """Fetch a bill's PublicationDate and its expanded document rows in one request."""
+        try:
+            data = json.loads(
+                self._get_odata(f"KNS_Bill?$filter=Id eq {bill_id}&$expand=KNS_DocumentBill")
+            )
+        except Exception as e:
+            logger.warning("Error fetching bill %s: %s", bill_id, e)
+            return None, []
+        rows = data.get("value", [])
+        if not rows:
+            return None, []
+        bill = rows[0]
+        return bill.get("PublicationDate"), bill.get("KNS_DocumentBill", []) or []
+
+    @staticmethod
+    def _build_correction_date_map(corrections: list[dict]) -> dict[Any, str]:
+        """Map amending bill id -> earliest correction date (PublicationDate fallback)."""
+        bill_dates: dict[Any, str] = {}
+        for c in corrections:
+            lc = c.get("KNS_LawCorrection") or {}
+            bid = lc.get("BillID")
+            if bid is None:
+                continue
+            d = lc.get("CommencementDate") or lc.get("PublicationDate") or lc.get("VoteDate")
+            if d and (bid not in bill_dates or d < bill_dates[bid]):
+                bill_dates[bid] = d
+        return bill_dates
 
     def _download_and_extract_text(self, docs: list[dict]) -> str:
         """Download document from the list and extract its text."""
@@ -298,4 +325,3 @@ class IsraelClient(HttpClient):
                 logger.warning("Error downloading/parsing document %s: %s", url, e)
 
         return ""
-

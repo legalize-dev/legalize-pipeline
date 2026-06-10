@@ -219,14 +219,19 @@ class IsraelTextParser(TextParser):
                 )
             )
 
-        # Append amending blocks from reforms_text
-        # Each amending block will be versioned at its respective date
-        for reform in reforms_text:
+        # Append amending blocks from reforms_text, dated to their real effective date.
+        # Sort chronologically so each law's commits are written oldest-first.
+        dated_reforms = sorted(
+            (
+                (parse_gregorian_date(reform.get("date")) or pub_date, reform)
+                for reform in reforms_text
+            ),
+            key=lambda item: item[0],
+        )
+
+        for ref_date, reform in dated_reforms:
             ref_text = reform.get("text", "")
             ref_bill_id = str(reform.get("bill_id", ""))
-
-            # Simple fallback reform date
-            ref_date = date(2000, 1, 1)
 
             ref_lines = [line.strip() for line in ref_text.splitlines() if line.strip()]
             if ref_lines:

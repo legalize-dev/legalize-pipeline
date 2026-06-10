@@ -5,7 +5,12 @@ from __future__ import annotations
 import json
 from datetime import date
 
-from legalize.fetcher.il.client import is_visual_hebrew, reverse_visual_line, is_reblaze_content
+from legalize.fetcher.il.client import (
+    IsraelClient,
+    is_visual_hebrew,
+    reverse_visual_line,
+    is_reblaze_content,
+)
 from legalize.fetcher.il.dates_il import hebrew_year_to_gregorian, parse_gregorian_date
 from legalize.fetcher.il.parser import IsraelMetadataParser, IsraelTextParser
 from legalize.models import NormStatus
@@ -150,3 +155,84 @@ class TestIsraelTextParser:
         # Check amendment block
         assert blocks[-1].block_type == "amendment"
         assert blocks[-1].id == "amendment_12345"
+
+    def test_reform_uses_real_date_and_chronological_order(self):
+        """Amendments must carry their real effective date, not a placeholder, and be ordered."""
+        text_dict = {
+            "original_text": "סעיף 1. פתיח\nטקסט מקורי",
+            "publication_date": "1982-08-22T00:00:00+03:00",
+            "reforms_text": [
+                {"bill_id": "200", "text": "תיקון מאוחר", "date": "2010-05-01T00:00:00+03:00"},
+                {"bill_id": "100", "text": "תיקון מוקדם", "date": "1990-03-15T00:00:00+02:00"},
+            ],
+        }
+        parser = IsraelTextParser()
+        blocks = parser.parse_text(json.dumps(text_dict).encode("utf-8"))
+
+        amendments = [b for b in blocks if b.block_type == "amendment"]
+        assert [b.id for b in amendments] == ["amendment_100", "amendment_200"]
+        assert amendments[0].versions[0].effective_date == date(1990, 3, 15)
+        assert amendments[1].versions[0].effective_date == date(2010, 5, 1)
+        # No placeholder dates leaked into the history.
+        assert all(v.effective_date != date(2000, 1, 1) for b in amendments for v in b.versions)
+
+    def test_reform_without_date_falls_back_to_publication_date(self):
+        text_dict = {
+            "original_text": "סעיף 1. פתיח\nטקסט",
+            "publication_date": "1982-08-22T00:00:00+03:00",
+            "reforms_text": [{"bill_id": "300", "text": "תיקון ללא תאריך"}],
+        }
+        parser = IsraelTextParser()
+        blocks = parser.parse_text(json.dumps(text_dict).encode("utf-8"))
+        amendment = [b for b in blocks if b.block_type == "amendment"][0]
+        assert amendment.versions[0].effective_date == date(1982, 8, 22)
+
+
+# ─────────────────────────────────────────────
+# Correction date map (client) tests
+# ─────────────────────────────────────────────
+
+
+class TestCorrectionDateMap:
+    def test_maps_bill_to_earliest_date(self):
+        corrections = [
+            {
+                "KNS_LawCorrection": {
+                    "BillID": 147159,
+                    "PublicationDate": "1984-01-04T00:00:00+02:00",
+                }
+            },
+            {
+                "KNS_LawCorrection": {
+                    "BillID": 152082,
+                    "PublicationDate": "1989-12-31T00:00:00+02:00",
+                }
+            },
+            {
+                "KNS_LawCorrection": {
+                    "BillID": 152082,
+                    "PublicationDate": "1989-12-07T00:00:00+02:00",
+                }
+            },
+        ]
+        result = IsraelClient._build_correction_date_map(corrections)
+        assert result[147159] == "1984-01-04T00:00:00+02:00"
+        # Earliest of the two 152082 dates wins.
+        assert result[152082] == "1989-12-07T00:00:00+02:00"
+
+    def test_prefers_commencement_then_publication(self):
+        corrections = [
+            {
+                "KNS_LawCorrection": {
+                    "BillID": 1,
+                    "CommencementDate": "2000-01-01T00:00:00+02:00",
+                    "PublicationDate": "1999-01-01T00:00:00+02:00",
+                }
+            }
+        ]
+        result = IsraelClient._build_correction_date_map(corrections)
+        assert result[1] == "2000-01-01T00:00:00+02:00"
+
+    def test_skips_missing_bill_id(self):
+        corrections = [{"KNS_LawCorrection": {"PublicationDate": "2000-01-01"}}, {}]
+        assert IsraelClient._build_correction_date_map(corrections) == {}
