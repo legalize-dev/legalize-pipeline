@@ -189,9 +189,9 @@ class IsraelClient(HttpClient):
 
         return json.dumps(package, ensure_ascii=False).encode("utf-8")
 
-    def get_text(self, norm_id: str) -> bytes:
+    def get_text(self, norm_id: str, meta_data: bytes | None = None) -> bytes:
         """Resolves documents of the law, downloads them, and returns a text package."""
-        metadata_bytes = self.get_metadata(norm_id)
+        metadata_bytes = meta_data if meta_data is not None else self.get_metadata(norm_id)
         metadata_pkg = json.loads(metadata_bytes.decode("utf-8"))
 
         bindings = metadata_pkg.get("bindings", [])

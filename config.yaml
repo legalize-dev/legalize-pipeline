@@ -58,10 +58,10 @@ countries:
   il:
     repo_path: "../countries/il"
     data_dir: "../countries/data-il"
-    max_workers: 1
+    max_workers: 2
     source:
       base_url: "https://knesset.gov.il/OdataV4/ParliamentInfo"
-      request_timeout: 30
+      request_timeout: 60
       max_retries: 5
       requests_per_second: 1.0
       user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
