@@ -129,7 +129,10 @@ class IsraelMetadataParser(MetadataParser):
         department = ", ".join(sorted(set(dept_list))) if dept_list else "Knesset"
 
         # Source URL
-        source_url = f"https://main.knesset.gov.il/Activity/Legislation/Laws/Pages/LawBill.aspx?lawitemid={norm_id}"
+        # The Knesset website (main.knesset.gov.il) redesigned in 2024/2025 and broke
+        # most LawBill.aspx deep links. Use the OData API endpoint as the canonical
+        # source — it returns structured JSON and does not rely on the fragile site.
+        source_url = f"https://knesset.gov.il/OdataV4/ParliamentInfo/KNS_IsraelLaw({norm_id})"
 
         # Subjects
         subjects = tuple(

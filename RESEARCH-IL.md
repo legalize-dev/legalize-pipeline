@@ -18,6 +18,12 @@
 - ID space: primary laws are `KNS_IsraelLaw.Id` (the 18 Basic Laws are `2000037`–`2000051`,
   `2002342`, `2007162`, `2073986`). Discovery for the milestone is restricted to Basic Laws via
   `KNS_IsraelLaw?$filter=IsBasicLaw eq true` (`is_basic_law_only: true` in `config.yaml`).
+- **Website deep links are broken.** The Knesset redesigned its site in 2024/2025 and all
+  `LawBill.aspx?lawitemid={id}` URLs now return an ASP.NET error page (HTTP 247 / "Object
+  reference not set to an instance of an object"). The stable canonical source URL is the
+  **OData entity endpoint**:
+  `https://knesset.gov.il/OdataV4/ParliamentInfo/KNS_IsraelLaw({id})`.
+  `IsraelMetadataParser` emits this endpoint as `source`.
 
 ## 0.2 Fixtures
 
@@ -146,6 +152,8 @@ per-article edit operations — only the amending act's own publication and text
   `max_workers: 2`.
 - Full primary legislation (`KNS_IsraelLaw`, ~thousands) and secondary legislation
   (`KNS_SecondaryLaw` / תקנות) are reachable with the same client but not yet bootstrapped.
+  Use `legalize fetch -c il --all --no-basic-laws-only` (or `--latest N` for a small
+  validation sample) to expand scope.
 - Daily path: generic daily via `discover_daily` on `LastUpdatedDate` (Gate 2). No custom
   `daily.py` required.
 

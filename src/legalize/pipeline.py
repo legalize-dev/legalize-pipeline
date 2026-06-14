@@ -18,6 +18,7 @@ import logging
 import subprocess
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import requests
 
@@ -311,12 +312,14 @@ def generic_fetch_all(
     force: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    **discover_kwargs: Any,
 ) -> list[str]:
     """Fetch all norms for any country using discovery + dispatch.
 
     Uses NormDiscovery.discover_all() then fetches each norm.
-    Supports --limit and --offset for splitting across multiple VMs.
+    Supports --limit and --offset for splitting across VMs.
     Uses max_workers from config for parallel fetching.
+    Extra kwargs are forwarded to the country's discover_all().
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -326,9 +329,15 @@ def generic_fetch_all(
     client_cls = get_client_class(country)
     discovery_cls = get_discovery_class(country)
 
-    # Discover all norm IDs — cache to disk so restarts skip rediscovery
+    # Discover all norm IDs — cache to disk so restarts skip rediscovery.
+    # Use a keyed cache when discover_kwargs are present so param changes
+    # don't reuse stale cached IDs.
     source_with_cache = {**cc.source, "cache_dir": cc.data_dir}
-    discovery_cache = Path(cc.data_dir) / "discovery_ids.txt"
+    cache_suffix = ""
+    if discover_kwargs:
+        # Simple hash of sorted kwargs for cache keying
+        cache_suffix = "_" + "_".join(f"{k}_{v}" for k, v in sorted(discover_kwargs.items()))
+    discovery_cache = Path(cc.data_dir) / f"discovery_ids{cache_suffix}.txt"
 
     if discovery_cache.exists() and not force:
         norm_ids = [
@@ -338,7 +347,7 @@ def generic_fetch_all(
     else:
         with client_cls.create(cc) as client:
             discovery = discovery_cls.create(source_with_cache)
-            norm_ids = list(discovery.discover_all(client))
+            norm_ids = list(discovery.discover_all(client, **discover_kwargs))
         discovery_cache.parent.mkdir(parents=True, exist_ok=True)
         discovery_cache.write_text("\n".join(norm_ids) + "\n")
         console.print(f"[dim]Saved {len(norm_ids)} IDs to discovery cache[/dim]")

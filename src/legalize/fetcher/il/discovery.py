@@ -27,14 +27,31 @@ class IsraelDiscovery(NormDiscovery):
     def discover_all(self, client: LegislativeClient, **kwargs: Any) -> Iterator[str]:
         """Page through all KNS_IsraelLaw records and yield norm IDs.
 
-        Can filter to Basic Laws only if configured.
+        Supports:
+        - is_basic_law_only (constructor or kwarg override)
+        - latest=N: fetch N most recently updated laws
         """
         # Ensure we have the IsraelClient
         il_client = client
 
+        # Kwarg overrides take precedence over constructor config
+        basic_only = kwargs.get("is_basic_law_only", self.is_basic_law_only)
+        latest = kwargs.get("latest")
+
+        # Build OData query
+        query_parts: list[str] = []
+        if basic_only:
+            query_parts.append("$filter=IsBasicLaw eq true")
+        if latest is not None:
+            # Order by last update descending and limit at the API level
+            if query_parts:
+                query_parts[0] += "&$orderby=LastUpdatedDate desc&$top={}".format(latest)
+            else:
+                query_parts.append("$orderby=LastUpdatedDate desc&$top={}".format(latest))
+
         path = "KNS_IsraelLaw"
-        if self.is_basic_law_only:
-            path += "?$filter=IsBasicLaw eq true"
+        if query_parts:
+            path += "?" + "&".join(query_parts)
 
         logger.info("Starting Knesset discovery with path: %s", path)
 

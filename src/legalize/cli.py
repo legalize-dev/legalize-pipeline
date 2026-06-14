@@ -82,6 +82,17 @@ def cli(ctx: click.Context, config_path: str, verbose: bool) -> None:
 @click.option(
     "--offset", default=0, type=int, help="Skip first N norms (for splitting across VMs)."
 )
+@click.option(
+    "--latest",
+    default=None,
+    type=int,
+    help="Fetch the N most recently updated norms (country-specific ordering).",
+)
+@click.option(
+    "--basic-laws-only/--no-basic-laws-only",
+    default=None,
+    help="Override is_basic_law_only config for Israel (IL only).",
+)
 @click.pass_context
 def fetch(
     ctx: click.Context,
@@ -94,6 +105,8 @@ def fetch(
     legi_dir: str | None,
     limit: int | None,
     offset: int,
+    latest: int | None,
+    basic_laws_only: bool | None,
 ) -> None:
     """Download laws to data/ (does not touch git).
 
@@ -102,6 +115,8 @@ def fetch(
         legalize fetch -c ar --all --limit 10000            # First 10K only
         legalize fetch -c ar --all --offset 10000           # Skip first 10K
         legalize fetch -c ar --all --offset 10000 --limit 10000  # Norms 10K-20K
+        legalize fetch -c il --all --latest 10                # Latest 10 IL laws
+        legalize fetch -c il --all --latest 10 --no-basic-laws-only
     """
     from legalize.pipeline import generic_fetch_all, generic_fetch_one
 
@@ -118,7 +133,14 @@ def fetch(
 
         fetch_catalog(config, force=force)
     elif fetch_all_flag:
-        generic_fetch_all(config, country, force=force, limit=limit, offset=offset)
+        discover_kwargs: dict[str, Any] = {}
+        if latest is not None:
+            discover_kwargs["latest"] = latest
+        if basic_laws_only is not None:
+            discover_kwargs["is_basic_law_only"] = basic_laws_only
+        generic_fetch_all(
+            config, country, force=force, limit=limit, offset=offset, **discover_kwargs
+        )
     elif norm_ids:
         for norm_id in norm_ids:
             generic_fetch_one(config, country, norm_id, force=force)
