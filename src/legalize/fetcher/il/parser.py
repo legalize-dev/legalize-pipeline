@@ -145,12 +145,14 @@ class IsraelMetadataParser(MetadataParser):
             )
         )
 
-        # Extra metadata
-        extra = [
-            ("knesset_num", str(law.get("KnessetNum") or "")),
-            ("is_budget_law", str(law.get("IsBudgetLaw") or "False")),
-            ("is_favorite_law", str(law.get("IsFavoriteLaw") or "False")),
-        ]
+        # Extra metadata. Only emit flags that carry meaning — a frontmatter full of
+        # "False" strings is noise, and IsFavoriteLaw is a Knesset-internal UI flag.
+        extra: list[tuple[str, str]] = []
+        knesset_num = law.get("KnessetNum")
+        if knesset_num:
+            extra.append(("knesset_num", str(knesset_num)))
+        if law.get("IsBudgetLaw"):
+            extra.append(("is_budget_law", "true"))
 
         return NormMetadata(
             title=title,

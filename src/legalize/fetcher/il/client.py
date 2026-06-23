@@ -16,15 +16,15 @@ from legalize.fetcher.base import HttpClient
 
 logger = logging.getLogger(__name__)
 
-# Zero-width / BOM / bidirectional control characters that pollute Hebrew PDF text.
-_ZERO_WIDTH = (
-    "\ufeff"  # zero-width no-break space / BOM
-    "\u200b"  # zero-width space
-    "\u200c\u200d"  # ZWNJ / ZWJ
-    "\u200e\u200f"  # LRM / RLM
-    "\u202a\u202b\u202c\u202d\u202e"  # bidi embedding/override
-)
-_ZERO_WIDTH_RE = re.compile(f"[{_ZERO_WIDTH}]")
+# Honest bot identity. The Knesset OData API and fs.knesset.gov.il accept it; if Reblaze
+# ever hard-blocks it, override `user_agent` in config.yaml rather than spoofing by default.
+_DEFAULT_USER_AGENT = "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
+
+# Some Knesset Reshumot PDFs encode word boundaries with zero-width characters
+# (U+FEFF / U+200B) instead of regular spaces; these must become spaces, not be deleted.
+_WORD_SEP_RE = re.compile(r"[\ufeff\u200b]+")
+# Bidirectional control marks carry no textual content and are removed outright.
+_REMOVE_CONTROL_RE = re.compile(r"[\u200c\u200d\u200e\u200f\u202a-\u202e]")
 _SOFT_HYPHEN_RE = re.compile(r"\s*\u00ad\s*")
 
 
@@ -32,13 +32,15 @@ def clean_extracted_text(text: str) -> str:
     """Normalize text extracted from Hebrew PDF/DOC documents.
 
     Replaces the soft hyphen (used as a maqaf/hyphen across line breaks) with a real
-    hyphen, drops zero-width/bidi control characters and other C0/C1 control codes
-    (keeping newlines and tabs), and collapses runs of spaces. UTF-8 throughout.
+    hyphen, converts zero-width word separators (U+FEFF/U+200B) to spaces, drops bidi
+    control marks and other C0/C1 control codes (keeping newlines and tabs), and
+    collapses runs of spaces. UTF-8 throughout.
     """
     if not text:
         return text
     text = _SOFT_HYPHEN_RE.sub("-", text)
-    text = _ZERO_WIDTH_RE.sub("", text)
+    text = _REMOVE_CONTROL_RE.sub("", text)
+    text = _WORD_SEP_RE.sub(" ", text)
     text = "".join(
         c for c in text if c in ("\n", "\t") or unicodedata.category(c) not in ("Cc", "Cf")
     )
@@ -138,7 +140,7 @@ class IsraelClient(HttpClient):
         """Create from CountryConfig."""
         source = country_config.source or {}
         base_url = source.get("base_url", "https://knesset.gov.il/OdataV4/ParliamentInfo/")
-        user_agent = source.get("user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+        user_agent = source.get("user_agent", _DEFAULT_USER_AGENT)
         request_timeout = source.get("request_timeout", 30)
         max_retries = source.get("max_retries", 5)
         requests_per_second = source.get("requests_per_second", 1.0)
@@ -154,7 +156,7 @@ class IsraelClient(HttpClient):
         self,
         *,
         base_url: str = "https://knesset.gov.il/OdataV4/ParliamentInfo/",
-        user_agent: str = "Mozilla/5.0",
+        user_agent: str = _DEFAULT_USER_AGENT,
         request_timeout: int = 30,
         max_retries: int = 5,
         requests_per_second: float = 1.0,

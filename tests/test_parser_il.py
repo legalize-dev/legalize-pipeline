@@ -119,7 +119,23 @@ class TestIsraelMetadataParser:
         assert meta.status == NormStatus.IN_FORCE
         assert meta.department == "התקשורת"
         assert "תקשורת" in meta.subjects
-        assert dict(meta.extra).get("knesset_num") == "10"
+        extra = dict(meta.extra)
+        assert extra.get("knesset_num") == "10"
+        # Internal UI flag is dropped; non-budget law omits the noisy "False".
+        assert "is_favorite_law" not in extra
+        assert "is_budget_law" not in extra
+
+    def test_budget_law_flag_emitted_only_when_true(self):
+        meta_dict = {
+            "law": {
+                "Id": 1,
+                "Name": "חוק התקציב",
+                "IsBudgetLaw": True,
+                "PublicationDate": "2020-01-01",
+            }
+        }
+        meta = IsraelMetadataParser().parse(json.dumps(meta_dict).encode("utf-8"), "1")
+        assert dict(meta.extra).get("is_budget_law") == "true"
 
     def test_basic_law_rank(self):
         meta_dict = {
@@ -259,9 +275,15 @@ class TestCleanExtractedText:
         assert clean_extracted_text("על\u00adפי") == "על-פי"
         assert clean_extracted_text("צבא\u00adהגנה\u00adלישראל") == "צבא-הגנה-לישראל"
 
-    def test_strips_zero_width_and_bom(self):
-        dirty = "\ufeffמבקר\u200bהמדינה\u200f"
-        assert clean_extracted_text(dirty) == "מבקרהמדינה"
+    def test_zero_width_separators_become_spaces(self):
+        # Some Reshumot PDFs use U+FEFF / U+200B as word separators, not regular spaces.
+        assert clean_extracted_text("ספר\ufeffהחוקים") == "ספר החוקים"
+        assert clean_extracted_text("מבקר\u200bהמדינה") == "מבקר המדינה"
+
+    def test_strips_bidi_marks_and_bom(self):
+        # Leading BOM and trailing RLM are removed; the word itself is preserved.
+        assert clean_extracted_text("\ufeffמבקר\u200f") == "מבקר"
+        assert clean_extracted_text("א\u200eב") == "אב"
 
     def test_collapses_spaces_and_trims_lines(self):
         assert clean_extracted_text("מבקר   המדינה  \n  שורה   שנייה") == "מבקר המדינה\nשורה שנייה"

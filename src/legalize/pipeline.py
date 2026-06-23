@@ -445,7 +445,12 @@ def generic_bootstrap(
     console.print(f"  Repo output: {cc.repo_path}\n")
 
     fetched = generic_fetch_all(config, country, force=False, limit=limit)
-    if not fetched:
+    # Proceed to commit as long as there is data on disk: a run where every discovered
+    # id was skipped or transiently failed (so `fetched` is empty) must still commit the
+    # laws already in data/json/, otherwise the fetch→commit handoff silently no-ops.
+    json_dir = Path(cc.data_dir) / "json"
+    has_data = json_dir.exists() and any(json_dir.glob("*.json"))
+    if not fetched and not has_data:
         console.print("[yellow]No norms found.[/yellow]")
         return 0
 
