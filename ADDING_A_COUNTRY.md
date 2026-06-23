@@ -1299,8 +1299,38 @@ git -C ../countries/xx remote add origin git@github.com:legalize-dev/legalize-{c
 git -C ../countries/xx push -u origin main
 ```
 
-Add a README in the country's language and an MIT LICENSE. Copy the structure
-from an existing country repo (`legalize-lv`, `legalize-ad`).
+The repo's **README and `.github/FUNDING.yml` are generated automatically** by
+the pipeline (bootstrap runs `write_repo_meta` after the commit history is
+built), so you do not add them by hand. They are rendered in the country's own language from the bundled
+metadata in `src/legalize/readme_data.json` (single source of truth) — see
+`legalize.country_meta` and `legalize.committer.readme`. This keeps every country
+repo identical in structure and style.
+
+To onboard a new country's presentation so it comes out identical to the rest:
+
+1. Add a `countries` entry in `src/legalize/readme_data.json` (name, language,
+   source_name, source_urls, data_license, scope, norm_types, attribution,
+   notes — free text in the country's language). **Verify the data reuse license
+   of the official source and cite it**; default to "public domain (official
+   government publications)" only when the source has no explicit open license.
+2. If the country's language is not yet in the `labels` section of
+   `readme_data.json`, add it (translate the section labels, plus `desc_tagline`
+   and `desc_clause`, which are used for the GitHub "About" line).
+3. After the repo exists, set its GitHub "About" (description + homepage) to
+   match every other repo — this is GitHub metadata, not a file, so a script
+   sets it via the API:
+   ```bash
+   python scripts/set_repo_about.py {code}
+   ```
+4. Backfill only — to push README + FUNDING.yml to a repo that already exists,
+   without a local clone (uses the GitHub API):
+   ```bash
+   python scripts/push_repo_meta.py {code}
+   ```
+
+Still add an MIT `LICENSE` by hand (not generated): it covers the repository
+structure/metadata. The legislative *content* license is recorded in the README
+metadata (step 1), since it varies per source.
 
 ### 9.2 Run the full bootstrap
 

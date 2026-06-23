@@ -27,6 +27,7 @@ from legalize.committer.git_ops import FastImporter, GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
 from legalize.models import (
+    CommitInfo,
     CommitType,
     NormMetadata,
     ParsedNorm,
@@ -450,6 +451,8 @@ def generic_bootstrap(
     total_commits = commit_all_fast(config, country, dry_run=dry_run)
 
     write_country_meta(config, country)
+    if not dry_run:
+        write_repo_meta(config, country)
 
     console.print(f"\n[bold green]✓ Bootstrap {country.upper()} completed[/bold green]")
     console.print(f"  {len(fetched)} norms fetched, {total_commits} commits created")
@@ -871,3 +874,44 @@ def write_country_meta(config: Config, country: str) -> None:
         yaml.dump(meta, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
     console.print(f"  [dim]Wrote {meta_path}[/dim]")
+
+
+def write_repo_meta(config: Config, country: str) -> None:
+    """Write repo-level meta files (.github/FUNDING.yml, ...) into the country repo.
+
+    These are project metadata, not legislative records. They are committed as a
+    single ``[fix-pipeline]`` meta commit with no ``Source-Date`` trailer, so the
+    reform-history sync ignores them (see ``state/store.py``). The commit is only
+    created when a file actually changed, so re-running is idempotent.
+    """
+    from legalize.committer.repo_meta import repo_meta_files
+
+    cc = config.get_country(country)
+    repo_dir = Path(cc.repo_path)
+    if not repo_dir.exists():
+        return
+
+    repo = GitRepo(cc.repo_path, config.git.committer_name, config.git.committer_email)
+    repo.init()
+
+    changed = [
+        rel_path
+        for rel_path, content in repo_meta_files(country).items()
+        if repo.write_and_add(rel_path, content)
+    ]
+    if not changed:
+        return
+
+    info = CommitInfo(
+        commit_type=CommitType.FIX_PIPELINE,
+        subject="[fix-pipeline] Update repository metadata",
+        body="Refresh project meta files: " + ", ".join(changed) + ".",
+        trailers={},
+        author_name=config.git.committer_name,
+        author_email=config.git.committer_email,
+        author_date=date.today(),
+        file_path=changed[0],
+        content="",
+    )
+    repo.commit(info)
+    console.print(f"  [dim]Committed repo meta: {', '.join(changed)}[/dim]")
