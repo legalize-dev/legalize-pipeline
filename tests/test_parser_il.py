@@ -8,6 +8,7 @@ from pathlib import Path
 
 from legalize.fetcher.il.client import (
     IsraelClient,
+    _document_priority,
     clean_extracted_text,
     is_visual_hebrew,
     reverse_visual_line,
@@ -267,6 +268,60 @@ class TestCleanExtractedText:
 
     def test_empty(self):
         assert clean_extracted_text("") == ""
+
+
+# ─────────────────────────────────────────────
+# Document selection: enacted text vs draft bill
+# ─────────────────────────────────────────────
+
+
+class TestDocumentSelection:
+    def test_draft_bill_is_excluded(self):
+        # Bills carry the explanatory memorandum (דברי הסבר) and must never be used.
+        assert (
+            _document_priority(
+                {"GroupTypeDesc": "הצעת חוק לקריאה הראשונה", "ApplicationDesc": "PDF"}
+            )
+            is None
+        )
+
+    def test_image_and_ppt_formats_excluded(self):
+        assert (
+            _document_priority({"GroupTypeDesc": "חוק - פרסום ברשומות", "ApplicationDesc": "PIC"})
+            is None
+        )
+        assert (
+            _document_priority({"GroupTypeDesc": "חוק - פרסום ברשומות", "ApplicationDesc": "PPT"})
+            is None
+        )
+
+    def test_enacted_reshumot_preferred_over_other_groups(self):
+        reshumot_pdf = _document_priority(
+            {"GroupTypeDesc": "חוק - פרסום ברשומות", "ApplicationDesc": "PDF"}
+        )
+        correction_pdf = _document_priority(
+            {"GroupTypeDesc": "חוק - תיקון טעות", "ApplicationDesc": "PDF"}
+        )
+        other_pdf = _document_priority({"GroupTypeDesc": "משהו אחר", "ApplicationDesc": "PDF"})
+        assert reshumot_pdf is not None and correction_pdf is not None and other_pdf is not None
+        # Reshumot + correction are gazette publications (group rank 0); other is rank 1.
+        assert reshumot_pdf[0] == 0
+        assert correction_pdf[0] == 0
+        assert other_pdf[0] == 1
+
+    def test_pdf_preferred_over_doc_within_group(self):
+        pdf = _document_priority({"GroupTypeDesc": "חוק - פרסום ברשומות", "ApplicationDesc": "PDF"})
+        doc = _document_priority({"GroupTypeDesc": "חוק - פרסום ברשומות", "ApplicationDesc": "DOC"})
+        assert pdf < doc
+
+    def test_real_bill_fixture_has_both_enacted_and_draft_docs(self):
+        bill = _load_fixture("bill_with_docs.json")["value"][0]
+        docs = bill.get("KNS_DocumentBill", [])
+        usable = [d for d in docs if _document_priority(d) is not None]
+        excluded = [d for d in docs if _document_priority(d) is None]
+        # Some docs are selectable (gazette text) and some are excluded (drafts/images).
+        assert usable and excluded
+        assert all("הצעת חוק" not in (d.get("GroupTypeDesc") or "") for d in usable)
 
 
 # ─────────────────────────────────────────────

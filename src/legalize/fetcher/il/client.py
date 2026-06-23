@@ -46,6 +46,30 @@ def clean_extracted_text(text: str) -> str:
     return "\n".join(line.strip() for line in text.splitlines())
 
 
+# Document selection: a law must be rendered from its ENACTED text (published in Reshumot),
+# never from the draft bill, which carries sponsors (יוזמים) and an explanatory memorandum
+# (דברי הסבר). KNS_DocumentBill rows are tagged by GroupTypeDesc.
+_BILL_GROUP_MARKER = "הצעת חוק"  # draft bill — always excluded
+_ENACTED_GROUP_MARKERS = ("פרסום ברשומות", "תיקון טעות")  # published in the official gazette
+_APPLICATION_RANK = {"PDF": 0, "DOCX": 1, "DOC": 2}
+
+
+def _document_priority(doc: dict) -> tuple[int, int] | None:
+    """Rank a KNS_DocumentBill row for enacted-text selection (lower = better).
+
+    Returns ``None`` for documents that must not be used: draft bills (which contain the
+    explanatory memorandum) and non-text formats (PIC/TIF images, PPT).
+    """
+    group = doc.get("GroupTypeDesc") or ""
+    if _BILL_GROUP_MARKER in group:
+        return None
+    app_rank = _APPLICATION_RANK.get(doc.get("ApplicationDesc"))
+    if app_rank is None:
+        return None
+    group_rank = 0 if any(m in group for m in _ENACTED_GROUP_MARKERS) else 1
+    return (group_rank, app_rank)
+
+
 # Common Hebrew words reversed for visual Hebrew detection
 REVERSED_WORDS = {"קוח", "ףיעס", "קרפ", "תסנכ", "תנידמ", "לארשי"}
 LOGICAL_WORDS = {"חוק", "סעיף", "פרק", "כנסת", "מדינה", "ישראל"}
@@ -308,12 +332,14 @@ class IsraelClient(HttpClient):
         return bill_dates
 
     def _download_and_extract_text(self, docs: list[dict]) -> str:
-        """Download document from the list and extract its text."""
-        # Order of preference: PDF, then others
-        pdf_docs = [d for d in docs if d.get("ApplicationDesc") == "PDF"]
-        doc_docs = [d for d in docs if d.get("ApplicationDesc") in ("DOC", "DOCX")]
+        """Download the enacted law document from the list and extract its text.
 
-        candidates = pdf_docs + doc_docs
+        Selects the Reshumot publication (enacted text) over other non-bill documents and
+        skips draft bills entirely, so the explanatory memorandum is never rendered as law.
+        """
+        ranked = [(p, d) for d in docs if (p := _document_priority(d)) is not None]
+        ranked.sort(key=lambda item: item[0])
+        candidates = [d for _, d in ranked]
         for doc in candidates:
             file_path = doc.get("FilePath")
             if not file_path:
