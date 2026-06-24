@@ -1,0 +1,1968 @@
+{
+  "labels": {
+    "ca": {
+      "tagline": "{name} — legislació en Markdown, amb control de versions com a repositori git.",
+      "intro": "Cada llei és un fitxer; cada reforma és un commit datat amb la data de publicació oficial real. El `git log` de qualsevol llei mostra el seu historial complet: quan es va promulgar, quins articles van canviar i per quina norma.",
+      "whats_inside": "Què conté",
+      "source": "Font de les dades",
+      "attribution": "Atribució",
+      "other_countries": "Altres països",
+      "other_countries_body": "Aquest repositori forma part de **Legalize**, que manté la legislació de múltiples països com a repositoris git. Consulteu https://legalize.dev per al catàleg complet.",
+      "support": "Suport",
+      "support_body": "Legalize és gratuït i obert. Si aquesta feina us és útil, podeu ajudar a sostenir-ne l'allotjament i el desenvolupament: [Doneu suport a aquest projecte](https://buymeacoffee.com/legalizedev).",
+      "license": "Llicència",
+      "license_code": "**Codi del pipeline**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Dades**: {data_license}",
+      "desc_clause": "Cada llei és un fitxer, cada reforma un commit.",
+      "desc_tagline": "{name} — legislació en Markdown, versionada amb Git."
+    },
+    "cs": {
+      "tagline": "{name} — legislativa v Markdownu, verzovaná jako git repozitář.",
+      "intro": "Každý zákon je soubor; každá novela je commit datovaný ke skutečnému dni úředního vyhlášení. `git log` libovolného zákona ukazuje jeho úplnou historii — kdy byl přijat, které články se změnily a kterou normou.",
+      "whats_inside": "Co obsahuje",
+      "source": "Zdroj dat",
+      "attribution": "Uvedení zdroje",
+      "other_countries": "Další země",
+      "other_countries_body": "Tento repozitář je součástí projektu **Legalize**, který spravuje legislativu více zemí jako git repozitáře. Úplný katalog najdete na https://legalize.dev.",
+      "support": "Podpora",
+      "support_body": "Legalize je zdarma a otevřený. Pokud je pro vás tato práce užitečná, můžete pomoci financovat jeho hosting a vývoj: [Podpořit tento projekt](https://buymeacoffee.com/legalizedev).",
+      "license": "Licence",
+      "license_code": "**Kód pipeline**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Data**: {data_license}",
+      "desc_clause": "Každý zákon je soubor, každá novela je commit.",
+      "desc_tagline": "{name} — legislativa v Markdownu, verzovaná v Gitu."
+    },
+    "de": {
+      "tagline": "{name} — Gesetzgebung in Markdown, versioniert als Git-Repository.",
+      "intro": "Jedes Gesetz ist eine Datei; jede Reform ist ein Commit, datiert auf das tatsächliche amtliche Veröffentlichungsdatum. Das `git log` eines jeden Gesetzes zeigt seine vollständige Historie — wann es erlassen wurde, welche Artikel sich geändert haben und durch welche Norm.",
+      "whats_inside": "Inhalt",
+      "source": "Datenquelle",
+      "attribution": "Quellenangabe",
+      "other_countries": "Weitere Länder",
+      "other_countries_body": "Dieses Repository ist Teil von **Legalize**, das die Gesetzgebung mehrerer Länder als Git-Repositories pflegt. Den vollständigen Katalog finden Sie unter https://legalize.dev.",
+      "support": "Unterstützung",
+      "support_body": "Legalize ist kostenlos und offen. Wenn diese Arbeit für Sie nützlich ist, können Sie dazu beitragen, ihr Hosting und ihre Weiterentwicklung zu sichern: [Dieses Projekt unterstützen](https://buymeacoffee.com/legalizedev).",
+      "license": "Lizenz",
+      "license_code": "**Pipeline-Code**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Daten**: {data_license}",
+      "desc_clause": "Jedes Gesetz ist eine Datei, jede Reform ein Commit.",
+      "desc_tagline": "{name} — Gesetzgebung in Markdown, versioniert mit Git."
+    },
+    "el": {
+      "tagline": "{name} — νομοθεσία σε Markdown, με έλεγχο εκδόσεων ως αποθετήριο git.",
+      "intro": "Κάθε νόμος είναι ένα αρχείο· κάθε μεταρρύθμιση είναι ένα commit χρονολογημένο στην πραγματική ημερομηνία επίσημης δημοσίευσης. Το `git log` οποιουδήποτε νόμου εμφανίζει την πλήρη ιστορία του — πότε θεσπίστηκε, ποια άρθρα τροποποιήθηκαν και με ποια νομοθετική πράξη.",
+      "whats_inside": "Τι περιλαμβάνεται",
+      "source": "Πηγή δεδομένων",
+      "attribution": "Αναφορά προέλευσης",
+      "other_countries": "Άλλες χώρες",
+      "other_countries_body": "Αυτό το αποθετήριο αποτελεί μέρος του **Legalize**, το οποίο διατηρεί τη νομοθεσία πολλών χωρών ως αποθετήρια git. Δείτε το https://legalize.dev για τον πλήρη κατάλογο.",
+      "support": "Υποστήριξη",
+      "support_body": "Το Legalize είναι δωρεάν και ανοικτό. Αν αυτή η δουλειά σας φαίνεται χρήσιμη, μπορείτε να βοηθήσετε στη βιωσιμότητα της φιλοξενίας και της ανάπτυξής της: [Υποστηρίξτε αυτό το έργο](https://buymeacoffee.com/legalizedev).",
+      "license": "Άδεια χρήσης",
+      "license_code": "**Κώδικας pipeline**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Δεδομένα**: {data_license}",
+      "desc_clause": "Κάθε νόμος ένα αρχείο, κάθε μεταρρύθμιση ένα commit.",
+      "desc_tagline": "{name} — νομοθεσία σε Markdown, με έλεγχο εκδόσεων μέσω Git."
+    },
+    "en": {
+      "tagline": "{name} legislation in Markdown, version-controlled as a git repository.",
+      "intro": "Each law is a file; each reform is a commit dated to the real official publication date. The `git log` of any law shows its full history — when it was enacted, which articles changed and by which norm.",
+      "whats_inside": "What's inside",
+      "source": "Data source",
+      "attribution": "Attribution",
+      "other_countries": "Other countries",
+      "other_countries_body": "This repository is part of **Legalize**, which maintains the legislation of multiple countries as git repos. See https://legalize.dev for the full catalog.",
+      "support": "Support",
+      "support_body": "Legalize is free and open. If this work is useful to you, you can help sustain its hosting and development: [Support this project](https://buymeacoffee.com/legalizedev).",
+      "license": "License",
+      "license_code": "**Pipeline code**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Data**: {data_license}",
+      "desc_clause": "Each law is a file, each reform a commit.",
+      "desc_tagline": "{name} legislation in Markdown, version-controlled with Git."
+    },
+    "es": {
+      "tagline": "Legislación de {name} en formato Markdown, versionada como repositorio git.",
+      "intro": "Cada ley es un archivo; cada reforma es un commit con la fecha real de publicación oficial. El `git log` de cada ley te muestra su historia completa — cuándo se sancionó, qué artículos se modificaron y por qué norma.",
+      "whats_inside": "Qué contiene",
+      "source": "Fuente de los datos",
+      "attribution": "Atribución",
+      "other_countries": "Otros países",
+      "other_countries_body": "Este repositorio es parte del proyecto **Legalize**, que mantiene legislación de múltiples países como repos git. Ver https://legalize.dev para el catálogo completo.",
+      "support": "Apoyar",
+      "support_body": "Legalize es libre y abierto. Si este trabajo te resulta útil, puedes ayudar a sostener su alojamiento y desarrollo: [Apoya este proyecto](https://buymeacoffee.com/legalizedev).",
+      "license": "Licencia",
+      "license_code": "**Código del pipeline**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Datos**: {data_license}",
+      "desc_clause": "Cada ley es un archivo, cada reforma un commit.",
+      "desc_tagline": "Legislación de {name} en Markdown, versionada como git."
+    },
+    "et": {
+      "tagline": "{name} — õigusaktid Markdown-vormingus, versioonihallatuna git-repositooriumina.",
+      "intro": "Iga seadus on fail; iga reform on commit, mille kuupäev vastab tegelikule ametlikule avaldamiskuupäevale. Mis tahes seaduse `git log` näitab selle täielikku ajalugu — millal see jõustus, millised artiklid muutusid ja millise normiga.",
+      "whats_inside": "Mis on sees",
+      "source": "Andmeallikas",
+      "attribution": "Viitamine",
+      "other_countries": "Teised riigid",
+      "other_countries_body": "See repositoorium on osa projektist **Legalize**, mis haldab mitme riigi õigusakte git-repositooriumitena. Täielik kataloog on aadressil https://legalize.dev.",
+      "support": "Toetamine",
+      "support_body": "Legalize on tasuta ja avatud. Kui sellest tööst on sulle kasu, saad aidata katta selle majutus- ja arenduskulusid: [Toeta seda projekti](https://buymeacoffee.com/legalizedev).",
+      "license": "Litsents",
+      "license_code": "**Pipeline'i kood**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Andmed**: {data_license}",
+      "desc_clause": "Iga seadus on fail, iga reform on commit.",
+      "desc_tagline": "{name} — õigusaktid Markdownis, versioonihaldus Gitiga."
+    },
+    "fi": {
+      "tagline": "{name} — lainsäädäntö Markdown-muodossa, versionhallittuna git-repositoriona.",
+      "intro": "Jokainen laki on tiedosto; jokainen uudistus on commit, joka on päivätty todelliseen viralliseen julkaisupäivään. Minkä tahansa lain `git log` näyttää sen koko historian — milloin se säädettiin, mitkä pykälät muuttuivat ja minkä normin nojalla.",
+      "whats_inside": "Sisältö",
+      "source": "Tietolähde",
+      "attribution": "Lähdeviittaus",
+      "other_countries": "Muut maat",
+      "other_countries_body": "Tämä repositorio on osa **Legalize**-hanketta, joka ylläpitää useiden maiden lainsäädäntöä git-repositorioina. Koko luettelo löytyy osoitteesta https://legalize.dev.",
+      "support": "Tue hanketta",
+      "support_body": "Legalize on ilmainen ja avoin. Jos tästä työstä on sinulle hyötyä, voit auttaa kattamaan sen ylläpidon ja kehityksen kustannuksia: [Tue tätä hanketta](https://buymeacoffee.com/legalizedev).",
+      "license": "Lisenssi",
+      "license_code": "**Pipeline-koodi**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Tiedot**: {data_license}",
+      "desc_clause": "Jokainen laki on tiedosto, jokainen uudistus on commit.",
+      "desc_tagline": "{name} — lainsäädäntö Markdownina, versionhallinta Gitillä."
+    },
+    "fr": {
+      "tagline": "{name} — législation en Markdown, versionnée sous forme de dépôt git.",
+      "intro": "Chaque loi est un fichier ; chaque réforme est un commit daté de la véritable date de publication officielle. Le `git log` de toute loi présente son historique complet — quand elle a été promulguée, quels articles ont été modifiés et par quelle norme.",
+      "whats_inside": "Contenu",
+      "source": "Source des données",
+      "attribution": "Attribution",
+      "other_countries": "Autres pays",
+      "other_countries_body": "Ce dépôt fait partie de **Legalize**, qui maintient la législation de plusieurs pays sous forme de dépôts git. Consultez https://legalize.dev pour le catalogue complet.",
+      "support": "Soutien",
+      "support_body": "Legalize est libre et ouvert. Si ce travail vous est utile, vous pouvez contribuer à en financer l'hébergement et le développement : [Soutenir ce projet](https://buymeacoffee.com/legalizedev).",
+      "license": "Licence",
+      "license_code": "**Code du pipeline** : MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Données** : {data_license}",
+      "desc_clause": "Chaque loi est un fichier, chaque réforme un commit.",
+      "desc_tagline": "{name} — législation en Markdown, versionnée avec Git."
+    },
+    "it": {
+      "tagline": "{name} — legislazione in Markdown, sotto controllo di versione come repository git.",
+      "intro": "Ogni legge è un file; ogni riforma è un commit datato alla data ufficiale di pubblicazione reale. Il `git log` di qualsiasi legge ne mostra la storia completa: quando è stata promulgata, quali articoli sono cambiati e per effetto di quale norma.",
+      "whats_inside": "Cosa contiene",
+      "source": "Fonte dei dati",
+      "attribution": "Attribuzione",
+      "other_countries": "Altri paesi",
+      "other_countries_body": "Questo repository fa parte di **Legalize**, che mantiene la legislazione di più paesi come repository git. Consulta https://legalize.dev per il catalogo completo.",
+      "support": "Sostieni il progetto",
+      "support_body": "Legalize è gratuito e aperto. Se questo lavoro ti è utile, puoi contribuire a sostenerne l'hosting e lo sviluppo: [Sostieni questo progetto](https://buymeacoffee.com/legalizedev).",
+      "license": "Licenza",
+      "license_code": "**Codice della pipeline**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Dati**: {data_license}",
+      "desc_clause": "Ogni legge è un file, ogni riforma un commit.",
+      "desc_tagline": "{name} — legislazione in Markdown, versionata con Git."
+    },
+    "ko": {
+      "tagline": "{name} — Markdown으로 작성하고 git 저장소로 버전 관리하는 법령.",
+      "intro": "각 법령은 하나의 파일이며, 각 개정은 실제 공식 공포일을 기준으로 날짜가 기록된 commit입니다. 어떤 법령이든 `git log`를 통해 전체 이력을 확인할 수 있습니다 — 언제 제정되었는지, 어떤 조문이 변경되었는지, 어떤 규범에 의해 변경되었는지.",
+      "whats_inside": "구성 내용",
+      "source": "데이터 출처",
+      "attribution": "출처 표시",
+      "other_countries": "다른 국가",
+      "other_countries_body": "이 저장소는 여러 국가의 법령을 git 저장소로 관리하는 **Legalize**의 일부입니다. 전체 카탈로그는 https://legalize.dev 에서 확인하십시오.",
+      "support": "후원",
+      "support_body": "Legalize는 무료이며 오픈소스입니다. 이 작업이 유용하다고 느끼신다면 호스팅과 개발을 지속할 수 있도록 도와주실 수 있습니다: [이 프로젝트 후원하기](https://buymeacoffee.com/legalizedev).",
+      "license": "라이선스",
+      "license_code": "**파이프라인 코드**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**데이터**: {data_license}",
+      "desc_clause": "각 법령은 파일 하나, 각 개정은 commit 하나.",
+      "desc_tagline": "{name} — Markdown 법령, Git으로 버전 관리."
+    },
+    "lt": {
+      "tagline": "{name} teisės aktai Markdown formatu, su versijų valdymu kaip git saugykla.",
+      "intro": "Kiekvienas įstatymas yra failas; kiekviena reforma yra commit'as, datuojamas pagal tikrąją oficialią paskelbimo datą. Bet kurio įstatymo `git log` rodo visą jo istoriją — kada jis priimtas, kurie straipsniai pasikeitė ir kuriuo teisės aktu.",
+      "whats_inside": "Kas viduje",
+      "source": "Duomenų šaltinis",
+      "attribution": "Priskyrimas",
+      "other_countries": "Kitos šalys",
+      "other_countries_body": "Ši saugykla yra **Legalize** dalis, kuri tvarko kelių šalių teisės aktus kaip git saugyklas. Visą katalogą rasite https://legalize.dev.",
+      "support": "Parama",
+      "support_body": "Legalize yra nemokamas ir atviras. Jei šis darbas jums naudingas, galite padėti išlaikyti jo prieglobą ir plėtrą: [Paremkite šį projektą](https://buymeacoffee.com/legalizedev).",
+      "license": "Licencija",
+      "license_code": "**Pipeline kodas**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Duomenys**: {data_license}",
+      "desc_clause": "Kiekvienas įstatymas – failas, kiekviena reforma – commit'as.",
+      "desc_tagline": "{name} teisės aktai Markdown formatu, versijuojami su Git."
+    },
+    "lv": {
+      "tagline": "{name} — tiesību akti Markdown formātā, versiju kontrolē kā git repozitorijs.",
+      "intro": "Katrs likums ir fails; katra reforma ir commit ar datumu, kas atbilst reālajam oficiālās publikācijas datumam. Jebkura likuma `git log` parāda tā pilnu vēsturi — kad tas tika pieņemts, kuri panti tika grozīti un ar kuru tiesību normu.",
+      "whats_inside": "Kas ir iekšā",
+      "source": "Datu avots",
+      "attribution": "Atsauce",
+      "other_countries": "Citas valstis",
+      "other_countries_body": "Šis repozitorijs ir daļa no **Legalize**, kas uztur vairāku valstu tiesību aktus kā git repozitorijus. Pilnu katalogu skatiet https://legalize.dev.",
+      "support": "Atbalsts",
+      "support_body": "Legalize ir bezmaksas un atvērts. Ja šis darbs jums ir noderīgs, jūs varat palīdzēt uzturēt tā mitināšanu un izstrādi: [Atbalstīt šo projektu](https://buymeacoffee.com/legalizedev).",
+      "license": "Licence",
+      "license_code": "**Pipeline kods**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Dati**: {data_license}",
+      "desc_clause": "Katrs likums ir fails, katra reforma ir commit.",
+      "desc_tagline": "{name} — tiesību akti Markdown formātā, versionēti ar Git."
+    },
+    "nl": {
+      "tagline": "{name} — wetgeving in Markdown, versiebeheerd als een git-repository.",
+      "intro": "Elke wet is een bestand; elke hervorming is een commit met de datum van de werkelijke officiële publicatiedatum. De `git log` van een wet toont de volledige geschiedenis ervan — wanneer ze is uitgevaardigd, welke artikelen zijn gewijzigd en door welke norm.",
+      "whats_inside": "Wat zit erin",
+      "source": "Gegevensbron",
+      "attribution": "Bronvermelding",
+      "other_countries": "Andere landen",
+      "other_countries_body": "Deze repository maakt deel uit van **Legalize**, dat de wetgeving van meerdere landen als git-repositories beheert. Zie https://legalize.dev voor de volledige catalogus.",
+      "support": "Ondersteuning",
+      "support_body": "Legalize is gratis en open. Als dit werk nuttig voor u is, kunt u helpen de hosting en ontwikkeling ervan te ondersteunen: [Steun dit project](https://buymeacoffee.com/legalizedev).",
+      "license": "Licentie",
+      "license_code": "**Pipelinecode**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Gegevens**: {data_license}",
+      "desc_clause": "Elke wet is een bestand, elke hervorming een commit.",
+      "desc_tagline": "{name} — wetgeving in Markdown, met versiebeheer via Git."
+    },
+    "no": {
+      "tagline": "{name} — lovgivning i Markdown, versjonskontrollert som et git-repository.",
+      "intro": "Hver lov er en fil; hver reform er en commit datert til den faktiske offisielle publiseringsdatoen. `git log` for en hvilken som helst lov viser hele historikken — når den ble vedtatt, hvilke artikler som ble endret og av hvilken norm.",
+      "whats_inside": "Hva er inkludert",
+      "source": "Datakilde",
+      "attribution": "Kreditering",
+      "other_countries": "Andre land",
+      "other_countries_body": "Dette repositoryet er en del av **Legalize**, som vedlikeholder lovgivningen til flere land som git-repositories. Se https://legalize.dev for hele katalogen.",
+      "support": "Støtte",
+      "support_body": "Legalize er gratis og åpen. Hvis dette arbeidet er nyttig for deg, kan du bidra til å opprettholde hosting og utvikling: [Støtt dette prosjektet](https://buymeacoffee.com/legalizedev).",
+      "license": "Lisens",
+      "license_code": "**Pipeline-kode**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Data**: {data_license}",
+      "desc_clause": "Hver lov er en fil, hver reform en commit.",
+      "desc_tagline": "{name} — lovgivning i Markdown, versjonskontrollert med Git."
+    },
+    "pl": {
+      "tagline": "{name} — ustawodawstwo w formacie Markdown, wersjonowane jako repozytorium git.",
+      "intro": "Każda ustawa to plik; każda nowelizacja to commit z datą rzeczywistej, oficjalnej publikacji. `git log` dowolnej ustawy pokazuje jej pełną historię — kiedy została uchwalona, które artykuły uległy zmianie i na mocy której normy.",
+      "whats_inside": "Co zawiera",
+      "source": "Źródło danych",
+      "attribution": "Atrybucja",
+      "other_countries": "Inne kraje",
+      "other_countries_body": "To repozytorium jest częścią projektu **Legalize**, który utrzymuje ustawodawstwo wielu krajów w postaci repozytoriów git. Pełny katalog dostępny jest pod adresem https://legalize.dev.",
+      "support": "Wsparcie",
+      "support_body": "Legalize jest darmowy i otwarty. Jeśli ta praca jest dla Ciebie przydatna, możesz pomóc w utrzymaniu hostingu i dalszym rozwoju: [Wesprzyj ten projekt](https://buymeacoffee.com/legalizedev).",
+      "license": "Licencja",
+      "license_code": "**Kod pipeline'u**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Dane**: {data_license}",
+      "desc_clause": "Każda ustawa to plik, każda nowelizacja to commit.",
+      "desc_tagline": "{name} — ustawodawstwo w Markdown, wersjonowane z Git."
+    },
+    "pt": {
+      "tagline": "{name} — legislação em Markdown, versionada como um repositório git.",
+      "intro": "Cada lei é um ficheiro; cada reforma é um commit datado da verdadeira data de publicação oficial. O `git log` de qualquer lei mostra o seu histórico completo — quando foi promulgada, que artigos foram alterados e por qual norma.",
+      "whats_inside": "O que contém",
+      "source": "Fonte dos dados",
+      "attribution": "Atribuição",
+      "other_countries": "Outros países",
+      "other_countries_body": "Este repositório faz parte do **Legalize**, que mantém a legislação de vários países como repositórios git. Consulte https://legalize.dev para ver o catálogo completo.",
+      "support": "Apoio",
+      "support_body": "O Legalize é gratuito e aberto. Se este trabalho lhe for útil, pode ajudar a sustentar o seu alojamento e desenvolvimento: [Apoie este projeto](https://buymeacoffee.com/legalizedev).",
+      "license": "Licença",
+      "license_code": "**Código do pipeline**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Dados**: {data_license}",
+      "desc_clause": "Cada lei é um ficheiro, cada reforma um commit.",
+      "desc_tagline": "{name} — legislação em Markdown, versionada com Git."
+    },
+    "ro": {
+      "tagline": "{name} — legislația în Markdown, cu istoric de versiuni într-un repository git.",
+      "intro": "Fiecare lege este un fișier; fiecare reformă este un commit datat la data reală a publicării oficiale. `git log` al oricărei legi îi arată întregul istoric — când a fost adoptată, ce articole s-au modificat și prin ce normă.",
+      "whats_inside": "Ce conține",
+      "source": "Sursa datelor",
+      "attribution": "Atribuire",
+      "other_countries": "Alte țări",
+      "other_countries_body": "Acest repository face parte din **Legalize**, care menține legislația mai multor țări sub formă de repository-uri git. Vezi https://legalize.dev pentru catalogul complet.",
+      "support": "Susținere",
+      "support_body": "Legalize este gratuit și open. Dacă această lucrare îți este utilă, poți contribui la susținerea găzduirii și dezvoltării sale: [Susține acest proiect](https://buymeacoffee.com/legalizedev).",
+      "license": "Licență",
+      "license_code": "**Codul pipeline-ului**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Date**: {data_license}",
+      "desc_clause": "Fiecare lege un fișier, fiecare reformă un commit.",
+      "desc_tagline": "{name} — legislație în Markdown, versionată cu Git."
+    },
+    "sk": {
+      "tagline": "{name} — legislatíva v Markdowne s verziovaním ako git repozitár.",
+      "intro": "Každý zákon je súbor; každá novela je commit s dátumom skutočného oficiálneho vyhlásenia. `git log` ktoréhokoľvek zákona zobrazuje celú jeho históriu — kedy bol prijatý, ktoré články sa zmenili a ktorou normou.",
+      "whats_inside": "Čo obsahuje",
+      "source": "Zdroj údajov",
+      "attribution": "Uvedenie zdroja",
+      "other_countries": "Ďalšie krajiny",
+      "other_countries_body": "Tento repozitár je súčasťou projektu **Legalize**, ktorý spravuje legislatívu viacerých krajín ako git repozitáre. Úplný katalóg nájdete na https://legalize.dev.",
+      "support": "Podpora",
+      "support_body": "Legalize je bezplatný a otvorený. Ak je pre vás táto práca užitočná, môžete pomôcť udržať jeho hosting a vývoj: [Podporte tento projekt](https://buymeacoffee.com/legalizedev).",
+      "license": "Licencia",
+      "license_code": "**Kód pipeline**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Údaje**: {data_license}",
+      "desc_clause": "Každý zákon je súbor, každá novela je commit.",
+      "desc_tagline": "{name} — legislatíva v Markdowne, verziovaná v Gite."
+    },
+    "sv": {
+      "tagline": "{name} — lagstiftning i Markdown, versionshanterad som ett git-repository.",
+      "intro": "Varje lag är en fil; varje reform är en commit daterad till det faktiska officiella publiceringsdatumet. `git log` för en lag visar dess fullständiga historik — när den antogs, vilka artiklar som ändrades och genom vilken norm.",
+      "whats_inside": "Innehåll",
+      "source": "Datakälla",
+      "attribution": "Tillskrivning",
+      "other_countries": "Andra länder",
+      "other_countries_body": "Detta repository är en del av **Legalize**, som upprätthåller flera länders lagstiftning som git-repositorier. Se https://legalize.dev för hela katalogen.",
+      "support": "Stöd",
+      "support_body": "Legalize är gratis och öppen. Om detta arbete är användbart för dig kan du hjälpa till att finansiera dess hosting och utveckling: [Stöd detta projekt](https://buymeacoffee.com/legalizedev).",
+      "license": "Licens",
+      "license_code": "**Pipeline-kod**: MIT (https://github.com/legalize-dev/legalize-pipeline)",
+      "license_data": "**Data**: {data_license}",
+      "desc_clause": "Varje lag är en fil, varje reform en commit.",
+      "desc_tagline": "{name} — lagstiftning i Markdown, versionshanterad med Git."
+    }
+  },
+  "countries": {
+    "ad": {
+      "code": "ad",
+      "name": "Andorra",
+      "language": "ca",
+      "source_name": "Butlletí Oficial del Principat d'Andorra (BOPA) — Govern del Principat d'Andorra i Consell General",
+      "source_urls": [
+        "Portal: https://www.bopa.ad/",
+        "API (Azure Functions): https://bopaazurefunctions.azurewebsites.net/api/",
+        "Magatzem de documents (Azure Blob): https://bopadocuments.blob.core.windows.net/bopa-documents/"
+      ],
+      "data_license": "Domini públic — els textos oficials estan exclosos de la protecció del dret d'autor (art. 4.2 de la Llei sobre drets d'autor i drets veïns, 1999)",
+      "scope": "Aquest repositori recull les normes de rang superior publicades al BOPA per quatre organismes emissors: Lleis i Lleis qualificades i la Constitució (Consell General), i Legislació delegada i Reglaments (Govern). El BOPA és la publicació oficial d'Andorra; la versió electrònica és la jurídicament autèntica des de la Llei 25/2014. La cobertura històrica arrenca el 1989.",
+      "norm_types": [
+        {
+          "label": "Lleis i lleis qualificades",
+          "pattern": "BOPA-L-XXXX-NN.md",
+          "note": "Aprovades pel Consell General. L'identificador codifica any i número (N/AAAA); si el títol no en porta, recau a BOPA-L-{any}-{nomDocument}.",
+          "examples": [
+            "ad/BOPA-L-2024-18.md"
+          ]
+        },
+        {
+          "label": "Reglaments (decrets)",
+          "pattern": "BOPA-D-XXXX-NN.md",
+          "note": "Decrets del Govern que aproven reglaments.",
+          "examples": [
+            "ad/BOPA-D-2024-501.md"
+          ]
+        },
+        {
+          "label": "Legislació delegada (decrets legislatius)",
+          "pattern": "BOPA-LD-XXXX-NN.md",
+          "note": "Decrets legislatius del Govern.",
+          "examples": [
+            "ad/BOPA-LD-2024-5.md"
+          ]
+        },
+        {
+          "label": "Constitució del Principat d'Andorra",
+          "pattern": "BOPA-C-1993.md",
+          "note": "Document únic, amb l'any del referèndum de 1993.",
+          "examples": [
+            "ad/BOPA-C-1993.md"
+          ]
+        }
+      ],
+      "attribution": "> Font: Butlletí Oficial del Principat d'Andorra (BOPA) — Govern del Principat d'Andorra i Consell General (https://www.bopa.ad/). Els textos oficials estan exclosos de la protecció del dret d'autor segons l'article 4.2 de la Llei sobre drets d'autor i drets veïns (1999). Aquest repositori és un mirall **no oficial**; el BOPA continua sent l'única font autèntica de la legislació andorrana.",
+      "notes": "## Limitacions conegudes\n\n- L'API `GetDocumentsByBOPA` està limitada a 132 resultats per butlletí independentment del total real; els organismes objectiu (02. Consell General, 03. Govern) ocupen els primers llocs de l'ordre, de manera que rarament queden truncats.\n- Coexisteixen dos formats HTML d'origen: el modern (InDesign, ≈2015 endavant) amb classes CSS semàntiques i alta fidelitat, i el llegat (1989–≈2014) en text pla amb només salts de línia, de fidelitat inferior (la Constitució de 1993 és en format llegat).\n- El BOPA no publica textos consolidats: cada document publicat és una unitat legal autònoma. Per tant, cada modificació es publica com a norma independent i no com a refosa del text original."
+    },
+    "ar": {
+      "code": "ar",
+      "name": "Argentina",
+      "language": "es",
+      "source_name": "InfoLEG (Ministerio de Justicia — Dirección Nacional del SAIJ)",
+      "source_urls": [
+        "Catálogo mensual en CSV: https://datos.jus.gob.ar/dataset/base-de-datos-legislativos-infoleg",
+        "Texto consolidado por norma: https://servicios.infoleg.gob.ar/infolegInternet/anexos/",
+        "Portal: https://www.infoleg.gob.ar"
+      ],
+      "data_license": "CC-BY 4.0 (atribución obligatoria a SAIJ)",
+      "scope": "Alcance V1: **solo legislación nacional con texto consolidado** (~2.000 normas). La legislación provincial (23 provincias + CABA) se incorporará en V2 desde el dataset SAIJ provincial.",
+      "norm_types": [
+        {
+          "label": "Leyes nacionales",
+          "pattern": "LEY-XXXXX.md",
+          "examples": [
+            "ar/LEY-19550.md",
+            "ar/LEY-26994.md"
+          ],
+          "note": ""
+        },
+        {
+          "label": "Decretos reglamentarios",
+          "pattern": "DEC-N-YYYY.md",
+          "examples": [
+            "ar/DEC-222-2003.md"
+          ],
+          "note": ""
+        },
+        {
+          "label": "Decretos de Necesidad y Urgencia",
+          "pattern": "DNU-N-YYYY.md",
+          "examples": [
+            "ar/DNU-70-2023.md"
+          ],
+          "note": ""
+        },
+        {
+          "label": "Decretos/leyes",
+          "pattern": "DL-N-YYYY.md",
+          "examples": [],
+          "note": "normas dictadas por gobiernos de facto con fuerza de ley."
+        },
+        {
+          "label": "Constitución Nacional",
+          "pattern": "",
+          "examples": [],
+          "note": "incluida vía `LEY-24430.md` (el acto legislativo que ordenó la publicación del texto oficial)."
+        }
+      ],
+      "attribution": "> Datos legislativos provistos por el Ministerio de Justicia de la República Argentina a través de la Dirección Nacional del Sistema Argentino de Información Jurídica (SAIJ). Publicados en https://datos.jus.gob.ar bajo licencia Creative Commons Atribución 4.0 Internacional.",
+      "notes": "Todos los datos son públicos y se publican bajo la licencia **Creative Commons Atribución 4.0 (CC-BY 4.0)** (Resolución MINJUS 986/2016).\n\n## Versiones reales, no solo timeline\n\nA diferencia de otros portales, este repo **reconstruye el contenido de cada artículo en cada fecha** en que fue modificado. Cuando miras `git log ar/LEY-19550.md`, cada commit corresponde a un Boletín Oficial concreto (una reforma real) y `git show` te muestra exactamente qué cambió en esa fecha.\n\nLa reconstrucción se basa en:\n\n1. El texto original de la ley (`norma.htm` en InfoLEG) como commit inicial.\n2. Las modificatorias cronológicamente ordenadas, bajadas una por una y analizadas para extraer los artículos que sustituyen, derogan o incorporan.\n3. Una verificación final contra el texto consolidado actual (`texact.htm`) para garantizar que el último commit del repo coincide con el texto vigente.\n\nCada norma lleva en su frontmatter un campo `reform_quality` con el grado de fidelidad de la reconstrucción:\n\n- `clean` — la cadena de reformas converge exactamente al texto consolidado.\n- `partial` — algunas reformas no se pudieron aplicar automáticamente; el último commit es una `[consolidacion]` que alinea con el texto vigente.\n- `bootstrap-only` — la reconstrucción falló; el repo solo tiene el texto original y el texto actual, sin el camino intermedio.\n\n## Limitaciones conocidas\n\n- Las **tablas tarifarias escaneadas como JPG** (p. ej. los anexos de la Ley 27.430 de Reforma Tributaria) se dropean del texto Markdown. El campo `extra.images_dropped` en el frontmatter indica cuántas se perdieron. Un futuro pase de OCR las incorporará.\n- Las **~94 resoluciones que actualizan montos** (capital social mínimo por inflación, multas) de algunas leyes clave no se incluyen como commits en V1. Son cambios puramente numéricos que no modifican el articulado.\n- **Actualizaciones mensuales**: el catálogo InfoLEG se regenera el día 1 de cada mes. El repo se sincroniza automáticamente el día 2. La latencia máxima entre una publicación en el B.O. y su aparición aquí es ~30 días."
+    },
+    "at": {
+      "code": "at",
+      "name": "Österreich",
+      "language": "de",
+      "source_name": "RIS – Rechtsinformationssystem des Bundes (Bundeskanzleramt der Republik Österreich)",
+      "source_urls": [
+        "Portal: https://www.ris.bka.gv.at/",
+        "Bundesrecht konsolidiert: https://www.ris.bka.gv.at/Bundesrecht/",
+        "OGD-API (v2.6, Applikation BrKons): https://data.bka.gv.at/ris/api/v2.6",
+        "Open Government Data / Lizenz: https://www.ris.bka.gv.at/UI/Ogd.aspx"
+      ],
+      "data_license": "CC BY 4.0 (Creative Commons Namensnennung 4.0 International)",
+      "scope": "Abgedeckt ist das österreichische Bundesrecht in der konsolidierten Fassung (Applikation „BrKons\" der RIS-OGD-Schnittstelle). Jede Norm wird über ihre RIS-Gesetzesnummer identifiziert und aus allen zugehörigen NOR-Dokumenten (Paragrafen/Artikeln) zu einem konsolidierten Dokument zusammengesetzt.",
+      "norm_types": [
+        {
+          "label": "Bundesgesetz",
+          "pattern": "AT-XXXXXXXX.md",
+          "note": "RIS-Typ „G\".",
+          "examples": [
+            "at/AT-10001848.md"
+          ]
+        },
+        {
+          "label": "Bundesverfassungsgesetz",
+          "pattern": "AT-XXXXXXXX.md",
+          "note": "RIS-Typ „BVG\"."
+        },
+        {
+          "label": "Verordnung",
+          "pattern": "AT-XXXXXXXX.md",
+          "note": "RIS-Typ „V\".",
+          "examples": [
+            "at/AT-10002333.md"
+          ]
+        },
+        {
+          "label": "Kundmachung",
+          "pattern": "AT-XXXXXXXX.md",
+          "note": "RIS-Typ „K\"."
+        },
+        {
+          "label": "Erlass",
+          "pattern": "AT-XXXXXXXX.md",
+          "note": "RIS-Typ „E\"."
+        },
+        {
+          "label": "Staatsvertrag",
+          "pattern": "AT-XXXXXXXX.md",
+          "note": "RIS-Typ „Vertrag\"; auch zusammengesetzte Typen wie „Vertrag – Schweiz\"."
+        },
+        {
+          "label": "Sonstige",
+          "pattern": "AT-XXXXXXXX.md",
+          "note": "Fallback-Rang für nicht zugeordnete RIS-Typen."
+        }
+      ],
+      "attribution": "> Quelle: RIS – Rechtsinformationssystem des Bundes, Bundeskanzleramt der Republik Österreich (https://www.ris.bka.gv.at/). Lizenziert unter CC BY 4.0 (Creative Commons Namensnennung 4.0 International). Aus den Daten können keinerlei Rechtsansprüche abgeleitet werden.",
+      "notes": "## Dateinamen\n\nDer Dateiname ist `AT-` gefolgt von der RIS-Gesetzesnummer (z. B. `at/AT-10002333.md`). Alle Normen liegen flach im Verzeichnis `at/`; der Rang steht im YAML-Frontmatter, nicht im Verzeichnisbaum.\n\n## Bekannte Einschränkungen\n\n- Die vollständige Novellen-/Reformhistorie wird derzeit nicht aus dem separaten Novellen-Endpunkt zusammengeführt (`extract_reforms` liefert noch keine Reformpunkte aus den Metadaten).\n- Abgedeckt ist ausschließlich Bundesrecht konsolidiert — Landesrecht, Judikatur und Erlässe außerhalb des konsolidierten Bundesrechts sind nicht enthalten.\n- Bilder/binäre Inhalte werden ausgelassen."
+    },
+    "be": {
+      "code": "be",
+      "name": "Belgique",
+      "language": "fr",
+      "source_name": "Justel — Législation consolidée (Moniteur belge / Belgisch Staatsblad), Service public fédéral Justice (SPF Justice)",
+      "source_urls": [
+        "Portail Justel : https://www.ejustice.just.fgov.be/cgi_loi/welcome.pl?language=fr",
+        "Hôte des textes (ELI) : https://www.ejustice.just.fgov.be/eli/",
+        "SPF Justice — Moniteur belge : https://justice.belgium.be/fr/service_public_federal_justice/organisation/moniteur_belge",
+        "Cadre open data fédéral : https://data.gov.be/fr"
+      ],
+      "data_license": "Licence ouverte / open data fédéral belge (CC0 par défaut)",
+      "scope": "Le dépôt couvre la législation primaire fédérale et fédérée consolidée publiée via Justel : la Constitution coordonnée (1994), les lois (depuis 1831), les décrets des parlements régionaux et communautaires (depuis 1972) et les ordonnances de la Région de Bruxelles-Capitale (depuis 1989). La législation secondaire (arrêtés royaux et ministériels, ~150 000 textes) est explicitement exclue de cette version. Chaque norme correspond à un fichier ; chaque version archivée (réforme) devient un commit git daté à la date de publication de la loi modificative.",
+      "norm_types": [
+        {
+          "label": "Constitution",
+          "pattern": "{NUMAC}.md",
+          "note": "Constitution coordonnée du 17 février 1994 (document unique).",
+          "examples": [
+            "be/1994021048.md"
+          ]
+        },
+        {
+          "label": "Loi",
+          "pattern": "{NUMAC}.md",
+          "note": "Lois fédérales, depuis 1831.",
+          "examples": [
+            "be/1867060850.md",
+            "be/2024000164.md"
+          ]
+        },
+        {
+          "label": "Décret",
+          "pattern": "{NUMAC}.md",
+          "note": "Décrets des parlements de communauté et de région, depuis 1972."
+        },
+        {
+          "label": "Ordonnance",
+          "pattern": "{NUMAC}.md",
+          "note": "Ordonnances de la Région de Bruxelles-Capitale, depuis 1989."
+        }
+      ],
+      "notes": "## Identifiant et nommage\n\nLe nom de fichier est le NUMAC officiel à 10 chiffres (numéro d'identification du Moniteur belge), au format `be/{NUMAC}.md`. L'identifiant interne de découverte (`dt:aaaa:mm:jj:numac`) sert à reconstruire l'URL ELI, mais seul le NUMAC est conservé comme nom de fichier.\n\n## Source et encodage\n\nJustel ne dispose ni d'API REST ni de dump en masse : les textes sont extraits par scraping des pages HTML ELI, encodées en ISO-8859-1 (converties en UTF-8 en sortie). Les images sont ignorées ; les tableaux sont convertis en tableaux Markdown.\n\n## Dates des réformes\n\nL'historique des versions est reconstruit depuis la barre latérale d'archives de Justel. Lorsque la date d'entrée en vigueur d'une version est « indéterminée » ou non chronologique, la date de publication de la loi modificative est utilisée comme date effective de repli."
+    },
+    "ch": {
+      "code": "ch",
+      "name": "Schweiz",
+      "language": "de",
+      "source_name": "Fedlex — Die Publikationsplattform des Bundesrechts (Bundeskanzlei / Schweizerische Eidgenossenschaft)",
+      "source_urls": [
+        "Portal: https://www.fedlex.admin.ch/",
+        "Linked-Data / SPARQL-Endpoint: https://fedlex.data.admin.ch/sparqlendpoint",
+        "Filestore (Akoma-Ntoso-XML): https://fedlex.data.admin.ch/filestore",
+        "ELI-Basis: https://fedlex.data.admin.ch/eli/"
+      ],
+      "data_license": "gemeinfrei (amtliche Texte, von Gesetzes wegen vom Urheberrechtsschutz ausgenommen)",
+      "scope": "Erfasst wird das eidgenössische Bundesrecht aus der Systematischen Rechtssammlung (SR / Classified Compilation, ELI-Pfad eli/cc/) auf Deutsch. Jede Norm ist eine Markdown-Datei, jede Reform ein Git-Commit, datiert auf das Datum der Inkraftsetzung der jeweiligen Konsolidierung (jolux:dateApplicability).",
+      "norm_types": [
+        {
+          "label": "Bundesverfassung",
+          "pattern": "cc-YYYY-N.md",
+          "note": "Bundesverfassung der Schweizerischen Eidgenossenschaft (Kurztitel BV).",
+          "examples": [
+            "ch/cc-1999-404.md"
+          ]
+        },
+        {
+          "label": "Bundesgesetz (inkl. Kodifikationen wie ZGB, OR, StGB)",
+          "pattern": "cc-YYYY-N.md",
+          "note": "Eidgenössische Gesetze; die Schweizer Kodifikationen sind formell Bundesgesetze.",
+          "examples": [
+            "ch/cc-24-233_245_233.md"
+          ]
+        },
+        {
+          "label": "Verordnung (des Bundesrates, eines Departements, eines Amtes, der Bundesversammlung)",
+          "pattern": "cc-YYYY-N.md",
+          "note": "Untergesetzliche Erlasse der Exekutive."
+        },
+        {
+          "label": "Bundesbeschluss (auch dem fakultativen bzw. obligatorischen Referendum unterstehend)",
+          "pattern": "cc-YYYY-N.md",
+          "note": ""
+        },
+        {
+          "label": "Völkerrechtliche Verträge (bilateral / multilateral)",
+          "pattern": "cc-YYYY-N.md",
+          "note": "Internationale Rechtstexte in der SR."
+        },
+        {
+          "label": "Weitere Erlasstypen",
+          "pattern": "cc-YYYY-N.md",
+          "note": "Reglement, Beschluss, Richtlinie, Weisung u. a.; nicht klassifizierbare Typen erhalten den Rang \"andere\". Der Dateiname leitet sich aus der ELI-URI eli/cc/YYYY/N ab (z. B. eli/cc/1999/404 → cc-1999-404; Unterstriche in Alt-IDs bleiben erhalten)."
+        }
+      ],
+      "notes": "## Abdeckung und Grenzen\n\n- Geltungsbereich v1: nur Erlasse der Systematischen Rechtssammlung (eli/cc/), die mindestens eine deutschsprachige Akoma-Ntoso-3.0-XML-Konsolidierung besitzen — rund 5'139 von etwa 17'258 SR-Nummern. Erlasse, die ausschliesslich als PDF/DOC vorliegen, werden in v1 übersprungen.\n- Historie ist bei älteren Erlassen unvollständig: Die XML-Konsolidierungen beginnen frühestens um 2011 (alte Kodifikationen), für die meisten Erlasse erst ab 2021. Wo die Versionsgeschichte abgeschnitten ist, wird dies pro Norm in `extra.history_from` vermerkt.\n- Daten stammen ausschliesslich aus der deutschen Sprachfassung; Titel in anderen Amtssprachen (z. B. `title_fr`) werden, soweit vorhanden, im `extra`-Feld mitgeführt.\n- Bilder werden nicht übernommen; Tabellen, Fett-/Kursivauszeichnung, Querverweise und Fussnoten werden nach Markdown überführt."
+    },
+    "cl": {
+      "code": "cl",
+      "name": "Chile",
+      "language": "es",
+      "source_name": "Biblioteca del Congreso Nacional de Chile (BCN) — Ley Chile",
+      "source_urls": [
+        "Portal: https://www.bcn.cl/leychile/",
+        "Texto XML por norma: https://www.leychile.cl/Consulta/obtxml?opt=7&idNorma={id}",
+        "Búsqueda/exportación CSV: https://nuevo.leychile.cl/servicios/Consulta/script/exportarBSimpleMetas",
+        "Datos abiertos enlazados: https://datos.bcn.cl/es/"
+      ],
+      "data_license": "Dominio público (publicaciones oficiales del Estado)",
+      "scope": "El repositorio recoge la legislación consolidada de Chile publicada por BCN — Ley Chile, con cada norma como archivo Markdown y cada reforma como un commit de git fechado en la fecha oficial de publicación en el Diario Oficial. El alcance del fetcher se centra en leyes, decretos con fuerza de ley, decretos leyes, decretos supremos, decretos, tratados internacionales, leyes orgánicas constitucionales y leyes de quórum calificado; se excluyen explícitamente resoluciones y ordenanzas.",
+      "norm_types": [
+        {
+          "label": "Ley",
+          "pattern": "CL-XXXXXX.md",
+          "note": "Incluye leyes ordinarias, leyes interpretativas y la Constitución Política de la República (caso especial de rango).",
+          "examples": [
+            "cl/CL-242302.md",
+            "cl/CL-1138479.md"
+          ]
+        },
+        {
+          "label": "Código",
+          "pattern": "CL-XXXXXX.md",
+          "note": "Códigos consolidados (p. ej. el Código Tributario).",
+          "examples": [
+            "cl/CL-6374.md"
+          ]
+        },
+        {
+          "label": "Decreto con Fuerza de Ley",
+          "pattern": "CL-XXXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Decreto Ley",
+          "pattern": "CL-XXXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Decreto / Decreto Supremo",
+          "pattern": "CL-XXXXXX.md",
+          "note": "",
+          "examples": [
+            "cl/CL-258831.md"
+          ]
+        },
+        {
+          "label": "Tratado Internacional",
+          "pattern": "CL-XXXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Ley Orgánica Constitucional",
+          "pattern": "CL-XXXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Ley de Quórum Calificado",
+          "pattern": "CL-XXXXXX.md",
+          "note": ""
+        }
+      ],
+      "notes": "## Identificador y nombres de archivo\n\nEl identificador de cada norma es `CL-{idNorma}`, donde `idNorma` es el identificador interno de BCN para la norma (no el número de ley). El archivo se nombra `cl/CL-{idNorma}.md`.\n\n## Descubrimiento y límites de cobertura\n\nEl endpoint de búsqueda simple de BCN (`exportarBSimpleMetas`) limita silenciosamente cada consulta a unas ~1.600 filas e ignora la paginación, por lo que el descubrimiento combina dos fases: (A) iteración por número de ley (`idLey` 1…~22.000) vía `Navegar/get_norma_json` para resolver el catálogo completo de leyes, y (B) paginación por tipo de norma para el resto de rangos. En consecuencia, las leyes tienen cobertura prácticamente completa, mientras que los demás tipos (decretos, decretos leyes, DFL, decretos supremos, tratados, etc.) están limitados a las ~1.600 normas más recientes por tipo.\n\n## Contenido omitido\n\nLos adjuntos binarios incrustados (JPEG/PDF en base64 dentro del texto) se descartan y se contabilizan en `extra`. Las imágenes no se incluyen."
+    },
+    "co": {
+      "code": "co",
+      "name": "Colombia",
+      "language": "es",
+      "source_name": "SUIN-Juriscol — Sistema Único de Información Normativa, Ministerio de Justicia y del Derecho de Colombia",
+      "source_urls": [
+        "Portal: https://www.suin-juriscol.gov.co",
+        "Documento: https://www.suin-juriscol.gov.co/viewDocument.asp?id={id}",
+        "Dataset (Datos Abiertos Colombia): https://www.datos.gov.co/Justicia-y-Derecho/Lista-de-normas-cargadas-en-el-Sistema-nico-de-Inf/fiev-nid6"
+      ],
+      "data_license": "Dominio público (textos oficiales del Estado, libre reproducción)",
+      "scope": "Cobertura de la normativa nacional colombiana publicada en SUIN-Juriscol, con texto consolidado por norma. SUIN no expone API ni catálogo: las normas se descubren enumerando identificadores numéricos internos del portal (viewDocument.asp?id=...). Cada archivo es una norma; el historial de reformas se reconstruye a partir de los bloques \"LEGISLACIÓN ANTERIOR\" que SUIN incrusta por artículo, con su rango de vigencia.",
+      "norm_types": [
+        {
+          "label": "Ley",
+          "pattern": "LEY-XX-AAAA.md",
+          "note": "Leyes del Congreso de la República (incluye leyes ordinarias, estatutarias, orgánicas, según el subtipo).",
+          "examples": [
+            "co/LEY-57-1887.md"
+          ]
+        },
+        {
+          "label": "Decreto",
+          "pattern": "DECRETO-XX-AAAA.md",
+          "note": "Decretos del Gobierno Nacional (decretos ordinarios, decretos ley, decretos presidenciales, etc.).",
+          "examples": [
+            "co/DECRETO-453-1981.md"
+          ]
+        },
+        {
+          "label": "Acto Legislativo",
+          "pattern": "ACTO-LEGISLATIVO-XX-AAAA.md",
+          "note": "Reformas a la Constitución Política."
+        },
+        {
+          "label": "Otros tipos normativos",
+          "pattern": "{TIPO}-XX-AAAA.md",
+          "note": "SUIN-Juriscol también publica acuerdos, resoluciones, circulares, instrucciones, constituciones y jurisprudencia (Corte Constitucional, Consejo de Estado, Corte Suprema); el rango del nombre de archivo se deriva del campo tipo de cada norma."
+        }
+      ],
+      "notes": "## Limitaciones conocidas\n\n- Las imágenes incrustadas en las normas se omiten deliberadamente (no se procesan activos binarios).\n- Las fechas de publicación provienen de campos editados manualmente por SUIN y ocasionalmente contienen años futuros erróneos; el parser los descarta y recurre a otras fechas (vigencia, expedición) cuando la fecha del Diario Oficial es implausible.\n- SUIN-Juriscol sirve una cadena de certificados TLS rota, por lo que la descarga deshabilita la verificación de TLS.\n- El identificador del archivo se construye a partir de los campos tipo/número/año de la norma; cuando faltan, se intenta derivar del título y, en última instancia, se usa el id numérico interno de SUIN."
+    },
+    "cz": {
+      "code": "cz",
+      "name": "Česko",
+      "language": "cs",
+      "source_name": "e-Sbírka — elektronická Sbírka zákonů a mezinárodních smluv (Ministerstvo vnitra České republiky)",
+      "source_urls": [
+        "Portál: https://e-sbirka.gov.cz/",
+        "Otevřená data a veřejné API: https://zakony.gov.cz/gov/otevrena-data-a-verejna-api-systemu-e-sbirka-od-15-ledna/",
+        "API (cache): https://e-sbirka.gov.cz/sbr-cache"
+      ],
+      "data_license": "volné dílo (úřední díla podle § 3 písm. a) zákona č. 121/2000 Sb., autorského zákona)",
+      "scope": "Repozitář obsahuje právní předpisy publikované ve Sbírce zákonů (sbírkový kód „sb“) získané z e-Sbírky. Discovery sekvenčně prochází identifikátory /sb/{rok}/{číslo} pro každý rok od roku 1945 do současnosti. Každý soubor je jedna konsolidovaná norma; každá reforma je samostatný git commit datovaný k oficiálnímu datu vyhlášení.",
+      "norm_types": [
+        {
+          "label": "Zákon",
+          "pattern": "SB-RRRR-N.md",
+          "note": "Zákony Sbírky zákonů (sbírkový kód „sb“). Číslo a rok pocházejí z identifikátoru staleUrl /sb/{rok}/{číslo}.",
+          "examples": [
+            "cz/SB-2012-89.md",
+            "cz/SB-2009-40.md",
+            "cz/SB-1992-586.md"
+          ]
+        },
+        {
+          "label": "Ústavní zákon",
+          "pattern": "SB-RRRR-N.md",
+          "note": "Šablona hierarchie *_UST. Ranku „constitutional_law“ ve frontmatteru.",
+          "examples": [
+            "cz/SB-1993-1.md"
+          ]
+        },
+        {
+          "label": "Novela",
+          "pattern": "SB-RRRR-N.md",
+          "note": "Čistá novela (pozměňující zákon); ve frontmatteru ranku „law“.",
+          "examples": [
+            "cz/SB-2024-1.md"
+          ]
+        },
+        {
+          "label": "Nařízení",
+          "pattern": "SB-RRRR-N.md",
+          "note": "Nařízení vlády (šablona *_NARIZENI), ranku „regulation“."
+        },
+        {
+          "label": "Vyhláška",
+          "pattern": "SB-RRRR-N.md",
+          "note": "Vyhláška (šablona *_VYHLASKA), ranku „ordinance“."
+        },
+        {
+          "label": "Dekret",
+          "pattern": "SB-RRRR-N.md",
+          "note": "Dekret / ústavní dekret (šablona *_DEKRET), ranku „decree“ nebo „constitutional_decree“."
+        }
+      ],
+      "notes": "## Omezení\n\n- Identifikátor souboru má tvar `SB-{rok}-{číslo}` (např. `SB-1993-1`), odvozený z `staleUrl` ve tvaru `/sb/{rok}/{číslo}`. Rang (zákon, ústavní zákon, nařízení, vyhláška, dekret) je uložen ve frontmatteru, nikoli ve struktuře adresářů — všechny soubory leží ploše v adresáři `cz/`.\n- Obrázky a binární přílohy se nepřebírají (politika projektu); v textu jsou nahrazeny značkou `[image omitted]`.\n- Seznam reforem (novel) je odvozen z metadat normy (úplná citace s novelami), nikoli z textu."
+    },
+    "de": {
+      "code": "de",
+      "name": "Deutschland",
+      "language": "de",
+      "source_name": "Gesetze im Internet — Bundesministerium der Justiz (BMJ) und Bundesamt für Justiz, technisch betrieben durch die juris GmbH",
+      "source_urls": [
+        "Portal: https://www.gesetze-im-internet.de/",
+        "Inhaltsverzeichnis (TOC-XML): https://www.gesetze-im-internet.de/gii-toc.xml",
+        "XML-Download je Gesetz: https://www.gesetze-im-internet.de/{slug}/xml.zip"
+      ],
+      "data_license": "gemeinfrei (amtliche Werke nach § 5 UrhG; freie Nutzung und Weiterverwendung)",
+      "scope": "Bundesrecht der Bundesrepublik Deutschland: konsolidierte Fassungen von rund 6.900 Gesetzen und Rechtsverordnungen, wie sie über das Inhaltsverzeichnis (gii-toc.xml) von gesetze-im-internet.de bereitgestellt werden. Jede Norm ist eine Markdown-Datei; jede dokumentierte Änderung ist ein Git-Commit. Landesrecht (Recht der Bundesländer) ist nicht enthalten.",
+      "norm_types": [
+        {
+          "label": "Grundgesetz",
+          "pattern": "GG.md",
+          "note": "Verfassungsrang; nur das Grundgesetz für die Bundesrepublik Deutschland (rank: grundgesetz).",
+          "examples": [
+            "de/GG.md"
+          ]
+        },
+        {
+          "label": "Bundesgesetz",
+          "pattern": "{ABK}.md",
+          "note": "Förmliche Bundesgesetze und Gesetzbücher; Standardrang für Normen ohne spezifischere Einstufung (rank: bundesgesetz).",
+          "examples": [
+            "de/BGB.md",
+            "de/STGB.md"
+          ]
+        },
+        {
+          "label": "Rechtsverordnung",
+          "pattern": "{ABK}.md",
+          "note": "Verordnungen des Bundes (rank: rechtsverordnung).",
+          "examples": []
+        },
+        {
+          "label": "Bekanntmachung",
+          "pattern": "{ABK}.md",
+          "note": "Amtliche Bekanntmachungen (rank: bekanntmachung).",
+          "examples": []
+        },
+        {
+          "label": "Satzung",
+          "pattern": "{ABK}.md",
+          "note": "Satzungen (rank: satzung).",
+          "examples": []
+        }
+      ],
+      "notes": "## Hinweise\n\n- Die hier veröffentlichten konsolidierten Fassungen sind nicht die amtliche Verkündungsfassung. Maßgeblich bleibt der im Bundesgesetzblatt (BGBl.) verkündete Text; die jeweilige Fundstelle ist im Frontmatter unter `extra.bgbl_reference` vermerkt.\n- Der Dateiname entspricht der amtlichen bzw. juris-Abkürzung (`jurabk`) in Großbuchstaben, Leerzeichen durch Bindestriche ersetzt (z. B. `GG`, `BGB`, `STGB`). Weitere Kennungen wie die juris-Dokumentnummer (`doknr`, beginnend mit „BJNR…\") und der URL-Slug stehen im Frontmatter unter `extra`.\n- Bilder werden nicht übernommen; Tabellen, Listen sowie Fett- und Kursivauszeichnungen bleiben als Markdown erhalten."
+    },
+    "ee": {
+      "code": "ee",
+      "name": "Eesti",
+      "language": "et",
+      "source_name": "Riigi Teataja (Eesti Vabariigi ametlik väljaanne)",
+      "source_urls": [
+        "Portaal: https://www.riigiteataja.ee",
+        "Akti XML: https://www.riigiteataja.ee/akt/{globaalID}.xml",
+        "Avaandmed (aastased XML-arhiivid): https://www.riigiteataja.ee/avaandmed/ERT/xml.{YYYY}.zip"
+      ],
+      "data_license": "avalik omand (ametlikud riiklikud väljaanded)",
+      "scope": "Repositoorium katab Riigi Teataja konsolideeritud õigusaktid, mis on piiratud dokumendiliikidega seadus ja määrus (tekstiliigid terviktekst ja algtekst-terviktekst). Iga seadus on eraldi fail ja iga reform on git-commit, mis on dateeritud akti ametliku jõustumiskuupäeva järgi.",
+      "norm_types": [
+        {
+          "label": "Seadused",
+          "pattern": "{globaalID}.md",
+          "note": "dokumentLiik = seadus; konsolideeritud terviktekstid. Failinimi on Riigi Teataja globaalID (numbriline identifikaator).",
+          "examples": [
+            "ee/115052015002.md",
+            "ee/122122025002.md"
+          ]
+        },
+        {
+          "label": "Määrused",
+          "pattern": "{globaalID}.md",
+          "note": "dokumentLiik = määrus; konsolideeritud terviktekstid.",
+          "examples": []
+        }
+      ],
+      "notes": "Failinimi on alati akti Riigi Teataja globaalID (nt 115052015002). Allikas pakub andmeid avaandmetena aastaste XML-arhiividena (xml.{YYYY}.zip), mida regenereeritakse iga päev. Andmekate algab vaikimisi aastast 2010; varasem sisu (enne 2010) on koondatud arhiivi xml.2010.zip. Pildid jäetakse teadlikult välja."
+    },
+    "es": {
+      "code": "es",
+      "name": "España",
+      "language": "es",
+      "source_name": "BOE — Agencia Estatal Boletín Oficial del Estado",
+      "source_urls": [
+        "Portal: https://www.boe.es",
+        "Datos abiertos (API): https://www.boe.es/datosabiertos",
+        "Legislación consolidada: https://www.boe.es/legislacion/legislacion_ava.php",
+        "Condiciones de reutilización / Aviso legal: https://www.boe.es/informacion/aviso_legal/index.php"
+      ],
+      "data_license": "Condiciones de reutilización del BOE — cita obligatoria de la fuente",
+      "scope": "Cubre legislación estatal española y normativa de las comunidades autónomas publicada en el BOE, en su versión consolidada (texto vigente con todas sus redacciones). Cada norma es un fichero Markdown y cada reforma es un commit de git con la fecha oficial de publicación. Las normas de ámbito estatal se ubican en el directorio es/ y las autonómicas en directorios por jurisdicción (es-pv/, es-ct/, etc.). Datos obtenidos de la API de datos abiertos del BOE.",
+      "norm_types": [
+        {
+          "label": "Constitución",
+          "pattern": "BOE-A-AAAA-N.md",
+          "note": "Norma suprema del ordenamiento (rango: constitucion).",
+          "examples": [
+            "es/BOE-A-1978-31229.md"
+          ]
+        },
+        {
+          "label": "Ley orgánica",
+          "pattern": "BOE-A-AAAA-N.md",
+          "note": "Rango: ley_organica.",
+          "examples": []
+        },
+        {
+          "label": "Ley",
+          "pattern": "BOE-A-AAAA-N.md",
+          "note": "Leyes ordinarias (rango: ley).",
+          "examples": [
+            "es/BOE-A-2015-11430.md"
+          ]
+        },
+        {
+          "label": "Real Decreto-ley",
+          "pattern": "BOE-A-AAAA-N.md",
+          "note": "Rango: real_decreto_ley.",
+          "examples": []
+        },
+        {
+          "label": "Real Decreto Legislativo",
+          "pattern": "BOE-A-AAAA-N.md",
+          "note": "Textos refundidos (rango: real_decreto_legislativo).",
+          "examples": [
+            "es/BOE-A-1996-8930.md"
+          ]
+        },
+        {
+          "label": "Real Decreto",
+          "pattern": "BOE-A-AAAA-N.md",
+          "note": "Rango: real_decreto.",
+          "examples": []
+        },
+        {
+          "label": "Otros rangos estatales",
+          "pattern": "BOE-A-AAAA-N.md",
+          "note": "Orden, Resolución, Circular, Instrucción, Acuerdo, Decreto, Acuerdo internacional.",
+          "examples": []
+        },
+        {
+          "label": "Normativa autonómica (foral/regional)",
+          "pattern": "es-XX/BOE-A-AAAA-N.md",
+          "note": "Leyes y decretos de comunidades autónomas, ubicados en directorios por jurisdicción ELI (es-pv, es-ct, es-ga, etc.). Incluye rangos forales: ley foral, decreto legislativo, decreto-ley, decreto-ley foral, decreto foral legislativo.",
+          "examples": []
+        }
+      ],
+      "attribution": "> Fuente de los datos: Agencia Estatal Boletín Oficial del Estado (https://www.boe.es). Datos reutilizados conforme a las condiciones de reutilización del BOE (Resolución de 27 de junio de 2024). Este repositorio es una obra derivada basada en datos de la Agencia Estatal Boletín Oficial del Estado.",
+      "notes": "## Estructura de ficheros\n\nEstructura plana: un directorio por ámbito (es/ para el Estado; es-XX/ por comunidad autónoma según código ELI). El rango de la norma (constitución, ley orgánica, ley, real decreto, etc.) figura en el frontmatter YAML, nunca en la ruta del fichero.\n\n## Limitaciones\n\nLas imágenes del texto original se omiten (el proyecto no incorpora activos binarios). Se conserva el texto, las tablas, el formato enriquecido y los metadatos. El identificador del fichero es el ID oficial del BOE; un cambio de formato implicaría regenerar todo el historial de commits."
+    },
+    "eu": {
+      "code": "eu",
+      "name": "European Union",
+      "language": "en",
+      "source_name": "EUR-Lex / CELLAR — Publications Office of the European Union",
+      "source_urls": [
+        "Portal: https://eur-lex.europa.eu",
+        "SPARQL endpoint (CELLAR): https://publications.europa.eu/webapi/rdf/sparql",
+        "REST API (CELLAR): https://publications.europa.eu/resource/cellar/",
+        "Consolidated texts: https://eur-lex.europa.eu/collection/eu-law/consleg.html"
+      ],
+      "data_license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "scope": "Scope (v1) is EU regulations only — base regulations plus implementing, delegated and financial regulations — that are currently in force and have an English XHTML/HTML expression in CELLAR. Directives, decisions, treaties and case law are not included. Each regulation's git history is built from its consolidated-text versions: the original act plus every consolidated version, one commit per reform dated to the consolidation's document date.",
+      "norm_types": [
+        {
+          "label": "Regulation",
+          "pattern": "3YYYYR-XXXX.md",
+          "note": "Base regulations of the European Parliament and of the Council (CELEX sector 3, descriptor R). Filename is the CELEX number; consolidated version history is reconstructed as git commits.",
+          "examples": [
+            "eu/32016R0679.md",
+            "eu/32014R0596.md",
+            "eu/32024R1689.md"
+          ]
+        },
+        {
+          "label": "Implementing Regulation",
+          "pattern": "3YYYYR-XXXX.md",
+          "note": "Commission implementing regulations (resource type REG_IMPL). Same CELEX-number filename scheme; regulation_type recorded in frontmatter extra."
+        },
+        {
+          "label": "Delegated Regulation",
+          "pattern": "3YYYYR-XXXX.md",
+          "note": "Commission delegated regulations (resource type REG_DEL)."
+        },
+        {
+          "label": "Financial Regulation",
+          "pattern": "3YYYYR-XXXX.md",
+          "note": "Financial regulations (resource type REG_FINANC)."
+        }
+      ],
+      "attribution": "> © European Union, https://eur-lex.europa.eu — Source: EUR-Lex (Publications Office of the European Union). Reused under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Only EU legislation published in the printed Official Journal of the European Union is deemed authentic; consolidated texts are reproduced here for documentation purposes and have been reformatted to Markdown.",
+      "notes": "## Coverage and limitations\n\n- **English texts only.** The fetcher requests the English-language expression (`language/ENG`) for every norm; other official languages are not fetched.\n- **In-force regulations only.** Discovery filters on `resource_legal_in-force = true`; repealed or expired regulations are excluded. Corrigenda (`CORRIGENDUM`) are filtered out.\n- **HTML/XHTML availability required.** Regulations that exist in CELLAR only as PDF are skipped, because the parser cannot extract their text.\n- **Version cap.** A small number of heavily amended codes have their consolidated history truncated to the 200 most recent versions to bound bootstrap cost.\n- **Images are dropped** — binary assets are not reproduced.\n- **Identifier = CELEX number.** Filenames use the EUR-Lex CELEX number (e.g. `32016R0679`), with `eli`, `celex` and `regulation_type` recorded in the frontmatter `extra` block. Only the version published in the Official Journal is legally authentic."
+    },
+    "fi": {
+      "code": "fi",
+      "name": "Suomi",
+      "language": "fi",
+      "source_name": "Finlex — Suomen säädöskokoelman ajantasainen lainsäädäntö (oikeusministeriö, Oikeusrekisterikeskus)",
+      "source_urls": [
+        "Portaali: https://www.finlex.fi",
+        "Avoin data (API): https://opendata.finlex.fi/finlex/avoindata/v1",
+        "API-dokumentaatio (Swagger): https://opendata.finlex.fi/swagger-ui/index.html",
+        "Avoimen datan tiedot: https://www.finlex.fi/fi/avoin-data"
+      ],
+      "data_license": "Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0)",
+      "scope": "Aineisto kattaa Suomen ajantasaisen (konsolidoidun) lainsäädännön Finlexin avoimen datan rajapinnasta. Jokainen säädös on yksi tiedosto ja jokainen muutos vastaa Git-committia, joka on päivätty viralliseen voimaantulopäivään. Tunnisteet noudattavat muotoa {vuosi}-{numero}.",
+      "norm_types": [
+        {
+          "label": "Laki",
+          "pattern": "{vuosi}-{numero}.md",
+          "note": "Finlexin tyyppi 'act'.",
+          "examples": [
+            "fi/1999-731.md",
+            "fi/2024-224.md"
+          ]
+        },
+        {
+          "label": "Asetus",
+          "pattern": "{vuosi}-{numero}.md",
+          "note": "Finlexin tyyppi 'decree'.",
+          "examples": [
+            "fi/2025-51.md"
+          ]
+        },
+        {
+          "label": "Valtioneuvoston asetus",
+          "pattern": "{vuosi}-{numero}.md",
+          "note": "Finlexin tyyppi 'government-decree'."
+        },
+        {
+          "label": "Ministeriön asetus",
+          "pattern": "{vuosi}-{numero}.md",
+          "note": "Finlexin tyyppi 'ministerial-decree'."
+        },
+        {
+          "label": "Tasavallan presidentin asetus",
+          "pattern": "{vuosi}-{numero}.md",
+          "note": "Finlexin tyyppi 'presidential-decree'."
+        },
+        {
+          "label": "Määräys",
+          "pattern": "{vuosi}-{numero}.md",
+          "note": "Finlexin tyyppi 'order'."
+        }
+      ],
+      "attribution": "> Sisältää Finlexin aineistoa, jonka on julkaissut oikeusministeriö (Oikeusrekisterikeskus). Aineisto on lisensoitu Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0) -lisenssillä: https://creativecommons.org/licenses/by/4.0/deed.fi. Aineistoon on tehty muotomuutoksia (XML-muoto muunnettu Markdowniksi).",
+      "notes": "## Huomioita\n\n- Aineisto perustuu Finlexin tarjoamaan suomenkieliseen (fin) konsolidoituun ilmaisuun. Kaksikielisten säädösten ruotsinkielisiä (swe) versioita ei sisällytetä.\n- Lähde julkaisee säädökset Akoma Ntoso 3.0 -XML-muodossa; pipeline muuntaa ne Markdowniksi.\n- Kuvat jätetään pois (binääriaineistoa ei tueta); pois jätettyjen kuvien määrä kirjataan kenttään extra.images_dropped."
+    },
+    "fr": {
+      "code": "fr",
+      "name": "France",
+      "language": "fr",
+      "source_name": "Légifrance — base LEGI (Direction de l'information légale et administrative, DILA, services du Premier ministre)",
+      "source_urls": [
+        "Portail : https://www.legifrance.gouv.fr",
+        "Jeu de données LEGI (data.gouv.fr) : https://www.data.gouv.fr/datasets/legi-codes-lois-et-reglements-consolides",
+        "Dump Open Data LEGI (DILA) : https://echanges.dila.gouv.fr/OPENDATA/LEGI/",
+        "Open data et API : https://www.legifrance.gouv.fr/contenu/pied-de-page/open-data-et-api"
+      ],
+      "data_license": "Licence Ouverte / Open Licence (Etalab) v2.0",
+      "scope": "Ce dépôt couvre les textes consolidés de la base LEGI de Légifrance. La phase initiale du pipeline se limite aux textes en vigueur dont la nature est « CODE » ou « CONSTITUTION » : les codes français consolidés et la Constitution du 4 octobre 1958. Chaque texte est un fichier Markdown ; chaque modification correspond à un commit git daté à la date de prise d'effet de la version, ce qui reconstitue l'historique des réformes article par article.",
+      "norm_types": [
+        {
+          "label": "Codes consolidés",
+          "pattern": "LEGITEXTXXXXXXXXXXXX.md",
+          "note": "Codes français en vigueur (nature LEGI « CODE »). Identifiant LEGITEXT à 12 chiffres.",
+          "examples": [
+            "fr/LEGITEXT000006069414.md"
+          ]
+        },
+        {
+          "label": "Constitution",
+          "pattern": "LEGITEXTXXXXXXXXXXXX.md",
+          "note": "Constitution du 4 octobre 1958 (nature LEGI « CONSTITUTION »).",
+          "examples": [
+            "fr/LEGITEXT000006071194.md"
+          ]
+        },
+        {
+          "label": "Lois, lois organiques, ordonnances et décrets",
+          "pattern": "LEGITEXTXXXXXXXXXXXX.md",
+          "note": "Natures LEGI LOI, LOI ORGANIQUE, ORDONNANCE, DÉCRET reconnues par le parseur (textes JORF). Hors périmètre de la phase initiale d'amorçage."
+        }
+      ],
+      "attribution": "> Source : Direction de l'information légale et administrative (DILA) — base LEGI / Légifrance (https://www.legifrance.gouv.fr). Données réutilisées sous Licence Ouverte / Open Licence (Etalab) v2.0. Les textes ont été convertis au format Markdown par Legalize ; ils peuvent différer de la version officielle. Seules les versions publiées au Journal officiel et sur Légifrance font foi.",
+      "notes": "## Précisions\n\n- Les identifiants de fichiers sont les identifiants LEGI officiels (préfixe `LEGITEXT` suivi de 12 chiffres).\n- La date de chaque version est la date de début (`debut`) de l'article ou de la section dans la base LEGI ; la valeur sentinelle `2999-01-01` (validité indéterminée) est traitée comme absente.\n- Les images sont volontairement écartées (le pipeline ne gère pas encore les fichiers binaires).\n- La portée actuelle est restreinte aux codes et à la Constitution ; les lois, ordonnances et décrets isolés (textes JORF) sont reconnus par le parseur mais ne sont pas inclus dans cette phase d'amorçage."
+    },
+    "gr": {
+      "code": "gr",
+      "name": "Ελλάδα",
+      "language": "el",
+      "source_name": "Εθνικό Τυπογραφείο — Εφημερίδα της Κυβερνήσεως (ΦΕΚ), Τεύχος Α'",
+      "source_urls": [
+        "Πύλη αναζήτησης: https://search.et.gr/",
+        "API (Azure Functions): https://searchetv99.azurewebsites.net/api",
+        "Αρχείο PDF (Azure Blob): https://ia37rg02wpsa01.blob.core.windows.net/fek/"
+      ],
+      "data_license": "Δημόσιος τομέας (επίσημα κρατικά κείμενα)",
+      "scope": "Καλύπτεται το Τεύχος Α' της Εφημερίδας της Κυβερνήσεως (νόμοι, προεδρικά διατάγματα, πράξεις νομοθετικού περιεχομένου, αναθεωρήσεις του Συντάγματος και κυρώσεις διεθνών συμβάσεων), από το έτος 2000 και εξής. Τα υπόλοιπα τεύχη (Β' υπουργικές αποφάσεις, Γ' διορισμοί κ.λπ.) δεν περιλαμβάνονται.",
+      "norm_types": [
+        {
+          "label": "Νόμος",
+          "pattern": "FEK-A-XXX-YYYY.md",
+          "note": "Νόμος ψηφισμένος από τη Βουλή· ο αριθμός είναι ο αύξων αριθμός του φύλλου ΦΕΚ Τεύχους Α' και το έτος.",
+          "examples": [
+            "gr/FEK-A-167-2013.md",
+            "gr/FEK-A-145-2016.md"
+          ]
+        },
+        {
+          "label": "Προεδρικό Διάταγμα",
+          "pattern": "FEK-A-XXX-YYYY.md",
+          "note": "Π.Δ. δημοσιευμένο στο Τεύχος Α'.",
+          "examples": []
+        },
+        {
+          "label": "Πράξη Νομοθετικού Περιεχομένου (ΠΝΠ)",
+          "pattern": "FEK-A-XXX-YYYY.md",
+          "note": "Πράξη νομοθετικού περιεχομένου κατά το άρθρο 44 παρ. 1 του Συντάγματος.",
+          "examples": []
+        },
+        {
+          "label": "Σύνταγμα / Αναθεωρήσεις",
+          "pattern": "FEK-A-XXX-YYYY.md",
+          "note": "Σύνταγμα και ψηφίσματα της Αναθεωρητικής Βουλής.",
+          "examples": []
+        },
+        {
+          "label": "Κύρωση Διεθνούς Σύμβασης",
+          "pattern": "FEK-A-XXX-YYYY.md",
+          "note": "Κυρωτικός νόμος διεθνούς σύμβασης ή συνθήκης.",
+          "examples": []
+        }
+      ],
+      "notes": "## Πηγή και πιστότητα\n\nΗ πηγή είναι πάντα το επίσημο, ψηφιακά γεννημένο PDF του ΦΕΚ (μετά το 2000 δεν υπάρχει XML/HTML/JSON πλήρους κειμένου). Το κείμενο εξάγεται από το PDF, οπότε ενδέχεται να υπάρχουν μικρές ατέλειες στη μετατροπή σε Markdown.\n\n## Τροποποιήσεις\n\nΚάθε ΦΕΚ Α' αντιμετωπίζεται ως αυτοτελές έγγραφο «ως ψηφίστηκε»· οι τροποποιήσεις δεν ενσωματώνονται στα υφιστάμενα αρχεία στην έκδοση v1. Το γράφημα τροποποιήσεων μεταξύ εγγράφων (επίσημο timeline του Εθνικού Τυπογραφείου) καταγράφεται χωριστά στα μεταδεδομένα (extra.amends)."
+    },
+    "ie": {
+      "code": "ie",
+      "name": "Ireland",
+      "language": "en",
+      "source_name": "Irish Statute Book (ISB) — Office of the Houses of the Oireachtas",
+      "source_urls": [
+        "Portal: https://www.irishstatutebook.ie",
+        "Discovery API: https://api.oireachtas.ie/v1/legislation",
+        "Revised acts: https://revisedacts.lawreform.ie"
+      ],
+      "data_license": "CC-BY 4.0 (Oireachtas Open Data PSI Licence)",
+      "scope": "Phase 1 covers **Acts of the Oireachtas (1922–present)** sourced from the official ELI XML. Statutory Instruments (~35,000, HTML only) and the Constitution (HTML only) are out of scope for Phase 1.",
+      "norm_types": [
+        {
+          "label": "Acts of the Oireachtas",
+          "pattern": "",
+          "examples": [],
+          "note": "every public Act, sourced as official ELI XML from the Irish Statute Book (e.g. `eli/2024/act/1`)."
+        }
+      ],
+      "attribution": "> Contains Irish Public Sector Information licensed under the Oireachtas (Houses of the Oireachtas) Open Data PSI Licence / Creative Commons Attribution 4.0 International, sourced from https://www.irishstatutebook.ie.",
+      "notes": "## Known limitations\n\n- **Statutory Instruments** (~35,000) are published as HTML only and are out of scope for Phase 1.\n- The **Constitution of Ireland** (Bunreacht na hÉireann) has no XML — only a special HTML path — and is handled separately.\n- Texts are sourced *as enacted*; consolidated/revised versions are cross-referenced from the Law Reform Commission's revised acts."
+    },
+    "it": {
+      "code": "it",
+      "name": "Italia",
+      "language": "it",
+      "source_name": "Normattiva — Il Portale della legge vigente (Presidenza del Consiglio dei Ministri, Istituto Poligrafico e Zecca dello Stato)",
+      "source_urls": [
+        "Portale: https://www.normattiva.it",
+        "Open Data: https://dati.normattiva.it",
+        "API Open Data: https://api.normattiva.it/t/normattiva.api",
+        "Documentazione API: https://dati.normattiva.it/assets/come_fare_per/API_Normattiva_OpenData.pdf"
+      ],
+      "data_license": "Pubblico dominio (testi ufficiali, art. 5 L. 633/1941)",
+      "scope": "Il repository raccoglie la legislazione statale italiana consolidata pubblicata su Normattiva. L'ambito della versione 1 comprende: Costituzione, leggi costituzionali, leggi ordinarie, decreti legislativi, decreti-legge, decreti del Presidente della Repubblica (DPR), decreti del Presidente del Consiglio dei Ministri (DPCM) e decreti. La cronologia delle riforme è ricostruita seguendo le versioni temporali (vigenza) di ciascun articolo: ogni data di inizio vigenza successiva alla prima genera un commit di riforma datato. Le immagini sono escluse.",
+      "norm_types": [
+        {
+          "label": "Costituzione",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "La Costituzione della Repubblica Italiana (un solo atto).",
+          "examples": []
+        },
+        {
+          "label": "Legge costituzionale",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "rank: legge_costituzionale",
+          "examples": []
+        },
+        {
+          "label": "Legge",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "Leggi ordinarie dello Stato. rank: legge",
+          "examples": []
+        },
+        {
+          "label": "Decreto legislativo",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "rank: decreto_legislativo",
+          "examples": []
+        },
+        {
+          "label": "Decreto-legge",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "rank: decreto_legge",
+          "examples": []
+        },
+        {
+          "label": "Decreto del Presidente della Repubblica (DPR)",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "rank: decreto_presidente_repubblica",
+          "examples": []
+        },
+        {
+          "label": "Decreto del Presidente del Consiglio dei Ministri (DPCM)",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "rank: decreto_presidente_consiglio",
+          "examples": []
+        },
+        {
+          "label": "Decreto",
+          "pattern": "{codiceRedazionale}.md",
+          "note": "rank: decreto",
+          "examples": []
+        }
+      ],
+      "notes": "## Identificatore e nomi dei file\n\nL'identificatore usato nel nome del file è il «codice redazionale» di Normattiva (campo `codiceRedazionale`), non l'URN. Il percorso del file è `it/{codiceRedazionale}.md`, struttura piatta con un'unica cartella `it/`. Il rango (`rank`) dell'atto è registrato nel frontmatter YAML, non nella struttura delle cartelle. Il campo `source` del frontmatter contiene invece un URN Normattiva (`urn:nir:stato:...`).\n\n## Date e cronologia\n\nLe date di pubblicazione derivano dalla data di emanazione dell'atto (con fallback sulla data della Gazzetta Ufficiale). Le riforme sono dedotte dalle date di inizio vigenza degli articoli; gli atti senza versioni temporali successive risultano con il solo commit iniziale.\n\n## Recupero del testo\n\nIl testo consolidato è ottenuto in via primaria dall'API Open Data via URN; per alcuni tipi di atto (es. DPR, DPCM) in cui l'endpoint URN restituisce 404 si ricorre allo scraping della pagina web normattiva.it. Il bootstrap massivo usa le raccolte «multivigente» precompilate (ZIP) fornite da Normattiva."
+    },
+    "kr": {
+      "code": "kr",
+      "name": "대한민국",
+      "language": "ko",
+      "source_name": "국가법령정보센터 (National Law Information Center) — 법제처 (Ministry of Government Legislation, MOLEG)",
+      "source_urls": [
+        "포털: https://www.law.go.kr/",
+        "영문 포털: https://www.law.go.kr/LSW/eng/engMain.do",
+        "오픈 API / 공동활용: https://open.law.go.kr/",
+        "운영기관(법제처): https://www.moleg.go.kr/"
+      ],
+      "data_license": "공공누리 제1유형(출처표시) — 법령 본문은 저작권 보호 제외(저작권법 §7)",
+      "scope": "대한민국의 현행 법령을 공식 공포일을 기준으로 버전 관리되는 마크다운으로 발행한다. 원천 데이터는 법제처가 운영하는 국가법령정보센터(law.go.kr)와 국가법령정보 공동활용(open.law.go.kr) 오픈 API다. 이 엔진에는 한국 전용 페처(fetcher)가 없으며, 데이터는 독립된 파이프라인으로 수집되었다.",
+      "norm_types": [
+        {
+          "label": "법령 (법률·대통령령·총리령·부령 등)",
+          "note": "헌법·법률 및 그 시행령·시행규칙을 포함하는 중앙 법령",
+          "pattern": "",
+          "examples": []
+        },
+        {
+          "label": "행정규칙 (훈령·예규·고시 등)",
+          "note": "중앙행정기관의 행정규칙",
+          "pattern": "",
+          "examples": []
+        },
+        {
+          "label": "자치법규 (조례·규칙)",
+          "note": "지방자치단체의 조례 및 규칙",
+          "pattern": "",
+          "examples": []
+        },
+        {
+          "label": "조약",
+          "note": "대한민국이 체결한 조약",
+          "pattern": "",
+          "examples": []
+        }
+      ],
+      "attribution": "> 출처: 국가법령정보센터(법제처, https://www.law.go.kr) — 공공누리 제1유형(출처표시)에 따라 이용.",
+      "notes": "## 검증 한계\n\n- 이 저장소의 실제 파일명 규칙과 예시 ID는 엔진 내 페처·테스트·픽스처로 확인할 수 없어(한국 전용 페처 없음) 명시하지 않았다.\n- 국가법령정보센터는 법령 외에도 행정규칙, 자치법규, 조약, 판례 등을 제공하나, 본 저장소에 실제 포함된 문서 유형의 범위는 별도 확인이 필요하다."
+    },
+    "li": {
+      "code": "li",
+      "name": "Liechtenstein",
+      "language": "de",
+      "source_name": "Lilex — Gesetzesdatenbank des Fürstentums Liechtenstein (Liechtensteinisches Landesgesetzblatt, LGBl), herausgegeben von der Regierung des Fürstentums Liechtenstein",
+      "source_urls": [
+        "Portal: https://www.gesetze.li",
+        "Konsolidiertes Recht (Gebietssystematik): https://www.gesetze.li/konso/gebietssystematik",
+        "Neueste Landesgesetzblätter: https://www.gesetze.li/chrono/neueste-lgbl"
+      ],
+      "data_license": "gemeinfrei (amtliche Werke des Staates)",
+      "scope": "Dieses Repository enthält das konsolidierte Landesrecht Liechtensteins (Gesetze und Verordnungen) sowie die in Lilex konsolidierten Staatsverträge, jeweils aus der Gesetzesdatenbank Lilex (gesetze.li). Erfasst werden die in Kraft stehenden konsolidierten Normen samt ihrer historischen Fassungen: Jede frühere Fassung einer Norm wird als eigener Git-Commit auf das jeweilige Inkrafttretensdatum der Fassung datiert.",
+      "norm_types": [
+        {
+          "label": "Landesrecht (Gesetze)",
+          "pattern": "LGBl-JJJJ-NNN.md",
+          "note": "Konsolidierte liechtensteinische Gesetze; Rang aus dem Titel abgeleitet (u. a. verfassung, verfassungsgesetz, gesetz).",
+          "examples": [
+            "li/LGBl-1921-015.md",
+            "li/LGBl-1926-004.md"
+          ]
+        },
+        {
+          "label": "Verordnungen und sonstige Erlasse",
+          "pattern": "LGBl-JJJJ-NNN.md",
+          "note": "Verordnungen, Kundmachungen, Beschlüsse, Reglemente und weitere konsolidierte Erlasse; alle flach im Verzeichnis li/.",
+          "examples": [
+            "li/LGBl-1988-037.md"
+          ]
+        },
+        {
+          "label": "Staatsverträge",
+          "pattern": "LGBl-JJJJ-NNN.md",
+          "note": "In Lilex konsolidierte völkerrechtliche Verträge, Abkommen, Übereinkommen und Protokolle.",
+          "examples": [
+            "li/LGBl-2024-076.md"
+          ]
+        }
+      ],
+      "notes": "## Identifikator und Dateinamen\n\nJede Norm wird als `li/LGBl-{Jahr}-{Nummer}.md` abgelegt, wobei die dreistellige LGBl-Nummer mit führenden Nullen aufgefüllt ist (z. B. `li/LGBl-1921-015.md`). Der Identifikator leitet sich aus der LGBl-Nummer in punktierter Form (z. B. `1921.015`) ab.\n\n## Versionsgeschichte\n\nLilex stellt pro Norm ein Versions-Dropdown mit allen konsolidierten Fassungen bereit; die Pipeline holt jede historische Fassung einzeln und erzeugt daraus eine Commit-Historie. Wenn für eine Fassung kein datierter Eintrag vorliegt, wird ersatzweise der 1. Januar des LGBl-Jahrgangs als Datum verwendet.\n\n## Bekannte Einschränkungen\n\nLilex bietet keine öffentliche API; die Daten werden per HTML-Scraping über gesetze.li bezogen. Bilder/Binärinhalte werden ausgelassen. Der Rang (`rank`) wird heuristisch aus dem Titel abgeleitet und kann in Einzelfällen ungenau sein."
+    },
+    "lt": {
+      "code": "lt",
+      "name": "Lietuva",
+      "language": "lt",
+      "source_name": "Teisės aktų registras (TAR) — Lietuvos Respublikos teisingumo ministerija / VĮ Registrų centras; duomenys gaunami per Lietuvos atvirų duomenų portalą (data.gov.lt, Spinta API)",
+      "source_urls": [
+        "Teisės aktų registras: https://www.e-tar.lt/",
+        "Atvirų duomenų rinkinys (Teisės aktų registro duomenys): https://data.gov.lt/datasets/2613/",
+        "Spinta API: https://get.data.gov.lt/datasets/gov/lrsk/teises_aktai/Dokumentas"
+      ],
+      "data_license": "Creative Commons Priskyrimas 4.0 tarptautinė (CC BY 4.0)",
+      "scope": "Saugykloje skelbiami pagrindiniai galiojantys ir negaliojantys Lietuvos teisės aktai — apie 15 tūkst. normų. Įtraukti tik esminiai teisės aktų tipai (Konstitucija, konstituciniai įstatymai, įstatymai, kodeksai); administraciniai aktai (nutarimai, įsakymai, dekretai ir kt.) į pagrindinę apimtį neįtraukti, nors kasdienių atnaujinimų metu jie gali būti apdorojami, jei keičia įstatymus.",
+      "norm_types": [
+        {
+          "label": "Įstatymas",
+          "pattern": "TAR.XXXXXXXXXXXX.md",
+          "note": "Pagrindinė teisės aktų rūšis (apie 14,9 tūkst. normų). Failo pavadinimas = dokumento_id su priešdėliu TAR.",
+          "examples": []
+        },
+        {
+          "label": "Kodeksas",
+          "pattern": "TAR.XXXXXXXXXXXX.md",
+          "note": "Kodeksai (pvz., Civilinis, Baudžiamasis); frontmatter rango laukas — istatymas.",
+          "examples": []
+        },
+        {
+          "label": "Konstitucinis įstatymas",
+          "pattern": "TAR.XXXXXXXXXXXX.md",
+          "note": "Konstituciniai įstatymai.",
+          "examples": []
+        },
+        {
+          "label": "Konstitucija",
+          "pattern": "TAR.XXXXXXXXXXXX.md",
+          "note": "Lietuvos Respublikos Konstitucija ir su ja susiję aktai.",
+          "examples": []
+        }
+      ],
+      "attribution": "> Duomenų šaltinis: Teisės aktų registras (TAR), Lietuvos atvirų duomenų portalas (data.gov.lt). Licencija: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.lt). Duomenys gali būti pakeisti (konvertuoti į Markdown formatą).",
+      "notes": "## Šaltinio ypatumai\n\nMetaduomenys ir pilnas tekstas gaunami iš to paties data.gov.lt Spinta API (`tekstas_lt` laukas), o ne tiesiogiai iš e-tar.lt. Frontmatter nurodyta `source` nuoroda veda į oficialų e-tar.lt aktą.\n\nTekstas teikiamas kaip grynasis tekstas (be HTML), todėl turinys struktūrizuojamas pagal lietuviškus struktūros žymenis (straipsnis, skyrius, skirsnis, dalis). Reformų istorija (commit'ai) atkuriama iš Suvestinė lentelės — kiekviena suvestinės versija tampa atskira teksto būsena nustatytą galiojimo datą."
+    },
+    "lu": {
+      "code": "lu",
+      "name": "Lëtzebuerg / Luxembourg",
+      "language": "fr",
+      "source_name": "Legilux — Journal officiel du Grand-Duché de Luxembourg (Service central de législation, Ministère d'État)",
+      "source_urls": [
+        "Portail open data (Casemates): https://data.legilux.public.lu/",
+        "Point d'accès SPARQL: https://data.legilux.public.lu/sparqlendpoint",
+        "Filestore XML (Akoma Ntoso): https://data.legilux.public.lu/filestore",
+        "Jeu de données sur data.public.lu: https://data.public.lu/en/datasets/legilux-journal-officiel-du-grand-duche-de-luxembourg-1/"
+      ],
+      "data_license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "scope": "Le dépôt couvre la législation primaire luxembourgeoise diffusée par Legilux dans le périmètre v1 : lois, règlements grand-ducaux et la Constitution. Chaque norme est un fichier Markdown et chaque consolidation (réforme) issue du modèle de données JOLux donne lieu à un commit git daté à sa date d'applicabilité.",
+      "norm_types": [
+        {
+          "label": "Loi",
+          "pattern": "leg-loi-AAAA-MM-JJ-aNNN.md",
+          "note": "Type de document LOI (rang « loi »). Identifiant dérivé de l'URI ELI.",
+          "examples": [
+            "lu/leg-loi-2022-05-27-a250.md"
+          ]
+        },
+        {
+          "label": "Règlement grand-ducal",
+          "pattern": "leg-rgd-AAAA-MM-JJ-aNNN.md",
+          "note": "Type de document RGD (rang « reglement_grand_ducal »).",
+          "examples": [
+            "lu/leg-rgd-2026-04-02-a185.md"
+          ]
+        },
+        {
+          "label": "Constitution",
+          "pattern": "leg-constitution-AAAA-MM-JJ-nN.md",
+          "note": "Constitution du Grand-Duché (rang « constitution »).",
+          "examples": [
+            "lu/leg-constitution-1868-10-17-n1.md"
+          ]
+        }
+      ],
+      "attribution": "> Source : Legilux — Journal officiel du Grand-Duché de Luxembourg (Service central de législation, Ministère d'État). Données réutilisées sous licence Creative Commons Attribution 4.0 International (CC BY 4.0).",
+      "notes": "## Limites de couverture\n\n- Seuls les actes disposant d'une manifestation XML (Akoma Ntoso) dans le filestore sont inclus ; environ 20 % des textes anciens (antérieurs à 1900) n'existent qu'en PDF et sont donc absents.\n- L'historique des versions provient des consolidations JOLux (champ `dateApplicability`). Les chaînes de consolidations très longues sont plafonnées à 200 versions par norme.\n- Les images sont volontairement omises (pas de prise en charge des binaires)."
+    },
+    "lv": {
+      "code": "lv",
+      "name": "Latvija",
+      "language": "lv",
+      "source_name": "Likumi.lv — Latvijas Republikas tiesību akti (oficiālais izdevējs \"Latvijas Vēstnesis\")",
+      "source_urls": [
+        "Portāls: https://likumi.lv",
+        "Tiesību akta lapa: https://likumi.lv/ta/id/{id}",
+        "Vietnes karte (sitemap): https://likumi.lv/sitemap-index.xml",
+        "Oficiālais izdevums: https://www.vestnesis.lv"
+      ],
+      "data_license": "brīvi pieejams (oficiālie valsts izdevumi nav aizsargāti ar autortiesībām)",
+      "scope": "Repozitorijs satur Latvijas konsolidētos (spēkā esošos) tiesību aktus, kas iegūti no likumi.lv portāla. Katrs tiesību akts ir viens Markdown fails ar konsolidēto tekstu un metadatiem; tiesību akta veids (rangs) ir norādīts faila frontmatter laukā \"rank\", nevis mapju struktūrā.",
+      "norm_types": [
+        {
+          "label": "Satversme (Konstitūcija)",
+          "pattern": "{id}.md",
+          "note": "Latvijas Republikas Satversme, izdevusi Satversmes sapulce.",
+          "examples": [
+            "lv/57980.md"
+          ]
+        },
+        {
+          "label": "Likums",
+          "pattern": "{id}.md",
+          "note": "Saeimas pieņemti likumi (tostarp kodeksi).",
+          "examples": [
+            "lv/225418.md",
+            "lv/68488.md"
+          ]
+        },
+        {
+          "label": "Konstitucionālais likums",
+          "pattern": "{id}.md",
+          "note": ""
+        },
+        {
+          "label": "Ministru kabineta noteikumi",
+          "pattern": "{id}.md",
+          "note": "Veids \"noteikumi\"."
+        },
+        {
+          "label": "Saistošie noteikumi",
+          "pattern": "{id}.md",
+          "note": "Pašvaldību saistošie noteikumi."
+        },
+        {
+          "label": "Rīkojums",
+          "pattern": "{id}.md",
+          "note": ""
+        },
+        {
+          "label": "Lēmums",
+          "pattern": "{id}.md",
+          "note": ""
+        },
+        {
+          "label": "Instrukcija",
+          "pattern": "{id}.md",
+          "note": ""
+        },
+        {
+          "label": "Līgums / starptautiskais līgums / konvencija",
+          "pattern": "{id}.md",
+          "note": "Veidi \"ligums\", \"starptautiskais-ligums\", \"konvencija\"."
+        }
+      ],
+      "notes": "## Tvēruma ierobežojumi\n\n- Faila nosaukums ir likumi.lv ciparu identifikators (piem., `lv/57980.md` = Satversme). Avota URL: `https://likumi.lv/ta/id/{id}`.\n- Iekļauti tikai konsolidētie tiesību akti. Grozījumu dokumenti (URL ar prefiksiem \"grozijumi-\", \"grozijums-\", \"par-grozijumiem-\") tiek izlaisti, jo tie izmanto atšķirīgu HTML formātu bez konsolidētas struktūras.\n- Aptuveni 483 identifikatori, ko aizliedz likumi.lv `robots.txt`, ir izslēgti.\n- Vēsturiskās redakcijas (`/redakcijas-datums/`) `robots.txt` aizliedz iegūt, tāpēc katrs tiesību akts tiek saglabāts kā viena pašreizējā konsolidētā versija — atsevišķa reformu (grozījumu) git vēsture katram aktam nav pieejama.\n- Attēli netiek saglabāti."
+    },
+    "nl": {
+      "code": "nl",
+      "name": "Nederland",
+      "language": "nl",
+      "source_name": "Basis Wetten Bestand (BWB) — KOOP (Kennis- en Exploitatiecentrum voor Officiële Overheidspublicaties), Ministerie van Binnenlandse Zaken en Koninkrijksrelaties",
+      "source_urls": [
+        "Portaal: https://wetten.overheid.nl",
+        "Dataset: https://data.overheid.nl/dataset/basis-wetten-bestand",
+        "SRU-zoekdienst: https://zoekservice.overheid.nl/sru/Search?x-connection=BWB",
+        "Repository (XML): https://repository.officiele-overheidspublicaties.nl/bwb"
+      ],
+      "data_license": "CC0 1.0 Universeel (publiek domein)",
+      "scope": "De dataset bevat de geconsolideerde, geldende Nederlandse wet- en regelgeving uit het Basis Wetten Bestand (BWB). De bootstrap haalt elke regeling op die vandaag geldig is (ongeveer 22.000 actieve regelingen, gemeten 2026-04-11) en downloadt elke historische expressie (\"toestand\") uit de repository, zodat de git-historie één commit per echte wijziging weergeeft.",
+      "norm_types": [
+        {
+          "label": "Wet",
+          "pattern": "BWBR-XXXXXXX.md",
+          "note": "Formele wetten en rijkswetten.",
+          "examples": [
+            "nl/BWBR0005291.md"
+          ]
+        },
+        {
+          "label": "Grondwet",
+          "pattern": "BWBR-XXXXXXX.md",
+          "note": "De Grondwet (BWBR0001840) krijgt een eigen rang.",
+          "examples": [
+            "nl/BWBR0001840.md"
+          ]
+        },
+        {
+          "label": "Algemene maatregel van bestuur (AMvB) en koninklijk besluit (KB)",
+          "pattern": "BWBR-XXXXXXX.md",
+          "note": "Inclusief rijks-AMvB en rijks-KB.",
+          "examples": []
+        },
+        {
+          "label": "Ministeriële regeling",
+          "pattern": "BWBR-XXXXXXX.md",
+          "note": "Inclusief BES-varianten en archiefselectielijsten.",
+          "examples": [
+            "nl/BWBR0011353.md"
+          ]
+        },
+        {
+          "label": "Beleidsregel, circulaire en reglement",
+          "pattern": "BWBR-XXXXXXX.md",
+          "note": "Inclusief BES-varianten.",
+          "examples": []
+        },
+        {
+          "label": "Verdrag",
+          "pattern": "BWBV-XXXXXXX.md",
+          "note": "Internationale verdragen; identifier begint met BWBV.",
+          "examples": []
+        }
+      ],
+      "notes": "## Beperkingen\n\n- Per regeling worden maximaal 200 historische expressies opgenomen. Bij een handvol regelingen met langere ketens wordt afgekapt tot de 200 meest recente toestanden, zodat de huidige tekst altijd aanwezig blijft.\n- Expressies die alleen als \"gedrukte tekst\" bestaan zonder XML-manifestatie worden overgeslagen.\n- Afbeeldingen worden niet opgenomen; beeldknopen worden weggelaten."
+    },
+    "no": {
+      "code": "no",
+      "name": "Norge",
+      "language": "no",
+      "source_name": "Lovdata (Stiftelsen Lovdata) — Lovdatas åpne data-API (publicData)",
+      "source_urls": [
+        "Portal: https://lovdata.no",
+        "API: https://api.lovdata.no/v1/publicData",
+        "Datasett (gjeldende lover): https://api.lovdata.no/v1/publicData/get/gjeldende-lover.tar.bz2",
+        "Om API-tjenesten: https://api.lovdata.no/om-api-tjenesten/"
+      ],
+      "data_license": "NLOD 2.0 (Norsk lisens for offentlige data)",
+      "scope": "Dette repoet inneholder konsoliderte (oppdaterte) gjeldende norske lover hentet fra Lovdatas åpne data-API (datasettet `gjeldende-lover`). Hver lov er én Markdown-fil og hver reform er en git-commit datert til den offisielle kunngjøringsdatoen.",
+      "norm_types": [
+        {
+          "label": "Grunnlov",
+          "pattern": "LOV-1814-05-17.md",
+          "note": "Kongeriket Norges Grunnlov; egen rang `grunnlov`, særbehandlet i parseren.",
+          "examples": [
+            "no/LOV-1814-05-17.md"
+          ]
+        },
+        {
+          "label": "Lov",
+          "pattern": "LOV-ÅÅÅÅ-MM-DD-N.md",
+          "note": "Formelle lover; identifikator er Lovdatas legacy-ID med prefiks LOV. Rang `lov`.",
+          "examples": [
+            "no/LOV-2005-05-20-28.md",
+            "no/LOV-2023-06-09-26.md"
+          ]
+        },
+        {
+          "label": "Forskrift",
+          "pattern": "FOR-ÅÅÅÅ-MM-DD-N.md",
+          "note": "Sentrale forskrifter; identifikator med prefiks FOR, rang `forskrift`. Foreløpig ikke inkludert i gjeldende uttrekk (`gjeldende-lover`)."
+        }
+      ],
+      "attribution": "> Inneholder data under Norsk lisens for offentlige data (NLOD) distribuert av Stiftelsen Lovdata.",
+      "notes": "## Begrensninger\n\n- Kun gjeldende lover. Bygger på Lovdatas frie datasett `gjeldende-lover.tar.bz2`, som inneholder konsoliderte gjeldende lover (ca. 781 dokumenter). Sentrale forskrifter ligger i et eget datasett (`gjeldende-sentrale-forskrifter`) og er foreløpig ikke inkludert, selv om rangtypen `forskrift` finnes i parseren.\n- Ingen reformhistorikk ennå. Det frie datauttrekket eksponerer ikke historiske versjoner per paragraf, så git-historikken inneholder foreløpig kun den gjeldende teksten (bootstrap). Historiske versjoner krever Lovdatas autentiserte API.\n- Nynorskvarianter hoppes over. Kun bokmålsversjonen tas med; for øyeblikket har bare Grunnloven en egen nynorskvariant i kilden.\n- Bilder utelates. Binære vedlegg tas ikke med."
+    },
+    "pl": {
+      "code": "pl",
+      "name": "Polska",
+      "language": "pl",
+      "source_name": "ISAP — Internetowy System Aktów Prawnych / ELI API Sejmu Rzeczypospolitej Polskiej (Kancelaria Sejmu)",
+      "source_urls": [
+        "Portal ISAP: https://isap.sejm.gov.pl/",
+        "Portal ELI: https://eli.gov.pl/",
+        "API ELI (Sejm): https://api.sejm.gov.pl/eli",
+        "Dokumentacja API: https://api.sejm.gov.pl/eli_pl.html"
+      ],
+      "data_license": "domena publiczna (urzędowe publikacje rządowe)",
+      "scope": "Repozytorium obejmuje akty prawne publikowane w Dzienniku Ustaw (wydawca DU) udostępniane przez ELI API Sejmu. Zakres wersji 1: wyłącznie akty z dostępną treścią HTML, od roku 2000 wzwyż (pokrycie HTML jest niemal pełne od ~2012 r.). Każdy plik odpowiada jednemu aktowi, każda reforma to commit git datowany na oficjalną datę ogłoszenia.",
+      "norm_types": [
+        {
+          "label": "Ustawa",
+          "pattern": "DU-RRRR-PPP.md",
+          "note": "Akt rangi ustawowej publikowany w Dzienniku Ustaw.",
+          "examples": [
+            "pl/DU-2024-1907.md",
+            "pl/DU-2023-1963.md"
+          ]
+        },
+        {
+          "label": "Rozporządzenie",
+          "pattern": "DU-RRRR-PPP.md",
+          "note": "Akt wykonawczy (np. Rady Ministrów lub ministra) publikowany w Dzienniku Ustaw.",
+          "examples": [
+            "pl/DU-2024-1984.md",
+            "pl/DU-2024-1977.md"
+          ]
+        },
+        {
+          "label": "Konstytucja",
+          "pattern": "DU-RRRR-PPP.md",
+          "note": "Konstytucja Rzeczypospolitej Polskiej (dostępna w ISAP głównie jako PDF — może nie występować w wersji v1)."
+        },
+        {
+          "label": "Obwieszczenie",
+          "pattern": "DU-RRRR-PPP.md",
+          "note": "Obwieszczenia (m.in. teksty jednolite) publikowane w Dzienniku Ustaw."
+        },
+        {
+          "label": "Uchwała",
+          "pattern": "DU-RRRR-PPP.md",
+          "note": ""
+        },
+        {
+          "label": "Umowa międzynarodowa",
+          "pattern": "DU-RRRR-PPP.md",
+          "note": "Umowy i protokoły międzynarodowe ogłaszane w Dzienniku Ustaw."
+        }
+      ],
+      "notes": "## Ograniczenia zakresu\n\n- Uwzględniany jest wyłącznie wydawca **DU (Dziennik Ustaw)**; Monitor Polski (MP) i inne dzienniki urzędowe nie są obecnie pobierane.\n- Pomijane są akty dostępne **tylko w formacie PDF** (np. Konstytucja z 1997 r., obwieszczenia z tekstami jednolitymi kodeksów, większość aktów sprzed 2012 r.), ponieważ pipeline przetwarza treść z HTML.\n- **Obrazy są pomijane** — pipeline nie obsługuje jeszcze zasobów binarnych.\n- Identyfikator pliku pochodzi z ELI: `{wydawca}-{rok}-{pozycja}` (forma ELI `DU/rok/pozycja` zapisana z myślnikami, bezpieczna dla systemu plików)."
+    },
+    "pt": {
+      "code": "pt",
+      "name": "Portugal",
+      "language": "pt",
+      "source_name": "DRE — Diário da República Eletrónico (Imprensa Nacional-Casa da Moeda)",
+      "source_urls": [
+        "Portal: https://diariodarepublica.pt",
+        "Fonte de dados (bootstrap, espelho SQLite): https://dre.tretas.org",
+        "API interna (atualizações diárias): https://diariodarepublica.pt/dr"
+      ],
+      "data_license": "domínio público (publicações oficiais do Estado)",
+      "scope": "O repositório cobre legislação da 1.ª Série (Série I) do Diário da República publicada desde 1911, restrita aos principais tipos de atos normativos. Cada lei é um ficheiro Markdown e cada reforma é um commit de Git datado à data oficial de publicação. As imagens são omitidas; as tabelas são convertidas para tabelas Markdown.",
+      "norm_types": [
+        {
+          "label": "Lei",
+          "pattern": "DRE-L-XXXXX.md",
+          "note": "Lei da Assembleia da República",
+          "examples": [
+            "pt/DRE-L-39-2016.md"
+          ]
+        },
+        {
+          "label": "Lei Constitucional",
+          "pattern": "DRE-LC-XXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Lei Orgânica",
+          "pattern": "DRE-LO-XXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Decreto-Lei",
+          "pattern": "DRE-DL-XXXXX.md",
+          "note": "",
+          "examples": [
+            "pt/DRE-DL-111-A-2017.md"
+          ]
+        },
+        {
+          "label": "Decreto",
+          "pattern": "DRE-D-XXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Decreto Regulamentar",
+          "pattern": "DRE-DR-XXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Decreto Legislativo Regional",
+          "pattern": "DRE-DLR-XXXXX.md",
+          "note": "Regiões Autónomas (Açores e Madeira)"
+        },
+        {
+          "label": "Decreto Regulamentar Regional",
+          "pattern": "DRE-DRR-XXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Portaria",
+          "pattern": "DRE-P-XXXXX.md",
+          "note": "",
+          "examples": [
+            "pt/DRE-P-180-2024.md"
+          ]
+        },
+        {
+          "label": "Resolução",
+          "pattern": "DRE-R-XXXXX.md",
+          "note": "Inclui Resoluções do Conselho de Ministros e da Assembleia da República"
+        }
+      ],
+      "notes": "## Limitações\n\n- O bootstrap usa o despejo SQLite semanal de dre.tretas.org (todos os documentos do Diário da República desde 1911); as atualizações diárias usam a API OutSystems oficial de diariodarepublica.pt.\n- A cobertura limita-se à Série I e aos principais tipos de atos normativos (leis, decretos-leis, decretos, portarias, resoluções, etc.). Despachos, avisos e atos de menor relevância normativa só são incluídos quando ocorrem na Série I.\n- O URL de origem de cada norma usa o identificador ELI (European Legislation Identifier) quando disponível; caso contrário, o PDF do DRE ou uma ligação de dre.tretas.org."
+    },
+    "ro": {
+      "code": "ro",
+      "name": "România",
+      "language": "ro",
+      "source_name": "Portalul Legislativ (legislatie.just.ro), administrat de Ministerul Justiției — texte consolidate provenite din Monitorul Oficial al României",
+      "source_urls": [
+        "Portal: https://legislatie.just.ro",
+        "Pagină text consolidat: https://legislatie.just.ro/Public/DetaliiDocumentAfis/{ID}",
+        "Pagină detaliu (metadate + istoric versiuni): https://legislatie.just.ro/Public/DetaliiDocument/{ID}",
+        "API SOAP (descoperire): https://legislatie.just.ro/apiws/FreeWebService.svc?wsdl"
+      ],
+      "data_license": "Domeniu public (texte oficiale, Legea nr. 8/1996, art. 9)",
+      "scope": "Acoperă corpusul legislativ principal al României în formă consolidată: Constituția, legi (inclusiv legi constituționale), coduri, ordonanțe și ordonanțe de urgență, hotărâri, decrete și decrete-lege, regulamente, norme și statute. Sunt excluse intenționat tipurile de acte secundare/administrative (de exemplu comunicate, anexe, instrucțiuni, protocoale). Descoperirea pornește de la anul 1989.",
+      "norm_types": [
+        {
+          "label": "Constituție",
+          "pattern": "RO-XXXXX.md",
+          "note": "Constituția României (text consolidat).",
+          "examples": [
+            "ro/RO-798.md"
+          ]
+        },
+        {
+          "label": "Lege (inclusiv lege constituțională)",
+          "pattern": "RO-XXXXX.md",
+          "note": "Legi ordinare, organice și constituționale."
+        },
+        {
+          "label": "Cod",
+          "pattern": "RO-XXXXX.md",
+          "note": "Codul civil, Codul penal, Codul fiscal, Codul muncii, Codul de procedură civilă și Codul de procedură penală."
+        },
+        {
+          "label": "Ordonanță și ordonanță de urgență",
+          "pattern": "RO-XXXXX.md",
+          "note": "Ordonanțe (OG) și ordonanțe de urgență ale Guvernului (OUG)."
+        },
+        {
+          "label": "Hotărâre",
+          "pattern": "RO-XXXXX.md",
+          "note": "Hotărâri (de regulă ale Guvernului)."
+        },
+        {
+          "label": "Decret și decret-lege",
+          "pattern": "RO-XXXXX.md",
+          "note": ""
+        },
+        {
+          "label": "Regulament, normă și statut",
+          "pattern": "RO-XXXXX.md",
+          "note": ""
+        }
+      ],
+      "notes": "## Identificator și nume de fișier\n\nIdentificatorul fiecărui act este `RO-{ID}`, unde `{ID}` este identificatorul numeric al documentului folosit de Portalul Legislativ (de exemplu, documentul 798 pentru Constituție devine `RO-798`). Numele fișierului este `ro/RO-{ID}.md`, structură plată, fără subdirectoare; rangul (tipul actului) este înregistrat în frontmatter, nu în calea fișierului.\n\n## Istoricul reformelor\n\nFiecare versiune consolidată are propriul identificator de document pe portal. Istoricul de com-uri este reconstruit din secțiunea „istoric consolidări\" de pe pagina de detaliu: fiecare consolidare devine un commit datat la data intrării în vigoare a versiunii respective.\n\n## Imagini\n\nImaginile sunt eliminate (nu se publică active binare); numărul lor este consemnat în `extra.images_dropped`."
+    },
+    "se": {
+      "code": "se",
+      "name": "Sverige",
+      "language": "sv",
+      "source_name": "Sveriges riksdag — Riksdagens öppna data (Svensk författningssamling, SFS)",
+      "source_urls": [
+        "Portal: https://www.riksdagen.se/sv/dokument-och-lagar/riksdagens-oppna-data/",
+        "API/dataset: https://data.riksdagen.se/dokumentlista/?doktyp=sfs&format=json",
+        "Dokument: https://data.riksdagen.se/dokument/{dok_id}.json",
+        "Ändringsregister (SFSR): https://rkrattsbaser.gov.se/sfsr?bet={SFS}"
+      ],
+      "data_license": "Fri användning med källhänvisning (Riksdagens öppna data)",
+      "scope": "Innehåller svenska grundförfattningar ur Svensk författningssamling (SFS) hämtade via Riksdagens öppna data. Varje författning är en fil och varje ändring (ändrings-SFS) blir en git-commit daterad till det officiella publiceringsdatumet.",
+      "norm_types": [
+        {
+          "label": "Grundlag",
+          "pattern": "SFS-XXXX-XX.md",
+          "note": "Grundlagar, t.ex. regeringsform, tryckfrihetsförordning, yttrandefrihetsgrundlag, successionsordning.",
+          "examples": [
+            "se/SFS-1974-152.md"
+          ]
+        },
+        {
+          "label": "Balk",
+          "pattern": "SFS-XXXX-XX.md",
+          "note": "Balkar (omfattande kodifieringar), t.ex. brottsbalken.",
+          "examples": [
+            "se/SFS-1962-700.md"
+          ]
+        },
+        {
+          "label": "Lag",
+          "pattern": "SFS-XXXX-XX.md",
+          "note": "Lagar — den vanligaste typen av SFS-författning.",
+          "examples": []
+        },
+        {
+          "label": "Förordning",
+          "pattern": "SFS-XXXX-XX.md",
+          "note": "Förordningar utfärdade av regeringen.",
+          "examples": [
+            "se/SFS-2011-1108.md"
+          ]
+        }
+      ],
+      "attribution": "> Källa: Sveriges riksdag (Riksdagens öppna data). Detta projekt drivs inte av och är inte godkänt av Sveriges riksdag.",
+      "notes": "## Avgränsningar\n\nÄndrings-SFS (titlar med \"om ändring i\" eller \"om upphävande av\") sparas inte som egna filer — de tillämpas på den grundförfattning de ändrar och registreras som ändringshistorik. Ändringsregistret (SFSR) hämtas separat från rkrattsbaser.gov.se. För äldre författningar utan registrerat publiceringsdatum används den 1 januari det år SFS-numret avser som ungefärligt datum. Bilder och andra binära tillgångar tas inte med."
+    },
+    "sk": {
+      "code": "sk",
+      "name": "Slovensko",
+      "language": "sk",
+      "source_name": "Slov-Lex — elektronická Zbierka zákonov (e-Zbierka), Ministerstvo spravodlivosti Slovenskej republiky",
+      "source_urls": [
+        "Portál: https://www.slov-lex.sk/",
+        "API: https://api-gateway.slov-lex.sk",
+        "Statické dáta: https://static.slov-lex.sk"
+      ],
+      "data_license": "verejná doména (úradné texty vylúčené z autorskoprávnej ochrany)",
+      "scope": "Repozitár obsahuje konsolidované znenia právnych predpisov Slovenskej republiky zo Zbierky zákonov (ZZ), získané z portálu Slov-Lex. Každý predpis je jeden súbor Markdown a každé účinné znenie (novela) je samostatný git commit datovaný dátumom nadobudnutia účinnosti. Katalóg Slov-Lex obsahuje približne 26 000 predpisov.",
+      "norm_types": [
+        {
+          "label": "Zákon",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Bežný zákon (typ Zakon / ZakonCeleZnenie).",
+          "examples": []
+        },
+        {
+          "label": "Ústavný zákon",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Ústava a ústavné zákony (typ UstavnyZakon). Ústava SR má číslo 460/1992 Z. z.",
+          "examples": [
+            "sk/ZZ-1992-460.md"
+          ]
+        },
+        {
+          "label": "Nariadenie vlády",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Vykonávací predpis vlády (typ NariadenieVlady).",
+          "examples": []
+        },
+        {
+          "label": "Vyhláška",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Vyhláška ministerstva alebo iného orgánu (typ Vyhlaska).",
+          "examples": []
+        },
+        {
+          "label": "Opatrenie",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Opatrenie (typ Opatrenie).",
+          "examples": []
+        },
+        {
+          "label": "Oznámenie",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Oznámenie (typ Oznamenie), vrátane redakčného oznámenia (RedakcneOznamenie).",
+          "examples": []
+        },
+        {
+          "label": "Nález",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Nález Ústavného súdu (typ Nalez).",
+          "examples": []
+        },
+        {
+          "label": "Rozhodnutie",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Rozhodnutie orgánu verejnej moci (typ Rozhodnutie).",
+          "examples": []
+        },
+        {
+          "label": "Uznesenie",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Uznesenie (typ Uznesenie).",
+          "examples": []
+        },
+        {
+          "label": "Zákonné opatrenie",
+          "pattern": "ZZ-RRRR-NNN.md",
+          "note": "Zákonné opatrenie (typ ZakonneOpatrenie).",
+          "examples": []
+        }
+      ],
+      "notes": "## Pokrytie a obmedzenia\n\n- Identifikátorom súboru je číslo predpisu v Zbierke zákonov vo formáte `ZZ-{rok}-{číslo}` (napr. predpis č. 460/1992 Z. z. → `ZZ-1992-460`).\n- Vyhlásené znenie (`vyhlasene_znenie`, pôvodný text pred prvou konsolidáciou) sa vynecháva — jeho portálová adresa pri starších predpisoch často vracia chybu 404. História sa preto začína prvým konsolidovaným znením.\n- Verzie bez dátumu nadobudnutia účinnosti alebo bez dostupného textu sa preskakujú.\n- Obrázky sa zámerne nepreberajú (binárne prílohy zatiaľ nie sú podporované)."
+    },
+    "uk": {
+      "code": "uk",
+      "name": "United Kingdom",
+      "language": "en",
+      "source_name": "legislation.gov.uk, published by The National Archives",
+      "source_urls": [
+        "Portal: https://www.legislation.gov.uk",
+        "Data (CLML XML / Atom): https://www.legislation.gov.uk/{type}/{year}/{number}/data.xml",
+        "Reuse documentation: https://legislation.github.io/data-documentation/reuse-licence.html"
+      ],
+      "data_license": "Open Government Licence v3.0 (attribution required)",
+      "scope": "Covers UK primary legislation (Acts and Measures) and secondary legislation (Statutory Instruments) across all four jurisdictions. Documents are sourced as CLML (Crown Legislation Markup Language) XML and split across directories by jurisdiction: uk/ for UK-wide laws, uk-sct/ for Scotland, uk-wls/ for Wales, uk-nir/ for Northern Ireland. Each law's git history reconstructs its revised-text timeline: a bootstrap commit from the as-enacted text plus one commit per applied in-force amendment date, derived from the official point-in-time snapshots and change timeline feeds.",
+      "norm_types": [
+        {
+          "label": "UK Public General Acts",
+          "pattern": "uk/ukpga-YYYY-N.md",
+          "note": "UK-wide primary legislation (type code ukpga); stored at state level in the uk/ directory.",
+          "examples": [
+            "uk/ukpga-1998-42.md",
+            "uk/ukpga-2018-12.md"
+          ]
+        },
+        {
+          "label": "UK Statutory Instruments",
+          "pattern": "uk/uksi-YYYY-N.md",
+          "note": "UK-wide secondary legislation (type code uksi); stored at state level in the uk/ directory.",
+          "examples": [
+            "uk/uksi-2020-52.md"
+          ]
+        },
+        {
+          "label": "Acts of the Scottish Parliament",
+          "pattern": "uk-sct/asp-YYYY-N.md",
+          "note": "Scottish primary legislation (type code asp); Scottish Statutory Instruments (ssi) also live under uk-sct/.",
+          "examples": [
+            "uk-sct/asp-2021-11.md"
+          ]
+        },
+        {
+          "label": "Welsh primary legislation (Senedd Acts and Measures)",
+          "pattern": "uk-wls/{asc|anaw|mwa}-YYYY-N.md",
+          "note": "Acts of Senedd Cymru (asc), former National Assembly Acts (anaw) and Measures (mwa); Welsh Statutory Instruments (wsi) also live under uk-wls/.",
+          "examples": [
+            "uk-wls/asc-2020-1.md"
+          ]
+        },
+        {
+          "label": "Acts of the Northern Ireland Assembly",
+          "pattern": "uk-nir/nia-YYYY-N.md",
+          "note": "NI primary legislation (type code nia); NI Statutory Rules (nisr) and Statutory Rules and Orders (nisro) also live under uk-nir/.",
+          "examples": [
+            "uk-nir/nia-2022-2.md"
+          ]
+        }
+      ],
+      "attribution": "> © Crown and database right. Derived from content available under the Open Government Licence v3.0 from legislation.gov.uk.",
+      "notes": "## Coverage notes\n\n- Reform history depends on legislation.gov.uk's revised/point-in-time data, which has the fullest schema coverage for post-1988 legislation; older Acts may carry fewer revision commits.\n- Images are not included: image nodes are dropped during conversion and counted in the metadata.\n- A small number of large Acts can be withheld on demand by the source's CloudFront/WAF layer (HTTP 202 with an empty body); such laws are flagged for reprocessing rather than committed empty."
+    },
+    "us": {
+      "code": "us",
+      "name": "United States",
+      "language": "en",
+      "source_name": "United States Code, prepared and published by the Office of the Law Revision Counsel (OLRC) of the U.S. House of Representatives",
+      "source_urls": [
+        "Portal: https://uscode.house.gov/",
+        "Downloads (USLM XML release points): https://uscode.house.gov/download/download.shtml",
+        "About the Code: https://uscode.house.gov/about_code.xhtml"
+      ],
+      "data_license": "public domain (work of the U.S. Government, 17 U.S.C. § 105)",
+      "scope": "This repository covers the United States Code (the codified general and permanent federal statutes) as published by the Office of the Law Revision Counsel in USLM XML format. Each norm is one section of the Code; the source bundles all sections of a title into a single XML release point, and the pipeline splits them to section granularity (roughly 60,000 sections across the 54 titles). Versioning is derived by diffing successive OLRC \"release points\" (complete snapshots of the Code current through a specific Public Law), so reform history is tracked at release-point resolution rather than per individual amending law.",
+      "norm_types": [
+        {
+          "label": "United States Code sections",
+          "pattern": "USC-T{title}-S{section}.md",
+          "note": "One file per section of the U.S. Code, stored flat under the us/ directory. The ID encodes the title number and the section identifier.",
+          "examples": [
+            "us/USC-T18-S1341.md",
+            "us/USC-T17-S105.md"
+          ]
+        }
+      ],
+      "notes": "## Coverage notes\n\n- Source data is the OLRC USLM XML, not the Statutes at Large or the Code of Federal Regulations. Only the United States Code is included.\n- Reforms are detected by comparing consecutive release points, so a single commit may bundle the effects of multiple Public Laws enacted between two snapshots. Publication dates fall back to the release-point date when section-level dates are absent.\n- Images and other binary assets are not included.\n- The OLRC download endpoint blocks non-U.S. IP addresses; the pipeline falls back to a Wayback Machine cached copy when fetching from outside the United States."
+    },
+    "uy": {
+      "code": "uy",
+      "name": "Uruguay",
+      "language": "es",
+      "source_name": "IMPO — Centro de Información Oficial (Dirección Nacional de Impresiones y Publicaciones Oficiales), Uruguay",
+      "source_urls": [
+        "Portal: https://www.impo.com.uy/",
+        "Base de normativa: https://www.impo.com.uy/bases/",
+        "API de datos abiertos (JSON): cualquier URL de norma + ?json=true — https://www.impo.com.uy/datos-abiertos/",
+        "Esquema JSON: https://www.impo.com.uy/resources/basesIMPO.json"
+      ],
+      "data_license": "Licencia de Datos Abiertos – Uruguay (Decreto 54/017) — requiere atribución",
+      "scope": "Recopila normativa nacional uruguaya consolidada publicada por IMPO: leyes, decretos-ley del período de facto (1973-1985), constitución y códigos. IMPO publica únicamente el texto consolidado vigente, por lo que cada norma se incorpora como un único punto de partida (bootstrap) en la fecha de su publicación, sin historial de reformas artículo por artículo. La cobertura por defecto del pipeline se concentra en el rango más fiable y denso de IMPO (leyes con número 9000 en adelante, posteriores a 1935); las normas anteriores a 1935 están mayormente sin indexar en la fuente.",
+      "norm_types": [
+        {
+          "label": "Leyes",
+          "pattern": "UY-ley-XXXXX.md",
+          "note": "Leyes nacionales identificadas por su número.",
+          "examples": [
+            "uy/UY-ley-19996.md",
+            "uy/UY-ley-18331.md"
+          ]
+        },
+        {
+          "label": "Decretos-ley",
+          "pattern": "UY-decreto-ley-XXXXX.md",
+          "note": "Normas del período de facto (1973-1985).",
+          "examples": [
+            "uy/UY-decreto-ley-14261.md"
+          ]
+        },
+        {
+          "label": "Decretos",
+          "pattern": "UY-decreto-NNN-AAAA.md",
+          "note": "El número de decreto se reinicia cada año, por lo que el identificador incluye el año.",
+          "examples": [
+            "uy/UY-decreto-414-2009.md",
+            "uy/UY-decreto-122-2021.md"
+          ]
+        },
+        {
+          "label": "Códigos",
+          "pattern": "UY-codigo-{nombre}-XXXXX.md",
+          "note": "Códigos identificados por su variante y el número de la ley que los aprueba.",
+          "examples": [
+            "uy/UY-codigo-tributario-14306.md",
+            "uy/UY-codigo-civil-16603.md"
+          ]
+        },
+        {
+          "label": "Constitución",
+          "pattern": "UY-constitucion-AAAA.md",
+          "note": "Constitución de la República, identificada por año.",
+          "examples": [
+            "uy/UY-constitucion-1967.md"
+          ]
+        }
+      ],
+      "attribution": "> Fuente: IMPO — Centro de Información Oficial (https://www.impo.com.uy). Datos reutilizados bajo la Licencia de Datos Abiertos – Uruguay (Decreto 54/017).",
+      "notes": "## Detalles de la fuente\n\n- Codificación de origen: ISO-8859-1 (Latin-1), normalizada a UTF-8 en el repositorio.\n- Las imágenes (escaneos del Diario Oficial, etc.) no se incluyen; se conserva el enlace al escaneo en `extra.gazette_scan_url`.\n- Las notas editoriales de IMPO (referencias cruzadas e historial de modificaciones que añade el organismo, no texto legal aprobado) no se vuelcan al cuerpo; solo se registra su número en `extra.editorial_notes_count`."
+    }
+  }
+}
