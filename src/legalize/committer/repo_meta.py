@@ -1,8 +1,8 @@
 """Repo-level meta files committed to each country repo.
 
 These are NOT law files and are NOT part of the legislative record. They are
-project metadata (funding config today; README / LICENSE could be added here
-later). They are committed as a standalone meta commit which the reform-history
+project metadata (funding config, README, and LICENSE). They are committed as a
+standalone meta commit which the reform-history
 sync ignores, because they carry no ``Source-Date`` trailer (see
 ``state/store.py``).
 """
@@ -26,6 +26,7 @@ def repo_meta_files(country: str) -> dict[str, str]:
     everywhere; the README is generated in the country's own language when
     presentation metadata exists for it (see :mod:`legalize.country_meta`).
     """
+    from legalize.committer.license import render_license
     from legalize.committer.readme import render_readme
     from legalize.country_meta import COUNTRY_META
 
@@ -34,5 +35,6 @@ def repo_meta_files(country: str) -> dict[str, str]:
     meta = COUNTRY_META.get(country)
     if meta is not None:
         files["README.md"] = render_readme(meta)
+        files["LICENSE"] = render_license(meta)
 
     return files
