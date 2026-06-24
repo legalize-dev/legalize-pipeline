@@ -139,10 +139,10 @@ def _ref_targets_norm(reference: str, target_norm_number: str) -> bool:
 # "Sustitúyese el artículo X (de la Ley Y)? por el siguiente: <new text>"
 _SUBSTITUTE_SINGLE_RE = re.compile(
     r"Sustit[úu]yese\s+el\s+art[íi]culo\s+(?P<art>\d+\s*(?:bis|ter|quáter|quater)?)"
-    r"\s*[°º]?(?P<between>[^:]{0,400}?)"
+    r"\s*[°º]?(?P<between>.{0,400}?)"
     r"(?:por\s+el\s+siguiente|por\s+el\s+texto\s+siguiente|el\s+que\s+quedar[áa]\s+redactado[^:]{0,80})"
     r"\s*[:\.]\s*(?P<body>.+?)"
-    r"(?=\bArt\.?\s*\d+[\.°º]?\s*[\-–]|\bARTICULO\s+\d+|\Z)",
+    r"(?=\bArt[ií]culo\s+\d+[\.°º]?\s*[\-—\.]|\bArt\.?\s*\d+[\.°º]?\s*[\-—\.]|\Z)",
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -180,7 +180,7 @@ _QUOTED_ARTICLE_RE = re.compile(
 
 _REPEAL_SINGLE_RE = re.compile(
     r"Der[óo]gase\s+el\s+art[íi]culo\s+(?P<art>\d+(?:\s*bis|\s*ter)?)"
-    r"\s*[°º]?(?P<between>[^.]{0,300})\.",
+    r"\s*[°º]?(?P<between>.{0,300}?)\.",
     re.IGNORECASE,
 )
 
@@ -199,7 +199,7 @@ def _split_modificatoria_blocks(plain: str) -> list[str]:
     Each block starts with ``Art. N.-`` or ``ARTICULO N.-`` and runs until
     the next such header (or end of document).
     """
-    return re.split(r"(?=\bArt\.?\s*\d+[\.°º]?\s*[\-–])", plain)
+    return re.split(r"(?=\bArt\.?\s*\d+[\.°º]?\s*[\-—])", plain)
 
 
 def _strip_article_header(body: str) -> str:
@@ -256,7 +256,7 @@ def extract_modifications(modificatoria_html: bytes, target_norm_number: str) ->
         if not block.strip():
             continue
 
-        source_art_match = re.match(r"\bArt\.?\s*(\d+)[\.°º]?\s*[\-–]", block)
+        source_art_match = re.match(r"\b(?:Art[ií]culo|Art\.?)\s*(\d+)[\.°º]?\s*[\-–\.]", block, re.IGNORECASE)
         source_art = source_art_match.group(1) if source_art_match else ""
 
         # Single substitution
