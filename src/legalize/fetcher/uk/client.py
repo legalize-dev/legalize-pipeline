@@ -305,6 +305,19 @@ class LegislationGovUkClient(HttpClient):
                     # it up later.
                     logger.warning("%s: no PIT XML for %s (404), skipping", norm_id, eff_date)
                     continue
+                if status is not None and status >= 500:
+                    # Transient server-side failure after retries are
+                    # exhausted; typically a CloudFront 504 render timeout on
+                    # the largest Acts. Skip this one snapshot rather than
+                    # discarding the enacted base and every PIT already
+                    # collected; the daily re-fetches and fills the gap.
+                    logger.warning(
+                        "%s: PIT render failed for %s (HTTP %s), skipping",
+                        norm_id,
+                        eff_date,
+                        status,
+                    )
+                    continue
                 raise
             if not pit_xml:
                 logger.warning("%s: empty PIT body for %s (WAF hold?), skipping", norm_id, eff_date)

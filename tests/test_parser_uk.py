@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import pytest
+import requests
 
 from legalize.countries import (
     get_client_class,
@@ -306,6 +307,43 @@ class TestSuvestine:
         """SIs use <ukm:Made Date="..."> instead of <ukm:EnactmentDate>."""
         data = _read_fixture("sample-si-uksi-2020-52.xml")
         assert _extract_enacted_date(data) == "2020-01-20"
+
+    def test_pit_5xx_is_skipped_not_fatal(self, monkeypatch):
+        """A 5xx on one point-in-time fetch (e.g. a CloudFront 504 render
+        timeout, after retries are exhausted) must skip that one snapshot, not
+        discard the enacted base and every PIT already collected.
+        """
+        client = LegislationGovUkClient()
+        enacted = _read_fixture("sample-dpa-2018-enacted.xml")  # enacted 2018-05-23
+        pit = _read_fixture("sample-dpa-2018-pit-2023.xml")
+        feed = (
+            b'<feed xmlns="http://www.w3.org/2005/Atom"'
+            b' xmlns:ukm="http://www.legislation.gov.uk/namespaces/metadata">'
+            b'<ukm:Effect AffectingURI="http://www.legislation.gov.uk/id/ukpga/2019/1">'
+            b'<ukm:InForceDates><ukm:InForce Applied="true" Date="2020-01-01"/>'
+            b"</ukm:InForceDates></ukm:Effect>"
+            b'<ukm:Effect AffectingURI="http://www.legislation.gov.uk/id/ukpga/2020/1">'
+            b'<ukm:InForceDates><ukm:InForce Applied="true" Date="2021-01-01"/>'
+            b"</ukm:InForceDates></ukm:Effect></feed>"
+        )
+
+        monkeypatch.setattr(client, "get_enacted", lambda nid: enacted)
+        monkeypatch.setattr(client, "get_changes_feed", lambda nid, **kw: [feed])
+
+        def fake_get_at_date(nid, target_date):
+            if target_date.isoformat() == "2020-01-01":
+                resp = requests.Response()
+                resp.status_code = 504
+                raise requests.HTTPError(response=resp)
+            return pit
+
+        monkeypatch.setattr(client, "get_at_date", fake_get_at_date)
+
+        blob = json.loads(client.get_suvestine("ukpga-2018-12"))
+        dates = [v["effective_date"] for v in blob["versions"]]
+        # The 504 date is dropped; the enacted base and the healthy PIT both
+        # survive, and get_suvestine does not raise.
+        assert dates == ["2018-05-23", "2021-01-01"]
 
 
 # ─── Statutory instruments ────────────────────────────────────
