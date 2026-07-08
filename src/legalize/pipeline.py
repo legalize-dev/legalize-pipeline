@@ -142,6 +142,7 @@ def generic_daily(
 
     repo = GitRepo(cc.repo_path, config.git.committer_name, config.git.committer_email)
     commits_created = 0
+    pushed = 0  # commits already pushed to the remote (checkpoint tracker)
     errors: list[str] = []
 
     text_parser = get_text_parser(country)
@@ -214,6 +215,22 @@ def generic_daily(
                     errors.append(msg)
 
             state.last_summary_date = current_date
+
+            # Checkpoint: push after each completed day so a mid-run failure
+            # keeps the days already finished. Only push at day boundaries —
+            # the next run resumes from the newest Source-Date, so pushing
+            # mid-day would make it skip that day's remaining norms.
+            if not dry_run and config.git.push and commits_created > pushed:
+                try:
+                    repo.push()
+                    pushed = commits_created
+                except Exception:
+                    logger.warning(
+                        "Checkpoint push failed after %s; commits stay local "
+                        "and retry at the next day boundary or finalize",
+                        current_date,
+                        exc_info=True,
+                    )
 
     return finalize_daily(
         repo,
