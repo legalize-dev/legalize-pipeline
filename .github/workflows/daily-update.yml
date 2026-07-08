@@ -55,7 +55,15 @@ jobs:
           repository: legalize-dev/legalize-${{ matrix.country }}
           path: repos/${{ matrix.country }}
           token: ${{ steps.app-token.outputs.token }}
+          # Blobless partial clone: full commit graph (needed by
+          # infer_last_date_from_git's `git log --grep=Source-Date`) but no
+          # historical blobs. On a large repo (nl ≈ 2 GB of per-reform history)
+          # a full fetch-depth:0 checkout downloaded every past version and ate
+          # most of the job's time budget; blobless fetches only the current
+          # tree's blobs (+ any it needs on demand) and cuts checkout to minutes,
+          # leaving the window for actual processing. Harmless for small repos.
           fetch-depth: 0
+          filter: blob:none
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
