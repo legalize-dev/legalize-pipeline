@@ -306,6 +306,69 @@ class TestDailyATOrchestration:
         state_path = Path(config.get_country("at").state_path)
         assert state_path.exists()
 
+    def test_checkpoint_pushes_after_each_day(self, tmp_path):
+        """A multi-day daily run pushes after each completed day (checkpoint),
+        not only once at the end — so a mid-run failure keeps finished days and
+        the next run resumes from the last completed day instead of restarting.
+        """
+        from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+
+        config = self._make_config(tmp_path)
+        config.git.push = True  # checkpoint only pushes when pushing is enabled
+        mock_client, mock_client_cls, mock_discovery, mock_disc_cls = self._mock_countries()
+        # Two days, one modified norm each.
+        mock_discovery.discover_daily.side_effect = [iter(["AT-1"]), iter(["AT-2"])]
+        mock_client.get_metadata.return_value = b"<m/>"
+        mock_client.get_text.return_value = b"<t/>"
+
+        def _meta(_data, nid):
+            return NormMetadata(
+                title=nid,
+                short_title=nid,
+                identifier=nid,
+                country="at",
+                rank=Rank.LEY,
+                publication_date=date(2026, 4, 1),
+                status=NormStatus.IN_FORCE,
+                department="T",
+                source="https://example.com/",
+            )
+
+        meta_parser = MagicMock(spec=["parse"])
+        meta_parser.parse.side_effect = _meta
+        block = Block(
+            id="a1",
+            block_type="precepto",
+            title="Art 1",
+            versions=(
+                Version(
+                    norm_id="x",
+                    publication_date=date(2026, 4, 1),
+                    effective_date=date(2026, 4, 1),
+                    paragraphs=(Paragraph(css_class="p", text="txt"),),
+                ),
+            ),
+        )
+        text_parser = MagicMock(spec=["parse_text"])
+        text_parser.parse_text.return_value = [block]
+
+        with (
+            patch("legalize.countries.get_client_class", return_value=mock_client_cls),
+            patch("legalize.countries.get_discovery_class", return_value=mock_disc_cls),
+            patch("legalize.countries.get_metadata_parser", return_value=meta_parser),
+            patch("legalize.countries.get_text_parser", return_value=text_parser),
+            patch(
+                "legalize.pipeline.resolve_dates_to_process",
+                return_value=[date(2026, 4, 1), date(2026, 4, 2)],
+            ),
+            patch("legalize.pipeline.GitRepo.push") as mock_push,
+        ):
+            generic_daily(config, "at", target_date=None)
+
+        # Each of the two days produced a commit → pushed per day (>= 2),
+        # not the single end-of-run push the old code did.
+        assert mock_push.call_count >= 2
+
     def test_state_saved_after_run(self, tmp_path):
         config = self._make_config(tmp_path)
         mock_client, mock_client_cls, mock_discovery, mock_disc_cls = self._mock_countries()
