@@ -271,20 +271,29 @@ def generic_fetch_one(
             blocks = text_parser.parse_text(text_data)
             reforms = _extract_reforms_generic(text_parser, client, norm_id, blocks, text_data)
 
-            # Suvestine: replace blocks + reforms with versioned historical data
+            # Suvestine: replace blocks + reforms with versioned historical data.
+            # For a suvestine-capable country a fetch/parse failure is a hard
+            # skip: falling through to the consolidated text would commit it as
+            # a fabricated "original version" (wrong label + date), violating the
+            # commit-integrity rule. Skip the norm and log — the next run retries.
             if hasattr(text_parser, "parse_suvestine") and hasattr(client, "get_suvestine"):
                 try:
                     suvestine_data = client.get_suvestine(norm_id)
                     sv_blocks, sv_reforms = text_parser.parse_suvestine(suvestine_data, norm_id)
-                    if sv_reforms:
-                        blocks = sv_blocks
-                        reforms = sv_reforms
-                        console.print(f"    [dim]Suvestine: {len(sv_reforms)} versions[/dim]")
                 except Exception:
-                    logger.warning(
-                        "Suvestine unavailable for %s, using consolidated text",
+                    logger.error(
+                        "Suvestine fetch/parse failed for %s; skipping norm "
+                        "(will retry next run) rather than committing consolidated "
+                        "text as a fabricated version",
                         norm_id,
+                        exc_info=True,
                     )
+                    console.print(f"  [red]✗ Suvestine failed for {norm_id}, skipping[/red]")
+                    return None
+                if sv_reforms:
+                    blocks = sv_blocks
+                    reforms = sv_reforms
+                    console.print(f"    [dim]Suvestine: {len(sv_reforms)} versions[/dim]")
 
             norm = ParsedNorm(
                 metadata=metadata,
