@@ -308,10 +308,14 @@ countries:
     cache_dir: ".cache"
     # Bootstrap downloads every historical expression of every law (the BWB
     # preserves them all) and produces one git commit per real reform.
-    # Start at 4 workers × 2 req/s = 8 req/s effective — tuned for politeness
-    # against zoekservice.overheid.nl + repository.officiele-overheidspublicaties.nl.
+    # 2 workers × 4 req/s = 8 req/s effective — tuned for politeness against
+    # zoekservice.overheid.nl + repository.officiele-overheidspublicaties.nl.
+    # The daily flow is single-threaded, so 4 req/s is also its effective rate
+    # (was 2): heavily-amended laws refetch their full expression history each
+    # run, and at 2 req/s the daily job overran the CI time budget. 8 req/s
+    # effective for bootstrap is unchanged (workers halved, rate doubled).
     # Estimated 22K active laws × ~6 expressions avg → ~130K downloads → ~4-5 h.
-    max_workers: 4
+    max_workers: 2
     source:
       # Basis Wetten Bestand (BWB) — official Dutch consolidated legislation.
       # Two interfaces: SRU (discovery + metadata) and HTTPS repository (full XML).
@@ -321,7 +325,7 @@ countries:
       portal_url: "https://wetten.overheid.nl"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 4.0
       # Download every historical expression of every law so git history
       # reflects each real reform. Set to false for a lightweight bootstrap
       # that only commits the current state.
