@@ -22,6 +22,14 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    # The GitHub App token minted at job start lives ~1h, and pushes are the
+    # only durable output — anything processed after it expires is wasted work
+    # that can never be pushed. Cap the job just under the token lifetime so a
+    # slow country (e.g. nl catching up a large backlog) stops instead of
+    # burning hours it can't commit. Per-day checkpoint pushes (see
+    # pipeline.generic_daily) persist whatever completed within the window, and
+    # the next run resumes from there. Fast countries finish in minutes.
+    timeout-minutes: 55
     strategy:
       fail-fast: false
       matrix:
