@@ -156,6 +156,58 @@ class TestGenericFetchErrorHandling:
         assert "NORM-003" in result
         assert "NORM-002" not in result
 
+    def test_fetch_one_skips_norm_on_suvestine_failure(self, test_config):
+        """A suvestine-capable country whose get_suvestine raises must skip the
+        norm (return None), never fall back to committing the consolidated text
+        as a fabricated 'original version' (commit-integrity rule).
+        """
+        d = date(2024, 1, 1)
+        meta = NormMetadata(
+            title="Test",
+            short_title="Test",
+            identifier="TEST-SV",
+            country="es",
+            rank=Rank.LEY,
+            publication_date=d,
+            status=NormStatus.IN_FORCE,
+            department="Test",
+            source="https://example.com/test",
+        )
+
+        # Client supports suvestine but the fetch fails (e.g. an upstream 504).
+        mock_client = MagicMock(
+            spec=["get_metadata", "get_text", "get_suvestine", "__enter__", "__exit__"]
+        )
+        mock_client.get_metadata.return_value = b"<metadata/>"
+        # get_text must be a real function: the pipeline inspects its
+        # __code__.co_varnames to decide whether to pass meta_data.
+        mock_client.get_text = lambda norm_id, **kwargs: b"<text/>"
+        mock_client.get_suvestine.side_effect = requests.RequestException("504")
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+
+        mock_client_cls = MagicMock()
+        mock_client_cls.create.return_value = mock_client
+
+        # Parser is suvestine-capable and parses consolidated text fine.
+        mock_text_parser = MagicMock(spec=["parse_text", "parse_suvestine"])
+        mock_text_parser.parse_text.return_value = [
+            _make_block("a1", "Articulo 1", [_make_version("TEST-SV", d, "Texto.")]),
+        ]
+
+        mock_meta_parser = MagicMock(spec=["parse"])
+        mock_meta_parser.parse.return_value = meta
+
+        with (
+            patch("legalize.countries.get_client_class", return_value=mock_client_cls),
+            patch("legalize.countries.get_text_parser", return_value=mock_text_parser),
+            patch("legalize.countries.get_metadata_parser", return_value=mock_meta_parser),
+        ):
+            result = generic_fetch_one(test_config, "es", "TEST-SV", force=True)
+
+        assert result is None
+        mock_client.get_suvestine.assert_called_once()
+
     def test_fetch_one_returns_none_on_parse_error(self, test_config):
         """Mock client that returns data, but parser.parse raises ValueError.
         Verify returns None.
