@@ -302,6 +302,29 @@ countries:
       max_retries: 5
       requests_per_second: 4.0
 
+  cu:
+    repo_path: "../legalize-cu"
+    data_dir: "../data-cu"
+    cache_dir: ".cache"
+    # max_workers: 4 after Step 8 benchmark — pymupdf (MuPDF) is documented
+    # thread-safe, and Gaceta tolerated ~4 req/s without 429s. Each worker
+    # has its own rate limiter (requests_per_second: 1.0) = ~4 req/s total.
+    max_workers: 4
+    source:
+      # Official source: the Gaceta Oficial de la República de Cuba +
+      # MINJUS for consolidated book editions. The catalog landing page
+      # (/es/algunas-legislaciones-cubanas) 403s the default legalize-bot
+      # UA but 200s a browser UA, so catalog fetches send browser_ua.
+      # The catalog exposes law *names* but no .pdf links — the URL map is
+      # manifest.json, shipped at the root of the legalize-cu repo.
+      base_url: "https://www.gacetaoficial.gob.cu"
+      catalog_url: "https://www.gacetaoficial.gob.cu/es/algunas-legislaciones-cubanas"
+      manifest_url: "https://raw.githubusercontent.com/luilver/legalize-cu/main/manifest.json"
+      browser_ua: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+      request_timeout: 60
+      max_retries: 5
+      requests_per_second: 1.0
+
   nl:
     repo_path: "../countries/nl"
     data_dir: "../countries/data-nl"
