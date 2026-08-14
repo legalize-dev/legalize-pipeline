@@ -21,6 +21,7 @@ Each law is a file. Each reform is a commit. Every country is a repo.
 | Austria | [legalize-at](https://github.com/legalize-dev/legalize-at) | RIS (Bundeskanzleramt) |
 | Belgium | [legalize-be](https://github.com/legalize-dev/legalize-be) | Justel (Belgisch Staatsblad) |
 | Chile | [legalize-cl](https://github.com/legalize-dev/legalize-cl) | BCN (LeyChile) |
+| Cuba | [legalize-cu](https://github.com/luilver/legalize-cu) | Gaceta Oficial |
 | Czech Republic | [legalize-cz](https://github.com/legalize-dev/legalize-cz) | e-Sbírka |
 | Denmark | [legalize-dk](https://github.com/legalize-dev/legalize-dk) | Retsinformation |
 | Estonia | [legalize-ee](https://github.com/legalize-dev/legalize-ee) | Riigi Teataja |
@@ -177,6 +178,7 @@ See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md) for the full walkthrough.
 | Austria | Live | [RIS](https://www.ris.bka.gv.at/) | — | [legalize-at](https://github.com/legalize-dev/legalize-at) |
 | Belgium | Live | [Justel](https://www.ejustice.just.fgov.be/) | — | [legalize-be](https://github.com/legalize-dev/legalize-be) |
 | Chile | Live | [BCN](https://www.leychile.cl/) | — | [legalize-cl](https://github.com/legalize-dev/legalize-cl) |
+| Cuba | Live | [Gaceta Oficial](https://www.gacetaoficial.gob.cu/) | — | [legalize-cu](https://github.com/luilver/legalize-cu) |
 | Czech Republic | Live | [e-Sbírka](https://www.e-sbirka.cz/) | — | [legalize-cz](https://github.com/legalize-dev/legalize-cz) |
 | Denmark | Fetcher ready | [Retsinformation](https://www.retsinformation.dk/) | — | [legalize-dk](https://github.com/legalize-dev/legalize-dk) |
 | Estonia | Live | [Riigi Teataja](https://www.riigiteataja.ee/) | — | [legalize-ee](https://github.com/legalize-dev/legalize-ee) |
