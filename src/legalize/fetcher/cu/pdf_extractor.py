@@ -47,15 +47,52 @@ reference converter) — ported with attribution into the pipeline.
 from __future__ import annotations
 
 import base64
+import gc
 import hashlib
 import json
 import logging
 import re
+import warnings
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any
 
-import pymupdf
+_SWIG_RUNTIME_NAMES = ("SwigPyPacked", "SwigPyObject", "swigvarlink")
+
+
+def _patch_swig_runtime_types() -> None:
+    """Set a real ``__module__`` on pymupdf's SWIG runtime heap types.
+
+    pymupdf's ``_mupdf`` extension is SWIG-generated and built with
+    Py_LIMITED_API, under which SWIG 4.3.1 emitted its runtime types
+    (``SwigPyPacked``, ``SwigPyObject``, ``swigvarlink``) as heap types with no
+    ``__module__`` attribute. CPython 3.14's ``PyType_FromSpec`` deprecates
+    that, so ``import pymupdf`` warns once per process and the types misbehave
+    under pickling/pydoc/repr. SWIG 4.4.0 fixed the generation
+    (swig/swig#2881), but pymupdf's shipped wheels are still built with 4.3.1,
+    so we repair the attribute here at import time.
+    """
+    for obj in gc.get_objects():
+        if (
+            isinstance(obj, type)
+            and obj.__name__ in _SWIG_RUNTIME_NAMES
+            and not hasattr(obj, "__module__")
+        ):
+            obj.__module__ = "pymupdf._mupdf"
+
+
+with warnings.catch_warnings():
+    # The DeprecationWarning fires from C inside the extension's import (via
+    # PyType_FromSpec) before any of our code can run; contain the one-time
+    # emission here and repair the root cause right after with the patch above.
+    warnings.filterwarnings(
+        "ignore",
+        message=r"builtin type (?:SwigPyPacked|SwigPyObject|swigvarlink) has no __module__ attribute",
+        category=DeprecationWarning,
+    )
+    import pymupdf
+
+_patch_swig_runtime_types()
 
 logger = logging.getLogger(__name__)
 
