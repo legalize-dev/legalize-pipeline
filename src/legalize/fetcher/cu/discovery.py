@@ -77,7 +77,9 @@ _RANK_NORMALIZED = {
 }
 
 # "Ley 86/2024 ...", "Decreto-Ley No. 304 de 2012 ...", "Ley No. 143 de 2021 ..."
-_NUMBER_YEAR_RE = re.compile(r"(?:No\.?\s*)?(\d{1,4})\s*(?:/\s*(\d{4})|de\s+(\d{4}))?\b", re.I)
+_NUMBER_YEAR_RE = re.compile(
+    r"(?:No\.?\s*)?(\d{1,4})\s*(?:/\s*(\d{4})|de\s+(\d{4}))?\b", re.IGNORECASE
+)
 
 
 def _parse_law_signature(text: str) -> tuple[str | None, int | None, int | None]:
@@ -90,7 +92,7 @@ def _parse_law_signature(text: str) -> tuple[str | None, int | None, int | None]
     rank: str | None = None
     match = None
     for word in _RANK_WORDS:
-        m = re.match(re.escape(word) + r"\b", stripped, re.I)
+        m = re.match(re.escape(word) + r"\b", stripped, re.IGNORECASE)
         if m:
             rank = _RANK_NORMALIZED.get(word.lower(), "otro")
             match = m
@@ -98,7 +100,7 @@ def _parse_law_signature(text: str) -> tuple[str | None, int | None, int | None]
     if rank is None:
         return None, None, None
 
-    tail = stripped[match.end():]
+    tail = stripped[match.end() :]
     m = _NUMBER_YEAR_RE.search(tail)
     if not m:
         return rank, None, None
@@ -121,7 +123,10 @@ def _signature_from_title(title: str) -> tuple[str | None, int | None, int | Non
     return _parse_law_signature(title)
 
 
-def _matches(sig_a: tuple[str | None, int | None, int | None], sig_b: tuple[str | None, int | None, int | None]) -> bool:
+def _matches(
+    sig_a: tuple[str | None, int | None, int | None],
+    sig_b: tuple[str | None, int | None, int | None],
+) -> bool:
     """True when two signatures refer to the same law.
 
     Rank and number must agree; year must agree when both are known (a
@@ -131,9 +136,7 @@ def _matches(sig_a: tuple[str | None, int | None, int | None], sig_b: tuple[str 
     rb, nb, yb = sig_b
     if ra != rb or na != nb or na is None:
         return False
-    if ya is not None and yb is not None and ya != yb:
-        return False
-    return True
+    return not (ya is not None and yb is not None and ya != yb)
 
 
 class GacetaDiscovery(NormDiscovery):
@@ -147,8 +150,7 @@ class GacetaDiscovery(NormDiscovery):
         """Yield every manifest identifier in sorted order."""
         if not hasattr(client, "get_manifest_keys"):
             raise TypeError("GacetaDiscovery requires GacetaClient")
-        for key in client.get_manifest_keys():
-            yield key
+        yield from client.get_manifest_keys()
 
     def discover_daily(
         self,
@@ -205,7 +207,7 @@ def _extract_catalog_rows(html: str) -> list[str]:
     ellipsis truncation for long titles (``...``).
     """
     rows: list[str] = []
-    for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", html, re.S | re.I):
+    for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", html, re.DOTALL | re.IGNORECASE):
         text = re.sub(r"<[^>]+>", " ", cell)
         text = re.sub(r"\s+", " ", text).strip()
         text = text.replace("\xa0", " ").strip()

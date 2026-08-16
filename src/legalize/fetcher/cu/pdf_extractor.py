@@ -102,36 +102,39 @@ DISPOSICION_RE = re.compile(
 )
 
 FURNITURE_RE = [
-    re.compile(r"^GACETA\s+OFICIAL\b", re.I),
-    re.compile(r"^DE LA REPÚBLICA DE CUBA\b", re.I),
-    re.compile(r"^MINISTERIO DE JUSTICIA\b", re.I),
+    re.compile(r"^GACETA\s+OFICIAL\b", re.IGNORECASE),
+    re.compile(r"^DE LA REPÚBLICA DE CUBA\b", re.IGNORECASE),
+    re.compile(r"^MINISTERIO DE JUSTICIA\b", re.IGNORECASE),
     re.compile(r"^ISSN\b"),
     re.compile(r"^EXTRAORDINARIA\b"),
     re.compile(r"^ORDINARIA\b"),
-    re.compile(r"^EDICIÓN ESPECIAL\b", re.I),
+    re.compile(r"^EDICIÓN ESPECIAL\b", re.IGNORECASE),
     re.compile(r"^AÑO\s+\w+"),
-    re.compile(r"^Sitio Web:? ", re.I),
-    re.compile(r"^Teléfonos:? ", re.I),
-    re.compile(r"^La Habana\b.*\d{4}", re.I),
-    re.compile(r"^Número\s+\d+$", re.I),
-    re.compile(r"^Página\s+\d+$", re.I),
+    re.compile(r"^Sitio Web:? ", re.IGNORECASE),
+    re.compile(r"^Teléfonos:? ", re.IGNORECASE),
+    re.compile(r"^La Habana\b.*\d{4}", re.IGNORECASE),
+    re.compile(r"^Número\s+\d+$", re.IGNORECASE),
+    re.compile(r"^Página\s+\d+$", re.IGNORECASE),
     re.compile(r"^\d+$"),
-    re.compile(r"^GOC-\d{4}-\d+-\w+$", re.I),
-    re.compile(r"^GOC-\d{4}-(?:O|E)\d+$", re.I),
-    re.compile(r"^\d{2}/\d{2}/\d{4}\s+GOC-\d{4}-", re.I),
+    re.compile(r"^GOC-\d{4}-\d+-\w+$", re.IGNORECASE),
+    re.compile(r"^GOC-\d{4}-(?:O|E)\d+$", re.IGNORECASE),
+    re.compile(r"^\d{2}/\d{2}/\d{4}\s+GOC-\d{4}-", re.IGNORECASE),
     re.compile(r"^\d{2}/\d{2}/\d{4}$"),
-    re.compile(r"^[A-ZÁÉÍÓÚÑÜ ]*SUMARIO[A-ZÁÉÍÓÚÑÜ ]*$", re.I),
-    re.compile(r"^Información en este número$", re.I),
-    re.compile(r"^\[Escriba texto\]$", re.I),
-    re.compile(r"^ASAMBLEA NACIONAL DEL PODER POPULAR\s*$", re.I),
+    re.compile(r"^[A-ZÁÉÍÓÚÑÜ ]*SUMARIO[A-ZÁÉÍÓÚÑÜ ]*$", re.IGNORECASE),
+    re.compile(r"^Información en este número$", re.IGNORECASE),
+    re.compile(r"^\[Escriba texto\]$", re.IGNORECASE),
+    re.compile(r"^ASAMBLEA NACIONAL DEL PODER POPULAR\s*$", re.IGNORECASE),
     re.compile(r"^\s*$"),
     # Gaceta masthead lines that pymupdf merges without spaces
-    re.compile(r"^GACETA OFICIAL\w+.*ISSN\b", re.I),
-    re.compile(r"^ISSN.*MINISTERIO DE JUSTICIA", re.I),
-    re.compile(r"^\S*GACETA OFICIAL\S*", re.I),
-    re.compile(r"^Número\s+\d+\s+Página", re.I),
-    re.compile(r"^\d+\s+Página\b", re.I),
-    re.compile(r"^Página\s+\d+\s+$", re.I),
+    re.compile(r"^GACETA OFICIAL\w+.*ISSN\b", re.IGNORECASE),
+    re.compile(r"^ISSN.*MINISTERIO DE JUSTICIA", re.IGNORECASE),
+    re.compile(r"^\S*GACETA OFICIAL\S*", re.IGNORECASE),
+    re.compile(r"^Número\s+\d+\s+Página", re.IGNORECASE),
+    re.compile(r"^\d+\s+Página\b", re.IGNORECASE),
+    re.compile(r"^Página\s+\d+\s+$", re.IGNORECASE),
+    # Gaceta issue-date stamp printed as a running page header (page number +
+    # "GACETA OFICIAL" + "10 de abril de 2021") — page furniture, not law text.
+    re.compile(r"^\d{1,2} de \w+ de \d{4}$"),
 ]
 
 # Running page headers inside a Gaceta issue (left/right header text).
@@ -139,16 +142,17 @@ RUNNING_HEAD_RE = re.compile(
     r"^(Gaceta Oficial\b|Gaceta Oficial de la República de Cuba\b|GOC\.|"
     r"ISSN \d+-\d+|Sitio Web:|Calle Zanja|Teléfonos:|Año \w+|"
     r"Gaceta Oficial Extraordinaria|Gaceta Oficial Ordinaria|"
-    r"MINISTERIO DE JUSTICIA|LA HABANA,)", re.I
+    r"MINISTERIO DE JUSTICIA|LA HABANA,)",
+    re.IGNORECASE,
 )
 
-BODY_START_RE = re.compile(r"^HAGO SABER|^POR CUANTO", re.I)
-SIGNATURE_RE = re.compile(r"^DAD[OA] en ", re.I)
-GOC_RE = re.compile(r"^GOC-\d{4}-\d+-(?:O|E)\d+\s*$", re.I)
+BODY_START_RE = re.compile(r"^HAGO SABER|^POR CUANTO", re.IGNORECASE)
+SIGNATURE_RE = re.compile(r"^DAD[OA] en ", re.IGNORECASE)
+GOC_RE = re.compile(r"^GOC-\d{4}-\d+-(?:O|E)\d+\s*$", re.IGNORECASE)
 DOC_BOUNDARY_RE = re.compile(
     r"^(LEY|DECRETO|DECRETO-LEY|RESOLUCIÓN|RESOLUCION|ACUERDO|INSTRUCCIÓN|INSTRUCCION)"
     r"\s+(No\.?\s*)?\d+(/|$)",
-    re.I,
+    re.IGNORECASE,
 )
 
 # Engine CSS classes for Gaceta structural headings. Convert.py emitted
@@ -291,8 +295,8 @@ def _find_doc_starts(text: str) -> list[tuple[str | None, int]]:
         if GOC_RE.match(s):
             last_goc = s
             continue
-        if re.match(r"^HAGO SABER\b", s, re.I) or (
-            re.match(r"^POR CUANTO\b", s, re.I) and not (starts and last_goc is not None)
+        if re.match(r"^HAGO SABER\b", s, re.IGNORECASE) or (
+            re.match(r"^POR CUANTO\b", s, re.IGNORECASE) and not (starts and last_goc is not None)
         ):
             starts.append((last_goc, i))
             last_goc = None
@@ -310,7 +314,7 @@ def _slice_document(
     raw = text.split("\n")
 
     if start_regex:
-        rx = re.compile(start_regex, re.I)
+        rx = re.compile(start_regex, re.IGNORECASE)
         start = next((i for i, ln in enumerate(raw) if rx.match(_clean_line(ln))), 0)
     else:
         starts = _find_doc_starts(text)
@@ -323,7 +327,7 @@ def _slice_document(
         start = sel[1]
 
     if end_regex:
-        erx = re.compile(end_regex, re.I)
+        erx = re.compile(end_regex, re.IGNORECASE)
         for i in range(start + 1, len(raw)):
             if erx.match(_clean_line(raw[i])):
                 end = i
@@ -362,10 +366,9 @@ def extract_text_from_pdf(pdf_path: str | Path | bytes) -> str:
     if isinstance(pdf_path, bytes):
         import tempfile
 
-        tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
-        try:
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
             tmp.write(pdf_path)
-            tmp.close()
+        try:
             return _extract_text_uncached(Path(tmp.name))
         finally:
             try:
@@ -419,7 +422,9 @@ def convert_text(
     else:
         text = extract_text_from_pdf(Path(pdf_path))
 
-    raw = _slice_document(text, want_goc=goc, start_index=start_index, start_regex=start_regex, end_regex=end_regex).split("\n")
+    raw = _slice_document(
+        text, want_goc=goc, start_index=start_index, start_regex=start_regex, end_regex=end_regex
+    ).split("\n")
     raw = _merge_hyphenated(raw)
 
     lines: list[str] = []
@@ -471,13 +476,13 @@ def convert_text(
                 # a "bis" qualifier marks a genuine added article ("ARTÍCULO 231
                 # bis.1. ..."), never a cross-reference; the in_final_disp rule
                 # above still keeps quoted bis reproductions (Ley-156) as body
-                m_bis = re.match(r"^(bis)(?:[.\s]|$)", trailing, re.I)
+                m_bis = re.match(r"^(bis)(?:[.\s]|$)", trailing, re.IGNORECASE)
                 # a title-case heading whose trailing text or next line starts
                 # lowercase continues a sentence: it is a cross-reference
                 CROSSREF_RE = re.compile(
                     r"^[,;:]|^(?:apartado|inciso|numeral|párrafo|parrafo|literal)"
                     r"\b|^de (?:esta|este|la presente)\b",
-                    re.I,
+                    re.IGNORECASE,
                 )
                 if not m_bis and (
                     sub_ref
@@ -494,7 +499,7 @@ def convert_text(
                 bis = ""
                 if m_bis:
                     bis = " bis"
-                    trailing = trailing[m_bis.end():]
+                    trailing = trailing[m_bis.end() :]
                 paragraphs.append(Paragraph(css_class="articulo", text=f"Artículo {n}{bis}"))
                 if trailing:
                     buffer.append(trailing)

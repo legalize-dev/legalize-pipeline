@@ -411,6 +411,18 @@ class TestEncodingHygiene:
     def test_no_unicode_soft_hyphen(self, joined_text):
         assert "\u00ad" not in joined_text
 
+    def test_no_page_date_stamps(self, joined_text):
+        # Gaceta prints the issue date as a running page header (page number +
+        # "GACETA OFICIAL" + "10 de abril de 2021"); it is page furniture and
+        # must never leak into the law body, standalone or merged inline.
+        import re
+
+        stamps = re.findall(
+            r"(?m)^\d{1,2} de [a-záéíóúñü]+ de \d{4}(?:\s+[a-záéíóúñü]|$)",
+            joined_text,
+        )
+        assert stamps == [], f"Page date-stamp leaked into body: {stamps[:5]}"
+
     def test_no_replacement_char(self, joined_text):
         assert "\ufffd" not in joined_text
 
