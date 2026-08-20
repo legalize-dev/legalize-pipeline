@@ -616,18 +616,31 @@ class _FakeHttpClient:
         return [{"Id": 1}]
 
     def get_documents_by_journal(self, journal_id, is_serie1=True):
+        # LinkSitemap mirrors the real API: the detail screen is URL-driven,
+        # so the daily fetches by sitemap path rather than by id.
         return [
-            {"DiplomaConteudoId": d[0], "TipoActo": d[1], "Sumario": f"{d[1]} {d[2]}"}
+            {
+                "DiplomaConteudoId": d[0],
+                "TipoActo": d[1],
+                "Sumario": f"{d[1]} {d[2]}",
+                "LinkSitemap": f"/dr/detalhe/lei/{d[0]}",
+            }
             for d in self._docs
         ]
 
-    def get_text(self, diploma_id):
+    @staticmethod
+    def _id_from_ref(ref):
+        return ref.rsplit("/", 1)[-1]
+
+    def get_text(self, ref):
+        diploma_id = self._id_from_ref(ref)
         for d in self._docs:
             if d[0] == diploma_id:
                 return d[3].encode("utf-8")
-        raise ValueError(f"Not found: {diploma_id}")
+        raise ValueError(f"Not found: {ref}")
 
-    def get_metadata(self, diploma_id):
+    def get_metadata(self, ref):
+        diploma_id = self._id_from_ref(ref)
         for d in self._docs:
             if d[0] == diploma_id:
                 meta = {
