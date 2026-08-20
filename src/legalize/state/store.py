@@ -18,6 +18,13 @@ logger = logging.getLogger(__name__)
 # Default safety cap for automatic lookback (no explicit --date)
 MAX_LOOKBACK_DAYS = 10
 
+# How far back to walk pipeline commits looking for a usable Source-Date.
+# Bootstrap writes one commit per norm in the norms' own chronological
+# order, so a repo can open with a long run of future-dated commits at the
+# tip: the worst observed is legalize-it with 72 in a row. 500 leaves ample
+# headroom without walking 86k commits on every daily run.
+MAX_COMMITS_SCANNED = 500
+
 
 def resolve_dates_to_process(
     state: "StateStore",
@@ -82,29 +89,118 @@ def resolve_dates_to_process(
     return dates
 
 
-def infer_last_date_from_git(repo_path: str) -> date | None:
-    """Infer the last processed date from the most recent Source-Date trailer.
+def _parse_iso_date(value: str) -> date | None:
+    """Parse an ISO date, returning None instead of raising on garbage."""
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
 
-    Uses ``git log --grep`` to find only pipeline commits (which carry a
-    Source-Date trailer), ignoring manual commits like README updates.
-    Works for any country — all pipeline commits use the same trailer.
+
+def latest_source_date(repo_path: str) -> date | None:
+    """Most recent ``Source-Date`` trailer that is not in the future.
+
+    Walks pipeline commits (the ones carrying the trailer) newest first;
+    manual commits such as the README/LICENSE sweeps carry no trailer and
+    are filtered out by ``--grep``. Returns None when no such commit is
+    found within ``MAX_COMMITS_SCANNED``.
+
+    Future-dated trailers have to be skipped rather than trusted: bootstrap
+    writes one commit per norm in the norms' own chronological order, and a
+    norm whose entry into force is years away carries that future date, so
+    a freshly bootstrapped repo opens with a run of them at the tip (72 in
+    a row in legalize-it; up to 2034-01-01 in legalize-lt).
+
+    This is also the corpus freshness signal: git commit dates are useless
+    for it, since the committer sets GIT_COMMITTER_DATE to the norm's own
+    date (see committer.git_ops.GitRepo.commit).
     """
+    today = date.today()
     try:
         result = subprocess.run(
-            ["git", "log", "-1", "--grep=Source-Date:", "--format=%B"],
+            [
+                "git",
+                "log",
+                f"-{MAX_COMMITS_SCANNED}",
+                "--grep=Source-Date:",
+                "--format=%B%x1e",
+            ],
             cwd=repo_path,
             capture_output=True,
             text=True,
         )
-        if result.returncode == 0 and result.stdout.strip():
-            for line in result.stdout.splitlines():
-                if line.startswith("Source-Date: "):
-                    inferred = date.fromisoformat(line[len("Source-Date: ") :].strip())
-                    logger.info("Inferred last date from git: %s", inferred)
-                    return inferred
-    except (OSError, ValueError):
-        pass
+    except OSError:
+        return None
+
+    if result.returncode != 0:
+        return None
+
+    for body in result.stdout.split("\x1e"):
+        for line in body.splitlines():
+            if not line.startswith("Source-Date: "):
+                continue
+            found = _parse_iso_date(line[len("Source-Date: ") :].strip())
+            if found is not None and found <= today:
+                return found
+            # Future-dated (or malformed) trailer: keep walking back.
+            break
+
     return None
+
+
+def has_pipeline_commits(repo_path: str) -> bool:
+    """Whether the repo contains any commit the pipeline produced."""
+    try:
+        result = subprocess.run(
+            ["git", "log", "-1", "--grep=Source-Date:", "--format=%H"],
+            cwd=repo_path,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0 and bool(result.stdout.strip())
+
+
+def infer_last_date_from_git(repo_path: str) -> date | None:
+    """Infer the date the daily should resume from.
+
+    Normally the most recent non-future ``Source-Date`` in the repo.
+
+    Reading the tip commit's trailer as-is is what broke: it left ``start``
+    beyond today, the date loop produced an empty range, and the daily
+    exited 0 having done nothing. Green CI, no output, and self-locking —
+    with no commit the trailer never moves. Seven countries sat frozen like
+    that for months before anyone noticed.
+
+    Fallback when the repo has pipeline commits but no usable trailer among
+    the scanned ones: the lookback horizon, so the daily re-checks the full
+    window it is allowed to process automatically. Re-processing that
+    window is safe (the committer dedupes by Source-Id + Norm-Id) and it is
+    already what the clamp in :func:`resolve_dates_to_process` does for any
+    repo further behind. Returning None here instead would reproduce the
+    exact silent no-op this guard exists to prevent — and the commit date
+    is no help, since the committer sets it to the norm's own date, which
+    in this scenario is precisely the future date we just rejected.
+    """
+    found = latest_source_date(repo_path)
+    if found is not None:
+        logger.info("Inferred last date from git: %s", found)
+        return found
+
+    if not has_pipeline_commits(repo_path):
+        return None
+
+    fallback = date.today() - timedelta(days=MAX_LOOKBACK_DAYS)
+    logger.warning(
+        "No Source-Date <= today in the last %d pipeline commits; resuming "
+        "from the %d-day lookback horizon (%s). This repo was most likely "
+        "bootstrapped and never updated since.",
+        MAX_COMMITS_SCANNED,
+        MAX_LOOKBACK_DAYS,
+        fallback,
+    )
+    return fallback
 
 
 @dataclass
