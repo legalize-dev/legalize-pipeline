@@ -54,29 +54,61 @@ The client logged `Could not extract apiVersion`, kept POSTing to the old URLs,
 got HTML back, and the daily still exited 0. Verified live 2026-08-20: the
 first two endpoints work again with the renamed actions.
 
-## Known open break: document detail input
+## The detail screen is URL-driven
 
-`DataActionGetAllConteudoDetalheData` resolves and answers 200, but the screen
-no longer accepts `DipLegisId` as its input variable — the string does not
-appear anywhere in `dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc.js`. Probed
-without success: `ConteudoId`, `KeyConteudoId`, and both combined with
-`ParteId`/`FragmentoVersaoId`.
+`DataActionGetAllConteudoDetalheData` does **not** take a document id. The old
+`DipLegisId` input is gone — the string does not appear anywhere in
+`dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc.js`. The screen's input
+parameters are the segments of its own URL:
+
+```js
+// screen model variables, read out of the live page
+"tipoIn", "_tipoInDataFetchStatus",
+"keyIn",  "_keyInDataFetchStatus",
+"parteIdIn", "_parteIdInDataFetchStatus"
+```
+
+which post as `Tipo`, `Key` and `ParteId`:
+
+```json
+{"screenData": {"variables": {
+  "Tipo": "decreto-lei",        "_tipoInDataFetchStatus": 1,
+  "Key":  "169-2026-1159106557", "_keyInDataFetchStatus": 1,
+  "ParteId": "0",                "_parteIdInDataFetchStatus": 1
+}}}
+```
+
+Both segments come straight from the `LinkSitemap` the document list already
+returns for every document — `/dr/detalhe/decreto-lei/169-2026-1159106557` —
+so nothing has to be reconstructed. `_split_sitemap_ref()` splits it, and
+`get_text()`/`get_metadata()` take that path as their reference instead of an
+id. The daily carries it through `doc_info["ref"]`.
+
+Do not try to rebuild the key from `TipoDiploma` + `Numero` + id: a Portaria
+numbered `349/2026/1` does not map to its slug the way you would guess. Use
+`LinkSitemap`.
 
 An unrecognised input does **not** produce an error. DRE returns a default
 record — `Id: 0`, `Numero: ""`, `DataPublicacao: "1900-01-01"` — which would be
-committed as a law with no title, no date and no text. `get_document_detail()`
-therefore raises `DREApiError` on a record with neither `Numero` nor `ELI`.
+committed as a law with no title, no date and no text.
+`get_document_detail()` therefore raises `DREApiError` on a record with
+neither `Numero` nor `ELI`.
 
-Until this is solved the daily discovers the right documents and then fails
-red on the first text fetch. Leads for whoever picks it up:
+### How the input names were found
 
-- the document list gives `LinkSitemap`, e.g.
-  `/dr/detalhe/decreto-lei/169-2026-1159106557` — the screen is URL-driven, so
-  its input is probably derived from those segments rather than a raw id;
-- the response carries `KeyConteudoId`, `NewKey`, `PageName`, `ElementType`,
-  which smell like the resolved route parameters;
-- the surest route is capturing the real request in a browser devtools session
-  on a detail page and copying the `screenData.variables` block verbatim.
+The routes are not in `dr.appDefinition.js`, and the screen's data action takes
+its inputs from the screen model rather than from explicit call arguments, so
+the MVC JS alone does not name them. They came out of the live page:
+
+```js
+const M = requirejs.s.contexts._.defined[
+  'dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc$model'];
+Object.getOwnPropertyNames(Object.getPrototypeOf(new M.modelClass().variables));
+// → …, "tipoIn", "_tipoInDataFetchStatus", "keyIn", "_keyInDataFetchStatus", …
+```
+
+The `…In` suffix marks a screen input parameter; drop it and capitalise to get
+the name to post. Same trick works for any other DRE screen.
 
 ## Re-checking the contract by hand
 

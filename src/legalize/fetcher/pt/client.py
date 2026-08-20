@@ -61,6 +61,9 @@ _SCREEN_ENDPOINTS: dict[str, tuple[str, tuple[str, ...]]] = {
     ),
 }
 
+# Document sitemap path: /dr/detalhe/{tipo}/{key}
+_SITEMAP_REF_RE = re.compile(r"/dr/detalhe/([^/]+)/([^/?#]+)")
+
 # callDataAction("ActionName", "screenservices/...", "apiVersionHash", ...)
 _CALL_DATA_ACTION_RE = re.compile(
     r'callDataAction\s*\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"'
@@ -74,6 +77,21 @@ class DREApiError(RuntimeError):
     the daily run in red rather than recording a silent "no new norms" day
     and advancing the state past legislation we never saw.
     """
+
+
+def _split_sitemap_ref(ref: str) -> tuple[str, str]:
+    """Split a DRE sitemap path into the detail screen's (Tipo, Key) inputs.
+
+    ``/dr/detalhe/decreto-lei/169-2026-1159106557`` → ``("decreto-lei",
+    "169-2026-1159106557")``.  Accepts a full URL as well as a bare path.
+    """
+    match = _SITEMAP_REF_RE.search(ref or "")
+    if not match:
+        raise DREApiError(
+            f"Cannot read a document reference out of {ref!r}. Expected a DRE "
+            f"sitemap path like /dr/detalhe/decreto-lei/169-2026-1159106557."
+        )
+    return match.group(1), match.group(2)
 
 
 def _nested_get(d: dict, *keys: str, default: str = "") -> str:
@@ -355,22 +373,31 @@ class DREHttpClient(HttpClient):
             f"documents, so an unreadable response is a DRE change, not an empty day."
         )
 
-    def get_document_detail(self, diploma_id: str) -> dict:
+    def get_document_detail(self, ref: str) -> dict:
         """Fetch full document detail including text.
 
         Args:
-            diploma_id: Internal document legislation ID (DipLegisId).
+            ref: The document's sitemap path as published in the document
+                list, e.g. ``/dr/detalhe/decreto-lei/169-2026-1159106557``.
+                The detail screen is URL-driven: its inputs are the *type*
+                and *key* segments of that path, not a raw id.
 
         Returns:
             Dict with document details including Texto/TextoFormatado.
             Field names follow the new DRE API (2025+):
             TipoDiploma, Emissor, ELI, Vigencia, etc.
         """
+        tipo, key = _split_sitemap_ref(ref)
         payload = {
             "viewName": "Legislacao_Conteudos.Conteudo_Detalhe",
             "screenData": {
                 "variables": {
-                    "DipLegisId": str(diploma_id),
+                    "Tipo": tipo,
+                    "_tipoInDataFetchStatus": 1,
+                    "Key": key,
+                    "_keyInDataFetchStatus": 1,
+                    "ParteId": "0",
+                    "_parteIdInDataFetchStatus": 1,
                 },
             },
             "clientVariables": {
@@ -388,33 +415,32 @@ class DREHttpClient(HttpClient):
             str(detail.get("Numero", "")).strip() or str(detail.get("ELI", "")).strip()
         ):
             raise DREApiError(
-                f"{DOCUMENT_DETAIL} returned an empty record for diploma_id={diploma_id} "
+                f"{DOCUMENT_DETAIL} returned an empty record for {ref} "
                 f"(Id={detail.get('Id') if isinstance(detail, dict) else detail!r}). "
-                f"The screen no longer accepts DipLegisId as its input variable — "
-                f"see docs/pt-dre-api.md."
+                f"The screen's Tipo/Key inputs no longer resolve — see docs/pt-dre-api.md."
             )
         return detail
 
-    def get_text(self, diploma_id: str) -> bytes:
-        """Fetch the full text of a document.
+    def get_text(self, ref: str) -> bytes:
+        """Fetch the full text of a document by its sitemap path.
 
         Returns HTML text as UTF-8 bytes, compatible with DRETextParser.
         """
-        detail = self.get_document_detail(diploma_id)
+        detail = self.get_document_detail(ref)
         text = detail.get("Texto", "").strip()
         if not text:
             text = detail.get("TextoFormatado", "").strip()
         if not text:
-            raise ValueError(f"No text found for diploma_id={diploma_id}")
+            raise ValueError(f"No text found for {ref}")
         return text.encode("utf-8")
 
-    def get_metadata(self, diploma_id: str) -> bytes:
-        """Fetch metadata for a document.
+    def get_metadata(self, ref: str) -> bytes:
+        """Fetch metadata for a document by its sitemap path.
 
         Returns JSON bytes compatible with DREMetadataParser.
         Handles both legacy and new (2025+) field names from the API.
         """
-        detail = self.get_document_detail(diploma_id)
+        detail = self.get_document_detail(ref)
 
         # Vigencia: "NAO_VIGENTE" means repealed
         vigencia = detail.get("Vigencia", "")
@@ -442,7 +468,7 @@ class DREHttpClient(HttpClient):
         )
 
         meta = {
-            "claint": detail.get("ConteudoId", detail.get("Id", diploma_id)),
+            "claint": detail.get("ConteudoId", detail.get("Id", "")),
             "doc_type": doc_type,
             "number": detail.get("Numero", "").strip(),
             "emiting_body": emiting_body,

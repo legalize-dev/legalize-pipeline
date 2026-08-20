@@ -84,6 +84,9 @@ def _discover_daily_http(client, target_date: date) -> list[dict]:
                     documents.append(
                         {
                             "diploma_id": str(diploma_id),
+                            # The detail screen is URL-driven, so the fetch
+                            # needs the document's own sitemap path, not its id.
+                            "ref": doc.get("LinkSitemap", ""),
                             "doc_type": doc_type,
                             "title": doc.get("Sumario", doc_type),
                         }
@@ -162,10 +165,11 @@ def daily(
                     continue
 
                 try:
-                    meta_data = client.get_metadata(diploma_id)
+                    ref = doc_info["ref"]
+                    meta_data = client.get_metadata(ref)
                     metadata = meta_parser.parse(meta_data, diploma_id)
 
-                    text_data = client.get_text(diploma_id)
+                    text_data = client.get_text(ref)
                     blocks = text_parser.parse_text_with_date(
                         text_data, metadata.publication_date, metadata.identifier
                     )
@@ -197,6 +201,12 @@ def daily(
                         commits_created += 1
                         console.print(f"    [green]✓[/green] {info.subject}")
 
+                except DREApiError:
+                    # Same reasoning as discovery: a contract break hits every
+                    # remaining document, so collecting it per document would
+                    # walk the whole day and still exit 0.
+                    logger.exception("DRE API contract broken — aborting daily run")
+                    raise
                 except Exception as e:
                     msg = f"Error processing diploma_id={diploma_id}: {e}"
                     logger.exception(msg)

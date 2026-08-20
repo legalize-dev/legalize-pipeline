@@ -27,8 +27,9 @@ from legalize.fetcher.pt.client import (
     JOURNALS_BY_DATE,
     DREApiError,
     DREHttpClient,
+    _split_sitemap_ref,
 )
-from legalize.fetcher.pt.daily import daily
+from legalize.fetcher.pt.daily import _discover_daily_http, daily
 
 # Real shape of dr.Home.home.mvc.js after the May 2026 DRE redeploy: the
 # action gained an "AndCheckUserLog" suffix and a fresh apiVersion hash.
@@ -215,6 +216,73 @@ class TestJournalsByDate:
 
 
 # ─────────────────────────────────────────────
+# The detail screen is URL-driven
+# ─────────────────────────────────────────────
+
+
+class TestSitemapRef:
+    """The detail screen takes the URL's type and key, never a raw id."""
+
+    def test_splits_a_sitemap_path(self):
+        assert _split_sitemap_ref("/dr/detalhe/decreto-lei/169-2026-1159106557") == (
+            "decreto-lei",
+            "169-2026-1159106557",
+        )
+
+    def test_splits_a_full_url(self):
+        assert _split_sitemap_ref(
+            "https://diariodarepublica.pt/dr/detalhe/portaria/349-2026-1159106558"
+        ) == ("portaria", "349-2026-1159106558")
+
+    @pytest.mark.parametrize("ref", ["", "1159106557", "/dr/home", None])
+    def test_unusable_reference_raises(self, ref):
+        with pytest.raises(DREApiError, match="document reference"):
+            _split_sitemap_ref(ref)
+
+    def test_detail_posts_tipo_and_key(self):
+        """Regression: DipLegisId stopped being an input in the May 2026 deploy."""
+        client = _client()
+        request = MagicMock(
+            return_value=_json_response(
+                {"data": {"DetalheConteudo": {"Id": 1159106557, "Numero": "169/2026"}}}
+            )
+        )
+
+        with patch.object(client, "_request", request):
+            client.get_document_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
+
+        variables = request.call_args.kwargs["json"]["screenData"]["variables"]
+        assert variables["Tipo"] == "decreto-lei"
+        assert variables["Key"] == "169-2026-1159106557"
+        assert variables["_tipoInDataFetchStatus"] == 1
+        assert variables["_keyInDataFetchStatus"] == 1
+        assert "DipLegisId" not in variables
+
+
+class TestDiscoveryCarriesTheReference:
+    def test_link_sitemap_becomes_the_ref(self):
+        """Discovery must hand the detail fetch the document's own URL."""
+        client = MagicMock()
+        client.get_journals_by_date.return_value = [
+            {"Id": "1159106555", "conteudoTitle": "Diário da República n.º 159/2026, Série I"}
+        ]
+        client.get_documents_by_journal.return_value = [
+            {
+                "TipoDiploma": "Decreto-Lei",
+                "DiplomaLegisId": "1159106557",
+                "Sumario": "Altera o Decreto-Lei n.º 252/2007",
+                "LinkSitemap": "/dr/detalhe/decreto-lei/169-2026-1159106557",
+            }
+        ]
+
+        found = _discover_daily_http(client, date(2026, 8, 18))
+
+        assert len(found) == 1
+        assert found[0]["ref"] == "/dr/detalhe/decreto-lei/169-2026-1159106557"
+        assert found[0]["diploma_id"] == "1159106557"
+
+
+# ─────────────────────────────────────────────
 # get_document_detail: default record is not a document
 # ─────────────────────────────────────────────
 
@@ -238,7 +306,7 @@ class TestDocumentDetail:
             patch.object(client, "_request", return_value=_json_response(payload)),
             pytest.raises(DREApiError, match="empty record"),
         ):
-            client.get_document_detail("1159106557")
+            client.get_document_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
 
     def test_real_record_passes_through(self):
         client = _client()
@@ -255,7 +323,7 @@ class TestDocumentDetail:
         }
 
         with patch.object(client, "_request", return_value=_json_response(payload)):
-            detail = client.get_document_detail("1159106557")
+            detail = client.get_document_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
 
         assert detail["Numero"] == "169/2026"
 
@@ -317,6 +385,30 @@ class TestDailyAbortsOnApiBreak:
 
         state_path = Path(config.get_country("pt").state_path)
         assert not state_path.exists() or "2026-08-10" not in state_path.read_text()
+
+    @patch("legalize.fetcher.pt.client.DREHttpClient", autospec=True)
+    @patch("legalize.fetcher.pt.daily._discover_daily_http")
+    def test_api_break_while_fetching_a_document_aborts(
+        self, mock_discover, mock_client_cls, tmp_path
+    ):
+        """Discovery can succeed and the *fetch* still hit a broken contract."""
+        config = self._make_config(tmp_path)
+        mock_discover.return_value = [
+            {
+                "diploma_id": "1159106557",
+                "ref": "/dr/detalhe/decreto-lei/169-2026-1159106557",
+                "doc_type": "DECRETO-LEI",
+                "title": "Altera o Decreto-Lei n.º 252/2007",
+            }
+        ]
+
+        mock_client = mock_client_cls.create.return_value
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client.get_metadata.side_effect = DREApiError("returned an empty record")
+
+        with pytest.raises(DREApiError):
+            daily(config, target_date=date(2026, 8, 18))
 
     @patch("legalize.fetcher.pt.client.DREHttpClient", autospec=True)
     @patch("legalize.fetcher.pt.daily._discover_daily_http")
