@@ -70,13 +70,17 @@ class FinlexDiscovery(NormDiscovery):
     ) -> Iterator[str]:
         """Yield IDs of statutes modified since *target_date*.
 
-        Uses the ``publishedSince`` query parameter which accepts an
-        ISO datetime string.  We query for anything published since
-        midnight of the target date.
+        Uses the ``publishedSince`` query parameter, which takes an ISO
+        8601 *instant* — the offset is required. We query for anything
+        published since midnight UTC of the target date.
+
+        Finlex used to accept a naive ``YYYY-MM-DDTHH:MM:SS`` and now
+        answers 400 to it, which turned every day of the daily into an
+        error and Finland into a repo that had not moved since August.
         """
         assert isinstance(client, FinlexClient)
 
-        since = f"{target_date.isoformat()}T00:00:00"
+        since = f"{target_date.isoformat()}T00:00:00Z"
         page = 1
         total = 0
         seen: set[str] = set()
