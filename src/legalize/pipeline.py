@@ -33,7 +33,7 @@ from legalize.models import (
     ParsedNorm,
     Reform,
 )
-from legalize.state.store import StateStore, resolve_dates_to_process
+from legalize.state.store import StateStore, latest_source_date, resolve_dates_to_process
 from legalize.storage import load_norma_from_json, save_structured_json
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
@@ -97,6 +97,20 @@ def finalize_daily(
         console.print(f"[yellow]⚠ {len(errors)} errors[/yellow]")
 
     return commits_created
+
+
+def days_since_last_norm(config: Config, country: str) -> int | None:
+    """Days since the most recent norm the pipeline captured for a country.
+
+    Reads the newest non-future ``Source-Date`` in the country repo, which
+    is the only usable freshness signal there: commit timestamps carry the
+    norm's own date, not when the pipeline ran.
+
+    Returns None when the repo holds no usable pipeline commit at all.
+    """
+    cc = config.get_country(country)
+    latest = latest_source_date(cc.repo_path)
+    return None if latest is None else (date.today() - latest).days
 
 
 def generic_daily(

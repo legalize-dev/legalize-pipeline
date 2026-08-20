@@ -322,6 +322,41 @@ def bootstrap(
 # ─────────────────────────────────────────────
 
 
+def _report_freshness(config, country: str, *, enforce: bool) -> None:
+    """Report how current a country corpus is, and fail the run if stalled.
+
+    A daily that fetches, finds nothing and exits 0 is indistinguishable
+    from a healthy quiet day — that is how seven countries stayed frozen
+    behind a green CI matrix for two months. Exiting non-zero is the
+    alert: the matrix job turns red, GitHub notifies on failed scheduled
+    runs, and the Actions tab names the country. Nothing to subscribe to
+    and no log to read.
+
+    ``enforce`` is off for --dry-run and for explicit --date runs, so a
+    backfill loop is not aborted by the gap it is there to close.
+    """
+    from legalize.pipeline import days_since_last_norm
+
+    cc = config.get_country(country)
+    stale = days_since_last_norm(config, country)
+
+    if stale is None:
+        reason = "the repo holds no usable pipeline commit at all"
+    elif stale >= cc.stall_alert_days:
+        reason = (
+            f"no norm captured in {stale} days (threshold {cc.stall_alert_days}); "
+            f"the daily ran and produced nothing, so treat this as a broken "
+            f"fetcher until proven otherwise"
+        )
+    else:
+        console.print(f"[dim]Freshness: last norm captured {stale} day(s) ago[/dim]")
+        return
+
+    console.print(f"[bold red]STALLED: {country.upper()} — {reason}.[/bold red]")
+    if enforce:
+        raise SystemExit(1)
+
+
 @cli.command()
 @_country_option()
 @click.option("--date", "target_date", default=None, help="Date to process (YYYY-MM-DD).")
@@ -373,6 +408,8 @@ def daily(
         from legalize.pipeline import generic_daily
 
         generic_daily(config, country, target_date=parsed_date, dry_run=dry_run)
+
+    _report_freshness(config, country, enforce=not dry_run and parsed_date is None)
 
 
 # ─────────────────────────────────────────────
@@ -718,6 +755,7 @@ def status(ctx: click.Context) -> None:
     """Show pipeline status."""
     from pathlib import Path
 
+    from legalize.pipeline import days_since_last_norm
     from legalize.state.store import StateStore
 
     config = ctx.obj["config"]
@@ -739,6 +777,15 @@ def status(ctx: click.Context) -> None:
             state = StateStore(cc.state_path)
             state.load()
 
+            stale = days_since_last_norm(config, code)
+            if stale is None:
+                freshness = "[red]no pipeline commits[/red]"
+            elif stale >= cc.stall_alert_days:
+                freshness = f"[red]{stale} day(s) ago — STALLED[/red]"
+            else:
+                freshness = f"{stale} day(s) ago"
+
             console.print(f"\n  [bold]{code.upper()}[/bold]")
             console.print(f"    Downloaded norms: {count}")
             console.print(f"    Last summary: {state.last_summary_date or '[dim]none[/dim]'}")
+            console.print(f"    Last norm captured: {freshness}")
