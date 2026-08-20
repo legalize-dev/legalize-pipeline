@@ -24,7 +24,13 @@ jobs:
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
           python-version: "3.12"
-      - run: pip install ruff
+      # Pinned on purpose: the job installed whatever ruff was newest, so the
+      # lint rules changed under the repo without a commit. 0.16 widened the
+      # default rule set and CI went from clean to 476 errors overnight on
+      # code nobody had touched, while pre-commit (language: system) kept
+      # using the locally installed ruff and stayed green. Bump deliberately,
+      # together with the fixes the new rules ask for.
+      - run: pip install ruff==0.15.8
       - run: ruff check src/ tests/
       - run: ruff format --check src/ tests/
 
