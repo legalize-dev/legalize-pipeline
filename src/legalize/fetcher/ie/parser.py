@@ -20,6 +20,10 @@ from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
+# Module-level accumulator for footnote definitions collected during
+# _inline_text() calls.  Cleared by the parser after each act.
+_footnote_defs: list[tuple[str, str]] = []
+
 # ISB special entity elements → Unicode replacements.
 _ENTITY_MAP: dict[str, str] = {
     "ifada": "\u00ed",  # í
@@ -119,20 +123,40 @@ def _inline_text(elem: etree._Element) -> str:
                 parts.append(child.tail)
             continue
 
-        # Cross-references
+        # Cross-references — preserve href as markdown link
         if tag == "xref":
             inner = _inline_text(child).strip()
-            parts.append(inner)
+            href = child.get("href", "")
+            if inner and href:
+                parts.append(f"[{inner}]({href})")
+            else:
+                parts.append(inner)
             if child.tail:
                 parts.append(child.tail)
             continue
 
-        # Footnotes: extract marker number
+        # Footnotes: extract marker number and collect body text
         if tag == "fn":
             marker = child.find(".//marker")
             if marker is not None:
                 num = _inline_text(marker).strip().lstrip("^")
                 parts.append(f"[^{num}]")
+                # Collect footnote body text for definitions block
+                body_parts = []
+                for fn_child in child:
+                    fn_tag = fn_child.tag if isinstance(fn_child.tag, str) else ""
+                    if fn_tag == "marker":
+                        continue  # Already handled above
+                    if fn_tag == "p":
+                        fn_text = _inline_text(fn_child).strip()
+                        if fn_text:
+                            body_parts.append(fn_text)
+                    elif fn_tag:
+                        fn_text = _inline_text(fn_child).strip()
+                        if fn_text:
+                            body_parts.append(fn_text)
+                if body_parts:
+                    _footnote_defs.append((num, " ".join(body_parts)))
             if child.tail:
                 parts.append(child.tail)
             continue
@@ -169,13 +193,17 @@ def _table_to_markdown(table_elem: etree._Element) -> str:
 
     Handles:
     - Multi-paragraph cells (joined with space)
-    - colspan (cell repeated across columns)
+    - colspan (cell text repeated across spanned columns)
+    - rowspan (cell text propagated to subsequent rows)
     - Bold headers
+
+    Uses a pending-cell dict for rowspan, following the LV parser pattern.
     """
-    rows: list[list[str]] = []
+    # First pass: collect raw cell data with colspan/rowspan info
+    raw_rows: list[list[tuple[str, int, int]]] = []  # [(text, colspan, rowspan), ...]
 
     for tr in table_elem.findall(".//tr"):
-        cells: list[str] = []
+        row_cells: list[tuple[str, int, int]] = []
         for td in tr.findall("td"):
             # Cell may contain multiple <p> elements
             cell_parts = []
@@ -193,18 +221,47 @@ def _table_to_markdown(table_elem: etree._Element) -> str:
             cell_text = " ".join(cell_parts)
             # Escape pipes in cell content
             cell_text = cell_text.replace("|", "\\|")
-            cells.append(cell_text)
 
-            # Handle colspan: duplicate cell for extra columns
             colspan = int(td.get("colspan", "1"))
-            for _ in range(colspan - 1):
-                cells.append("")
+            rowspan = int(td.get("rowspan", "1"))
+            row_cells.append((cell_text, colspan, rowspan))
 
-        if cells:
-            rows.append(cells)
+        if row_cells:
+            raw_rows.append(row_cells)
 
-    if not rows:
+    if not raw_rows:
         return ""
+
+    # Second pass: resolve colspan and rowspan into a regular grid
+    rows: list[list[str]] = []
+    pending: dict[int, tuple[str, int]] = {}  # col -> (text, rows_remaining)
+
+    for raw_row in raw_rows:
+        out_row: list[str] = []
+        col = 0
+        cell_idx = 0
+
+        while cell_idx < len(raw_row) or col in pending:
+            if col in pending:
+                text, remaining = pending[col]
+                out_row.append(text)
+                if remaining > 1:
+                    pending[col] = (text, remaining - 1)
+                else:
+                    del pending[col]
+                col += 1
+            elif cell_idx < len(raw_row):
+                text, colspan, rowspan = raw_row[cell_idx]
+                for _ in range(colspan):
+                    out_row.append(text)
+                    if rowspan > 1:
+                        pending[col] = (text, rowspan - 1)
+                    col += 1
+                cell_idx += 1
+            else:
+                break
+
+        rows.append(out_row)
 
     # Normalize column count
     max_cols = max(len(r) for r in rows)
@@ -278,6 +335,13 @@ class ISBTextParser(TextParser):
         backmatter = root.find("backmatter")
         if backmatter is not None:
             self._parse_backmatter(backmatter, paragraphs)
+
+        # Flush collected footnote definitions (pattern: UK parser)
+        if _footnote_defs:
+            paragraphs.append(Paragraph(css_class="h2", text="Footnotes"))
+            for fn_num, fn_body in _footnote_defs:
+                paragraphs.append(Paragraph(css_class="parrafo", text=f"[^{fn_num}]: {fn_body}"))
+            _footnote_defs.clear()
 
         if not paragraphs:
             return []
@@ -943,6 +1007,8 @@ class ISBMetadataParser(MetadataParser):
             rank=Rank("act"),
             publication_date=pub_date,
             status=NormStatus.IN_FORCE,
+            # TODO(phase-3): detect REPEALED/PARTIALLY_REPEALED from Revised Acts
+            # F-annotations (e.g. "F1 Repealed (31.07.2024) by ...")
             department="",
             source=source,
             pdf_url=pdf_url or None,
@@ -962,6 +1028,8 @@ class ISBMetadataParser(MetadataParser):
             rank=Rank("act"),
             publication_date=date(year, 1, 1),
             status=NormStatus.IN_FORCE,
+            # TODO(phase-3): detect REPEALED/PARTIALLY_REPEALED from Revised Acts
+            # F-annotations (e.g. "F1 Repealed (31.07.2024) by ...")
             department="",
             source="",
         )
