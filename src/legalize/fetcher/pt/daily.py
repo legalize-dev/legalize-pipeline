@@ -98,7 +98,7 @@ def daily(
     dry_run: bool = False,
 ) -> int:
     """Daily processing for Portugal via HTTP (no SQLite needed)."""
-    from legalize.fetcher.pt.client import DREHttpClient
+    from legalize.fetcher.pt.client import DREApiError, DREHttpClient
     from legalize.fetcher.pt.parser import DREMetadataParser, DRETextParser
 
     cc = config.get_country("pt")
@@ -133,9 +133,15 @@ def daily(
 
             try:
                 documents = _discover_daily_http(client, current_date)
+            except DREApiError:
+                # A broken DRE contract is not a bad day, it is a broken
+                # client: every remaining date would fail the same way and
+                # record itself as "no new norms". Abort loudly instead.
+                logger.exception("DRE API contract broken — aborting daily run")
+                raise
             except Exception:
                 msg = f"Error discovering changes for {current_date}"
-                logger.error(msg, exc_info=True)
+                logger.exception(msg)
                 errors.append(msg)
                 continue
 
@@ -193,7 +199,7 @@ def daily(
 
                 except Exception as e:
                     msg = f"Error processing diploma_id={diploma_id}: {e}"
-                    logger.error(msg, exc_info=True)
+                    logger.exception(msg)
                     errors.append(msg)
 
             state.last_summary_date = current_date

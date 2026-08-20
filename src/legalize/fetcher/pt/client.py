@@ -26,27 +26,54 @@ logger = logging.getLogger(__name__)
 _BASE = "https://diariodarepublica.pt/dr"
 _MODULE_VERSION_URL = f"{_BASE}/moduleservices/moduleversioninfo"
 _OUTSYSTEMS_JS_URL = f"{_BASE}/scripts/OutSystems.js"
-_DRS_BY_DATE_URL = f"{_BASE}/screenservices/dr/Home/home/DataActionGetDRByDataCalendario"
-_DOC_LIST_URL = (
-    f"{_BASE}/screenservices/dr/Legislacao_Conteudos"
-    "/Conteudo_Det_Diario/DataActionGetDadosAndApplicationSettings"
-)
-_DOC_DETAIL_URL = (
-    f"{_BASE}/screenservices/dr/Legislacao_Conteudos"
-    "/Conteudo_Detalhe/DataActionGetConteudoDataAndApplicationSettings"
-)
+# ─── Screen actions (discovered at runtime) ───
+#
+# The OutSystems endpoints live under screenservices/ and each one needs a
+# per-action ``apiVersion`` hash that changes on every DRE deploy.  Both the
+# URL path and the hash are published in the screen's MVC JavaScript as
+# ``callDataAction("ActionName", "screenservices/...", "apiVersionHash", ...)``
+# so we read them from there instead of hardcoding them.
+#
+# DRE also *renames* actions across deploys — the May 2026 redeploy turned
+# ``DataActionGetDRByDataCalendario`` into
+# ``DataActionGetDRByDataCalendarioAndCheckUserLog`` and replaced
+# ``DataActionGetConteudoDataAndApplicationSettings`` with
+# ``DataActionGetAllConteudoDetalheData`` — so each endpoint matches a list of
+# known action-name prefixes rather than one exact name.  A suffix added to an
+# existing name keeps working; a wholesale rename needs a new prefix here and
+# raises DREApiError until it gets one, instead of silently finding nothing.
+JOURNALS_BY_DATE = "journals_by_date"
+DOCUMENTS_BY_JOURNAL = "documents_by_journal"
+DOCUMENT_DETAIL = "document_detail"
 
-# Screen MVC JS files containing per-endpoint apiVersion hashes.
-# OutSystems requires a per-action apiVersion that changes on each deploy.
-_SCREEN_JS_MAP: dict[str, str] = {
-    "DataActionGetDRByDataCalendario": f"{_BASE}/scripts/dr.Home.home.mvc.js",
-    "DataActionGetDadosAndApplicationSettings": (
-        f"{_BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Det_Diario.mvc.js"
+_SCREEN_ENDPOINTS: dict[str, tuple[str, tuple[str, ...]]] = {
+    JOURNALS_BY_DATE: (
+        f"{_BASE}/scripts/dr.Home.home.mvc.js",
+        ("DataActionGetDRByDataCalendario",),
     ),
-    "DataActionGetConteudoDataAndApplicationSettings": (
-        f"{_BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc.js"
+    DOCUMENTS_BY_JOURNAL: (
+        f"{_BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Det_Diario.mvc.js",
+        ("DataActionGetDadosAndApplicationSettings",),
+    ),
+    DOCUMENT_DETAIL: (
+        f"{_BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc.js",
+        ("DataActionGetConteudoData", "DataActionGetAllConteudoDetalhe"),
     ),
 }
+
+# callDataAction("ActionName", "screenservices/...", "apiVersionHash", ...)
+_CALL_DATA_ACTION_RE = re.compile(
+    r'callDataAction\s*\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"'
+)
+
+
+class DREApiError(RuntimeError):
+    """The DRE OutSystems API broke its contract.
+
+    Raised instead of degrading to an empty result, so a DRE redeploy fails
+    the daily run in red rather than recording a silent "no new norms" day
+    and advancing the state past legislation we never saw.
+    """
 
 
 def _nested_get(d: dict, *keys: str, default: str = "") -> str:
@@ -82,15 +109,18 @@ class DREHttpClient(HttpClient):
         )
         self._csrf_token: str = ""
         self._module_version: str = ""
-        self._api_versions: dict[str, str] = {}  # action_name → apiVersion hash
+        # logical endpoint name → (absolute URL, apiVersion hash)
+        self._endpoints: dict[str, tuple[str, str]] = {}
         self._request_count = 0
         self._init_session()
 
     def _init_session(self) -> None:
-        """Initialize session: fetch CSRF token, module version, and API versions.
+        """Initialize session: CSRF token, module version, and screen endpoints.
 
-        OutSystems requires a per-action apiVersion hash that changes on each
-        platform deploy. We extract these from the screen MVC JavaScript files.
+        Every piece here is a hard requirement: without a CSRF token or an
+        apiVersion hash the OutSystems endpoints answer with an HTML error page
+        instead of JSON.  Anything missing raises DREApiError rather than
+        leaving the client half-configured to fail later as "no results".
         """
         # 1. Get CSRF token from OutSystems.js
         resp = self._request("GET", _OUTSYSTEMS_JS_URL)
@@ -103,9 +133,12 @@ class DREHttpClient(HttpClient):
             if match:
                 self._csrf_token = match.group(1)
                 break
-        logger.info(
-            "CSRF token obtained: %s...", self._csrf_token[:8] if self._csrf_token else "NONE"
-        )
+        if not self._csrf_token:
+            raise DREApiError(
+                f"No CSRF token found in {_OUTSYSTEMS_JS_URL} "
+                f"({len(resp.text)} bytes) — DRE changed the token format."
+            )
+        logger.info("CSRF token obtained: %s...", self._csrf_token[:8])
 
         # 2. Get module version
         resp = self._request("GET", _MODULE_VERSION_URL)
@@ -114,41 +147,41 @@ class DREHttpClient(HttpClient):
             self._module_version = version_data.get("versionToken", "")
         elif isinstance(version_data, list) and version_data:
             self._module_version = version_data[0].get("versionToken", "")
-        logger.info(
-            "Module version: %s", self._module_version[:20] if self._module_version else "NONE"
+        if not self._module_version:
+            raise DREApiError(
+                f"No versionToken in {_MODULE_VERSION_URL} response: {version_data!r:.200}"
+            )
+        logger.info("Module version: %s", self._module_version)
+
+        # 3. Resolve each screen endpoint (URL + apiVersion) from its MVC JS.
+        self._endpoints = {}
+        js_cache: dict[str, str] = {}
+        for name, (js_url, prefixes) in _SCREEN_ENDPOINTS.items():
+            if js_url not in js_cache:
+                js_cache[js_url] = self._request("GET", js_url).text
+            self._endpoints[name] = self._resolve_endpoint(name, js_cache[js_url], js_url, prefixes)
+
+    def _resolve_endpoint(
+        self, name: str, js_text: str, js_url: str, prefixes: tuple[str, ...]
+    ) -> tuple[str, str]:
+        """Find the URL and apiVersion of one screen action inside its MVC JS."""
+        actions = {
+            m.group(1): (m.group(2), m.group(3)) for m in _CALL_DATA_ACTION_RE.finditer(js_text)
+        }
+        for prefix in prefixes:
+            for action_name, (path, api_version) in actions.items():
+                if action_name.startswith(prefix):
+                    logger.info("Resolved %s → %s (apiVersion %s)", name, action_name, api_version)
+                    return f"{_BASE}/{path.lstrip('/')}", api_version
+        raise DREApiError(
+            f"No action matching {prefixes} in {js_url} "
+            f"({len(js_text)} bytes, {len(actions)} actions found: "
+            f"{sorted(actions)}). DRE renamed the action — add the new prefix "
+            f"to _SCREEN_ENDPOINTS[{name!r}]."
         )
 
-        # 3. Extract per-action apiVersion hashes from screen MVC JS files.
-        # Each callDataAction("ActionName", "url", "apiVersionHash", ...) in the JS
-        # contains the hash required for that specific server action.
-        fetched_js: dict[str, str] = {}  # url → text (avoid duplicate fetches)
-        for action_name, js_url in _SCREEN_JS_MAP.items():
-            if js_url not in fetched_js:
-                try:
-                    js_resp = self._request("GET", js_url)
-                    fetched_js[js_url] = js_resp.text
-                except Exception:
-                    logger.warning("Failed to fetch screen JS: %s", js_url)
-                    fetched_js[js_url] = ""
-
-            js_text = fetched_js[js_url]
-            # Pattern: callDataAction("ActionName", "endpoint/url", "apiHash", ...)
-            pattern = (
-                rf'callDataAction\s*\(\s*"{re.escape(action_name)}"\s*,\s*"[^"]+"\s*,\s*"([^"]+)"'
-            )
-            match = re.search(pattern, js_text)
-            if match:
-                self._api_versions[action_name] = match.group(1)
-                logger.info("API version for %s: %s", action_name, match.group(1)[:20])
-            else:
-                logger.warning("Could not extract apiVersion for %s", action_name)
-
-    def _action_name_from_url(self, url: str) -> str:
-        """Extract the DataAction name from a full endpoint URL."""
-        return url.rsplit("/", 1)[-1] if "/" in url else url
-
-    def _post(self, url: str, payload: dict) -> dict:
-        """POST JSON to an OutSystems endpoint with CSRF token."""
+    def _post(self, endpoint: str, payload: dict) -> dict:
+        """POST JSON to a resolved OutSystems endpoint with CSRF + version info."""
         self._request_count += 1
 
         # Refresh session every 100 requests
@@ -156,25 +189,38 @@ class DREHttpClient(HttpClient):
             logger.info("Refreshing session after %d requests", self._request_count)
             self._init_session()
 
-        headers = {}
-        if self._csrf_token:
-            headers["X-CSRFToken"] = self._csrf_token
-
-        # Inject version info with per-action apiVersion
-        action_name = self._action_name_from_url(url)
-        api_version = self._api_versions.get(action_name, "")
+        url, api_version = self._endpoints[endpoint]
 
         payload.setdefault("versionInfo", {})
-        if self._module_version:
-            payload["versionInfo"]["moduleVersion"] = self._module_version
-        if api_version:
-            payload["versionInfo"]["apiVersion"] = api_version
+        payload["versionInfo"]["moduleVersion"] = self._module_version
+        payload["versionInfo"]["apiVersion"] = api_version
 
         # Required since DRE OutSystems migration (2025)
         payload.setdefault("clientVariables", {})
 
-        resp = self._request("POST", url, json=payload, headers=headers)
-        return resp.json()
+        resp = self._request("POST", url, json=payload, headers={"X-CSRFToken": self._csrf_token})
+        try:
+            data = resp.json()
+        except ValueError as exc:
+            # A stale apiVersion/CSRF makes OutSystems answer with an HTML error
+            # page.  Left alone this surfaces as JSONDecodeError deep in a
+            # per-date try/except and the run still ends green.
+            raise DREApiError(
+                f"{endpoint} returned {resp.headers.get('Content-Type', '?')} "
+                f"instead of JSON (HTTP {resp.status_code}): {resp.text[:200]!r}"
+            ) from exc
+
+        if not isinstance(data, dict):
+            raise DREApiError(f"{endpoint} returned {type(data).__name__}, expected an object")
+
+        if data.get("exception"):
+            exc_info = data["exception"]
+            raise DREApiError(
+                f"{endpoint} raised a server exception: "
+                f"{exc_info.get('name', '?')}/{exc_info.get('specificType', '?')} — "
+                f"{exc_info.get('message', '?')}"
+            )
+        return data
 
     @staticmethod
     def _parse_json_out(data: dict, key: str = "Json_Out") -> dict:
@@ -214,36 +260,39 @@ class DREHttpClient(HttpClient):
                 "Data": date_str,
             },
         }
-        result = self._post(_DRS_BY_DATE_URL, payload)
+        result = self._post(JOURNALS_BY_DATE, payload)
         data = result.get("data", {})
 
-        # New format (2025+): Elasticsearch response in Json_Out
+        # New format (2025+): Elasticsearch response in Json_Out.
+        # An empty `hits` list is a legitimate answer (holidays, Sundays);
+        # a response we cannot read at all is not — see below.
         es_data = self._parse_json_out(data)
         if es_data:
-            hits = es_data.get("hits", {}).get("hits", [])
             journals = []
-            for hit in hits:
+            for hit in es_data.get("hits", {}).get("hits", []):
                 source = hit.get("_source", {})
-                title = source.get("conteudoTitle", "")
                 journals.append(
                     {
                         "Id": source.get("dbId"),
                         "DiarioId": source.get("dbId"),
                         "Numero": source.get("numero", ""),
                         "DataPublicacao": source.get("dataPublicacao", ""),
-                        "conteudoTitle": title,
+                        "conteudoTitle": source.get("conteudoTitle", ""),
                     }
                 )
             return journals
 
         # Legacy format: structured SerieI.List
-        serie1 = data.get("SerieI", {})
-        if isinstance(serie1, dict) and serie1.get("List"):
-            return serie1["List"]
-        elif isinstance(serie1, list):
+        serie1 = data.get("SerieI")
+        if isinstance(serie1, dict):
+            return serie1.get("List", [])
+        if isinstance(serie1, list):
             return serie1
 
-        return []
+        raise DREApiError(
+            f"{JOURNALS_BY_DATE} for {date_str} returned neither Json_Out nor "
+            f"SerieI — keys: {sorted(data)}. DRE changed the response shape."
+        )
 
     def get_documents_by_journal(self, journal_id: int, is_serie1: bool = True) -> list[dict]:
         """Get all documents from a journal issue.
@@ -284,24 +333,27 @@ class DREHttpClient(HttpClient):
                 "DiplomaConteudoId": "",
             },
         }
-        result = self._post(_DOC_LIST_URL, payload)
+        result = self._post(DOCUMENTS_BY_JOURNAL, payload)
         data = result.get("data", {})
 
         # Try structured response: DetalheConteudo.List (current format)
         for key in ("DetalheConteudo", "DetalheConteudo2"):
-            container = data.get(key, {})
+            container = data.get(key)
             if isinstance(container, dict) and container.get("List"):
                 return container["List"]
-            elif isinstance(container, list):
+            if isinstance(container, list) and container:
                 return container
 
         # Elasticsearch response fallback
         es_data = self._parse_json_out(data)
         if es_data:
-            hits = es_data.get("hits", {}).get("hits", [])
-            return [hit.get("_source", {}) for hit in hits]
+            return [hit.get("_source", {}) for hit in es_data.get("hits", {}).get("hits", [])]
 
-        return []
+        raise DREApiError(
+            f"{DOCUMENTS_BY_JOURNAL} for journal {journal_id} returned no readable "
+            f"document list — keys: {sorted(data)}. A journal issue always has "
+            f"documents, so an unreadable response is a DRE change, not an empty day."
+        )
 
     def get_document_detail(self, diploma_id: str) -> dict:
         """Fetch full document detail including text.
@@ -325,8 +377,23 @@ class DREHttpClient(HttpClient):
                 "DiplomaConteudoId": "",
             },
         }
-        result = self._post(_DOC_DETAIL_URL, payload)
-        return result.get("data", {}).get("DetalheConteudo", {})
+        result = self._post(DOCUMENT_DETAIL, payload)
+        detail = result.get("data", {}).get("DetalheConteudo", {})
+
+        # DRE answers an unrecognised input with a fully-populated *default*
+        # record — Id 0, empty Numero, DataPublicacao 1900-01-01 — rather than
+        # an error.  Left alone that becomes a committed law with no title,
+        # no date and no text, so treat it as the API break it is.
+        if not isinstance(detail, dict) or not (
+            str(detail.get("Numero", "")).strip() or str(detail.get("ELI", "")).strip()
+        ):
+            raise DREApiError(
+                f"{DOCUMENT_DETAIL} returned an empty record for diploma_id={diploma_id} "
+                f"(Id={detail.get('Id') if isinstance(detail, dict) else detail!r}). "
+                f"The screen no longer accepts DipLegisId as its input variable — "
+                f"see docs/pt-dre-api.md."
+            )
+        return detail
 
     def get_text(self, diploma_id: str) -> bytes:
         """Fetch the full text of a document.
