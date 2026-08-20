@@ -259,7 +259,12 @@ class TestDailyPTOrchestration:
         config = self._make_config(tmp_path)
 
         mock_discover.return_value = [
-            {"diploma_id": "100001", "doc_type": "LEI", "title": "Bad law"},
+            {
+                "diploma_id": "100001",
+                "ref": "/dr/detalhe/lei/1-2026-100001",
+                "doc_type": "LEI",
+                "title": "Bad law",
+            },
         ]
 
         mock_client = mock_client_cls.create.return_value
