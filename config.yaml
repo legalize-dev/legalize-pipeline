@@ -13,6 +13,8 @@ countries:
     repo_path: "../countries/ad"
     data_dir: "../countries/data-ad"
     cache_dir: ".cache"
+    # sparse jurisdiction, gaps of months are normal
+    stall_alert_days: 90
     max_workers: 1
     source:
       api_base: "https://bopaazurefunctions.azurewebsites.net/api"
@@ -58,6 +60,8 @@ countries:
   se:
     repo_path: "../countries/se"
     data_dir: "../countries/data-se"
+    # observed max gap 21 d — SFS reform dates are approximate
+    stall_alert_days: 30
     max_workers: 1
     source: {}  # Riksdagen API, no config needed
 
@@ -164,6 +168,8 @@ countries:
     repo_path: "../countries/lu"
     data_dir: "../countries/data-lu"
     cache_dir: ".cache"
+    # observed max gap 90 d
+    stall_alert_days: 120
     # Legilux open data: SPARQL (discovery) + filestore (XML downloads).
     # No documented rate limits. Benchmarked 2026-04-13: server handles
     # 150+ req/s without errors. XML URLs derived deterministically from
@@ -373,6 +379,8 @@ countries:
     repo_path: "../countries/cz"
     data_dir: "../countries/data-cz"
     cache_dir: ".cache"
+    # observed max gap 48 d
+    stall_alert_days: 60
     # Benchmark 2026-04-12 (50 laws, metadata-only):
     #   1w × 5 r/s  →  4.9 laws/s (10s)
     #   4w × 5 r/s  → 18.0 laws/s (2.8s) — sweet spot

@@ -31,6 +31,11 @@ class CountryConfig:
     cache_dir: str = ".cache"
     max_workers: int = 1
     state_path: str = ""  # default: .pipeline/{code}/state.json
+    # Days without a newly captured norm before the daily reports the
+    # country as stalled. Tune per country from its observed cadence:
+    # a source that legitimately goes quiet for weeks needs a longer
+    # window, or the alert trains everyone to ignore it.
+    stall_alert_days: int = 14
     source: dict[str, Any] = field(default_factory=dict)
 
 
@@ -81,6 +86,7 @@ def load_config(path: str | Path = "config.yaml", overrides: dict | None = None)
             cache_dir=country_raw.get("cache_dir", ".cache"),
             max_workers=country_raw.get("max_workers", 1),
             state_path=country_raw.get("state_path", ""),
+            stall_alert_days=country_raw.get("stall_alert_days", CountryConfig.stall_alert_days),
             source=country_raw.get("source", {}),
         )
 
