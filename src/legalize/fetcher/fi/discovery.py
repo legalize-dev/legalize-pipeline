@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import re
 from collections.abc import Iterator
-from datetime import date
+from datetime import date, timedelta
 
 from legalize.fetcher.base import LegislativeClient, NormDiscovery
 from legalize.fetcher.fi.client import FinlexClient
@@ -33,8 +33,15 @@ class FinlexDiscovery(NormDiscovery):
     """Discovers Finnish consolidated statutes via the Finlex API.
 
     Bootstrap: ~4,250 paginated requests (10 items/page × ~42,500 statutes).
-    Daily: 1-2 paginated requests using publishedSince filter.
+    Daily: one pagination per date in the window (see discover_daily).
     """
+
+    def __init__(self) -> None:
+        # "Everything modified on or after D", per date. generic_daily walks
+        # the window forward and each date is needed twice — once as the day
+        # itself, once as the previous day's upper bound — so caching turns
+        # two paginations per day into one.
+        self._since_cache: dict[date, list[str]] = {}
 
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
         """Yield all consolidated statute IDs as ``{year}/{number}``."""
@@ -65,32 +72,19 @@ class FinlexDiscovery(NormDiscovery):
 
         logger.info("Discovery complete: %d unique statutes across %d pages", total, page)
 
-    def discover_daily(
-        self, client: LegislativeClient, target_date: date, **kwargs
-    ) -> Iterator[str]:
-        """Yield IDs of statutes modified since *target_date*.
+    def _ids_since(self, client: FinlexClient, since: date) -> list[str]:
+        """Every statute Finlex reports as modified on or after *since*."""
+        cached = self._since_cache.get(since)
+        if cached is not None:
+            return cached
 
-        Uses the ``publishedSince`` query parameter, which takes an ISO
-        8601 *instant* — the offset is required. We query for anything
-        published since midnight UTC of the target date.
-
-        Finlex used to accept a naive ``YYYY-MM-DDTHH:MM:SS`` and now
-        answers 400 to it, which turned every day of the daily into an
-        error and Finland into a repo that had not moved since August.
-        """
-        assert isinstance(client, FinlexClient)
-
-        since = f"{target_date.isoformat()}T00:00:00Z"
+        stamp = f"{since.isoformat()}T00:00:00Z"
         page = 1
-        total = 0
+        ids: list[str] = []
         seen: set[str] = set()
 
         while True:
-            items = client.list_statutes(
-                page=page,
-                limit=_PAGE_SIZE,
-                published_since=since,
-            )
+            items = client.list_statutes(page=page, limit=_PAGE_SIZE, published_since=stamp)
             if not items:
                 break
 
@@ -98,12 +92,50 @@ class FinlexDiscovery(NormDiscovery):
                 norm_id = _extract_norm_id(item.get("akn_uri", ""))
                 if norm_id and norm_id not in seen:
                     seen.add(norm_id)
-                    total += 1
-                    yield norm_id
+                    ids.append(norm_id)
 
             if len(items) < _PAGE_SIZE:
                 break
             page += 1
+
+        # Only this date and the ones after it can still be asked for.
+        self._since_cache = {d: v for d, v in self._since_cache.items() if d >= since}
+        self._since_cache[since] = ids
+        return ids
+
+    def discover_daily(
+        self, client: LegislativeClient, target_date: date, **kwargs
+    ) -> Iterator[str]:
+        """Yield statutes whose most recent modification falls on *target_date*.
+
+        ``publishedSince`` is a cumulative lower bound — everything modified
+        from that instant onwards, not what changed that day. Finlex offers no
+        upper bound: publishedBefore, publishedUntil, publishedTo, dateTo and
+        every other candidate are accepted and then silently ignored, and the
+        list items carry nothing but an AKN URI and a status, so there is no
+        date to bound on client-side either. The day's set is therefore the
+        difference between two cumulative queries.
+
+        Without that difference a 9-day window asked for "everything since day
+        one" nine times over — 6,394 statute fetches for 857 distinct statutes
+        — and ran the job past its 55-minute cap. Worse than slow: each day
+        re-rendered the same statute with that day's date in ``last_updated``
+        (transformer.frontmatter), so one statute would have been committed
+        once per day of the window, each time under a different date.
+
+        A statute modified twice inside the window is yielded once, on the day
+        of its latest modification.
+        """
+        assert isinstance(client, FinlexClient)
+
+        on_or_after = self._ids_since(client, target_date)
+        later = set(self._ids_since(client, target_date + timedelta(days=1)))
+
+        total = 0
+        for norm_id in on_or_after:
+            if norm_id not in later:
+                total += 1
+                yield norm_id
 
         logger.info("Daily discovery for %s: %d statutes", target_date, total)
 
