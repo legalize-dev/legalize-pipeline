@@ -135,6 +135,7 @@ rm -rf ../countries/es
 - Use `git -C <dir> <command>` instead of `cd <dir> && git <command>` to keep the working directory stable.
 - CI via GitHub App (Legalize Pipeline); daily runs via cron workflow.
 - **GitHub App token scope:** any workflow that pushes to a country repo (`legalize-{code}`) MUST pass `owner: legalize-dev` and `repositories: legalize-{code}` to `create-github-app-token`. Without these, the token is scoped only to `legalize-pipeline` and pushes fail with 403.
+  - **Exception — Cuba (cu):** the production repo lives on the personal account (`luilver/legalize-cu`) because the org creation was denied when onboarding it. Its workflow (`monthly-update-cu.yml`) passes `owner: luilver` instead — this requires the Legalize GitHub App to be installed on the `luilver` account and granted `legalize-cu`. If the repo ever moves under `legalize-dev`, revert the workflow to the org pattern.
 - Commands and CLI usage are documented in `README.md`. Do not duplicate them here.
 
 ## Git commits

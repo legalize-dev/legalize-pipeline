@@ -210,6 +210,12 @@ REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
         "text_parser": ("legalize.fetcher.ch.parser", "FedlexTextParser"),
         "metadata_parser": ("legalize.fetcher.ch.parser", "FedlexMetadataParser"),
     },
+    "cu": {
+        "client": ("legalize.fetcher.cu.client", "GacetaClient"),
+        "discovery": ("legalize.fetcher.cu.discovery", "GacetaDiscovery"),
+        "text_parser": ("legalize.fetcher.cu.parser", "GacetaTextParser"),
+        "metadata_parser": ("legalize.fetcher.cu.parser", "GacetaMetadataParser"),
+    },
     "uk": {
         "client": ("legalize.fetcher.uk.client", "LegislationGovUkClient"),
         "discovery": ("legalize.fetcher.uk.discovery", "LegislationGovUkDiscovery"),

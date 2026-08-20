@@ -747,6 +747,65 @@
       ],
       "notes": "## Omezení\n\n- Identifikátor souboru má tvar `SB-{rok}-{číslo}` (např. `SB-1993-1`), odvozený z `staleUrl` ve tvaru `/sb/{rok}/{číslo}`. Rang (zákon, ústavní zákon, nařízení, vyhláška, dekret) je uložen ve frontmatteru, nikoli ve struktuře adresářů — všechny soubory leží ploše v adresáři `cz/`.\n- Obrázky a binární přílohy se nepřebírají (politika projektu); v textu jsou nahrazeny značkou `[image omitted]`.\n- Seznam reforem (novel) je odvozen z metadat normy (úplná citace s novelami), nikoli z textu."
     },
+    "cu": {
+      "code": "cu",
+      "name": "Cuba",
+      "language": "es",
+      "source_name": "Gaceta Oficial de la República de Cuba (Ministerio de Justicia)",
+      "source_urls": [
+        "Portal: https://www.gacetaoficial.gob.cu",
+        "Catálogo «Algunas legislaciones cubanas»: https://www.gacetaoficial.gob.cu/es/algunas-legislaciones-cubanas",
+        "Ministerio de Justicia (ediciones de libro): https://www.minjus.gob.cu"
+      ],
+      "data_license": "Dominio público — el texto oficial de orden legislativo, administrativo o judicial no es objeto de protección del derecho de autor (artículo 9, inciso d), de la Ley No. 154 de 2022 «De los derechos del autor y del artista intérprete»)",
+      "scope": "El repositorio recoge 53 normas nacionales de rango superior publicadas en la Gaceta Oficial de la República de Cuba — la Constitución, leyes, códigos, decretos-leyes y decretos — seleccionadas por la propia Gaceta en su catálogo «Algunas legislaciones cubanas». Cada norma es un archivo Markdown. La fuente es exclusivamente PDF (no hay API ni texto completo en HTML): el texto se extrae de la capa de texto de los PDF oficiales. Cada ley se publica como un único archivo con una única versión; las ediciones consolidadas que la Gaceta republica con las reformas incorporadas se documentan como metadatos (fecha y notas de la edición), no como versiones del grafo de reformas.",
+      "norm_types": [
+        {
+          "label": "Constitución",
+          "pattern": "Constitucion-AAAA.md",
+          "note": "Constitución de la República de Cuba (único documento, con el año de proclamación).",
+          "examples": [
+            "cu/Constitucion-2019.md"
+          ]
+        },
+        {
+          "label": "Ley",
+          "pattern": "Ley-NNN-AAAA-....md",
+          "note": "Leyes aprobadas por la Asamblea Nacional del Poder Popular. El año del nombre es el de aprobación, no el de publicación en la Gaceta.",
+          "examples": [
+            "cu/Ley-143-2021-Proceso-Penal.md",
+            "cu/Ley-169-2024-Procedimiento-Administrativo.md"
+          ]
+        },
+        {
+          "label": "Código",
+          "pattern": "Ley-NNN-AAAA-Codigo-....md",
+          "note": "Códigos (Civil, Penal, de las Familias, de Seguridad Vial, de Trabajo, etc.); leyes con rango `codigo`.",
+          "examples": [
+            "cu/Ley-59-1987-Codigo-Civil.md",
+            "cu/Ley-156-2022-Codigo-de-las-Familias.md"
+          ]
+        },
+        {
+          "label": "Decreto-Ley",
+          "pattern": "Decreto-Ley-NNN-AAAA.md",
+          "note": "Decretos-leyes con fuerza de ley.",
+          "examples": [
+            "cu/Decreto-Ley-31-2021-Bienestar-Animal.md"
+          ]
+        },
+        {
+          "label": "Decreto",
+          "pattern": "Decreto-NNN-AAAA.md",
+          "note": "Decretos del Consejo de Ministros que aprueban reglamentos.",
+          "examples": [
+            "cu/Decreto-326-2014-Reglamento-Codigo-Trabajo.md"
+          ]
+        }
+      ],
+      "attribution": "> Fuente: Gaceta Oficial de la República de Cuba (Ministerio de Justicia, https://www.gacetaoficial.gob.cu). El texto oficial de orden legislativo, administrativo o judicial no es objeto de protección del derecho de autor según el artículo 9, inciso d), de la Ley No. 154 de 2022 «De los derechos del autor y del artista intérprete». Este repositorio es un espejo **no oficial**; la Gaceta Oficial sigue siendo la única fuente auténtica de la legislación cubana.",
+      "notes": "## Identificador y nombres de archivo\n\nEl identificador coincide con el nombre del archivo (p. ej. `Ley-143-2021-Proceso-Penal`). El año del nombre es el año de aprobación de la propia norma, no el de publicación en la Gaceta (p. ej. `Ley-150-2022`, publicada el 13 de septiembre de 2023); la Constitución usa el año de proclamación. Todos los archivos viven planos en el directorio `cu/`; el rango figura en el frontmatter YAML, no en la ruta.\n\n## Fechas de publicación\n\n`publication_date` es la fecha oficial de la Gaceta (portada de la edición), no la fecha de aprobación. `journal_issue` registra la edición (p. ej. «No. 140 Ordinaria de 2021»).\n\n## Ediciones consolidadas\n\nLa Gaceta republica algunas normas como ediciones consolidadas con las reformas incorporadas (p. ej. el Código Civil, «Actualizado 8 de noviembre de 2022»). El contenido es el de la edición consolidada; su procedencia se documenta en `notes` del frontmatter y la fecha corresponde a la de la edición.\n\n## Limitaciones conocidas\n\n- La fuente es exclusivamente PDF; no hay API ni texto completo en HTML. El texto se extrae de la capa de texto de los PDF oficiales, por lo que puede haber pequeñas imperfecciones en la conversión a Markdown.\n- La Constitución de 2019 solo se distribuye como PDF escaneado sin capa de texto; es un vacío genuino documentado (frontmatter completo, cuerpo vacío).\n- Un mismo PDF puede contener varias normas (p. ej. una edición con varios decretos-leyes); cada norma se corta por su código GOC y se publica como archivo independiente.\n- Las imágenes se omiten; las tablas, cuando existen, se conservan como texto continuo."
+    },
     "de": {
       "code": "de",
       "name": "Deutschland",
