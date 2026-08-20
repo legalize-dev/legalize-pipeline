@@ -28,6 +28,7 @@ from legalize.fetcher.fr.daily import (
     _extract_increment,
     _find_increment_for_date,
     _list_increments,
+    _repo_scope,
     daily,
 )
 from legalize.fetcher.fr.discovery import LEGIDiscovery
@@ -117,7 +118,11 @@ def _make_increment_tar(tmp_path: Path, date_str: str, norm_ids: dict[str, str])
     tar_path = tmp_path / f"LEGI_{date_str}-180000.tar.gz"
     with tarfile.open(tar_path, "w:gz") as tar:
         for norm_id, xml_content in norm_ids.items():
+            # DILA wraps the whole increment in a YYYYMMDD-HHMMSS/ directory.
+            # The fixture used to omit it, which is why the tests never caught
+            # that increments were landing outside the dump.
             rel_path = (
+                f"{date_str}-180000/"
                 f"legi/global/code_et_TNC_en_vigueur/code_en_vigueur/"
                 f"LEGI/TEXT/00/00/{norm_id}/texte/struct/{norm_id}.xml"
             )
@@ -448,37 +453,41 @@ class TestDiscoverDaily:
 # ─────────────────────────────────────────────
 
 
+def _make_config(tmp_path: Path):
+    """Build a Config with FR pointing to tmp dirs."""
+    from legalize.config import Config, CountryConfig, GitConfig
+
+    legi_dir = tmp_path / "legi"
+    # The consolidated dump root: FR daily refuses to run without it.
+    (legi_dir / "legi" / "global").mkdir(parents=True)
+    repo_path = tmp_path / "repo"
+    repo_path.mkdir()
+    # The repo IS the scope. legalize-fr tracks one .md per code, named
+    # after its LEGITEXT id; seed the one the fixtures modify.
+    (repo_path / "fr").mkdir()
+    (repo_path / "fr" / "LEGITEXT000006069414.md").write_text("seed\n")
+    state_path = tmp_path / "state" / "state.json"
+
+    # Init git repo
+    subprocess.run(["git", "init"], cwd=repo_path, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=repo_path, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@t.com"], cwd=repo_path, capture_output=True)
+
+    return Config(
+        git=GitConfig(committer_name="Legalize", committer_email="test@test.com"),
+        countries={
+            "fr": CountryConfig(
+                repo_path=str(repo_path),
+                data_dir=str(tmp_path / "data"),
+                state_path=str(state_path),
+                source={"legi_dir": str(legi_dir)},
+            )
+        },
+    )
+
+
 class TestDailyIntegration:
     """Integration tests for the full daily() pipeline with mocked I/O."""
-
-    def _make_config(self, tmp_path: Path):
-        """Build a Config with FR pointing to tmp dirs."""
-        from legalize.config import Config, CountryConfig, GitConfig
-
-        legi_dir = tmp_path / "legi"
-        legi_dir.mkdir()
-        repo_path = tmp_path / "repo"
-        repo_path.mkdir()
-        state_path = tmp_path / "state" / "state.json"
-
-        # Init git repo
-        subprocess.run(["git", "init"], cwd=repo_path, capture_output=True)
-        subprocess.run(["git", "config", "user.name", "Test"], cwd=repo_path, capture_output=True)
-        subprocess.run(
-            ["git", "config", "user.email", "t@t.com"], cwd=repo_path, capture_output=True
-        )
-
-        return Config(
-            git=GitConfig(committer_name="Legalize", committer_email="test@test.com"),
-            countries={
-                "fr": CountryConfig(
-                    repo_path=str(repo_path),
-                    data_dir=str(tmp_path / "data"),
-                    state_path=str(state_path),
-                    source={"legi_dir": str(legi_dir)},
-                )
-            },
-        )
 
     def test_no_legi_dir_returns_zero(self, tmp_path):
         """Returns 0 if legi_dir is not configured."""
@@ -494,7 +503,7 @@ class TestDailyIntegration:
     @responses.activate
     def test_dry_run_does_not_create_commits(self, tmp_path):
         """Dry run lists increments but creates no commits."""
-        config = self._make_config(tmp_path)
+        config = _make_config(tmp_path)
         responses.add(responses.GET, DILA_LEGI_URL, body=DILA_DIRECTORY_HTML, status=200)
 
         result = daily(config, target_date=date(2026, 4, 1), dry_run=True)
@@ -509,7 +518,7 @@ class TestDailyIntegration:
     @responses.activate
     def test_no_increment_for_date(self, tmp_path):
         """No increment available for the target date → 0 commits, state advances."""
-        config = self._make_config(tmp_path)
+        config = _make_config(tmp_path)
         # Directory listing with no matching date
         responses.add(
             responses.GET,
@@ -524,7 +533,7 @@ class TestDailyIntegration:
     @responses.activate
     def test_http_error_listing_returns_zero(self, tmp_path):
         """HTTP error listing increments → 0 commits."""
-        config = self._make_config(tmp_path)
+        config = _make_config(tmp_path)
         responses.add(responses.GET, DILA_LEGI_URL, body="Server Error", status=500)
 
         result = daily(config, target_date=date(2026, 4, 1))
@@ -533,7 +542,7 @@ class TestDailyIntegration:
     @responses.activate
     def test_full_pipeline_creates_commit(self, tmp_path):
         """Full happy path: download, extract, discover, process, commit."""
-        config = self._make_config(tmp_path)
+        config = _make_config(tmp_path)
         legi_dir = Path(config.get_country("fr").source["legi_dir"])
         repo_path = Path(config.get_country("fr").repo_path)
 
@@ -631,7 +640,7 @@ class TestDailyIntegration:
     @responses.activate
     def test_no_changes_detected_skips_commit(self, tmp_path):
         """If the same date is processed twice, no duplicate commit."""
-        config = self._make_config(tmp_path)
+        config = _make_config(tmp_path)
         legi_dir = Path(config.get_country("fr").source["legi_dir"])
 
         responses.add(responses.GET, DILA_LEGI_URL, body=DILA_DIRECTORY_HTML, status=200)
@@ -690,11 +699,11 @@ class TestDailyIntegration:
     @responses.activate
     def test_safety_check_skips_short_markdown(self, tmp_path):
         """If new markdown is <50% the size of existing, skip (safety check)."""
-        config = self._make_config(tmp_path)
+        config = _make_config(tmp_path)
         repo_path = Path(config.get_country("fr").repo_path)
 
         # Pre-create a large existing file in the repo
-        (repo_path / "fr").mkdir(parents=True)
+        (repo_path / "fr").mkdir(parents=True, exist_ok=True)
         existing_file = repo_path / "fr" / "LEGITEXT000006069414.md"
         existing_file.write_text("x" * 10000)  # 10KB
         subprocess.run(["git", "add", "."], cwd=repo_path, capture_output=True)
@@ -741,6 +750,189 @@ class TestDailyIntegration:
         # The safety check should prevent the commit because
         # the new markdown (~200 bytes frontmatter) < 50% of 10000 bytes
         assert result == 0
+
+
+# ─────────────────────────────────────────────
+# Tests: the CI scenario — no LEGI dump on disk
+#
+# For four and a half months the FR daily ran green every day and produced
+# nothing: the scope filter was built by scanning the dump, the CI runner has
+# no dump, so the index came out empty and discarded 100% of the modified
+# texts. These tests pin the two halves of that failure.
+# ─────────────────────────────────────────────
+
+
+VERSION_XML_TEMPLATE = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<TEXTE_VERSION><META><META_COMMUN><ID>{norm_id}</ID><NATURE>CODE</NATURE></META_COMMUN>
+<META_SPEC><META_TEXTE_VERSION><TITRE>{title}</TITRE><TITREFULL>{title}</TITREFULL>
+<ETAT>VIGUEUR</ETAT><DATE_DEBUT>1804-03-21</DATE_DEBUT></META_TEXTE_VERSION>
+<META_TEXTE_CHRONICLE><CID>{norm_id}</CID><DATE_PUBLI>2999-01-01</DATE_PUBLI>
+<DATE_TEXTE>2999-01-01</DATE_TEXTE><DERNIERE_MODIFICATION>2026-04-01</DERNIERE_MODIFICATION>
+<TITRE_TEXTE>{title}</TITRE_TEXTE></META_TEXTE_CHRONICLE></META_SPEC></META>
+<VERSIONS><VERSION etat="VIGUEUR">
+<LIEN_TXT debut="1804-03-21" fin="2999-01-01" id="{norm_id}" num=""/>
+</VERSION></VERSIONS></TEXTE_VERSION>
+"""
+
+
+def _seed_dump_text(legi_dir: Path, norm_id: str, title: str) -> Path:
+    """Put a complete (struct + version) text in the consolidated dump."""
+    struct_file = _make_struct_path(legi_dir, norm_id)
+    struct_file.write_text(STRUCT_XML_CODE.replace("LEGITEXT000006069414", norm_id))
+    version_file = struct_file.parent.parent / "version" / f"{norm_id}.xml"
+    version_file.parent.mkdir(parents=True, exist_ok=True)
+    version_file.write_text(VERSION_XML_TEMPLATE.format(norm_id=norm_id, title=title))
+    return struct_file
+
+
+class TestRepoScope:
+    def test_reads_legitext_files_only(self, tmp_path):
+        (tmp_path / "fr").mkdir()
+        (tmp_path / "fr" / "LEGITEXT000006069414.md").write_text("x")
+        (tmp_path / "fr" / "LEGITEXT000006071194.md").write_text("x")
+        (tmp_path / "README.md").write_text("x")
+
+        assert _repo_scope(tmp_path) == {"LEGITEXT000006069414", "LEGITEXT000006071194"}
+
+    def test_does_not_need_the_dump(self, tmp_path):
+        """The whole point: scope resolution never touches legi_dir."""
+        (tmp_path / "fr").mkdir()
+        (tmp_path / "fr" / "LEGITEXT000006069414.md").write_text("x")
+
+        assert _repo_scope(tmp_path) == {"LEGITEXT000006069414"}
+
+
+class TestIncrementAppliesOverDump:
+    def test_overwrites_the_dump_entry(self, tmp_path):
+        """The increment must patch the dump, not land beside it.
+
+        DILA ships increments inside a YYYYMMDD-HHMMSS/ root. Extracted as-is
+        they ended up in {legi_dir}/20260401-180000/legi/global/..., which the
+        client never reads, so every text re-rendered identical to the commit
+        already in the repo and no reform was ever recorded.
+        """
+        legi_dir = tmp_path / "legi_dump"
+        stale = _make_struct_path(legi_dir, "LEGITEXT000006069414")
+        stale.write_text("<TEXTELR>stale</TEXTELR>")
+
+        tar_path = _make_increment_tar(
+            tmp_path, "20260401", {"LEGITEXT000006069414": STRUCT_XML_CODE}
+        )
+        ids = _extract_increment(tar_path, legi_dir)
+
+        assert ids == {"LEGITEXT000006069414"}
+        assert stale.read_text() == STRUCT_XML_CODE
+        assert not (legi_dir / "20260401-180000").exists()
+        assert list(legi_dir.rglob("LEGITEXT000006069414.xml")) == [stale]
+
+
+class TestFailsLoudlyWithoutInputs:
+    """A daily that cannot see its inputs must fail, not report 0 commits."""
+
+    @responses.activate
+    def test_missing_dump_raises(self, tmp_path):
+        config = _make_config(tmp_path)
+        legi_dir = Path(config.get_country("fr").source["legi_dir"])
+        # Exactly the CI runner: repo checked out, no dump anywhere.
+        (legi_dir / "legi" / "global").rmdir()
+        responses.add(responses.GET, DILA_LEGI_URL, body=DILA_DIRECTORY_HTML, status=200)
+
+        with pytest.raises(RuntimeError, match="LEGI dump not found"):
+            daily(config, target_date=date(2026, 4, 1))
+
+    @responses.activate
+    def test_empty_repo_raises(self, tmp_path):
+        config = _make_config(tmp_path)
+        repo_path = Path(config.get_country("fr").repo_path)
+        (repo_path / "fr" / "LEGITEXT000006069414.md").unlink()
+        responses.add(responses.GET, DILA_LEGI_URL, body=DILA_DIRECTORY_HTML, status=200)
+
+        with pytest.raises(RuntimeError, match="nothing in scope"):
+            daily(config, target_date=date(2026, 4, 1))
+
+    @responses.activate
+    def test_dry_run_still_works_without_dump(self, tmp_path):
+        """Dry run neither downloads nor renders, so it needs neither input."""
+        config = _make_config(tmp_path)
+        (Path(config.get_country("fr").source["legi_dir"]) / "legi" / "global").rmdir()
+        responses.add(responses.GET, DILA_LEGI_URL, body=DILA_DIRECTORY_HTML, status=200)
+
+        assert daily(config, target_date=date(2026, 4, 1), dry_run=True) == 0
+
+
+class TestScopeComesFromRepo:
+    @responses.activate
+    def test_only_tracked_texts_are_committed(self, tmp_path):
+        """The dump holds 114k texts; the repo tracks ~80 codes. Scope = repo.
+
+        The increment modifies two codes, both present in the dump, only one
+        tracked in the repo. The untracked one must not be committed — the old
+        filter tested the dump index, so it would have added it.
+        """
+        config = _make_config(tmp_path)
+        legi_dir = Path(config.get_country("fr").source["legi_dir"])
+        repo_path = Path(config.get_country("fr").repo_path)
+
+        tracked, untracked = "LEGITEXT000006069414", "LEGITEXT000006070721"
+        _seed_dump_text(legi_dir, tracked, "Code civil")
+        _seed_dump_text(legi_dir, untracked, "Code du travail")
+
+        responses.add(responses.GET, DILA_LEGI_URL, body=DILA_DIRECTORY_HTML, status=200)
+        tar_path = _make_increment_tar(
+            tmp_path,
+            "20260401",
+            {tracked: STRUCT_XML_CODE, untracked: STRUCT_XML_CODE},
+        )
+        responses.add(
+            responses.GET,
+            f"{DILA_LEGI_URL}LEGI_20260401-180000.tar.gz",
+            body=tar_path.read_bytes(),
+            status=200,
+        )
+
+        result = daily(config, target_date=date(2026, 4, 1))
+
+        assert result == 1
+        assert {p.name for p in (repo_path / "fr").glob("*.md")} == {f"{tracked}.md"}
+
+    @responses.activate
+    def test_committed_even_when_the_dump_index_is_empty(self, tmp_path, monkeypatch):
+        """Scope must not depend on the client's dump index.
+
+        The index is forced empty here — what a CI runner produced every day
+        ("Built text directory index: 0 entries"). With the old filter this run
+        printed "No texts modified in scope" and committed nothing: the exact
+        four-and-a-half-month silence.
+        """
+        monkeypatch.setattr("legalize.fetcher.fr.client._build_text_dir_index", lambda base: {})
+        config = _make_config(tmp_path)
+        legi_dir = Path(config.get_country("fr").source["legi_dir"])
+        repo_path = Path(config.get_country("fr").repo_path)
+        _seed_dump_text(legi_dir, "LEGITEXT000006069414", "Code civil")
+
+        responses.add(responses.GET, DILA_LEGI_URL, body=DILA_DIRECTORY_HTML, status=200)
+        tar_path = _make_increment_tar(
+            tmp_path, "20260401", {"LEGITEXT000006069414": STRUCT_XML_CODE}
+        )
+        responses.add(
+            responses.GET,
+            f"{DILA_LEGI_URL}LEGI_20260401-180000.tar.gz",
+            body=tar_path.read_bytes(),
+            status=200,
+        )
+
+        result = daily(config, target_date=date(2026, 4, 1))
+
+        assert result == 1
+        log = subprocess.run(
+            ["git", "log", "--oneline"],
+            cwd=repo_path,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert "Code civil" in log.stdout
 
 
 # ─────────────────────────────────────────────
