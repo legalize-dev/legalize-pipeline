@@ -532,6 +532,42 @@ def daily(
 
 
 # ─────────────────────────────────────────────
+# REVISED (Ireland only)
+# ─────────────────────────────────────────────
+
+
+@cli.command()
+@_country_option(default="ie")
+@click.option("--limit", default=None, type=int, help="Max norms to process.")
+@click.option("--dry-run", is_flag=True, help="Simulate without creating commits.")
+@click.pass_context
+def revised(
+    ctx: click.Context,
+    country: str,
+    limit: int | None,
+    dry_run: bool,
+) -> None:
+    """Apply Revised Acts consolidated versions (Ireland).
+
+    After bootstrap, fetches consolidated text from
+    revisedacts.lawreform.ie and creates REFORM commits.
+
+    Examples:
+        legalize revised                         # All revised acts
+        legalize revised --limit 10              # First 10 only
+        legalize revised --dry-run               # Simulate
+    """
+    if country != "ie":
+        console.print("[red]The 'revised' command is only available for Ireland (ie).[/red]")
+        return
+
+    from legalize.fetcher.ie.revised import apply_revised_acts
+
+    config = ctx.obj["config"]
+    apply_revised_acts(config, dry_run=dry_run, limit=limit)
+
+
+# ─────────────────────────────────────────────
 # REPROCESS
 # ─────────────────────────────────────────────
 
