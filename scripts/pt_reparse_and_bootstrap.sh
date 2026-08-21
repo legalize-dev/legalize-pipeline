@@ -7,29 +7,49 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-DATA=../countries/data-pt
-REPO=../countries/pt
+# Overridable so the whole chain can be rehearsed on a slice of the cache before
+# it is trusted with the real one.
+CONFIG=${CONFIG:-config.yaml}
+DATA=${DATA:-../countries/data-pt}
+REPO=${REPO:-../countries/pt}
 
-echo "==> reparse ($(ls "$DATA"/raw/*.versions.json.gz | wc -l) cached norms)"
-python3 scripts/pt_reparse.py
+# json/ is keyed by identifier, and the identifier scheme changed under it (one
+# prefix per type now, and the Jornal Oficial dos Açores is out of scope). A stale
+# file is not overwritten by the reparse, it is simply left behind — and
+# commit_all_fast reads the directory, not the id list, so every one of them would
+# ship as a ghost law. raw/ is the source of truth; json/ is derived. Wipe it.
+echo "==> wipe json/ ($(ls "$DATA"/json 2>/dev/null | wc -l | tr -d ' ') stale files)"
+rm -rf "$DATA/json"
+mkdir -p "$DATA/json"
+
+echo "==> reparse ($(ls "$DATA"/raw/*.versions.json.gz | wc -l | tr -d ' ') cached norms)"
+CONFIG="$CONFIG" python3 scripts/pt_reparse.py
 
 echo "==> wipe and re-init the repo"
 rm -rf "$REPO"
 git init -q "$REPO"
 mkdir -p "$REPO/pt"
 git -C "$REPO" commit -q --allow-empty -m "[bootstrap] Init legalize-pt"
+git -C "$REPO" remote add origin git@github.com:legalize-dev/legalize-pt.git
 
-echo "==> bootstrap"
+# Not generic_bootstrap: that re-runs discovery and fetch_all first, which after a
+# reparse is a second full parse of the same 200,000 envelopes for no new data.
+# The reparse above already wrote json/; this is the commit half of bootstrap.
+echo "==> commit"
 python3 -c "
 import sys; sys.path.insert(0,'src')
 from legalize.config import load_config
-from legalize.pipeline import generic_bootstrap
-generic_bootstrap(load_config('config.yaml'), 'pt')
+from legalize.pipeline import commit_all_fast, write_country_meta, write_repo_meta
+config = load_config('$CONFIG')
+total = commit_all_fast(config, 'pt')
+write_country_meta(config, 'pt')
+write_repo_meta(config, 'pt')
+print(f'{total} commits')
 "
 
 echo "==> health"
 python3 -c "
 import sys; sys.path.insert(0,'src')
 from legalize.cli import cli
-cli(['health','-c','pt'], standalone_mode=False)
+cli(['--config','$CONFIG','health','-c','pt'], standalone_mode=False)
 "

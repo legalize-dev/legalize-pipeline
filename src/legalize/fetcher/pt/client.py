@@ -264,19 +264,19 @@ class DREClient(LegislativeClient):
             # Through _bundle, not _published: the raw cache makes this free instead
             # of a second detail call for every one of 204,314 diplomas.
             detail = self._bundle(norm_id).get("published") or {}
+            # Where the Jornal Oficial dos Açores leaves the corpus. 21 % of the
+            # as-published ids are DRE's legacy regional catalogue — every row with
+            # a FonteRegional names the Azorean gazette — and legalize-pt is the
+            # Diário da República (RESEARCH-PT-v2 §11). Keyed on the marker, not on
+            # emptiness: 188 of those rows do carry their text, and they are out of
+            # scope for being another gazette, not for being blank.
+            if (detail.get("TipoConteudo") or "") == "DiplomaLegacor":
+                raise ValueError(f"Jornal Oficial dos Açores, out of scope: {norm_id}")
             # clean() first: DRE writes a lone NUL into Texto on the rows it has
-            # no text for, and "\x00".strip() is not empty — 660-odd diplomas
-            # would have shipped as a law with no content at all.
+            # no text for, and "\x00".strip() is not empty — those would otherwise
+            # ship as a law with no content at all.
             body = clean(detail.get("TextoFormatado") or detail.get("Texto") or "").strip()
             if not body and not (detail.get("URL_PDF") or "").strip():
-                # This is where the Jornal Oficial dos Açores leaves the corpus:
-                # 21 % of the as-published ids are DRE's legacy catalogue rows for
-                # the Azorean gazette (TipoConteudo "DiplomaLegacor"), which carry a
-                # number, a date, the regional citation and a one-line Resumo but no
-                # text, no PDF and no ELI anywhere. legalize-pt is the Diário da
-                # República (RESEARCH-PT-v2 §11); a card you cannot read the law
-                # from is not the same trade as the scan-only diplomas below, where
-                # the PDF still holds the text.
                 raise ValueError(f"No text and no PDF for {norm_id}")
             # Historical types (acórdãos doutrinários, cartas de lei, regimentos)
             # exist at DRE only as a scan. Publishing the diploma with its metadata

@@ -1135,7 +1135,9 @@ in the README.
   da República, and this is a different gazette. The §14.4 trade for scan-only
   diplomas does not carry over — there the PDF still holds the text, here nothing
   does, so the stub would be a card you cannot read the law from. Enforced at
-  `client.get_text` and pinned by `TestOutOfScopeRecords`; the corpus keeps whatever
+  `client.get_text` on the `DiplomaLegacor` marker rather than on emptiness — 188 of
+  the rows do carry their text, and they are out for being another gazette, not for
+  being blank — and pinned by `TestOutOfScopeRecords`. The corpus keeps whatever
   Açores legislation the DR itself publishes (decretos legislativos regionais and
   the rest, jurisdiction `pt-20`).
 - Jurisprudence (`acordao-*`) beyond the handful DRE consolidates.

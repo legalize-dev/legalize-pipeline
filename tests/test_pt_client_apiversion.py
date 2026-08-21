@@ -336,8 +336,36 @@ class TestOutOfScopeRecords:
             }
         }
         with patch.object(type(client), "_bundle", lambda self, _id: bundle):
-            with pytest.raises(ValueError, match="No text and no PDF"):
+            with pytest.raises(ValueError, match="out of scope"):
                 client.get_text("pub:despacho-normativo:69-1983-30978201")
+
+    def test_legacor_row_with_text_is_still_out_of_scope(self):
+        """188 of the rows do carry their text. They are excluded for being another
+        gazette, not for being blank — otherwise the rule is emptiness, not scope,
+        and a text-less DR diploma would have to go too."""
+        client = self._client()
+        bundle = {
+            "published": {
+                "Id": "31359431",
+                "Numero": "59/2006",
+                "Texto": "S.R. DOS ASSUNTOS SOCIAIS\r\nDespacho Normativo n.º 59/2006",
+                "TextoFormatado": "",
+                "URL_PDF": "",
+                "TipoConteudo": "DiplomaLegacor",
+            }
+        }
+        with patch.object(type(client), "_bundle", lambda self, _id: bundle):
+            with pytest.raises(ValueError, match="out of scope"):
+                client.get_text("pub:despacho-normativo:59-2006-31359431")
+
+    def test_nul_only_text_is_not_text(self):
+        """DRE writes a lone NUL into Texto on rows it has nothing for, and
+        "\x00".strip() is not empty — those would ship as a law with no content."""
+        client = self._client()
+        bundle = {"published": {"Id": "1", "Texto": "\x00", "URL_PDF": ""}}
+        with patch.object(type(client), "_bundle", lambda self, _id: bundle):
+            with pytest.raises(ValueError, match="No text and no PDF"):
+                client.get_text("pub:lei:1-1980-1")
 
     def test_scan_only_diploma_is_kept(self):
         """The same branch must not swallow the diplomas DRE has only as a scan —

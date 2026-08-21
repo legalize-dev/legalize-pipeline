@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import os
 import sys
 import threading
 import queue
@@ -17,11 +18,11 @@ from pathlib import Path
 
 sys.path.insert(0, "src")
 
-from legalize.config import load_config          # noqa: E402
+from legalize.config import load_config  # noqa: E402
 from legalize.fetcher.pt import parser as pt_parser  # noqa: E402
 from legalize.pipeline import generic_fetch_one  # noqa: E402
 
-config = load_config("config.yaml")
+config = load_config(os.environ.get("CONFIG", "config.yaml"))
 data_dir = Path(config.get_country("pt").data_dir)
 
 thesaurus_path = data_dir / "thesaurus.json"
@@ -46,7 +47,12 @@ print(f"{len(ids)} norms to reparse", flush=True)
 work: queue.Queue = queue.Queue()
 for norm_id in ids:
     work.put(norm_id)
-lock, stats, t0 = threading.Lock(), {"ok": 0, "err": 0, "n": 0}, time.time()
+lock, t0 = threading.Lock(), time.time()
+stats = {"ok": 0, "skipped": 0, "err": 0, "n": 0}
+# One in five ids is an out-of-scope Açores row, and generic_fetch_one reports that
+# the same way it reports a crash — as None. Counted apart, or a real regression
+# hides inside a five-figure "err".
+failures: list[str] = []
 
 
 def worker() -> None:
@@ -55,18 +61,48 @@ def worker() -> None:
             norm_id = work.get_nowait()
         except queue.Empty:
             return
+        outcome = "err"
         try:
-            ok = generic_fetch_one(config, "pt", norm_id, force=True) is not None
+            if generic_fetch_one(config, "pt", norm_id, force=True) is not None:
+                outcome = "ok"
+            else:
+                outcome = "skipped" if _out_of_scope(norm_id) else "err"
         except Exception:
-            ok = False
+            outcome = "err"
         with lock:
             stats["n"] += 1
-            stats["ok" if ok else "err"] += 1
+            stats[outcome] += 1
+            if outcome == "err" and len(failures) < 200:
+                failures.append(norm_id)
             if stats["n"] % 2000 == 0:
-                print(f"{stats['n']}/{len(ids)} ok={stats['ok']} err={stats['err']}", flush=True)
+                print(
+                    f"{stats['n']}/{len(ids)} ok={stats['ok']} "
+                    f"out-of-scope={stats['skipped']} err={stats['err']}",
+                    flush=True,
+                )
+
+
+def _out_of_scope(norm_id: str) -> bool:
+    """A norm dropped on purpose: DRE's legacy Açores catalogue (RESEARCH-PT-v2 §11).
+
+    Read straight off the cached envelope — building a DREClient here would mean an
+    OutSystems handshake for each of the 40,000-odd rows.
+    """
+    safe = norm_id.replace(":", "-").replace("/", "-")
+    path = data_dir / "raw" / f"{safe}.meta.json.gz"
+    try:
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            published = json.load(handle).get("published") or {}
+    except Exception:
+        return False
+    return (published.get("TipoConteudo") or "") == "DiplomaLegacor"
 
 
 threads = [threading.Thread(target=worker, daemon=True) for _ in range(8)]
 [t.start() for t in threads]
 [t.join() for t in threads]
 print("DONE", stats, f"in {(time.time() - t0) / 60:.1f} min", flush=True)
+if failures:
+    print(f"failures ({len(failures)} shown):", flush=True)
+    for norm_id in failures:
+        print("   ", norm_id, flush=True)
