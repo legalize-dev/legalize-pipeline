@@ -1535,39 +1535,51 @@ Branch `feat/pt-v2`, worktree `engine-pt/`. Updated 2026-08-21.
 
 ### 14.2 In flight
 
-Two background fetches, both writing to `../countries/data-pt/`:
+One chain, started 2026-08-22 01:24 and unattended to the end. It does **not** push.
 
 ```bash
-python3 /tmp/pt_fetch_cons.py   # 5,561 consolidated,  ~31/min, ETA ~3 h
-python3 /tmp/pt_fetch_pub.py    # 204,314 as-published, ~282/min, ETA ~12 h
+scripts/pt_overnight.sh <fetch pids>   # logs/pt-overnight.log
 ```
 
-Both are resumable: `{data_dir}/json/` skips finished norms and `{data_dir}/raw/`
-skips the network for anything already downloaded. Re-running either script simply
-continues.
+It waits out the jobs already running, then: close the fetch gap twice ·
+close the descriptor gap · reparse · rebuild · health.
+
+| Job | State at 01:24 |
+|---|---|
+| Consolidated (5,561) | finished, 5,318 cached — the 243 it dropped are the gap pass's job |
+| As-published (204,314) | ~40,000 cached, running front-to-back (`/tmp/pt_fetch_pub.py`) |
+| Same, back-to-front | `pt_fetch_missing.py --reverse`, so the two meet in the middle |
+| Descriptor thesaurus | sampled run finished at 4,724 labels; `pt_thesaurus_gap.py` going after the other 6,612 |
+
+`{data_dir}/raw/` is the source of truth and skips the network for anything already
+downloaded. `{data_dir}/json/` is derived and gets wiped before the reparse — it is
+keyed by identifier, and the identifier scheme changed under it, so a stale file
+would not be overwritten but published (`commit_all_fast` reads the directory, not
+the id list).
+
+Note that `generic_fetch_one`'s resume check looks for `{norm_id}.json` while
+`save_structured_json` writes `{identifier}.json`, so it never fires for PT and a
+re-run re-parses everything. Cheap — it is all cache reads — but it means "resumable"
+here means the network, not the CPU.
 
 ### 14.3 Remaining, in order
 
-1. **Finish the fetch** (above).
-2. **Reparse** — `generic_fetch_one(..., force=True)` over every id replays from
-   `{data_dir}/raw/` with no network, so any parser fix lands in minutes. Do this
-   once at the end so the whole corpus is parsed by the final parser.
-3. **Resolve the descriptors.** `eli:is_about` gives numeric ids that do not
-   dereference; `AnaliseJuridica.DataActionGetData → ThesaurusTreeList` maps them to
-   Portuguese labels (recipe in `docs/pt-metadata-inventory.md` §3). Build the map
-   once, then fill `NormMetadata.subjects` on the reparse. Until then the ids live in
-   `extra.subject_ids` and `subjects` is empty — opaque numbers are worse than none.
-4. **Bootstrap the repo.** Wipe `../countries/pt`, `legalize bootstrap -c pt`, then
-   `legalize health -c pt` must report zero issues.
+1. ~~Finish the fetch~~ · 2. ~~Reparse~~ · 3. ~~Resolve the descriptors~~ ·
+   4. ~~Bootstrap~~ — all four are the chain in §14.2. Read `logs/pt-overnight.log`
+   for where it got to, and `pt_fetch_missing.py --report` for whether the corpus is
+   actually complete.
 5. **Push** to `legalize-dev/legalize-pt` (force; the history is rewritten) and tag
    the old head `pre-v2` first.
 6. **Engine PR** from `feat/pt-v2`, CI green.
 7. **Two one-line fixes in `enrichment`**, without which none of this reaches the
    site (see §1.2): add `[new`, `[repeal`, `[correction` to the accept-list in
    `parse_reform_commit`, and `^#{1,6}\s+Artigo` to `_ARTICLE_PATTERNS`.
+   Done on `fix/pt-reform-commits-and-article-count`, with tests.
 8. **`law-sync full --repo ../countries/pt`** — every `reforms.sha` is invalidated by
    the rewrite, so an incremental sync is not enough.
-9. **Redirect map** old id → new id for `legalize-web`; every filename changes (D2).
+9. **Redirect map** old id → new id for `legalize-web`; every filename changes (D2),
+   and note the type prefix moved again in §14.5 — build the map from the pushed
+   repo, not from an earlier run.
 
 ### 14.4 Decisions taken while building
 
@@ -1585,6 +1597,20 @@ continues.
   of 2,930, and collapsed 54 reforms into 1.
 - **`Version.publication_date` carries the effective date.** `effective_date` never
   reaches the JSON cache — `save_structured_json` writes only `publication_date`.
+
+### 14.5 Defects found auditing the first 31,000 fetches
+
+The corpus only shows these when it is read back as a whole; each one is now a test.
+
+| | |
+|---|---|
+| Three prefixes for one type | `TipoDiplomaAcronimo` is empty on 559 of 13,211 despachos normativos and disagrees with itself on the rest ("DN" on the legacy rows, "despnorm" on the modern ones), so the same type was landing under `DRE-DN-`, `DRE-DESPNORM-` and `DRE-DESPACHO-NORMATIVO-`. The type token now comes from the DRE slug via `TYPE_TOKENS`, read off every ELI in the corpus — 40 types, none mapping to two tokens. |
+| Tag soup in headings | `Epigrafe` and `Tituo` are documented as plain strings but carry an anchor for every EU act a heading cites; 34 diplomas shipped `<a href=…>` literally. |
+| `&lt;` shipped as four characters | A body with no tag still carries escaped angle brackets ("lotes &lt;15 t"). Unescaped on the plain-text branch only — earlier and the HTML parser would eat it as a tag. |
+| Dead relative links | DRE writes some hrefs bare ("eurlex.asp?ano=2009&id=309L0049", which 301s to the EUR-Lex CELEX record). Resolved against the site root; 1,164 links in a 400-diploma sample, none left relative. |
+| A malformed span dropped a whole law | `rowspan=2>` unquoted, lxml recovers the rest of the row into the attribute value, `int()` raises out of `render_table`, `generic_fetch_one` skips the norm. ~250 diplomas across the corpus. Fixed in the shared `_tables.py`, so every country. |
+| A lone NUL is not empty text | DRE writes `"\x00"` into `Texto` on rows it has nothing for, and `"\x00".strip()` is truthy, so those were shipping as laws with no content. |
+| Partial subject lists that read as complete | The sampled thesaurus labelled 4,724 of 11,258 ids; 57 % of diplomas with subjects resolved only partially. §14.2. |
 
 ## Artefacts produced by this research
 
