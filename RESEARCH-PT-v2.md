@@ -14,9 +14,12 @@ close the gap. It follows the Step 0 structure of `ADDING_A_COUNTRY.md`.
 
 Portugal was shipped in April 2026 from a **third-party SQLite mirror**
 (`dre.tretas.org`) containing the *as-published* text of each diploma, one snapshot
-per law. It has **zero version history**, **broken tables**, **no article structure in
-half the corpus**, a scraper artefact (`TEXTO :`) in 81 % of files, and it contributes
-**zero rows** to the web app's `reforms` table.
+per law. It has **zero version history**; 99.3 % of its commits are dated
+**1970-01-02** (the epoch clamp) and carry **`Source-Id: PLACEHOLDER`**; their
+subjects and bodies are **in Spanish**; a scraper label `TEXTO :` sits in **75.6 %**
+of the files and `(ver documento original)` replaces a table, figure or annex in
+**25.4 %**; **52.9 %** have no heading at all; and it contributes **zero rows** to the
+web app's `reforms` table.
 
 Meanwhile the official source, `diariodarepublica.pt`, publishes a **fully consolidated,
 article-level, point-in-time versioned corpus** of 5,561 diplomas — every amendment
@@ -68,8 +71,55 @@ $ git log --format='%s' | count by prefix
 ```
 
 **Zero `[reform]` commits.** Every law is a single snapshot of its *as-published*
-text, committed at its publication date. A reform of the Código Civil in 2025 is
-nowhere in this repo.
+text. A reform of the Código Civil in 2025 is nowhere in this repo.
+
+And the snapshot is not even dated correctly. Here is a real production commit,
+verbatim (`git show` on any `[bootstrap]` commit):
+
+```
+1970-01-02 00:00:00 +0000 | enrique <enriquelopezcast@gmail.com>
+
+[bootstrap] Exonera a Drª Maria Fernanda da Silva Mendes do cargo de Secretária
+Regional dos Assuntos Sociais e o Dr. Francisco Manu — versión original 1900
+
+Publicación original de Exonera a Drª Maria Fernanda da Silva Mendes do cargo de
+Secretária Regional dos Assuntos Sociais e o Dr. Francisco Manu.
+
+Norma: DRE-D-1-2002
+Fecha: 1900-01-01
+Fuente: https://dre.tretas.org/dre/159184/
+
+Source-Id: PLACEHOLDER
+Source-Date: 1900-01-01
+Norm-Id: DRE-D-1-2002
+```
+
+Seven distinct defects in one commit, each of them repeated ~109,000 times:
+
+| Defect | Count | % of commits |
+|---|---|---|
+| Author date is the **Unix epoch clamp, 1970-01-02**, not the law's date | 109,162 | 99.30 % |
+| `Source-Id: **PLACEHOLDER**` — the literal placeholder string, in production | 109,162 | 99.30 % |
+| `Source-Date: 1900-01-01` — the placeholder date | 109,162 | 99.30 % |
+| Subject and body **in Spanish** in a Portuguese repo ("versión original 1900", "Publicación original de") | 109,162 | 99.30 % |
+| Spanish trailers `Norma:`/`Fecha:`/`Fuente:` alongside the English ones — **two incompatible schemas** | 109,431 | 99.54 % |
+| Author is a **personal Gmail address**, not the Legalize bot | 109,347 | 99.47 % |
+| No `Co-Authored-By` trailer | 109,932 | 100 % |
+| Subject hard-truncated mid-word (mean 145.8 chars, 94.5 % ≥ 100) | ~103,900 | 94.5 % |
+
+`git log --format=%at | sort | uniq -c | sort -rn | head -1` → `109162  86400`.
+
+**Root cause, and it is one line.** `DRETextParser.parse_text` builds every `Version`
+with `pub_date=date(1900, 1, 1)` and `norm_id="PLACEHOLDER"` — see the docstring:
+*"Use placeholder values — the pipeline fills in real dates via extract_reforms()"*.
+Nothing ever fills them in. `extract_reforms` reads those same placeholders, and
+`committer/git_ops.py::_date_to_epoch` clamps any pre-1970 date to 1970-01-02. The
+768 daily `[new]` commits, which take a different path, are dated correctly in
+**768/768** cases — which is what proves the bootstrap path is the broken one.
+
+The core promise on the front page of legalize.dev — *cada reforma um commit*, dated
+when it took effect — is not merely incomplete for Portugal. It is inverted: there are
+no reforms, and the dates that exist are wrong.
 
 Worse, this is invisible in the product twice over:
 
@@ -93,16 +143,50 @@ disagree three ways.
 
 ### 1.3 Text quality — 600-file random sample
 
-`git cat-file --batch` over a `random.seed(11)` sample of 600 of the 109,929 files:
+Corpus-wide counts via `git grep -l … HEAD -- 'pt/*.md'`, plus a 1,000-file random
+sample for the per-file statistics:
 
-| Defect | Files | % |
+| Defect | Files | % of corpus |
 |---|---|---|
-| Body contains the literal scraper label **`TEXTO :`** | **488** | 81 % |
-| H1 title repeated verbatim as body text | **587** | 98 % |
-| **No heading at all** in the body (`^#{2,6} `) | **306** | 51 % |
-| Markdown pipe table present | 2 | 0.3 % |
-| `source:` still pointing at `dre.tretas.org` | 10 | 1.7 % |
-| Mojibake (`Ã…`, `â€`) | 0 | 0 % |
+| Body contains the literal scraper label **`TEXTO :`** | **83,072** | **75.6 %** |
+| Body contains **`(ver documento original)`** — a table, figure or annex that was never converted (61,674 occurrences) | **27,954** | **25.4 %** |
+| …of those, files where that placeholder is essentially the **entire body** | **385** | 0.35 % |
+| **No heading below H1** — the whole law is one wall of paragraphs | **58,132** | **52.9 %** |
+| H1 title repeated verbatim as body text | ~98 % of sample | ~98 % |
+| Markdown pipe table present | **907** | **0.82 %** |
+| `source:` citing the third-party scraper `dre.tretas.org` as official | 963 | 0.88 % |
+| `source:` pointing at a **dead endpoint** (`dre.pt/util/getpdf.asp`, soft-404) | 1,050 | 0.96 % |
+| `source:` using a `data.dre.pt` ELI | 498 | 0.45 % |
+| Raw C1 control bytes (unmapped cp1252: `\x9c` for `œ`, `\x96` for `–`, `\x97` for `—`) | 4 | 0.004 % |
+| Leftover HTML tags · undecoded entities · U+FFFD · empty bodies | **0** | — |
+
+Two of these deserve to be read twice. **`(ver documento original)`** is DRE's own
+"see the original document" marker, and the pipeline copies it through verbatim: one
+Portuguese law in four has at least one table, figure or annex replaced by that
+string, and 385 laws consist of essentially nothing else. The complete body of
+`pt/DRE-DL-109-G-2021.md` is:
+
+```markdown
+# Decreto-Lei n.º 109-G/2021
+
+Decreto-Lei n.º 109-G/2021
+
+de 10 de dezembro
+
+Sumário: Transpõe parcialmente a Diretiva (UE) 2019/2161…
+
+(ver documento original)
+
+114808797
+```
+
+That is the whole law. (The trailing `114808797` is an internal id, also copied
+through.) Meanwhile `legalize-pt/README.md` tells the reader *"as tabelas são
+convertidas para tabelas Markdown"* — true for **0.82 %** of files.
+
+The good news, and it is worth stating: the HTML→text conversion itself is clean.
+Zero leftover tags, zero undecoded entities, zero replacement characters, zero empty
+bodies corpus-wide. The failures are structural and editorial, not encoding.
 
 A representative file, in full shape:
 
@@ -146,16 +230,29 @@ Three separate bugs visible at once:
    on `\n` and makes every row its own `parrafo` `Paragraph`.** The renderer emits a
    blank line after each paragraph, so the table never renders as a table. No
    Portuguese tax schedule, tariff annex or fee table in the repo is a table.
-2. **Named HTML entities are not decoded.** `_strip_html` hand-rolls a table of ten
-   entities plus `&#NNN;`. `&ordm;` (º), `&atilde;` (ã), `&eacute;` (é), `&ccedil;` (ç)
-   — the entities Portuguese text is made of — pass through verbatim.
-3. **The article heading is lost as a consequence**: `Artigo 1.&ordm;` does not match
-   `_RE_ARTIGO`, so the heading degrades to a body paragraph. This is a plausible
-   contributor to the 51 % no-heading rate.
+2. **Named HTML entities are not decoded** — a *latent* bug. `_strip_html` hand-rolls
+   a table of ten entities plus `&#NNN;`; `&ordm;` (º), `&atilde;` (ã), `&eacute;` (é),
+   `&ccedil;` (ç) pass through verbatim. It has not fired in production because
+   neither the tretas.org dump nor the official DRE payload uses named entities
+   (0 occurrences corpus-wide, 0 in every official fixture measured). It is still a
+   bug the rewrite must not carry over, because it also breaks heading detection:
+   `Artigo 1.&ordm;` does not match `_RE_ARTIGO`.
+3. **`<style>` blocks and `(ver documento original)` markers pass straight through.**
+   The regex stripper removes tags but not the text inside `<style>`, and it has no
+   notion that DRE's "see the original document" marker means *a table was here*.
 
 The local `_html_table_to_markdown` also ignores `rowspan`/`colspan` and `<thead>`,
 while `src/legalize/fetcher/_tables.py::render_table` — the shared helper LV/BE/CH
 already use — handles all three.
+
+Net effect on the corpus: **907 files (0.82 %) have a Markdown table**, while 27,954
+(25.4 %) have a `(ver documento original)` placeholder where a table should be, and
+flattened dot-leader rows are everywhere:
+
+> `Artigo 4.º, n.º 1), alínea a) "Aquisições … Veículos com motor» ... 422000$00`
+
+(that line also shows a quote-normalisation bug — the opening `«` became a straight
+`"` and the closing `»` survived).
 
 ### 1.5 Structural hierarchy is collapsed
 
@@ -232,21 +329,32 @@ Spain models this correctly (`es-pv/`, `es-ct/`, …). Portugal should have `pt-
 | # | Defect | Scale | Fixable without a reprocess? |
 |---|---|---|---|
 | 1 | **No version history at all** — 0 `[reform]` commits | 109,929 laws | No |
-| 2 | Bootstrapped from a third-party mirror, not the official DRE | 109,929 laws | No |
-| 3 | `TEXTO :` scraper label in the body | ~81 % of files | No |
-| 4 | H1 title duplicated as body text | ~98 % of files | No |
-| 5 | No article/structural headings | ~51 % of files | No |
-| 6 | Tables destroyed by the paragraph splitter | every table in the corpus | No |
-| 7 | Named HTML entities not decoded (`&ordm;`, `&atilde;`, …) | wherever the source used them | No |
-| 8 | Whole categories missing (RCM, Lei Orgânica, Decreto do PR, …) | ~500 consolidated diplomas + siblings | No |
-| 9 | Regional law has no `jurisdiction` | 5,032 files | No |
-| 10 | 25+ metadata fields dropped, `subjects` always empty | 109,929 laws | No |
-| 11 | Inconsistent 2-digit/4-digit year in identifiers | 55,742 files | No (filenames) |
-| 12 | `[new]`/`[repeal]`/`[correction]` not parsed by the DB sync | cross-country | **Yes** — one-line fix in `enrichment` |
-| 13 | `article_count` always 0 (no `Artigo` pattern) | cross-country | **Yes** — one-line fix in `enrichment` |
+| 2 | **Commit dates are the Unix epoch clamp (1970-01-02)**, not the law's date | 109,162 commits (99.3 %) | No |
+| 3 | **`Source-Id: PLACEHOLDER` / `Source-Date: 1900-01-01`** shipped to production | 109,162 commits | No |
+| 4 | Commit subjects and bodies **in Spanish** in a Portuguese repo | 109,162 commits | No |
+| 5 | Two incompatible trailer schemas (`Norma/Fecha/Fuente` + `Source-Id/…`) | 109,431 commits | No |
+| 6 | Commits authored by a **personal Gmail address**, not the bot | 109,347 commits | No |
+| 7 | Bootstrapped from a third-party mirror, not the official DRE | 109,929 laws | No |
+| 8 | `TEXTO :` scraper label in the body | **83,072 files (75.6 %)** | No |
+| 9 | `(ver documento original)` where a table/figure/annex should be | **27,954 files (25.4 %)**, 385 of them almost entirely | No |
+| 10 | No heading below H1 | **58,132 files (52.9 %)** | No |
+| 11 | H1 title duplicated as body text | ~98 % of files | No |
+| 12 | Tables destroyed by the paragraph splitter | only 907 files (0.82 %) have a table at all | No |
+| 13 | `last_updated: 1900-01-01` in the frontmatter | 109,162 files (99.3 %) | No |
+| 14 | `eli` in 0 files, `summary` in 0.70 %, `pdf_url` in 0.47 %; `subjects` never emitted | 109,929 laws | No |
+| 15 | Whole categories missing (RCM, Lei Orgânica, Decreto do PR, …); 10 of 20 mapped act types produce zero files | ~500 consolidated diplomas + siblings | No |
+| 16 | Nothing before 1960, while the README claims coverage "desde 1911" | corpus-wide | No |
+| 17 | Regional law has no `jurisdiction` | 5,032 files | No |
+| 18 | Inconsistent 2-digit/4-digit year in identifiers | 55,742 files | No (filenames) |
+| 19 | `source:` dead or third-party | 1,050 dead + 963 tretas.org | No |
+| 20 | `department` carries internal DB annotations ("(Utilizar a Partir de 29 de Julho de 2004)") | 663 files | No |
+| 21 | Raw C1 control bytes (unmapped cp1252) | 4 files | No |
+| 22 | No `Co-Authored-By` trailer | 109,932 commits | No |
+| 23 | `[new]`/`[repeal]`/`[correction]` not parsed by the DB sync | cross-country | **Yes** — one line in `enrichment` |
+| 24 | `article_count` always 0 (no `Artigo` pattern) | cross-country | **Yes** — one line in `enrichment` |
 
-Items 1–11 all require regenerating the repository. That is the argument for doing the
-rebuild once, properly, rather than patching.
+Twenty-two of the twenty-four require regenerating the repository. That is the whole
+argument for rebuilding once, properly, rather than patching.
 
 ### 1.10 No tests
 
