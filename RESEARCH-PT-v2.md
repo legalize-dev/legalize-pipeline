@@ -1291,21 +1291,95 @@ and it cannot be changed after the bootstrap without regenerating everything.
 
 ## §13 Before / after
 
-### 13.1 The corpus
+Every "before" figure is measured on `legalize-pt` at HEAD (2026-08-21); every "after"
+figure is either measured on the official source or follows mechanically from a decision
+recorded in this document. Rows marked *(pending)* depend on a measurement still running.
 
-| | Before (today) | After |
+### 13.1a Provenance and scope
+
+| | Before | After |
 |---|---|---|
-| Source | `dre.tretas.org` SQLite mirror | `diariodarepublica.pt` + `data.dre.pt` (official) |
-| Laws | 109,929 | ~110,000 + the ~500 consolidated diplomas missing today (RCM, Lei Orgânica, Decreto do PR, Despacho Normativo, Acórdãos com força obrigatória geral, Declarações de Retificação) |
-| Commits | 109,932, of which **0 are reforms** | ~110,000 bootstrap + **13,030 reform commits** |
-| Laws with version history | **0** | **4,600** of the 5,528 consolidated diplomas actually have amendments (the other 928 have never been amended); mean 2.4 amendment dates, max 104 |
-| Commit dates | 99.3 % are `1970-01-02` (epoch clamp) | the date each version entered into force (`DataEntradaVigor`) |
-| `Source-Id` | `PLACEHOLDER` in 99.3 % of commits | the amending diploma's id |
-| Commit language | Spanish, in a Portuguese repo | Portuguese |
-| Trailers | two incompatible schemas coexisting | one |
-| Author | a personal Gmail address on 109,347 commits | the Legalize bot |
-| Rows in the web `reforms` table | **0** | 13,030 |
-| `article_count` in the DB | 0 for every law | real (needs the one-line `Artigo` pattern fix) |
+| Source | `dre.tretas.org` SQLite mirror, dump dated 2026-03-01, ~12 GB, downloaded by hand | `diariodarepublica.pt` + `data.dre.pt`, fetched live (D1) |
+| Laws | 109,929 | ~110,000 + ~5,300 Resoluções recovered + ~500 missing consolidated categories *(pending exact figure)* |
+| Temporal coverage | 1960-01-04 → 2026-08-21; **nothing before 1960** although the README claims 1911 | *(pending — how far the sitemaps reach)* |
+| Volume after 2010 | collapses 1,712 → 687 laws/year and never recovers | uniform, straight from the official catalogue |
+| Act types present | 10 of the parser's 20 mapped types produce **zero** files | every type in scope, from the ELI type vocabulary (33 types) |
+| Resoluções | **98.0 % sequence gap** (~5,300 acts), **zero files 2015–2025** | complete — `resolconsmin` and `resolassrep` are distinct ELI types |
+| Regional law | 5,032 files in `pt/`, no jurisdiction | `pt-20/` Açores, `pt-30/` Madeira, from the ELI path segment |
+
+### 13.1b Version history — the product
+
+| | Before | After |
+|---|---|---|
+| Laws with any history | **0** | **4,600** of the 5,528 consolidated diplomas (928 have genuinely never been amended) |
+| `[reform]` commits | **0** | **13,030** |
+| Commits per file | 1.00 | 1 + mean 2.36 amendments; max 105 (DL 215/89, 127 amending acts) |
+| Total commits | 109,932 | ~123,000 |
+| Commit author date | **1970-01-02 in 99.30 %** (epoch clamp) | the date each version entered into force (`DataEntradaVigor`) |
+| `Source-Id` | **`PLACEHOLDER`** in 109,162 commits | the amending diploma's id |
+| `Source-Date` | `1900-01-01` in 109,162 commits | the real effective date |
+| Commit language | **Spanish** in a Portuguese repo ("versión original 1900") | Portuguese |
+| Trailer schema | **two incompatible** — 109,431 `Norma/Fecha/Fuente` + 499 `Norm/Disposition/…` | one |
+| Commit author | **a personal Gmail address** on 109,347 commits | the Legalize bot |
+| `Co-Authored-By` | 0 commits | all |
+| Subject length | mean 145.8 chars, 94.5 % ≥ 100, truncated mid-word | short — `short_title` becomes a real short title (§12b) |
+
+### 13.1c Text fidelity
+
+| | Before | After |
+|---|---|---|
+| `TEXTO :` scraper label | **83,072 files (75.6 %)** | 0 |
+| `(ver documento original)` instead of a table/figure/annex | **27,954 files (25.4 %)**, 61,674 occurrences, and essentially the entire body of 385 laws | *(pending — the recoverability measurement decides how many come back from surface B vs the PDF)* |
+| Title repeated as body text | 98.1 % | 0 |
+| `Sumário:` label leaked into the body | 3,897 files | 0 |
+| Bare numeric database id leaked as a body line | 7,573 files | 0 |
+| Files with **no heading below H1** | **58,132 (52.9 %)**; largest is 964 KB with zero headings | 0 — hierarchy comes from `TipoFragmentoId`, not a regex |
+| `Art. N.º` not recognised as an article | **20,332 files (18.5 %)** | 0 |
+| `Artigo único` not recognised | 6,026 files | 0 |
+| Heading levels | 50,956 files use H5 for articles, only 1,076 use `##`; 40.1 % jump H1→H5 | 7 real levels (Livro > Título > Subtítulo > Capítulo > Secção > Subsecção > Divisão > Artigo) |
+| Markdown tables | **907 files (0.82 %)** | every table the source has (204 in four fixtures alone), via `_tables.py` with rowspan/colspan/thead |
+| Cross-reference links | `href` discarded | `[Lei n.º 45-A/2024](https://diariodarepublica.pt/…)` — 484 in four fixtures |
+| Images | dropped, not even counted | linked to `files.diariodarepublica.pt` + `extra.images_linked` (96 in one law) |
+| Raw C1 control bytes | 4 files | 0 — `fetcher/_text.py::clean()` |
+| Text vintage | the **as-published** text, presented as law in force | the **consolidated** text at each point in time |
+
+### 13.1d Metadata
+
+| | Before | After |
+|---|---|---|
+| Distinct frontmatter keys | 13 | ~30 |
+| `eli` | **0 files** | all |
+| `summary` | 767 files (0.70 %) | 99.1 % (`Sumario`) |
+| `short_title` | **NULL for every law** | 99.1 % (`Designacao`) |
+| `subjects` | never emitted | from `eli:is_about` *(pending the descriptor-label lookup)* |
+| `pdf_url` | 521 files (0.47 %) | all |
+| `last_updated` | **`1900-01-01` in 99.30 %** | `DataUltimaConsolidada` |
+| `status` | 99.89 % `in_force`, only 117 `repealed` — including 13,798 acts from the 1960s | mapped from `Vigencia` across the full `NormStatus` range |
+| `department` | 663 values carry internal DB annotations ("(Utilizar a Partir de…)") | clean `Emissor` + `EmissorAcronimo` |
+| Dates captured | `publication_date` only | + `DataEntradaVigor`, `DataProducaoEfeitos`, `DataSuspensao`, `DataVersao` |
+| Legal annotations | dropped | `Nota` (Constitutional Court rulings) and `AlteracoesList` captured |
+| EU law links | none | `eli:cites` to EUR-Lex directives |
+| `source:` URL | 963 files cite the third-party scraper; 1,050 point at a dead endpoint; 498 use an ELI | the ELI permalink, always |
+
+### 13.1e Identifiers
+
+| | Before | After |
+|---|---|---|
+| Scheme | `DRE-DL-47344`, `DRE-D-1-74` — 55,742 with a 2-digit year, 32,650 with 4 | `DRE-DEC-LEI-47344-1966` — ELI-derived, always 4-digit (D2) |
+| Numberless diplomas | **2 `*-UNKNOWN` files holding one document each** — thousands of `Decreto de <data>` silently overwritten, untraceable | each gets its own ELI-based id |
+| Fake numbers | 551 files cite `DDnnn`, the tretas internal key, as an official number | 0 |
+| Mangled numbers | 13 (`43199(1ªparte)` → `431991parte`) | 0 |
+| RCM vs RAR | both map to code `R` → same filename | `resolconsmin` vs `resolassrep` |
+
+### 13.1f What the user sees on legalize.dev
+
+| | Before | After |
+|---|---|---|
+| Rows in the `reforms` table | **0** | 13,030 |
+| `article_count` | **0 for every law** | real (needs the one-line `Artigo` pattern fix in `enrichment`) |
+| Searchability | **by number only** — `title` is the bare number, `short_title` is NULL, `extra` is not indexed | `title` and `short_title` both carry the descriptive text, both in the search vector |
+| Law page | 1966 text labelled `in_force`, no history, no summary | current consolidated text, full timeline, summary under the H1 |
+| README claims | four of them are falsified by the data | true |
 
 ### 13.2 One file
 
