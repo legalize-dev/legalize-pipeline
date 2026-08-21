@@ -27,7 +27,8 @@ Step 0: Research
   ├─ 0.4 Formatting inventory     → checklist in RESEARCH-{CC}.md
   ├─ 0.5 Version history spike    → tests/fixtures/{code}/version-spike.txt
   │       ┌──────────────────────────────────────────────────────┐
-  │       │ GATE: ≥2 versions extracted with dates from 1 law.  │
+  │       │ GATE: ≥2 versions extracted with dates from 1 law,  │
+  │       │ and the source classified into one text_state.       │
   │       │ If not → stop and investigate. Do not write parser.  │
   │       └──────────────────────────────────────────────────────┘
   ├─ 0.6 Estimate scope           → paragraph in RESEARCH-{CC}.md
@@ -347,6 +348,20 @@ or any law your research shows has been reformed). Then:
 3. **Save the evidence** as `tests/fixtures/{code}/version-spike.txt` (a summary
    showing "version 1: date X, N paragraphs; version 2: date Y, N paragraphs; ...")
    so the quality review in Step 7 can reference it.
+4. **Classify the source** and record the answer in `RESEARCH-{CC}.md`. This is the
+   same evidence, read one more time:
+
+   ```
+   Does the source give the text with amendments incorporated?
+     no  → as_enacted
+     yes → Does it give that text at a past date?
+             yes → point_in_time   (the default; declare nothing)
+             no  → current
+   ```
+
+   Anything other than `point_in_time` is declared in `countries.py::TEXT_STATE`, in
+   the same PR that registers the fetcher. It is one line and it decides what every
+   published file of that country says about itself — see CLAUDE.md, "Output format".
 
 **If you cannot extract at least 2 distinct versions with dates for a single law,
 stop and investigate:**
@@ -360,7 +375,9 @@ stop and investigate:**
 
 **Why this step exists:** every country where we discovered version-access problems
 late (DE, UY) cost a full reprocess. Catching it here costs an hour. Finding it
-after a full bootstrap costs a week.
+after a full bootstrap costs a week. The classification in point 4 is the cheap
+half of the same lesson: DE and UY publish a current text with no dated history,
+and nothing in their files said so for two years.
 
 ### 0.6 Estimate total scope
 

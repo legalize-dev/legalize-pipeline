@@ -39,7 +39,8 @@ from legalize.fetcher.uy.parser import (
     _strip_control_chars,
     _table_to_markdown,
 )
-from legalize.models import NormMetadata
+from legalize.models import NormMetadata, TextState
+from legalize.transformer.markdown import _NOTICES
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
 
@@ -454,9 +455,16 @@ class TestEndToEndMarkdown:
 
     @pytest.mark.parametrize("fname", list(NORM_IDS))
     def test_no_blockquote_in_body(self, fname):
-        """We don't emit any blockquote — IMPO has no quoted amending text."""
+        """We don't emit any blockquote — IMPO has no quoted amending text.
+
+        The text-state notice is the one deliberate blockquote: IMPO publishes the
+        current consolidated text and no dated history, so every UY file is
+        ``current`` and opens with the notice (Legalize Format Spec v0.3).
+        """
         _meta, md = _render(fname)
-        body_lines = md.split("\n")
+        notice = _NOTICES[TextState.CURRENT]
+        assert notice in md, f"{fname}: missing the current-text notice"
+        body_lines = md.replace(notice, "").split("\n")
         # The frontmatter `---` markers are fine; check actual body lines
         in_body = False
         for line in body_lines:

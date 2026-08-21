@@ -92,6 +92,22 @@ class NormStatus(str, Enum):
     EXPIRED = "expired"
 
 
+class TextState(str, Enum):
+    """What a file's body actually is (Legalize Format Spec v0.3).
+
+    Two different questions decide this: are the amendments incorporated into
+    the text, and does the text correspond to the date the file claims. A body
+    can be consolidated and still not be the law as it stood at that date.
+
+    POINT_IN_TIME is the default and is never written to the frontmatter — a
+    file without the field is the law as in force on its ``last_updated``.
+    """
+
+    POINT_IN_TIME = "point_in_time"  # the law as in force on last_updated
+    CURRENT = "current"  # the latest text the source publishes, whatever the date
+    AS_ENACTED = "as_enacted"  # the act as published; amendments not incorporated
+
+
 # ─────────────────────────────────────────────
 # XML model (blocks and versions)
 # ─────────────────────────────────────────────
@@ -156,6 +172,11 @@ class NormMetadata:
     subjects: tuple[str, ...] = ()
     summary: str = ""
     extra: tuple[tuple[str, str], ...] = ()  # Country-specific key-value pairs for frontmatter
+    # None → the country default from countries.TEXT_STATE. Set explicitly only
+    # to override one norm: inside a consolidated country there are individual
+    # norms the source never consolidated (ar tier 2, eu, lu, ch).
+    text_state: Optional[TextState] = None
+    last_amendment: Optional[str] = None  # official ID of the most recent amending act
 
 
 # ─────────────────────────────────────────────

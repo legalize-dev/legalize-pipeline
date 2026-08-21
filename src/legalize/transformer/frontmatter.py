@@ -26,7 +26,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from legalize.models import NormMetadata, NormStatus
+from legalize.countries import text_state_for
+from legalize.models import NormMetadata, NormStatus, TextState
 
 
 def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
@@ -49,6 +50,14 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
         f'status: "{status}"',
         f'source: "{metadata.source}"',
     ]
+
+    # Spec v0.3: emitted only when the body is not the law in force at
+    # last_updated, so files that already state the law correctly never change.
+    state = metadata.text_state or text_state_for(metadata.country)
+    if state is not TextState.POINT_IN_TIME:
+        lines.append(f'text_state: "{state.value}"')
+        if state is TextState.AS_ENACTED and metadata.last_amendment:
+            lines.append(f'last_amendment: "{_escape_yaml(metadata.last_amendment)}"')
 
     if metadata.department:
         lines.append(f'department: "{_escape_yaml(metadata.department)}"')

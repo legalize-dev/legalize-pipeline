@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from legalize.models import TextState
+
 if TYPE_CHECKING:
     from legalize.fetcher.base import (
         LegislativeClient,
@@ -22,6 +24,34 @@ if TYPE_CHECKING:
 # ─── Registry ───
 # Each country maps to (module_path, class_name) for lazy imports.
 # This avoids importing all country modules at startup.
+
+# ─── Text state ───
+# What each country's file bodies actually are (Legalize Format Spec v0.3).
+#
+# Countries absent from this map are POINT_IN_TIME: their body is the law as in
+# force on the file's ``last_updated``. Only sources that cannot deliver that are
+# listed, which is why adding a country here is a deliberate act and forgetting
+# to is the safe failure. A parser may still override per norm via
+# ``NormMetadata.text_state``.
+#
+# Changing a value here changes the published output of that country and requires
+# reprocessing its repo — see CLAUDE.md, "Output format — FINAL". A country is
+# declared here in the same PR that registers its fetcher, never before.
+
+TEXT_STATE: dict[str, TextState] = {
+    "ad": TextState.AS_ENACTED,  # BOPA publishes acts, never a consolidated text
+    "de": TextState.CURRENT,  # gesetze-im-internet: current text, undated standangabe
+    "dk": TextState.AS_ENACTED,  # Retsinformation: each act is its own document
+    "gr": TextState.AS_ENACTED,  # each FEK A' issue is an atomic act
+    "se": TextState.CURRENT,  # SFS gives one current text + an amendment register
+    "uy": TextState.CURRENT,  # IMPO: consolidated text, single bootstrap point
+}
+
+
+def text_state_for(country_code: str) -> TextState:
+    """Country default text state. Absent means POINT_IN_TIME (spec v0.3)."""
+    return TEXT_STATE.get(country_code, TextState.POINT_IN_TIME)
+
 
 REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
     "ad": {
