@@ -56,7 +56,7 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
     state = metadata.text_state or text_state_for(metadata.country)
     if state is not TextState.POINT_IN_TIME:
         lines.append(f'text_state: "{state.value}"')
-        if state is TextState.AS_ENACTED and metadata.last_amendment:
+        if metadata.last_amendment:
             lines.append(f'last_amendment: "{_escape_yaml(metadata.last_amendment)}"')
 
     if metadata.department:

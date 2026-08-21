@@ -118,12 +118,18 @@ class TestCurrent:
         assert 'text_state: "current"' in md
         assert "It is not the text as it stood on the date of any given commit." in md
 
-    def test_last_amendment_is_not_emitted(self):
-        """Optional outside as_enacted, and Sweden's body carries no such claim."""
-        md = render_norm_at_date(
-            _norm("se", last_amendment="SFS-2026-1524"), _blocks(), date(2026, 1, 1)
+    def test_last_amendment_is_emitted(self):
+        """Sweden is why: its body is constant and its reform dates are all
+        1 January of the SFS year, so without this field two amendments from the
+        same year render identically and the pipeline drops the second commit."""
+        first = render_norm_at_date(
+            _norm("se", last_amendment="SFS 2024:397"), _blocks(), date(2024, 1, 1)
         )
-        assert "last_amendment" not in md
+        second = render_norm_at_date(
+            _norm("se", last_amendment="SFS 2024:1013"), _blocks(), date(2024, 1, 1)
+        )
+        assert 'last_amendment: "SFS 2024:397"' in first
+        assert first != second
 
 
 class TestPerNormOverride:
