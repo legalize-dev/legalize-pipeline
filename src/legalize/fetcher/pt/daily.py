@@ -1,16 +1,27 @@
 """Portugal-specific daily processing.
 
-Fetches new legislation directly from diariodarepublica.pt via HTTP.
-No SQLite dump needed — works in CI environments.
+Two things happen every day and they are not the same thing:
 
-Discovery is done via the OutSystems API: list journals by date,
-then list documents per journal, then fetch full text per document.
+1. **New diplomas** are published in the Diário da República. Found by walking the
+   day's journal issues, committed as ``[new]``.
+2. **Existing consolidated diplomas are re-consolidated** because something amended
+   them. DRE does this on its own schedule, days or weeks after the amending act
+   appears, so watching the day's publications would miss it.
+
+The second is what makes Portugal a versioned corpus rather than a pile of
+snapshots, and it is detected for the price of one HTTP request: the consolidated
+sitemap carries a ``<lastmod>`` per diploma. Diff it against yesterday's copy and
+re-fetch exactly the diplomas whose consolidation moved.
 """
 
 from __future__ import annotations
 
+import gzip
+import json
 import logging
+import re
 from datetime import date
+from pathlib import Path
 
 from rich.console import Console
 
@@ -26,193 +37,179 @@ from legalize.transformer.slug import norm_to_filepath
 console = Console()
 logger = logging.getLogger(__name__)
 
-# Series I document types we care about (major legislative acts)
-_MAJOR_TYPES = {
-    "LEI",
-    "LEI CONSTITUCIONAL",
-    "LEI ORGÂNICA",
-    "DECRETO-LEI",
-    "DECRETO LEI",
-    "DECRETO REGULAMENTAR",
-    "DECRETO LEGISLATIVO REGIONAL",
-    "DECRETO REGULAMENTAR REGIONAL",
-    "DECRETO",
-    "PORTARIA",
-    "RESOLUÇÃO",
-}
+_URL_ENTRY = re.compile(
+    r"<url>\s*<loc>([^<]+)</loc>\s*(?:<lastmod>([^<]*)</lastmod>)?", re.IGNORECASE | re.DOTALL
+)
+_CONS_URL = re.compile(r"/dr/legislacao-consolidada/([^/]+)/(\d{4})-(\d+)")
+
+# The Diário da República publishes Monday to Friday. The daily has run on 121 of
+# 125 weekdays; the four misses were Portuguese public holidays.
+_SKIP_WEEKDAYS = {5, 6}
 
 
-def _discover_daily_http(client, target_date: date) -> list[dict]:
-    """Discover documents published on target_date via HTTP.
-
-    Returns list of dicts with 'diploma_id' and basic metadata.
-    Filters to Series I major legislative types only.
-    """
-    date_str = target_date.isoformat()
-    documents = []
-
-    journals = client.get_journals_by_date(date_str)
-    if not journals:
-        return []
-
-    for journal in journals:
-        # Filter to Serie I only (skip Serie II, III, and supplements)
-        title = journal.get("conteudoTitle", "")
-        if title and ("Série I" not in title or "Suplemento" in title):
-            continue
-
-        journal_id = journal.get("Id") or journal.get("DiarioId")
-        if not journal_id:
-            continue
-
-        docs = client.get_documents_by_journal(int(journal_id), is_serie1=True)
-        for doc in docs:
-            # Handle both old (TipoActo) and new (TipoDiploma) API field names
-            doc_type = (
-                (doc.get("TipoActo") or doc.get("TipoDiploma") or doc.get("Tipo") or "")
-                .strip()
-                .upper()
-            )
-            if doc_type in _MAJOR_TYPES:
-                diploma_id = (
-                    doc.get("DiplomaLegisId")
-                    or doc.get("DiplomaConteudoId")
-                    or doc.get("ConteudoId")
-                    or doc.get("Id")
-                )
-                if diploma_id:
-                    documents.append(
-                        {
-                            "diploma_id": str(diploma_id),
-                            # The detail screen is URL-driven, so the fetch
-                            # needs the document's own sitemap path, not its id.
-                            "ref": doc.get("LinkSitemap", ""),
-                            "doc_type": doc_type,
-                            "title": doc.get("Sumario", doc_type),
-                        }
-                    )
-
-    return documents
+def _lastmod_state_path(data_dir: str | Path) -> Path:
+    return Path(data_dir) / "consolidated_lastmod.json.gz"
 
 
-def daily(
-    config: Config,
-    target_date: date | None = None,
-    dry_run: bool = False,
-) -> int:
-    """Daily processing for Portugal via HTTP (no SQLite needed)."""
-    from legalize.fetcher.pt.client import DREApiError, DREHttpClient
-    from legalize.fetcher.pt.parser import DREMetadataParser, DRETextParser
+def _read_lastmods(data_dir: str | Path) -> dict[str, str]:
+    path = _lastmod_state_path(data_dir)
+    if not path.exists():
+        return {}
+    try:
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            return json.load(handle)
+    except Exception:
+        logger.warning("Unreadable lastmod state at %s, treating as empty", path)
+        return {}
+
+
+def _write_lastmods(data_dir: str | Path, lastmods: dict[str, str]) -> None:
+    path = _lastmod_state_path(data_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with gzip.open(path, "wt", encoding="utf-8") as handle:
+        json.dump(lastmods, handle)
+
+
+def fetch_consolidated_lastmods(client) -> dict[str, str]:
+    """``{norm_id: lastmod}`` for every consolidated diploma. One request."""
+    from legalize.fetcher.pt.discovery import CONSOLIDATED_SITEMAP, SITEMAP_INDEX
+
+    index = client._api.get_text_body(SITEMAP_INDEX)
+    target = next(
+        (u for u in re.findall(r"<loc>([^<]+)</loc>", index) if u.endswith(CONSOLIDATED_SITEMAP)),
+        None,
+    )
+    if not target:
+        raise RuntimeError("The consolidated sitemap is no longer in the DRE index")
+
+    lastmods: dict[str, str] = {}
+    for url, lastmod in _URL_ENTRY.findall(client._api.get_text_body(target)):
+        match = _CONS_URL.search(url)
+        if match:
+            lastmods[f"cons:{match.group(1)}:{match.group(2)}-{match.group(3)}"] = lastmod or ""
+    return lastmods
+
+
+def reconsolidated_since_last_run(client, data_dir: str | Path) -> tuple[list[str], dict[str, str]]:
+    """Which consolidated diplomas DRE has touched since we last looked."""
+    current = fetch_consolidated_lastmods(client)
+    previous = _read_lastmods(data_dir)
+    if not previous:
+        # First run after the bootstrap: record the baseline, claim nothing changed.
+        return [], current
+    changed = [nid for nid, stamp in current.items() if previous.get(nid) != stamp]
+    return changed, current
+
+
+def daily(config: Config, target_date: date | None = None, dry_run: bool = False) -> int:
+    """Daily processing for Portugal: new diplomas + re-consolidated ones."""
+    from legalize.fetcher.pt.client import DREClient
+    from legalize.fetcher.pt.discovery import DREDiscovery
+    from legalize.fetcher.pt.dre_api import DREApiError
+    from legalize.fetcher.pt.parser import DREMetadataParser
+    from legalize.pipeline import generic_fetch_one
 
     cc = config.get_country("pt")
     state = StateStore(cc.state_path)
     state.load()
 
     dates_to_process = resolve_dates_to_process(
-        state,
-        cc.repo_path,
-        target_date,
-        skip_weekdays={5, 6},
+        state, cc.repo_path, target_date, skip_weekdays=_SKIP_WEEKDAYS
     )
     if dates_to_process is None:
         console.print("[yellow]No last date found. Use --date or run bootstrap.[/yellow]")
         return 0
-    if not dates_to_process:
-        console.print("[green]Nothing to process — up to date[/green]")
-        return 0
-
-    console.print(f"[bold]Daily PT — processing {len(dates_to_process)} day(s)[/bold]")
 
     repo = GitRepo(cc.repo_path, config.git.committer_name, config.git.committer_email)
+    meta_parser = DREMetadataParser()
+    discovery = DREDiscovery.create({**cc.source, "cache_dir": cc.data_dir})
     commits_created = 0
     errors: list[str] = []
 
-    text_parser = DRETextParser()
-    meta_parser = DREMetadataParser()
-
-    with DREHttpClient.create(cc) as client:
-        for current_date in dates_to_process:
-            console.print(f"\n  [bold]{current_date}[/bold]")
-
+    with DREClient.create(cc) as client:
+        # ---- 1. diplomas DRE re-consolidated: one commit per new reform ----
+        try:
+            changed, lastmods = reconsolidated_since_last_run(client, cc.data_dir)
+        except DREApiError:
+            logger.exception("DRE API contract broken while reading the sitemap — aborting")
+            raise
+        if changed:
+            console.print(f"[bold]{len(changed)} diploma(s) re-consolidated[/bold]")
+        for norm_id in changed:
+            if dry_run:
+                console.print(f"  [dim]would refresh {norm_id}[/dim]")
+                continue
             try:
-                documents = _discover_daily_http(client, current_date)
+                commits_created += _commit_versions(
+                    config, repo, client, norm_id, generic_fetch_one
+                )
             except DREApiError:
-                # A broken DRE contract is not a bad day, it is a broken
-                # client: every remaining date would fail the same way and
-                # record itself as "no new norms". Abort loudly instead.
                 logger.exception("DRE API contract broken — aborting daily run")
                 raise
-            except Exception:
-                msg = f"Error discovering changes for {current_date}"
-                logger.exception(msg)
-                errors.append(msg)
+            except Exception as exc:
+                errors.append(f"Error refreshing {norm_id}: {exc}")
+                logger.exception("Error refreshing %s", norm_id)
+
+        # ---- 2. diplomas published on each pending date ----
+        for current_date in dates_to_process:
+            console.print(f"\n  [bold]{current_date}[/bold]")
+            try:
+                norm_ids = list(discovery.discover_daily(client, current_date))
+            except DREApiError:
+                # A broken contract is not a quiet day: every remaining date would
+                # fail the same way and record itself as "no new norms".
+                logger.exception("DRE API contract broken — aborting daily run")
+                raise
+            except Exception as exc:
+                errors.append(f"Error discovering {current_date}: {exc}")
+                logger.exception("Error discovering %s", current_date)
                 continue
 
-            if not documents:
+            if not norm_ids:
                 console.print("    No new norms found")
                 state.last_summary_date = current_date
                 continue
+            console.print(f"    {len(norm_ids)} norm(s) found")
 
-            console.print(f"    {len(documents)} norm(s) found")
-
-            for doc_info in documents:
-                diploma_id = doc_info["diploma_id"]
-
+            for norm_id in norm_ids:
                 if dry_run:
-                    console.print(
-                        f"    [dim]{doc_info['doc_type']} — {doc_info['title'][:60]}[/dim]"
-                    )
+                    console.print(f"    [dim]{norm_id}[/dim]")
                     continue
-
                 try:
-                    ref = doc_info["ref"]
-                    meta_data = client.get_metadata(ref)
-                    metadata = meta_parser.parse(meta_data, diploma_id)
-
-                    text_data = client.get_text(ref)
-                    blocks = text_parser.parse_text_with_date(
-                        text_data, metadata.publication_date, metadata.identifier
-                    )
-
-                    file_path = norm_to_filepath(metadata)
-                    markdown = render_norm_at_date(metadata, blocks, current_date, include_all=True)
-
-                    changed = repo.write_and_add(file_path, markdown)
-                    if not changed:
-                        console.print(f"    [dim]⏭ {metadata.short_title[:60]} — no changes[/dim]")
+                    norm = generic_fetch_one(config, "pt", norm_id, force=True)
+                    if norm is None:
                         continue
-
+                    metadata = meta_parser.parse(client.get_metadata(norm_id), norm_id)
+                    file_path = norm_to_filepath(metadata)
+                    markdown = render_norm_at_date(
+                        metadata, norm.blocks, metadata.publication_date, include_all=True
+                    )
+                    if not repo.write_and_add(file_path, markdown):
+                        continue
                     reform = Reform(
-                        date=current_date,
-                        norm_id=f"DRE-DAILY-{current_date.isoformat()}",
+                        date=metadata.publication_date,
+                        norm_id=metadata.identifier,
                         affected_blocks=(),
                     )
                     info = build_commit_info(
-                        CommitType.NEW,
-                        metadata,
-                        reform,
-                        blocks,
-                        file_path,
-                        markdown,
+                        CommitType.NEW, metadata, reform, norm.blocks, file_path, markdown
                     )
-                    sha = repo.commit(info)
-
-                    if sha:
+                    if repo.commit(info):
                         commits_created += 1
                         console.print(f"    [green]✓[/green] {info.subject}")
-
                 except DREApiError:
-                    # Same reasoning as discovery: a contract break hits every
-                    # remaining document, so collecting it per document would
-                    # walk the whole day and still exit 0.
                     logger.exception("DRE API contract broken — aborting daily run")
                     raise
-                except Exception as e:
-                    msg = f"Error processing diploma_id={diploma_id}: {e}"
-                    logger.exception(msg)
-                    errors.append(msg)
+                except Exception as exc:
+                    errors.append(f"Error processing {norm_id}: {exc}")
+                    logger.exception("Error processing %s", norm_id)
 
             state.last_summary_date = current_date
+
+        # Only record the sitemap baseline once the run got this far: crashing
+        # mid-run must not make us forget the diplomas we had not refreshed yet.
+        if not dry_run and not errors:
+            _write_lastmods(cc.data_dir, lastmods)
 
     return finalize_daily(
         repo,
@@ -223,3 +220,29 @@ def daily(
         dry_run=dry_run,
         push=config.git.push,
     )
+
+
+def _commit_versions(config, repo, client, norm_id: str, fetch_one) -> int:
+    """Re-fetch a consolidated diploma and commit any version it has gained."""
+    from legalize.fetcher.pt.parser import DREMetadataParser
+
+    norm = fetch_one(config, "pt", norm_id, force=True)
+    if norm is None or not norm.reforms:
+        return 0
+    metadata = DREMetadataParser().parse(client.get_metadata(norm_id), norm_id)
+    file_path = norm_to_filepath(metadata)
+    known = repo.load_existing_commits()
+    created = 0
+
+    for index, reform in enumerate(norm.reforms):
+        # One reform can affect many norms, so the dedupe key is the pair.
+        if (reform.norm_id, metadata.identifier) in known:
+            continue
+        markdown = render_norm_at_date(metadata, norm.blocks, reform.date, include_all=index == 0)
+        if not repo.write_and_add(file_path, markdown):
+            continue
+        commit_type = CommitType.BOOTSTRAP if index == 0 else CommitType.REFORM
+        info = build_commit_info(commit_type, metadata, reform, norm.blocks, file_path, markdown)
+        if repo.commit(info):
+            created += 1
+    return created

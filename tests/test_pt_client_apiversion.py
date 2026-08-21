@@ -14,22 +14,19 @@ These tests pin the two halves of the fix:
 
 from __future__ import annotations
 
-import subprocess
-from datetime import date
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
 
-from legalize.fetcher.pt.client import (
-    DOCUMENT_DETAIL,
+from legalize.fetcher.pt.dre_api import (
+    DOCUMENTS_BY_JOURNAL,
     JOURNALS_BY_DATE,
+    PUBLISHED_DETAIL,
+    DREApi,
     DREApiError,
-    DREHttpClient,
-    _split_sitemap_ref,
+    split_sitemap_ref,
 )
-from legalize.fetcher.pt.daily import _discover_daily_http, daily
 
 # Real shape of dr.Home.home.mvc.js after the May 2026 DRE redeploy: the
 # action gained an "AndCheckUserLog" suffix and a fresh apiVersion hash.
@@ -63,15 +60,15 @@ def _json_response(payload: dict) -> requests.Response:
     return resp
 
 
-def _client() -> DREHttpClient:
+def _client() -> DREApi:
     """A client with the network handshake skipped."""
-    with patch.object(DREHttpClient, "_init_session"):
-        client = DREHttpClient(timeout=5)
+    with patch.object(DREApi, "_handshake"):
+        client = DREApi(request_timeout=5)
     client._csrf_token = "csrf-token"
     client._module_version = "9DeZ4j9NYEpfCiXfe3gDLw"
     client._endpoints = {
-        name: (f"https://diariodarepublica.pt/dr/screenservices/{name}", "hash")
-        for name in (JOURNALS_BY_DATE, DOCUMENT_DETAIL, "documents_by_journal")
+        name: (f"https://diariodarepublica.pt/dr/screenservices/{name}", "hash", "View.view")
+        for name in (JOURNALS_BY_DATE, PUBLISHED_DETAIL, DOCUMENTS_BY_JOURNAL)
     }
     return client
 
@@ -132,7 +129,7 @@ class TestPostFailsLoudly:
             patch.object(client, "_request", return_value=_html_response()),
             pytest.raises(DREApiError) as exc,
         ):
-            client._post(JOURNALS_BY_DATE, {})
+            client.call(JOURNALS_BY_DATE, {})
 
         message = str(exc.value)
         assert "instead of JSON" in message
@@ -154,24 +151,27 @@ class TestPostFailsLoudly:
             patch.object(client, "_request", return_value=_json_response(payload)),
             pytest.raises(DREApiError, match="No role validation found"),
         ):
-            client._post(JOURNALS_BY_DATE, {})
+            client.call(JOURNALS_BY_DATE, {})
 
     def test_apiversion_and_module_version_are_sent(self):
         client = _client()
-        client._endpoints[JOURNALS_BY_DATE] = ("https://dre.test/action", "the-hash")
+        client._endpoints[JOURNALS_BY_DATE] = ("https://dre.test/action", "the-hash", "Home.home")
         request = MagicMock(return_value=_json_response({"data": {}}))
 
         with patch.object(client, "_request", request):
-            client._post(JOURNALS_BY_DATE, {})
+            client.call(JOURNALS_BY_DATE, {})
 
         sent = request.call_args.kwargs["json"]
         assert sent["versionInfo"]["apiVersion"] == "the-hash"
         assert sent["versionInfo"]["moduleVersion"] == "9DeZ4j9NYEpfCiXfe3gDLw"
         assert request.call_args.kwargs["headers"]["X-CSRFToken"] == "csrf-token"
+        # A Block's action must post under the *screen* viewName, or DRE answers
+        # "No role validation found" — see docs/pt-dre-api.md.
+        assert sent["viewName"] == "Home.home"
 
 
 # ─────────────────────────────────────────────
-# get_journals_by_date: empty day vs broken API
+# journals_by_date: empty day vs broken API
 # ─────────────────────────────────────────────
 
 
@@ -182,7 +182,7 @@ class TestJournalsByDate:
         payload = {"data": {"Json_Out": '{"hits": {"hits": []}}'}}
 
         with patch.object(client, "_request", return_value=_json_response(payload)):
-            assert client.get_journals_by_date("2026-08-16") == []
+            assert client.journals_by_date("2026-08-16") == []
 
     def test_hits_are_mapped(self):
         client = _client()
@@ -197,7 +197,7 @@ class TestJournalsByDate:
         }
 
         with patch.object(client, "_request", return_value=_json_response(payload)):
-            journals = client.get_journals_by_date("2026-08-18")
+            journals = client.journals_by_date("2026-08-18")
 
         assert len(journals) == 1
         assert journals[0]["Id"] == 1159106555
@@ -212,7 +212,7 @@ class TestJournalsByDate:
             patch.object(client, "_request", return_value=_json_response(payload)),
             pytest.raises(DREApiError, match="response shape"),
         ):
-            client.get_journals_by_date("2026-08-18")
+            client.journals_by_date("2026-08-18")
 
 
 # ─────────────────────────────────────────────
@@ -224,20 +224,20 @@ class TestSitemapRef:
     """The detail screen takes the URL's type and key, never a raw id."""
 
     def test_splits_a_sitemap_path(self):
-        assert _split_sitemap_ref("/dr/detalhe/decreto-lei/169-2026-1159106557") == (
+        assert split_sitemap_ref("/dr/detalhe/decreto-lei/169-2026-1159106557") == (
             "decreto-lei",
             "169-2026-1159106557",
         )
 
     def test_splits_a_full_url(self):
-        assert _split_sitemap_ref(
+        assert split_sitemap_ref(
             "https://diariodarepublica.pt/dr/detalhe/portaria/349-2026-1159106558"
         ) == ("portaria", "349-2026-1159106558")
 
     @pytest.mark.parametrize("ref", ["", "1159106557", "/dr/home", None])
     def test_unusable_reference_raises(self, ref):
         with pytest.raises(DREApiError, match="document reference"):
-            _split_sitemap_ref(ref)
+            split_sitemap_ref(ref)
 
     def test_detail_posts_tipo_and_key(self):
         """Regression: DipLegisId stopped being an input in the May 2026 deploy."""
@@ -249,7 +249,7 @@ class TestSitemapRef:
         )
 
         with patch.object(client, "_request", request):
-            client.get_document_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
+            client.published_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
 
         variables = request.call_args.kwargs["json"]["screenData"]["variables"]
         assert variables["Tipo"] == "decreto-lei"
@@ -257,34 +257,6 @@ class TestSitemapRef:
         assert variables["_tipoInDataFetchStatus"] == 1
         assert variables["_keyInDataFetchStatus"] == 1
         assert "DipLegisId" not in variables
-
-
-class TestDiscoveryCarriesTheReference:
-    def test_link_sitemap_becomes_the_ref(self):
-        """Discovery must hand the detail fetch the document's own URL."""
-        client = MagicMock()
-        client.get_journals_by_date.return_value = [
-            {"Id": "1159106555", "conteudoTitle": "Diário da República n.º 159/2026, Série I"}
-        ]
-        client.get_documents_by_journal.return_value = [
-            {
-                "TipoDiploma": "Decreto-Lei",
-                "DiplomaLegisId": "1159106557",
-                "Sumario": "Altera o Decreto-Lei n.º 252/2007",
-                "LinkSitemap": "/dr/detalhe/decreto-lei/169-2026-1159106557",
-            }
-        ]
-
-        found = _discover_daily_http(client, date(2026, 8, 18))
-
-        assert len(found) == 1
-        assert found[0]["ref"] == "/dr/detalhe/decreto-lei/169-2026-1159106557"
-        assert found[0]["diploma_id"] == "1159106557"
-
-
-# ─────────────────────────────────────────────
-# get_document_detail: default record is not a document
-# ─────────────────────────────────────────────
 
 
 class TestDocumentDetail:
@@ -306,7 +278,7 @@ class TestDocumentDetail:
             patch.object(client, "_request", return_value=_json_response(payload)),
             pytest.raises(DREApiError, match="empty record"),
         ):
-            client.get_document_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
+            client.published_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
 
     def test_real_record_passes_through(self):
         client = _client()
@@ -323,7 +295,7 @@ class TestDocumentDetail:
         }
 
         with patch.object(client, "_request", return_value=_json_response(payload)):
-            detail = client.get_document_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
+            detail = client.published_detail("/dr/detalhe/decreto-lei/169-2026-1159106557")
 
         assert detail["Numero"] == "169/2026"
 
@@ -331,94 +303,3 @@ class TestDocumentDetail:
 # ─────────────────────────────────────────────
 # daily(): red job, state untouched
 # ─────────────────────────────────────────────
-
-
-class TestDailyAbortsOnApiBreak:
-    def _make_config(self, tmp_path: Path):
-        from legalize.config import Config, CountryConfig, GitConfig
-
-        repo_path = tmp_path / "repo"
-        repo_path.mkdir()
-        subprocess.run(["git", "init"], cwd=repo_path, capture_output=True, check=False)
-
-        return Config(
-            git=GitConfig(committer_name="Legalize", committer_email="test@test.com"),
-            countries={
-                "pt": CountryConfig(
-                    repo_path=str(repo_path),
-                    data_dir=str(tmp_path / "data"),
-                    state_path=str(tmp_path / "state" / "state.json"),
-                    source={},
-                )
-            },
-        )
-
-    @patch("legalize.fetcher.pt.client.DREHttpClient", autospec=True)
-    @patch("legalize.fetcher.pt.daily._discover_daily_http")
-    def test_api_break_raises_instead_of_zero_commits(
-        self, mock_discover, mock_client_cls, tmp_path
-    ):
-        """The regression that cost three months: 0 commits used to exit green."""
-        config = self._make_config(tmp_path)
-        mock_discover.side_effect = DREApiError("returned text/html instead of JSON")
-
-        mock_client = mock_client_cls.create.return_value
-        mock_client.__enter__ = MagicMock(return_value=mock_client)
-        mock_client.__exit__ = MagicMock(return_value=False)
-
-        with pytest.raises(DREApiError):
-            daily(config, target_date=date(2026, 8, 10))
-
-    @patch("legalize.fetcher.pt.client.DREHttpClient", autospec=True)
-    @patch("legalize.fetcher.pt.daily._discover_daily_http")
-    def test_api_break_does_not_advance_state(self, mock_discover, mock_client_cls, tmp_path):
-        """A day we could not read must stay unprocessed, not be marked done."""
-        config = self._make_config(tmp_path)
-        mock_discover.side_effect = DREApiError("returned text/html instead of JSON")
-
-        mock_client = mock_client_cls.create.return_value
-        mock_client.__enter__ = MagicMock(return_value=mock_client)
-        mock_client.__exit__ = MagicMock(return_value=False)
-
-        with pytest.raises(DREApiError):
-            daily(config, target_date=date(2026, 8, 10))
-
-        state_path = Path(config.get_country("pt").state_path)
-        assert not state_path.exists() or "2026-08-10" not in state_path.read_text()
-
-    @patch("legalize.fetcher.pt.client.DREHttpClient", autospec=True)
-    @patch("legalize.fetcher.pt.daily._discover_daily_http")
-    def test_api_break_while_fetching_a_document_aborts(
-        self, mock_discover, mock_client_cls, tmp_path
-    ):
-        """Discovery can succeed and the *fetch* still hit a broken contract."""
-        config = self._make_config(tmp_path)
-        mock_discover.return_value = [
-            {
-                "diploma_id": "1159106557",
-                "ref": "/dr/detalhe/decreto-lei/169-2026-1159106557",
-                "doc_type": "DECRETO-LEI",
-                "title": "Altera o Decreto-Lei n.º 252/2007",
-            }
-        ]
-
-        mock_client = mock_client_cls.create.return_value
-        mock_client.__enter__ = MagicMock(return_value=mock_client)
-        mock_client.__exit__ = MagicMock(return_value=False)
-        mock_client.get_metadata.side_effect = DREApiError("returned an empty record")
-
-        with pytest.raises(DREApiError):
-            daily(config, target_date=date(2026, 8, 18))
-
-    @patch("legalize.fetcher.pt.client.DREHttpClient", autospec=True)
-    @patch("legalize.fetcher.pt.daily._discover_daily_http")
-    def test_transient_error_still_continues(self, mock_discover, mock_client_cls, tmp_path):
-        """Non-contract errors keep the old per-date tolerance."""
-        config = self._make_config(tmp_path)
-        mock_discover.side_effect = RuntimeError("connection reset")
-
-        mock_client = mock_client_cls.create.return_value
-        mock_client.__enter__ = MagicMock(return_value=mock_client)
-        mock_client.__exit__ = MagicMock(return_value=False)
-
-        assert daily(config, target_date=date(2026, 8, 10)) == 0

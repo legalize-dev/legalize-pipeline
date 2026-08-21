@@ -125,7 +125,7 @@ class DREApi(HttpClient):
             extra_headers={"Content-Type": "application/json; charset=UTF-8"},
         )
         self._refresh_every = refresh_every
-        self._csrf = ""
+        self._csrf_token = ""
         self._module_version = ""
         self._endpoints: dict[str, tuple[str, str, str]] = {}
         self._calls = 0
@@ -140,9 +140,9 @@ class DREApi(HttpClient):
         for pattern in _CSRF_PATTERNS:
             found = re.search(pattern, js)
             if found:
-                self._csrf = found.group(1)
+                self._csrf_token = found.group(1)
                 break
-        if not self._csrf:
+        if not self._csrf_token:
             raise DREApiError(
                 f"No CSRF token in {_OUTSYSTEMS_JS} ({len(js)} bytes) — DRE changed "
                 f"the token format."
@@ -155,33 +155,41 @@ class DREApi(HttpClient):
         if not self._module_version:
             raise DREApiError(f"No versionToken in {_MODULE_VERSION}: {version!r:.200}")
 
-        declared: dict[str, tuple[str, str]] = {}
-        for url in _SCREEN_JS:
-            text = self._request("GET", url).text
-            for name, path, api_version in _CALL_DATA_ACTION.findall(text):
-                declared[name] = (path, api_version)
+        combined = "\n".join(self._request("GET", url).text for url in _SCREEN_JS)
 
-        # Build into a local dict and swap in one assignment. Clearing
-        # ``self._endpoints`` in place while other threads read it lost 32 % of
-        # requests at 8 workers in the old client (KeyError: 'document_detail').
         endpoints: dict[str, tuple[str, str, str]] = {}
         for logical, (prefixes, view) in _ACTIONS.items():
-            for prefix in prefixes:
-                match = next((n for n in declared if n.startswith(prefix)), None)
-                if match:
-                    path, api_version = declared[match]
-                    endpoints[logical] = (f"{BASE}/{path.lstrip('/')}", api_version, view)
-                    break
-            else:
-                raise DREApiError(
-                    f"No action matching {prefixes} in the DRE screen JS "
-                    f"({len(declared)} actions declared: {sorted(declared)}). DRE "
-                    f"renamed it — add the new prefix to _ACTIONS[{logical!r}] and "
-                    f"update docs/pt-dre-api.md."
-                )
+            url, api_version = self._resolve_endpoint(
+                logical, combined, "the DRE screen JS", prefixes
+            )
+            endpoints[logical] = (url, api_version, view)
         self._endpoints = endpoints
         logger.info(
             "DRE session ready: %d actions, module %s", len(self._endpoints), self._module_version
+        )
+
+    def _resolve_endpoint(
+        self, name: str, js_text: str, js_url: str, prefixes: tuple[str, ...]
+    ) -> tuple[str, str]:
+        """Find one screen action's URL and apiVersion inside the screen JS.
+
+        Matching on a prefix absorbs the suffixes DRE adds across deploys
+        (``DataActionGetDRByDataCalendario`` became
+        ``…AndCheckUserLog`` in May 2026). A wholesale rename raises, listing every
+        action the JS *does* declare, so adding the new prefix is a one-line change.
+        """
+        actions = {
+            m.group(1): (m.group(2), m.group(3)) for m in _CALL_DATA_ACTION.finditer(js_text)
+        }
+        for prefix in prefixes:
+            for action_name, (path, api_version) in actions.items():
+                if action_name.startswith(prefix):
+                    return f"{BASE}/{path.lstrip('/')}", api_version
+        raise DREApiError(
+            f"No action matching {prefixes} in {js_url} ({len(js_text)} bytes, "
+            f"{len(actions)} actions found: {sorted(actions)}). DRE renamed the "
+            f"action — add the new prefix to _ACTIONS[{name!r}] and update "
+            f"docs/pt-dre-api.md."
         )
 
     # ------------------------------------------------------------------ calls
@@ -202,7 +210,7 @@ class DREApi(HttpClient):
             "screenData": {"variables": variables},
             "clientVariables": {},
         }
-        response = self._request("POST", url, json=body, headers={"X-CSRFToken": self._csrf})
+        response = self._request("POST", url, json=body, headers={"X-CSRFToken": self._csrf_token})
         try:
             payload = response.json()
         except ValueError as exc:
@@ -403,6 +411,8 @@ class DREApi(HttpClient):
                     "Id": (h.get("_source") or {}).get("dbId"),
                     "Numero": (h.get("_source") or {}).get("numero", ""),
                     "DataPublicacao": (h.get("_source") or {}).get("dataPublicacao", ""),
+                    # Names the série; the sitemap never does.
+                    "conteudoTitle": (h.get("_source") or {}).get("conteudoTitle", ""),
                 }
                 for h in hits
             ]
