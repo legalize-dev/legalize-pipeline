@@ -1072,6 +1072,123 @@ because D1 rebuilds the repository anyway, but the web app's existing deep links
 
 ---
 
+## §12b The title problem — Portuguese laws have no title
+
+A Portuguese diploma is cited by a number: *Decreto-Lei n.º 47344*. There is no
+descriptive title in the citation the way there is in Spain (*Ley Orgánica 10/1995,
+del Código Penal*). The descriptive text lives in two other fields, both of which we
+currently ignore.
+
+### 12b.1 What the source gives us
+
+| Field | Coverage | Length (chars) | What it is |
+|---|---|---|---|
+| `DiplomaLegis.Sumario` | **99.1 %** (5,478 / 5,528) | mean 152, median 136 | the official summary sentence |
+| `DiplomaFrag.Designacao` | **99.1 %** (5,480 / 5,528) | mean 122, median 103, max 497 | the diploma's designation — sometimes the popular name, usually a descriptive sentence |
+| `DiplomaFrag.Nota` | 164 diplomas | up to ~500 | document-level legal note ("Revogado, a partir de 05.08.2022, com efeitos…") |
+
+They are related but not the same. For the Código Civil:
+
+```
+Numero:      47344
+Designacao:  "Código Civil - CC"
+Sumario:     "Aprova o Código Civil e regula a sua aplicação — Revoga, a partir da
+              data da entrada em vigor do novo Código Civil, toda a legislação civil
+              relativa às matérias que o mesmo abrange"
+```
+
+`Designacao` is *usually* a sentence, not a short name — "Aprova o regime jurídico da
+transmissão e execução de sentenças em matéria penal…" (400 chars) — but when DRE has a
+popular name, that is where it lives.
+
+(Measured length caps: the catalogue dump truncated `Sumario` at 300 chars, so the true
+maximum is unknown; `Designacao` was stored whole.)
+
+### 12b.2 Why this is worse than it looks: Portuguese law is unsearchable today
+
+`laws.search_vector` in the web database is built from exactly two columns:
+
+```sql
+setweight(to_tsvector('simple', immutable_unaccent(coalesce(title, ''))),       'A') ||
+setweight(to_tsvector('simple', immutable_unaccent(coalesce(short_title, ''))), 'B')
+```
+
+For Portugal, `title` is `"Decreto-Lei n.º 47344"` and `short_title` is **NULL for every
+law** (the core renderer never emits `short_title`; the countries that have it — at, ch,
+ee, lu — add it as an `extra` key, and PT does not). `extra` is **not** in the search
+vector.
+
+So the entire Portuguese corpus is searchable **only by its number**. Nobody can find
+the Código Civil by typing "código civil", or the child-marriage reform by typing
+"casamento de menores". This is not a rendering nicety — it is the reason Portugal is
+effectively invisible on the site's search.
+
+Compare the house style, from the site's own API docs:
+
+```json
+{ "title": "Ley Orgánica 10/1995, del Código Penal", "short_title": "Código Penal" }
+```
+
+### 12b.3 The mapping
+
+| Target | Source | Note |
+|---|---|---|
+| `title` | `"{Tipo} n.º {Numero} — {Designacao}"`, `Designacao` cut at a word boundary at ~120 chars | matches the ES house style; searchable at **weight A**; keeps the citation as the leading token |
+| `short_title` | `Designacao` cut at a word boundary at ~80 chars | searchable at **weight B**, and it is what `committer/message.py` puts in the commit subject — so it must stay short (today PT feeds it `summary[:120]`, which is why subjects average 145.8 chars and truncate mid-word) |
+| `summary` (frontmatter) | full `Sumario` | capped at 500 per the guide |
+| `extra.designation` | full `Designacao` | only when it differs from `short_title` after truncation |
+| `extra.note` | `DiplomaFrag.Nota` | 164 diplomas; real legal notes, dropped today |
+| **body** | `Sumario`, rendered right under the H1 | see below |
+
+### 12b.4 Rendering the summary in the body
+
+The reader of the `.md` on GitHub sees only `# Decreto-Lei n.º 47344` and then legal
+text. The summary belongs on the page.
+
+**Do it in the PT parser, not in the engine.** `render_norm_at_date` emits
+frontmatter + `# {title}` + blocks, and `NormMetadata.summary` is never rendered for
+any country. Adding a summary line to the generic renderer is a cross-country output
+change and `CLAUDE.md` says that requires regenerating every country repo. Instead the
+PT text parser emits the summary as the **first `Block`**, with a single `Version` dated
+at the diploma's publication date so it survives every point-in-time render:
+
+```python
+Block(
+    id="sumario",
+    block_type="sumario",
+    title="Sumário",
+    versions=(Version(
+        norm_id=..., publication_date=pub_date, effective_date=pub_date,
+        paragraphs=(Paragraph(css_class="cita", text=sumario),),
+    ),),
+)
+```
+
+`cita` is already in `_SIMPLE_CSS_MAP` and renders as `> {text}`, so no renderer change
+is needed. Result:
+
+```markdown
+# Decreto-Lei n.º 47344 — Código Civil - CC
+
+> Aprova o Código Civil e regula a sua aplicação — Revoga, a partir da data da entrada
+> em vigor do novo Código Civil, toda a legislação civil relativa às matérias que o
+> mesmo abrange
+
+##### Artigo 1.º — (Aprovação do Código Civil)
+…
+```
+
+Because the summary is a Block with one early version, it is identical in every commit
+and therefore adds no noise to any reform diff.
+
+**Open sub-decision:** whether `title` carries the descriptive part (ES house style, and
+what makes weight-A search work) or stays the bare citation with the descriptive text
+only in `short_title`. Recommendation: carry it, because weight A is where search
+actually bites. Either way this is a permanent choice — it is the H1, the DB `title`,
+and it cannot be changed after the bootstrap without regenerating everything.
+
+---
+
 ## §13 Before / after
 
 ### 13.1 The corpus
