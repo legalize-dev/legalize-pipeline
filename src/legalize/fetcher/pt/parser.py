@@ -14,11 +14,13 @@ heading; the text pattern says which level.
 
 from __future__ import annotations
 
+import html
 import json
 import logging
 import re
 from datetime import date, datetime
 from typing import Any
+from urllib.parse import urljoin
 
 from lxml import html as lxml_html
 
@@ -170,8 +172,12 @@ def _inline(el: Any, pdf_url: str = "") -> str:
             href = (node.get("href") or "").strip()
             label = " ".join(node.itertext()).strip()
             if label:
-                if href.startswith("/"):
-                    href = DRE_BASE + href
+                # DRE writes site-relative hrefs both ways: "/dr/detalhe/…" and the
+                # bare "eurlex.asp?ano=2009&id=309L0049" its headings use, which
+                # 301s to the EUR-Lex CELEX record. Either is a dead link in a
+                # Markdown file, so both get resolved against the site root.
+                if href and not href.lower().startswith(("http:", "https:", "mailto:")):
+                    href = urljoin(DRE_BASE + "/", href)
                 parts.append(f"[{label}]({href})" if href else label)
             if node.tail:
                 parts.append(node.tail)
@@ -202,6 +208,19 @@ def _inline(el: Any, pdf_url: str = "") -> str:
     # here desyncs the parallel css_classes list on the way back in.
     text = re.sub(r"(?:[ \t]*\n){2,}", "  \n", text).strip()
     return _link_ver_documento(text, pdf_url)
+
+
+def _rich_text(value: str, pdf_url: str = "") -> str:
+    """Flatten a DRE field that may carry inline markup.
+
+    ``Epigrafe`` and ``Tituo`` are documented as plain strings but hold anchors for
+    every EU act a heading cites — "Transposição da Directiva n.º <a href=…>2009/49/
+    CE</a>" reached the Markdown as literal tag soup. Same path as the body text, so
+    a link in a heading becomes a link and an entity becomes its character.
+    """
+    if not value:
+        return ""
+    return _inline(lxml_html.fromstring(f"<div>{clean(value)}</div>", parser=_HTML_PARSER), pdf_url)
 
 
 def _link_ver_documento(text: str, pdf_url: str) -> str:
@@ -384,10 +403,8 @@ def _fragment_paragraphs(entry: dict, pdf_url: str) -> tuple[str, list[Paragraph
 
     # Tituo already carries the type word plus Identificacao, and only the bare
     # label when OmitTipo is set. Take it verbatim.
-    heading = " ".join(
-        (version.get("Tituo") or (entry.get("frag") or {}).get("Name") or "").split()
-    )
-    epigrafe = " ".join((version.get("Epigrafe") or "").split())
+    heading = _rich_text(version.get("Tituo") or (entry.get("frag") or {}).get("Name") or "")
+    epigrafe = _rich_text(version.get("Epigrafe") or "")
     if heading and epigrafe:
         heading = f"{heading} — {epigrafe}"
 
@@ -400,8 +417,11 @@ def _fragment_paragraphs(entry: dict, pdf_url: str) -> tuple[str, list[Paragraph
         if "<" in body:
             paragraphs.extend(_parse_published_html(body, pdf_url))
         else:
+            # No tag in the body, but DRE still escapes its angle brackets there:
+            # "lotes &lt;15 t" shipped verbatim. Unescape here and not before the
+            # branch above, or "&lt;15 t" would look like a tag to the HTML parser.
             for line in clean(body).split("\n"):
-                line = collapse_inline_whitespace(line).strip()
+                line = collapse_inline_whitespace(html.unescape(line)).strip()
                 if line:
                     paragraphs.append(
                         Paragraph(

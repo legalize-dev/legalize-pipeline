@@ -21,6 +21,7 @@ from legalize.fetcher.pt.parser import (
     FRAGMENT_TYPES,
     DREMetadataParser,
     DRETextParser,
+    _fragment_paragraphs,
     _parse_published_html,
 )
 from legalize.models import NormStatus
@@ -113,6 +114,25 @@ class TestIdentifier:
     def test_filesystem_safe(self):
         built = build_identifier("", "1/94-1ªsecção", "lei", 1994, "lei")
         assert not set(built) & set(':/\\*?"<>| ')
+
+    def test_one_prefix_per_type_whatever_the_row_says(self):
+        """DRE files 13,211 despachos normativos under three different acronyms —
+        "DN" on its legacy catalogue rows, "despnorm" on the modern ones and empty
+        on 559 — which split one type across three identifier prefixes."""
+        modern = build_identifier(
+            "https://data.dre.pt/eli/despnorm/7/1980/p/dre/pt/html",
+            "7/80",
+            "despacho-normativo",
+            1980,
+            "despnorm",
+        )
+        legacy = build_identifier("", "7/80", "despacho-normativo", 1980, "DN", "30993000")
+        blank = build_identifier("", "7/80", "despacho-normativo", 1980, "", "30993001")
+        assert modern == legacy == blank == "DRE-DESPNORM-7-1980"
+
+    def test_unknown_type_still_falls_back(self):
+        """A type DRE has not published an ELI for must still get an identifier."""
+        assert build_identifier("", "3/2020", "tipo-novo", 2020, "tn") == "DRE-TN-3-2020"
 
 
 class TestJurisdiction:
@@ -245,11 +265,71 @@ class TestPublishedHtml:
         assert "\x97" not in text
         assert "&ordm;" not in text and "&amp;" not in text
 
+    def test_relative_href_is_resolved_against_the_site_root(self):
+        """DRE links EU acts with a bare "eurlex.asp?..." that only resolves inside
+        the site; in a Markdown file it is a dead link."""
+        html = "<p>Ver a <a href='eurlex.asp?ano=2009&id=309L0049'>Directiva</a>.</p>"
+        text = _parse_published_html(html)[0].text
+        assert "(https://diariodarepublica.pt/eurlex.asp?ano=2009&id=309L0049)" in text
+
     def test_no_paragraph_contains_a_blank_line(self):
         """storage.py joins paragraphs with "\\n\\n" and splits on it, so a blank
         line inside one desyncs the parallel css_classes list."""
         html = "<p>Uma<br/><br/>linha</p><table><tr><td>a</td><td>b</td></tr></table>"
         assert all("\n\n" not in p.text for p in _parse_published_html(html))
+
+
+class TestFragment:
+    """Both defects were found in the corpus itself: 34 diplomas carried tag soup in
+    a heading and 16 blocks of Decreto-Lei 110/2001 shipped "&lt;" as four
+    characters."""
+
+    def test_heading_markup_is_flattened(self):
+        """``Epigrafe`` holds an anchor for every EU act a heading cites, and it was
+        going into the Markdown as literal tag soup."""
+        entry = {
+            "version": {
+                "TipoFragmentoId": 11,
+                "Tituo": "Artigo 13.º",
+                "Epigrafe": (
+                    'Transposição da Directiva n.º <a href="eurlex.asp?ano=2009&'
+                    'id=309L0049" title="Link">2009/49/CE</a>, de 18 de Junho'
+                ),
+                "Texto": "",
+            }
+        }
+        heading, paragraphs = _fragment_paragraphs(entry, "")
+        assert "<a" not in heading and "href" not in heading
+        assert "[2009/49/CE](https://diariodarepublica.pt/eurlex.asp?" in heading
+        assert paragraphs[0].text == heading
+
+    def test_escaped_angle_brackets_in_plain_body(self):
+        """No tag in the body, so it takes the plain-text branch — where DRE still
+        escapes its angle brackets."""
+        entry = {
+            "version": {
+                "TipoFragmentoId": 16,
+                "Tituo": "",
+                "Epigrafe": "",
+                "Texto": "Para os lotes &lt;15 t aplica-se o n.º 5.",
+            }
+        }
+        _, paragraphs = _fragment_paragraphs(entry, "")
+        assert paragraphs[0].text == "Para os lotes <15 t aplica-se o n.º 5."
+
+    def test_entity_body_is_not_mistaken_for_markup(self):
+        """Unescaping before the branch would hand "&lt;15 t …" to the HTML parser,
+        which would swallow it as a tag."""
+        entry = {
+            "version": {
+                "TipoFragmentoId": 16,
+                "Tituo": "",
+                "Epigrafe": "",
+                "Texto": "a) C1.2 &lt; 15 % - 1 ponto;",
+            }
+        }
+        _, paragraphs = _fragment_paragraphs(entry, "")
+        assert paragraphs[0].text == "a) C1.2 < 15 % - 1 ponto;"
 
 
 class TestSuvestine:

@@ -30,6 +30,61 @@ JURISDICTIONS = {"p": None, "a": "pt-20", "m": "pt-30"}
 
 _UNSAFE = re.compile(r"[^A-Z0-9]+")
 
+# DRE URL slug -> the ELI type token, the official short form of the same type.
+#
+# The record's own ``TipoDiplomaAcronimo`` cannot carry this: it is empty on 559 of
+# 13,211 despachos normativos and disagrees with itself on the rest ("DN" on the
+# legacy catalogue rows, "despnorm" on the modern ones), which split one type across
+# three prefixes — DRE-DN-, DRE-DESPNORM- and DRE-DESPACHO-NORMATIVO-. Keyed on the
+# slug instead, every diploma of a type gets one prefix whatever the row looks like.
+#
+# Derived from every ELI in the corpus (40 types, no type ever maps to two tokens);
+# "regimento" is the one entry read off TipoDiplomaAcronimo, DRE publishing no ELI
+# for it, and it matches its own sub-types rgtassrep / rgtconsest.
+TYPE_TOKENS = {
+    "acordao-supremo-tribunal-justica": "acstj",
+    "acordao-tribunal-constitucional": "actconst",
+    "acordao-tribunal-contas": "actcont",
+    "assento": "asst",
+    "aviso": "av",
+    "aviso-banco-portugal": "avbdp",
+    "declaracao": "decl",
+    "declaracao-rectificacao": "declrectif",
+    "declaracao-retificacao": "declretif",
+    "decreto": "dec",
+    "decreto-governo": "decgov",
+    "decreto-legislativo-regional": "declegreg",
+    "decreto-lei": "dec-lei",
+    "decreto-ministro-republica": "decminrep",
+    "decreto-ministro-republica-para-regiao-autonoma-acores": "decminrepraa",
+    "decreto-ministro-republica-para-regiao-autonoma-madeira": "decminrepram",
+    "decreto-presidente-republica": "decpresrep",
+    "decreto-regional": "decreg",
+    "decreto-regulamentar": "decregul",
+    "decreto-regulamentar-regional": "decregulreg",
+    "decreto-representante-republica-para-regiao-autonoma-acores": "decrepraa",
+    "decreto-representante-republica-para-regiao-autonoma-madeira": "decrepram",
+    "despacho": "desp",
+    "despacho-normativo": "despnorm",
+    "lei": "lei",
+    "lei-constitucional": "leiconst",
+    "lei-organica": "leiorg",
+    "mapa-oficial": "mapofic",
+    "portaria": "port",
+    "regimento": "rgt",
+    "regimento-assembleia-republica": "rgtassrep",
+    "regimento-conselho-estado": "rgtconsest",
+    "regulamento": "regul",
+    "regulamento-cmvm": "regul-cmvm",
+    "resolucao": "resol",
+    "resolucao-assembleia-legislativa-regiao-autonoma-acores": "resolalraa",
+    "resolucao-assembleia-legislativa-regiao-autonoma-madeira": "resolalram",
+    "resolucao-assembleia-legislativa-regional": "resolalr",
+    "resolucao-assembleia-regional": "resolassreg",
+    "resolucao-assembleia-republica": "resolassrep",
+    "resolucao-conselho-ministros": "resolconsmin",
+}
+
 
 def _slug(value: str) -> str:
     """Uppercase, de-accent and make filesystem-safe, without deleting characters.
@@ -100,7 +155,7 @@ def build_identifier(
     (``Decreto-Lei n.º 47344``) still gets one.
 
         dec-lei  + "47344"     + 1966 -> DRE-DEC-LEI-47344-1966
-        (no ELI, acronimo "port")     -> DRE-PORT-…  (pre-1990 diplomas)
+        (no ELI, slug "portaria")     -> DRE-PORT-…  (pre-1990 diplomas)
         lei      + "29/2026"          -> DRE-LEI-29-2026
         lei      + "82-D/2014"        -> DRE-LEI-82-D-2014
         port     + "216/2024/1"       -> DRE-PORT-216-2024-1
@@ -108,10 +163,13 @@ def build_identifier(
     """
     parsed = parse_eli(eli)
     # The as-published ELI only exists from about 1990 (0/16 diplomas before, 42/42
-    # after), so it cannot be the primary key for the ~104,000 older ones.
-    # TipoDiplomaAcronimo is filled 100 % of the time and carries the *same* token,
-    # which keeps one identifier shape across the whole corpus.
-    type_token = _slug(parsed["type"]) if parsed else (_slug(acronimo) or _slug(tipo_slug))
+    # after), so it cannot be the primary key for the ~104,000 older ones. The type
+    # is therefore read off the DRE slug, which every diploma of a type shares by
+    # construction, and only then off the record's own fields — TipoDiplomaAcronimo
+    # is neither always filled nor self-consistent (see TYPE_TOKENS).
+    type_token = _slug(
+        TYPE_TOKENS.get(tipo_slug) or (parsed["type"] if parsed else "") or acronimo or tipo_slug
+    )
     components = [c for c in (numero or "").split("/") if c.strip()]
 
     if parsed:
