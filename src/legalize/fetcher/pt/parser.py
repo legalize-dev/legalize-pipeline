@@ -184,6 +184,10 @@ def _inline(el: Any, pdf_url: str = "") -> str:
 
     walk(el)
     text = collapse_inline_whitespace(clean("".join(parts)))
+    # Consecutive <br> would leave a blank line inside one paragraph, and
+    # storage.py joins paragraphs with "\n\n" and splits on it — a blank line
+    # here desyncs the parallel css_classes list on the way back in.
+    text = re.sub(r"(?:[ \t]*\n){2,}", "  \n", text).strip()
     return _link_ver_documento(text, pdf_url)
 
 
