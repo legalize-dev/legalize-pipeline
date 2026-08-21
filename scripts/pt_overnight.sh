@@ -30,6 +30,13 @@ done
 say "final coverage"
 python3 scripts/pt_fetch_missing.py --report
 
+# The sampled thesaurus stalls at the long tail — it labelled 4,724 of the 11,258
+# descriptor ids the corpus uses. This goes after the ones it missed, and has to
+# run here, once the cache is complete, or the ids from the last diplomas fetched
+# would have no label baked into the reparse below.
+say "descriptor gap"
+python3 scripts/pt_thesaurus_gap.py || say "thesaurus gap exited non-zero, continuing"
+
 say "reparse + rebuild"
 bash scripts/pt_reparse_and_bootstrap.sh
 say "done (nothing pushed)"
