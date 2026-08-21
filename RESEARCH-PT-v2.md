@@ -768,35 +768,47 @@ fragments (6.7 MB). There is no per-fragment fetch. So the cost is
 | Version dates | 71 | (to be measured across the catalogue) |
 | Requests for full history | 71 | ~2 – 10 |
 
-**N measured.** The timeline endpoint was run across a 617-diploma slice of the
-catalogue (11 %, 0 errors) — `scripts/pt_spike_timeline.py` in a loop:
+**N measured — across the entire catalogue, not a sample.** The timeline endpoint was
+run against all **5,528** resolvable diplomas, **0 errors**
+(`scripts/pt_spike_timeline.py` in a loop, 4 workers at 0.6 s):
 
 ```
-distinct effective dates per diploma: mean 5.62 · median 3 · max 71
- 1 date  120 │ 2 dates 100 │ 3 dates  89 │ 4 dates  68 │ 5 dates  54
- 6 dates  45 │ 7 dates  23 │ 8 dates  20 │ 9 dates  18 │ 10 dates 17
- …  20+ dates 22
-amending diplomas per law: mean 6.8, max 102
-modifications per law:     mean 49.1, max 1,467
-100 % of consolidated diplomas have at least one dated version
+amendment dates per diploma (excluding the 1900-01-01 "original" pseudo-date):
+  mean 2.36 · median 1 · max 104
+   0 dates   928 (16.8 %)   ██████████
+   1 date  1,988 (36.0 %)   ██████████████████████
+   2       1,114            ████████████
+   3         541            ██████
+   4         331            ███
+   5         167
+   6-14      566
+  15+         60
+amending diplomas per law: mean 3.8, max 127     total 21,155
+modifications per law:     mean 16.3, max 1,467  total 89,917
 ```
 
-Most-amended in the sample: Código Civil (71 dates / 102 acts), DL 486/99 (59),
-DL 398/98 (52), DL 102/2008 (52), Código das Sociedades Comerciais (49),
-Lei 150/99 (49).
+Most-amended: **DL 215/89 (105 dates / 127 amending acts)**, Código Civil DL 47344
+(71 / 102), DL 298/92 (61 / 66), DL 48/95 (60 / 70), DL 486/99 (59 / 56).
 
-Extrapolated to the full 5,528 resolvable diplomas:
+The real totals, therefore:
 
 | | |
 |---|---|
-| Header + timeline calls | ~11,000 |
-| Point-in-time snapshots | **~31,000** |
-| Total requests | **~42,000** |
-| Wall clock at 4 workers / 0.6 s (the rate the catalogue dump sustained with 0 errors) | ~2–3 h |
-| **Reform commits produced** | **~31,000, against 0 today** |
+| Header + timeline calls (2 per diploma) | 11,056 |
+| Point-in-time snapshots (one per distinct date) | **15,422** |
+| **Total requests for the versioned corpus** | **26,478** |
+| Wall clock at 4 workers / 0.6 s (the rate the catalogue and timeline dumps both sustained with 0 errors) | ~2 h |
+| `[bootstrap]` commits | 5,528 |
+| **`[reform]` commits produced** | **13,030, against 0 today** |
 
-Bandwidth is dominated by a few dozen large codes; the median diploma is 3 snapshots
-of a few hundred KB.
+> An earlier estimate in this document said ~31,000 reform commits, extrapolated from
+> the first 617 diplomas processed. That slice was not random — it ran in sitemap order
+> and happened to be amendment-heavy. The full sweep halves it. 13,030 is the measured
+> number.
+
+16.8 % of consolidated diplomas have never been amended and will legitimately have a
+single `[bootstrap]` commit; the median consolidated diploma has exactly one amendment.
+Bandwidth is dominated by a few dozen large codes.
 
 ---
 
@@ -1121,8 +1133,8 @@ in the README.
 
 **D1 — Full re-fetch.** Every diploma is re-downloaded from the official DRE; the
 tretas.org dump is retired entirely. That means ~110,000 as-published fetches
-(preferring `TextoFormatado`) **plus** the ~42,000 consolidated calls of §3.5 —
-roughly 150,000 requests, ~15–18 h at the rate already sustained without errors.
+(preferring `TextoFormatado`) **plus** the 26,478 consolidated calls of §3.5 —
+roughly 136,000 requests, ~15–18 h at the rate already sustained without errors.
 Rationale: any smaller scope leaves the `TEXTO :` artefact and the duplicated titles
 in ~104,000 files, and leaves their tables, links and images unrecoverable, since the
 tretas text simply does not contain them.
@@ -1285,14 +1297,14 @@ and it cannot be changed after the bootstrap without regenerating everything.
 |---|---|---|
 | Source | `dre.tretas.org` SQLite mirror | `diariodarepublica.pt` + `data.dre.pt` (official) |
 | Laws | 109,929 | ~110,000 + the ~500 consolidated diplomas missing today (RCM, Lei Orgânica, Decreto do PR, Despacho Normativo, Acórdãos com força obrigatória geral, Declarações de Retificação) |
-| Commits | 109,932, of which **0 are reforms** | ~110,000 bootstrap + **~31,000 reform commits** |
-| Laws with version history | **0** | **5,528** (every consolidated diploma), mean 5.6 versions, max 71 |
+| Commits | 109,932, of which **0 are reforms** | ~110,000 bootstrap + **13,030 reform commits** |
+| Laws with version history | **0** | **4,600** of the 5,528 consolidated diplomas actually have amendments (the other 928 have never been amended); mean 2.4 amendment dates, max 104 |
 | Commit dates | 99.3 % are `1970-01-02` (epoch clamp) | the date each version entered into force (`DataEntradaVigor`) |
 | `Source-Id` | `PLACEHOLDER` in 99.3 % of commits | the amending diploma's id |
 | Commit language | Spanish, in a Portuguese repo | Portuguese |
 | Trailers | two incompatible schemas coexisting | one |
 | Author | a personal Gmail address on 109,347 commits | the Legalize bot |
-| Rows in the web `reforms` table | **0** | ~31,000 |
+| Rows in the web `reforms` table | **0** | 13,030 |
 | `article_count` in the DB | 0 for every law | real (needs the one-line `Artigo` pattern fix) |
 
 ### 13.2 One file
