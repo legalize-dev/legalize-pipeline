@@ -924,9 +924,11 @@ Portugal maps onto it cleanly:
 2. One `DataActionGetData` per date → one snapshot.
 3. Merge fragments by `ConsolidacaoFragmento.Id` → one `Block` per article, one
    `Version` per snapshot.
-4. `Version.publication_date` = the **effective** date. (`Version.effective_date` is
-   written to JSON but never read back — `publication_date` is the field the renderer
-   and committer use.)
+4. `Version.publication_date` = the **effective** date. This is not a preference, it is
+   forced: `storage.py::save_structured_json` writes only `"date": version.publication_date`,
+   so **`Version.effective_date` never reaches the JSON cache at all** and a reprocess
+   cannot recover it. `get_block_at_date` and `extract_reforms` read `publication_date`
+   exclusively. Put `DataEntradaVigor` in `publication_date` or lose it.
 5. `Version.norm_id` / `Reform.norm_id` = a stable unique key per reform, e.g.
    `{diploma_frag_id}@{yyyy-mm-dd}:{amending_diploma_legis_id}` — it becomes the
    `Source-Id` dedupe key and must not contain timestamps or randomness.
