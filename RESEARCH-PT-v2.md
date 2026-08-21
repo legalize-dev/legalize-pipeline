@@ -746,8 +746,8 @@ handles all of it:
 Today: `DRE-{TYPECODE}-{number}`, with the two-digit/four-digit year inconsistency of
 §1.7 and a hand-maintained `TYPE_CODE_MAP` of 19 entries against DRE's 33+ ELI types.
 
-Proposal: derive from the official ELI, which DRE already publishes for 98.3 % of the
-consolidated catalogue and for every as-published diploma.
+**Decided (D2, §12): derive from the official ELI**, which DRE already publishes for
+98.3 % of the consolidated catalogue and for every as-published diploma.
 
 ```
 https://data.dre.pt/eli/dec-lei/47344/1966/…  →  DRE-DEC-LEI-47344-1966
@@ -761,9 +761,9 @@ hand-maintained map), filesystem-safe, and reversible to the ELI permalink. Dipl
 without an ELI (95 of 5,561 in the consolidated set) fall back to
 `DRE-{tipo-slug}-{numero}-{ano}` using the sitemap's own `tipo` slug.
 
-**This is a decision that must be made before the bootstrap** — the filename is
-permanent (memory: `feedback_format`). It is written here as a proposal, not a
-settled fact; see §12.
+The filename is permanent (memory: `feedback_format`), so this was settled before any
+code was written — see §12 D2. Consequence to plan for: every existing deep link to
+`/pt/DRE-DL-…` breaks, so the cutover must ship an old-id → new-id redirect map.
 
 ### 6.2 Jurisdictions
 
@@ -836,7 +836,7 @@ Portugal maps onto it cleanly:
 | Set | Size | Source | History |
 |---|---|---|---|
 | Consolidated diplomas | 5,561 | Surface A | Full, one commit per amendment |
-| Everything else currently in the repo | ~104,000 | Surface B (re-fetched from the official DRE) | Single `[bootstrap]` commit — the diploma as published never changes |
+| Everything else currently in the repo | ~104,000 | Surface B, **re-fetched from the official DRE** (D1) using `TextoFormatado` | Single `[bootstrap]` commit — the diploma as published never changes |
 | Categories missing today (§1.6) | ~500 consolidated + their as-published siblings | A + B | — |
 
 An as-published diploma genuinely has one version: it is the printed text. The
@@ -913,24 +913,48 @@ in the README.
 
 ---
 
-## §12 Open questions — to settle before writing code
+## §12 Decisions and remaining questions
 
-1. **Identifier scheme** (§6.1): ELI-based `DRE-DEC-LEI-47344-1966`, or keep the
-   current `DRE-DL-…` shape with the year normalised to four digits? The first is
-   better; the second is a smaller diff for the web app's existing links. **User call.**
-2. **Tables lost in older consolidations** (§3.4): render the flattened text as-is, or
-   enrich from the as-published HTML / PDF where a table is detectable? Enrichment is
-   real work and risks mixing two texts in one file.
-3. **`AlteracoesList` and `Nota`** (§4.3): render them into the Markdown (as Spain does
-   with `nota_pie` → `> <small>…</small>`), or keep them in `extra` only?
-4. **Descriptor labels** (§2.4): `eli:is_about` gives numeric subject IDs that do not
-   dereference. Is there a lookup (the DRE search screen exposes a `DescritorList`)?
-   Without it, `subjects` would hold opaque IDs.
-5. **Scope of the re-fetch**: rebuild all ~110k as-published diplomas from the official
-   DRE (clean text, full metadata, ~110k requests, ~15 h at 2 req/s), or only the
-   consolidated 5,561 plus the missing categories, leaving the rest on tretas-sourced
-   text? Half-measures leave `TEXTO :` in 81 % of the repo. **Recommended: full
-   re-fetch.**
+### Settled (user, 2026-08-21)
+
+**D1 — Full re-fetch.** Every diploma is re-downloaded from the official DRE; the
+tretas.org dump is retired entirely. That means ~110,000 as-published fetches
+(preferring `TextoFormatado`) **plus** the ~42,000 consolidated calls of §3.5 —
+roughly 150,000 requests, ~15–18 h at the rate already sustained without errors.
+Rationale: any smaller scope leaves the `TEXTO :` artefact and the duplicated titles
+in ~104,000 files, and leaves their tables, links and images unrecoverable, since the
+tretas text simply does not contain them.
+
+**D2 — ELI-based identifiers.** `DRE-{ELI_TYPE}-{NUMBER}-{YEAR}`:
+
+```
+dec-lei/47344/1966   →  DRE-DEC-LEI-47344-1966
+lei/82-d/2014        →  DRE-LEI-82-D-2014
+port/324/2015        →  DRE-PORT-324-2015
+declegreg/54/2006    →  DRE-DECLEGREG-54-2006   (in pt-20/ or pt-30/)
+```
+
+Official, four-digit year always, one token per ELI type (33 of them, no hand-kept
+map), reversible to the `data.dre.pt` permalink. Diplomas with no ELI (95 of 5,561 in
+the consolidated set) fall back to the sitemap's own `tipo` slug:
+`DRE-{TIPO-SLUG}-{NUMERO}-{ANO}`. Every filename in the repo changes — which is fine,
+because D1 rebuilds the repository anyway, but the web app's existing deep links to
+`/pt/DRE-DL-…` will 404 and need a redirect map generated at cutover.
+
+### Still open
+
+1. **Tables lost in older consolidations** (§3.4): DRE itself flattened them into text
+   with dot leaders in pre-~2015 consolidations. Render as-is, or enrich from the
+   as-published HTML where a `<table>` exists for the same article? Enrichment risks
+   mixing two texts in one file. Default for now: render as-is and flag it in `extra`.
+2. **`AlteracoesList` and `Nota`** (§4.3): render into the Markdown (as Spain does with
+   `nota_pie` → `> <small>…</small>`), or keep in `extra` only? The `Nota` entries are
+   real legal annotation (Constitutional Court rulings) and argue for rendering.
+3. **Descriptor labels** (§2.4): `eli:is_about` yields numeric subject IDs that do not
+   dereference. The DRE search screen exposes a `DescritorList` — needs a spike. Without
+   a lookup, `subjects` would hold opaque IDs, which is worse than leaving it empty.
+4. **Redirect map** for the identifier change (D2) — generated from old id → new id at
+   cutover, applied in `legalize-web`.
 
 ---
 
