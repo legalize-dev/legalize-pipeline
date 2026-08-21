@@ -270,7 +270,23 @@ disposições transitórias/finais, the signature block, or the preamble formula
 all fall through to `parrafo`.
 
 The Código Civil has Livro > Título > Capítulo > Secção > Subsecção > Divisão >
-Subdivisão — seven levels, rendered today as three.
+Subdivisão — seven levels, rendered today as three. Corpus-wide the result is that
+**50,956 files use `#####` (H5) for articles while only 1,076 use `##` at all**, and
+**40.1 % of files jump straight from H1 to H5**.
+
+**And the article regex itself misses the commonest forms.** Counting files where an
+article marker was left as plain body text:
+
+| Marker left unrecognised | Files | % |
+|---|---|---|
+| `Art. N.º` (the standard abbreviation) | **20,332** | **18.5 %** |
+| `Artigo único` | 6,026 | 5.5 % |
+| `Artigo N.º` (missed for other reasons) | 1,404 | 1.3 % |
+| `CAPÍTULO` | 627 | 0.6 % |
+
+`pt/DRE-D-1-74.md` shows the damage inside one file: `Artigo 1.º` became a heading,
+`Art. 2.º` … `Art. 5.º` did not. The file ends up with exactly one heading. The largest
+unstructured file, `pt/DRE-DL-45935.md`, is **964 KB with zero internal headings**.
 
 ### 1.6 Scope gaps — whole categories of law are absent
 
@@ -297,6 +313,29 @@ the SQL filter is an exact `IN (...)` match. Resoluções do Conselho de Ministr
 the government's principal policy instrument — 329 of them are consolidated by DRE
 and none is in the repo.
 
+A sequence-gap analysis over the whole corpus (per code and year, 1976–2026,
+`missing = max(number) − count`) shows where coverage really breaks:
+
+| Code | Implied Σmax | Present | Missing | Gap |
+|---|---:|---:|---:|---:|
+| DR — Decreto Regulamentar | 1,858 | 1,858 | 0 | **0.0 %** |
+| L — Lei | 3,823 | 3,817 | 6 | 0.2 % |
+| P — Portaria | 46,319 | 46,248 | 71 | 0.2 % |
+| DL — Decreto-Lei | 16,650 | 16,433 | 217 | 1.3 % |
+| D — Decreto (year-numbered) | 4,134 | 2,888 | 1,246 | **30.1 %** |
+| DRR — non-regional | 175 | 17 | 158 | **90.3 %** |
+| DR-A — Açores | 52 | 2 | 50 | **96.2 %** |
+| **R — Resolução** | **5,419** | **111** | **5,308** | **98.0 %** |
+
+The headline acts are essentially complete. **Resoluções are effectively absent** —
+about 5,300 missing, and literally **zero files for 2015–2025** (the 10 that exist for
+2026 came from the daily fetcher, not the bootstrap).
+
+Two more coverage anomalies from the same pass: the corpus has **nothing before 1960**
+(while `README.md` claims coverage "desde 1911"), and the volume **collapses between
+2010 and 2011** (1,712 → 687 laws/year) and never recovers, leaving the modern half of
+the corpus about three times thinner than the 1990s.
+
 ### 1.7 Identifiers are inconsistent
 
 `_make_identifier` builds `DRE-{TYPECODE}-{number with / → -}`.
@@ -306,13 +345,34 @@ and none is in the repo.
 | ids ending in a 2-digit year (`DRE-D-1-74`) | **55,742** | from DRE numbers written `1/74` |
 | ids ending in a 4-digit year (`DRE-L-39-2016`) | 32,650 | from DRE numbers written `39/2016` |
 | ids with no year at all (`DRE-DL-47344`) | ~6,200 | pre-1976 continuous numbering — legitimate |
-| `…-UNKNOWN` | 2 | numberless diplomas |
-| Malformed (`DRE-DLR--2013-A.md`, empty number) | 1 | |
-| Actual filename collisions | 0 | verified case-insensitively |
+| **`…-UNKNOWN` catch-all files** | **2** | see below |
+| **Files citing a fake number `DDnnn`** | **551** | `title: "Resolução n.º DD652"` — the tretas.org internal key rendered as a legal citation |
+| Numbers silently mangled by `re.sub(r"[^a-zA-Z0-9\-]","",…)` | 13 | `43199(1ªparte)` → `DRE-D-431991parte`, `42991(2)` → `DRE-DL-429912`, `1/94-1ªseccao` → `DRE-L-1-94-1seccao` |
+| Malformed (`DRE-DLR--2013-A.md`, empty number) | 1 | `official_number: "/2013/A"` |
+| Filename collisions *visible in the repo* | 0 | but see below — a collision is an invisible overwrite |
 
-No data loss, but the scheme is unguessable: the same law is `DRE-D-1-74` or
-`DRE-D-1-1974` depending on how DRE typed the number that day. It is also
-disconnected from the official identifier Portugal already publishes (ELI, §6).
+The scheme is unguessable (the same law is `DRE-D-1-74` or `DRE-D-1-1974` depending on
+how DRE typed the number) and disconnected from the official identifier Portugal
+already publishes (ELI, §6). Worse, it **loses documents silently**:
+
+- **`pt/DRE-D-UNKNOWN.md` and `pt/DRE-P-UNKNOWN.md` each hold exactly one document.**
+  Portugal published thousands of `Decreto de <data>` and `Portaria de <data>` acts with
+  no number; every one of them wrote to the same two filenames and overwrote its
+  predecessor. The survivors are a 1993 Açores exoneration decree and a 1979 Madeira
+  portaria. Because each file has a single commit (§1.2), **git holds no trace of the
+  ones that were overwritten**.
+- **`RESOLUÇÃO DO CONSELHO DE MINISTROS` and `RESOLUÇÃO DA ASSEMBLEIA DA REPÚBLICA` both
+  map to code `R`**, so RCM n.º 50/2020 and RAR n.º 50/2020 are the same filename. This
+  is the mechanical cause of the 98 % Resolução gap in §1.6.
+
+So "0 collisions" means "no collision is *recoverable from the repo*", not "no collision
+happened". This is precisely the class of defect the ELI-based identifier (§6.1, D2)
+eliminates: ELI types distinguish `resolconsmin` from `resolassrep`, and a numberless
+diploma gets its ELI date instead of the string `UNKNOWN`.
+
+**One thing that is not a defect**, checked so the rewrite does not "fix" it: the `/1`
+suffix in `Portaria n.º 216/2024/1` is the real official numbering — the Diário da
+República PDF prints `Portaria n.º 216/2024/1, de 23 de setembro`.
 
 ### 1.8 Regional law has no jurisdiction
 
@@ -323,6 +383,29 @@ the national `pt/` directory with `jurisdiction` unset.
 
 Spain models this correctly (`es-pv/`, `es-ct/`, …). Portugal should have `pt-20`
 (Açores) and `pt-30` (Madeira) — see §6.2.
+
+### 1.8b The README already contradicts the data
+
+`legalize-pt/README.md`, generated by the pipeline from `readme_data.json`, makes four
+claims the repo falsifies:
+
+| README claim | Reality |
+|---|---|
+| *"cada reforma é um commit datado da verdadeira data de publicação oficial"* | 0 reform commits; 99.3 % of commits dated 1970-01-02 |
+| *"O `git log` de qualquer lei mostra o seu histórico completo — … que artigos foram alterados e por qual norma"* | one commit, in Spanish, `Source-Id: PLACEHOLDER` |
+| *"legislação … publicada desde 1911"* | earliest file is 1960-01-04 |
+| *"as tabelas são convertidas para tabelas Markdown"* | 907 files (0.82 %) have a table; 61,674 were replaced by `(ver documento original)` |
+
+Also: **99.89 % of the corpus is marked `status: "in_force"`** — 109,812 files, including
+13,798 acts from the 1960s. Only 117 are marked `repealed`.
+
+Two more body artefacts on top of `TEXTO :`: **3,897 files leak a `Sumário:` label** and
+**7,573 leak a bare numeric database id** on its own line (e.g. `114808797`).
+
+**What is healthy**, for balance: the daily updater has run on **121 of 125 weekdays**
+between 2026-03-02 and 2026-08-21, and the four misses are Portuguese public holidays
+(Good Friday, 1 May, Corpo de Deus, Dia de Portugal). The daily path works; the
+bootstrap is what is broken.
 
 ### 1.9 The defects, ranked
 
@@ -342,7 +425,10 @@ Spain models this correctly (`es-pv/`, `es-ct/`, …). Portugal should have `pt-
 | 12 | Tables destroyed by the paragraph splitter | only 907 files (0.82 %) have a table at all | No |
 | 13 | `last_updated: 1900-01-01` in the frontmatter | 109,162 files (99.3 %) | No |
 | 14 | `eli` in 0 files, `summary` in 0.70 %, `pdf_url` in 0.47 %; `subjects` never emitted | 109,929 laws | No |
-| 15 | Whole categories missing (RCM, Lei Orgânica, Decreto do PR, …); 10 of 20 mapped act types produce zero files | ~500 consolidated diplomas + siblings | No |
+| 15 | **Resoluções effectively absent — 98.0 % sequence gap (~5,300 acts), zero files for 2015–2025** — because RCM and RAR collapse onto one `DRE-R-` code | ~5,300 acts | No |
+| 15b | Whole categories missing (Lei Orgânica, Decreto do PR, Despacho Normativo, Acórdãos, Declarações de Retificação); 10 of 20 mapped act types produce zero files | ~500 consolidated diplomas + siblings | No |
+| 15c | Two `*-UNKNOWN` catch-all files silently overwrote every numberless `Decreto de <data>` / `Portaria de <data>`; 551 files cite a fake `DDnnn` number as if it were official | thousands lost, untraceable | No |
+| 15d | Article regex misses `Art. N.º` (20,332 files) and `Artigo único` (6,026) | 26,358 files | No |
 | 16 | Nothing before 1960, while the README claims coverage "desde 1911" | corpus-wide | No |
 | 17 | Regional law has no `jurisdiction` | 5,032 files | No |
 | 18 | Inconsistent 2-digit/4-digit year in identifiers | 55,742 files | No (filenames) |
