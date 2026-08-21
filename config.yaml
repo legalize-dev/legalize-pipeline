@@ -25,7 +25,7 @@ countries:
     repo_path: "../countries/ar"
     data_dir: "../countries/data-ar"
     cache_dir: ".cache"
-    max_workers: 4
+    max_workers: 8
     source:
       base_url: "http://servicios.infoleg.gob.ar/infolegInternet"
       catalog_url: "https://datos.jus.gob.ar/dataset/d9a963ea-8b1d-4ca3-9dd9-07a4773e8c23/resource/bf0ec116-ad4e-4572-a476-e57167a84403/download/base-infoleg-normativa-nacional.zip"
@@ -76,20 +76,20 @@ countries:
       base_url: "https://www.gesetze-im-internet.de"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   ee:
     repo_path: "../countries/ee"
     data_dir: "../countries/data-ee"
     cache_dir: ".cache"
-    max_workers: 4
+    max_workers: 8
     source:
       base_url: "https://www.riigiteataja.ee"
       bulk_url: "https://www.riigiteataja.ee/avaandmed/ERT"
       legi_dir: "../countries/data-ee/legi"
       request_timeout: 60
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
       document_types:
         - "seadus"
         - "määrus"
@@ -101,7 +101,7 @@ countries:
     repo_path: "../countries/it"
     data_dir: "../countries/data-it"
     cache_dir: ".cache"
-    max_workers: 4
+    max_workers: 8
     source:
       api_base: "https://api.normattiva.it/t/normattiva.api"
       web_base: "https://www.normattiva.it"
@@ -142,7 +142,7 @@ countries:
       suvestine_dataset: "datasets/gov/lrsk/teises_aktai/Suvestine"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   co:
     repo_path: "../countries/co"
@@ -197,12 +197,12 @@ countries:
   pt:
     repo_path: "../countries/pt"
     data_dir: "../countries/data-pt"
-    max_workers: 4
+    max_workers: 8
     source:
       # diariodarepublica.pt OutSystems screenservices — see docs/pt-dre-api.md.
       # Measured capacity: 560 detail calls at 16 workers / 54 req/s with zero 429s;
       # throughput saturates at 8 workers. 4 workers x 2 req/s is under 10 % of that.
-      requests_per_second: 2.0
+      requests_per_second: 5.0
       request_timeout: 60
       max_retries: 3
       # DRE has no machine-readable text before 1960 — only scanned PDFs.
@@ -213,7 +213,7 @@ countries:
     max_workers: 8
     source:
       base_url: "https://legislatie.just.ro"
-      requests_per_second: 2.0
+      requests_per_second: 5.0
       request_timeout: 60
       max_retries: 5
 
@@ -227,7 +227,7 @@ countries:
       # 8 workers × 2 req/s → ~3.5x speedup → ~1.5 sec/norm.
       # Full ~20K leyes ≈ 4-5h (fetch only; discovery adds another ~2h).
       base_url: "https://www.impo.com.uy"
-      requests_per_second: 2.0
+      requests_per_second: 5.0
       request_timeout: 30
       max_retries: 3
       collections:
@@ -248,7 +248,7 @@ countries:
       base_url: "https://likumi.lv"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   pl:
     repo_path: "../countries/pl"
@@ -366,12 +366,12 @@ countries:
     # Full bootstrap projection (primary legislation only, ~40K norms):
     #   40,000 laws × avg 2 versions = 80,000 fetches
     #   at ~2 laws/s effective → ~5-6 hours end-to-end.
-    max_workers: 4
+    max_workers: 8
     source:
       base_url: "https://www.ejustice.just.fgov.be"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   cz:
     repo_path: "../countries/cz"
@@ -384,7 +384,7 @@ countries:
     # Full text fetches are heavier (multi-page fragments for big laws),
     # so use 4 workers conservatively. Zero rate-limit errors observed
     # up to 40 req/s aggregate.
-    max_workers: 4
+    max_workers: 8
     source:
       base_url: "https://e-sbirka.gov.cz/sbr-cache"
       request_timeout: 30
@@ -395,13 +395,13 @@ countries:
     repo_path: "../countries/ie"
     data_dir: "../countries/data-ie"
     cache_dir: ".cache"
-    max_workers: 4
+    max_workers: 8
     source:
       isb_base_url: "https://www.irishstatutebook.ie"
       api_base_url: "https://api.oireachtas.ie"
       request_timeout: 30
       max_retries: 3
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   ua:
     repo_path: "../countries/ua"
@@ -434,7 +434,7 @@ countries:
     #  16w × 16  r/s → 8.96 laws/s (0 errors)
     # Discovery /list endpoint rate-limits at ~4 req/s → use 1.5 r/s.
     # Full bootstrap (~27K laws): ~8-10h at 4w × 1.5 r/s.
-    max_workers: 4
+    max_workers: 8
     source:
       api_base: "https://opendata.finlex.fi/finlex/avoindata/v1"
       request_timeout: 30
@@ -452,7 +452,7 @@ countries:
     #   8w × 8.0 r/s → 3.94 laws/s (0 errors) — server bottleneck, no gain
     # Zero 429/5xx at any rate tested. Cloudflare absorbs burst.
     # Full bootstrap (~63K lta documents): ~4.5h at 4w × 4 r/s.
-    max_workers: 4
+    max_workers: 8
     source:
       base_url: "https://www.retsinformation.dk"
       harvest_api: "https://api.retsinformation.dk"
@@ -469,13 +469,13 @@ countries:
     # Each law requires 1 history page + N version portal fragments.
     # Full bootstrap (~26K laws × ~3-5 versions avg): ~80K-130K requests.
     # At 4 workers × 2 req/s = 8 req/s → ~4-5h fetch time.
-    max_workers: 4
+    max_workers: 8
     source:
       api_base: "https://api-gateway.slov-lex.sk"
       static_base: "https://static.slov-lex.sk"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   li:
     repo_path: "../countries/li"
@@ -495,7 +495,7 @@ countries:
       base_url: "https://www.gesetze.li"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   eu:
     repo_path: "../countries/eu"
@@ -509,12 +509,12 @@ countries:
     # Each regulation needs: 1 SPARQL (consolidations) + N XHTML downloads.
     # Full bootstrap (~16K regs × ~2 consolidations avg): ~48K requests.
     # At 4 workers × 2 req/s = 8 req/s → ~1.5-2h fetch time.
-    max_workers: 4
+    max_workers: 8
     source:
       sparql_url: "https://publications.europa.eu/webapi/rdf/sparql"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
       reg_types:
         - "REG"
         - "REG_IMPL"
@@ -541,14 +541,14 @@ countries:
     #   - ~5,139 SPARQL queries (consolidation listings)
     #   - ~5,454 XML downloads (~100 KB avg = ~500 MB total)
     #   - ~10,600 requests → ~22 min raw HTTP, ~1h with parse + commits.
-    max_workers: 4
+    max_workers: 8
     source:
       sparql_url: "https://fedlex.data.admin.ch/sparqlendpoint"
       filestore_url: "https://fedlex.data.admin.ch/filestore"
       language: "de"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 2.0
+      requests_per_second: 5.0
 
   uk:
     repo_path: "../countries/uk"
@@ -561,7 +561,7 @@ countries:
     # Primary legislation bootstrap (2026-04-18): ~3h fetch + ~1h commits
     # (fast-import), producing 38,004 commits across 4 jurisdictions.
     # Secondary legislation (87K SIs) bootstrapped from bulk CLML data.
-    max_workers: 4
+    max_workers: 8
     source:
       base_url: "https://www.legislation.gov.uk"
       request_timeout: 45

@@ -17,6 +17,7 @@ Série is filtered at fetch time, from the detail record — the only place it e
 
 from __future__ import annotations
 
+import gzip
 import json
 import logging
 import re
@@ -149,13 +150,25 @@ class DREDiscovery(NormDiscovery):
         return path
 
     def _fetch_sitemap(self, client: DREClient, url: str) -> str:
+        """Read a sitemap from the cache, or download and cache it.
+
+        The whole index is 785 MB across 587 children, so it is stored gzipped and
+        a plain sibling is honoured too (earlier runs wrote both).
+        """
         cache_dir = self._sitemap_dir()
-        cached = (cache_dir / url.rsplit("/", 1)[1]) if cache_dir else None
-        if cached and cached.exists():
-            return cached.read_text(encoding="utf-8")
+        name = url.rsplit("/", 1)[1]
+        if cache_dir:
+            plain = cache_dir / name
+            if plain.exists():
+                return plain.read_text(encoding="utf-8")
+            packed = cache_dir / f"{name}.gz"
+            if packed.exists():
+                with gzip.open(packed, "rt", encoding="utf-8") as handle:
+                    return handle.read()
         body = client._api.get_text_body(url)
-        if cached:
-            cached.write_text(body, encoding="utf-8")
+        if cache_dir:
+            with gzip.open(cache_dir / f"{name}.gz", "wt", encoding="utf-8") as handle:
+                handle.write(body)
         return body
 
     def _child_sitemaps(self, client: DREClient) -> list[str]:

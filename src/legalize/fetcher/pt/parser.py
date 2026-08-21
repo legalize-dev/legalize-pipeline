@@ -277,10 +277,6 @@ def _classify_published(text: str, css: str, previous: str) -> str | None:
         for pattern, klass in _HEADING_PATTERNS:
             if pattern.match(text):
                 return klass
-        # A bold-centre line right after a heading is that heading's epígrafe; the
-        # heading paragraph already absorbed it.
-        if previous in {c for _, c in _HEADING_PATTERNS}:
-            return None
         return "parrafo"
     for pattern, klass in _HEADING_PATTERNS:
         if pattern.match(text):
@@ -654,6 +650,8 @@ class DREMetadataParser(MetadataParser):
             )
         for key in ("in_force", "legal_value", "licence", "publisher", "language"):
             add(f"eli_{key}", eli_meta.get(key))
+        if eli_meta.get("subjects"):
+            add("subject_ids", " ".join(eli_meta["subjects"]))
         if eli_meta.get("cites"):
             add("cites", "; ".join(eli_meta["cites"][:20]))
             add("cites_count", len(eli_meta["cites"]))
@@ -677,7 +675,12 @@ class DREMetadataParser(MetadataParser):
             jurisdiction=jurisdiction,
             last_modified=_parse_date(consolidation.get("DataUltimaConsolidada")),
             pdf_url=pdf_url or None,
-            subjects=tuple(eli_meta.get("subjects") or ()),
+            # eli:is_about yields numeric descriptor ids, not labels, and the
+            # authority URIs do not dereference. Opaque numbers in `subjects` are
+            # worse than an empty list, so they are parked in `extra` until the
+            # AnaliseJuridica ThesaurusTreeList lookup resolves them to Portuguese
+            # terms (docs/pt-metadata-inventory.md §3) — a reparse, no refetch.
+            subjects=(),
             summary=sumario,
             extra=tuple(extra),
         )

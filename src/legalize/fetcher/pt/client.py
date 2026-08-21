@@ -258,9 +258,11 @@ class DREClient(LegislativeClient):
 
     def get_text(self, norm_id: str) -> bytes:
         """The current text. Real history comes from ``get_suvestine``."""
-        surface, tipo, key = parse_norm_id(norm_id)
+        surface, _tipo, _key = parse_norm_id(norm_id)
         if surface == PUBLISHED:
-            detail = self._published(tipo, key)
+            # Through _bundle, not _published: the raw cache makes this free instead
+            # of a second detail call for every one of 204,314 diplomas.
+            detail = self._bundle(norm_id).get("published") or {}
             body = (detail.get("TextoFormatado") or detail.get("Texto") or "").strip()
             if not body:
                 raise ValueError(f"No text for {norm_id}")
