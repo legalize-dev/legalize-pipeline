@@ -568,14 +568,35 @@ fragments (6.7 MB). There is no per-fragment fetch. So the cost is
 | Version dates | 71 | (to be measured across the catalogue) |
 | Requests for full history | 71 | ~2 – 10 |
 
-Rough bootstrap estimate for surface A: 5,561 diplomas × (1 header + 1 timeline +
-N snapshots). With a mean N ≈ 7 that is **~50,000 requests**; at a polite 2 req/s
-serial, ~7 h; with `max_workers: 4` (the catalogue dump ran 4 workers for 50 min
-with **0 errors**), ~2 h. Bandwidth is dominated by a few dozen large codes.
+**N measured.** The timeline endpoint was run across a 617-diploma slice of the
+catalogue (11 %, 0 errors) — `scripts/pt_spike_timeline.py` in a loop:
 
-**Before implementation**, run the timeline endpoint across the full catalogue
-(5,561 cheap calls) to get the real distribution of N. That is the input to
-`max_workers` tuning (Step 8) and it is a one-hour job.
+```
+distinct effective dates per diploma: mean 5.62 · median 3 · max 71
+ 1 date  120 │ 2 dates 100 │ 3 dates  89 │ 4 dates  68 │ 5 dates  54
+ 6 dates  45 │ 7 dates  23 │ 8 dates  20 │ 9 dates  18 │ 10 dates 17
+ …  20+ dates 22
+amending diplomas per law: mean 6.8, max 102
+modifications per law:     mean 49.1, max 1,467
+100 % of consolidated diplomas have at least one dated version
+```
+
+Most-amended in the sample: Código Civil (71 dates / 102 acts), DL 486/99 (59),
+DL 398/98 (52), DL 102/2008 (52), Código das Sociedades Comerciais (49),
+Lei 150/99 (49).
+
+Extrapolated to the full 5,528 resolvable diplomas:
+
+| | |
+|---|---|
+| Header + timeline calls | ~11,000 |
+| Point-in-time snapshots | **~31,000** |
+| Total requests | **~42,000** |
+| Wall clock at 4 workers / 0.6 s (the rate the catalogue dump sustained with 0 errors) | ~2–3 h |
+| **Reform commits produced** | **~31,000, against 0 today** |
+
+Bandwidth is dominated by a few dozen large codes; the median diploma is 3 snapshots
+of a few hundred KB.
 
 ---
 
