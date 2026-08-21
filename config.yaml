@@ -197,12 +197,16 @@ countries:
   pt:
     repo_path: "../countries/pt"
     data_dir: "../countries/data-pt"
-    max_workers: 1
+    max_workers: 4
     source:
-      # Download SQLite dump from https://uploads.tretas.org/
-      # Decompress: bunzip2 YYYY-MM-DD-DRE.sqlite3.bz2
-      db_path: "../countries/data-pt/2026-03-01-DRE.sqlite3"
-
+      # diariodarepublica.pt OutSystems screenservices — see docs/pt-dre-api.md.
+      # Measured capacity: 560 detail calls at 16 workers / 54 req/s with zero 429s;
+      # throughput saturates at 8 workers. 4 workers x 2 req/s is under 10 % of that.
+      requests_per_second: 2.0
+      request_timeout: 60
+      max_retries: 3
+      # DRE has no machine-readable text before 1960 — only scanned PDFs.
+      earliest_year: 1960
   ro:
     repo_path: "../countries/ro"
     data_dir: "../countries/data-ro"

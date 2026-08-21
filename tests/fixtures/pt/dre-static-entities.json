@@ -1,0 +1,138 @@
+{
+ "tipoVigencia": {
+  "0": "nULL",
+  "1": "vigencia_Condicionada",
+  "2": "omisso",
+  "3": "vigente",
+  "4": "nao_Vigente",
+  "5": "caducado"
+ },
+ "tipoFragmento": {
+  "0": "nULL",
+  "1": "capitulo",
+  "2": "base",
+  "3": "subseccao",
+  "4": "parte",
+  "5": "subtitulo",
+  "6": "subdivisao",
+  "7": "assinatura",
+  "8": "seccao",
+  "9": "divisao",
+  "10": "subcapitulo",
+  "11": "artigo",
+  "12": "livro",
+  "13": "titulo",
+  "14": "anexo",
+  "15": "root",
+  "16": "numero",
+  "17": "alinea",
+  "18": "subalinea"
+ },
+ "thesaurusElementType": {
+  "1": "term",
+  "2": "descriptor"
+ },
+ "versaoEstado": {
+  "1": "inactiva",
+  "2": "suspensa",
+  "3": "inconstitucional",
+  "4": "revogada",
+  "5": "por_Validar",
+  "6": "validada"
+ },
+ "grupoTipoModificacaoEnum": {
+  "1": "movimenta",
+  "2": "rectifica",
+  "3": "altera",
+  "4": "suspende",
+  "5": "revoga",
+  "6": "adita",
+  "7": "elimina",
+  "8": "repoe_Em_Vigor",
+  "9": "declara_Inconstitucionalidade"
+ },
+ "diplomaConsolidacaoEstado": {
+  "1": "revoked",
+  "2": "inProgress",
+  "3": "partiallyConcluded",
+  "4": "concluded",
+  "5": "expired",
+  "6": "conditional"
+ },
+ "diplomaFragEstado": {
+  "1": "inProgress",
+  "2": "inRectification",
+  "3": "waitingValidation",
+  "4": "validated",
+  "5": "unknown"
+ },
+ "tipoNotaAnalise": {
+  "1": "resumo",
+  "2": "dados_Gerais",
+  "3": "texto_Integral",
+  "4": "associacoes"
+ },
+ "consolidacaoEstado": {
+  "1": "organizingStructure",
+  "2": "waitingValidation",
+  "3": "waitingUserSelection",
+  "4": "inRectification",
+  "5": "inProgress",
+  "6": "inValidationBySystem",
+  "7": "published"
+ },
+ "tipoConteudo": {
+  "0": "nULL",
+  "1": "contratoPublico",
+  "2": "diplomaDGO",
+  "3": "jurisprudencia",
+  "4": "diarioRepublica",
+  "5": "diplomaLegis",
+  "6": "actoSocietario",
+  "7": "tradutorJuridico",
+  "8": "guiasPraticos",
+  "9": "diplomaRegTrab",
+  "10": "servicoAlertas",
+  "11": "dicionarioJuridico",
+  "12": "consolidacao",
+  "13": "textoJuridico",
+  "14": "acordaoSTA",
+  "15": "diplomaLegacor",
+  "16": "diplomaTraduzido",
+  "17": "newsletter",
+  "18": "fAQ",
+  "19": "diplomaDGAP",
+  "20": "analiseJuridica",
+  "21": "acordaoSTADiploma",
+  "22": "diplomaExterno",
+  "23": "diplomaFrag"
+ },
+ "tipoLocalizacao": {
+  "1": "conservatoria_Registo_Comercial",
+  "2": "pais",
+  "3": "concelho"
+ },
+ "diplomaRelacionadoType": {
+  "1": "retifica"
+ },
+ "conteudoEstado": {
+  "1": "partiallyValidated",
+  "2": "notApplicable",
+  "3": "waitingForValidation",
+  "4": "partiallyPublished",
+  "5": "rejected",
+  "6": "created",
+  "7": "published",
+  "8": "validated"
+ },
+ "tipoDiplomaModulo": {
+  "1": "diarioRepublica",
+  "2": "analiseJuridica"
+ },
+ "tipoFicheiroDiploma": {
+  "1": "manualInstrucao",
+  "2": "outro",
+  "3": "avaliacaoImpacto",
+  "4": "diploma"
+ }
+}

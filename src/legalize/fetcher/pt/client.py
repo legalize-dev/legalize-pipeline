@@ -1,579 +1,386 @@
-"""Portugal DRE (Diario da Republica Eletronico) clients.
+"""Portugal (PT) — client for the Diário da República Eletrónico.
 
-Two client implementations:
-1. DREClient (SQLite) — reads from dre.tretas.org weekly dump. For bootstrap.
-2. DREHttpClient (HTTP) — fetches directly from diariodarepublica.pt. For daily.
+Two surfaces, one client:
 
-The HTTP client accesses the OutSystems API endpoints of diariodarepublica.pt,
-the official Portuguese legislation portal. Protocol details learned from the
-dre.tretas.org open source project (GPLv3, https://gitlab.com/hgg/dre).
+``cons:{tipo}:{ano}-{fragId}``
+    a diploma DRE consolidates. ``get_suvestine`` walks its amendment timeline and
+    returns one point-in-time snapshot per effective date, which becomes one commit
+    per reform. 5,528 diplomas, 13,030 amendment dates.
+
+``pub:{tipo}:{key}``
+    every other diploma, as printed in the Diário da República. A published text
+    never changes, so its "timeline" is a single snapshot.
+
+Both shapes go through ``get_suvestine`` so the pipeline has one path.
 """
 
 from __future__ import annotations
 
+import base64
+import gzip
 import json
 import logging
-import re
-import sqlite3
+import threading
+from typing import Any
+
 from pathlib import Path
 
-from legalize.fetcher.base import HttpClient, LegislativeClient
+from legalize.fetcher.base import LegislativeClient
+from legalize.fetcher.pt.dre_api import DREApi, DREApiError
 
 logger = logging.getLogger(__name__)
 
-# ─── OutSystems API endpoints (diariodarepublica.pt) ───
+CONSOLIDATED = "cons"
+PUBLISHED = "pub"
 
-_BASE = "https://diariodarepublica.pt/dr"
-_MODULE_VERSION_URL = f"{_BASE}/moduleservices/moduleversioninfo"
-_OUTSYSTEMS_JS_URL = f"{_BASE}/scripts/OutSystems.js"
-# ─── Screen actions (discovered at runtime) ───
-#
-# The OutSystems endpoints live under screenservices/ and each one needs a
-# per-action ``apiVersion`` hash that changes on every DRE deploy.  Both the
-# URL path and the hash are published in the screen's MVC JavaScript as
-# ``callDataAction("ActionName", "screenservices/...", "apiVersionHash", ...)``
-# so we read them from there instead of hardcoding them.
-#
-# DRE also *renames* actions across deploys — the May 2026 redeploy turned
-# ``DataActionGetDRByDataCalendario`` into
-# ``DataActionGetDRByDataCalendarioAndCheckUserLog`` and replaced
-# ``DataActionGetConteudoDataAndApplicationSettings`` with
-# ``DataActionGetAllConteudoDetalheData`` — so each endpoint matches a list of
-# known action-name prefixes rather than one exact name.  A suffix added to an
-# existing name keeps working; a wholesale rename needs a new prefix here and
-# raises DREApiError until it gets one, instead of silently finding nothing.
-JOURNALS_BY_DATE = "journals_by_date"
-DOCUMENTS_BY_JOURNAL = "documents_by_journal"
-DOCUMENT_DETAIL = "document_detail"
+# DRE's placeholder for "this version has always been here": fragments carried over
+# from the original text report DataEntradaVigor 1900-01-01.
+_NO_DATE = "1900-01-01"
 
-_SCREEN_ENDPOINTS: dict[str, tuple[str, tuple[str, ...]]] = {
-    JOURNALS_BY_DATE: (
-        f"{_BASE}/scripts/dr.Home.home.mvc.js",
-        ("DataActionGetDRByDataCalendario",),
-    ),
-    DOCUMENTS_BY_JOURNAL: (
-        f"{_BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Det_Diario.mvc.js",
-        ("DataActionGetDadosAndApplicationSettings",),
-    ),
-    DOCUMENT_DETAIL: (
-        f"{_BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc.js",
-        ("DataActionGetConteudoData", "DataActionGetAllConteudoDetalhe"),
-    ),
-}
-
-# Document sitemap path: /dr/detalhe/{tipo}/{key}
-_SITEMAP_REF_RE = re.compile(r"/dr/detalhe/([^/]+)/([^/?#]+)")
-
-# callDataAction("ActionName", "screenservices/...", "apiVersionHash", ...)
-_CALL_DATA_ACTION_RE = re.compile(
-    r'callDataAction\s*\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"'
+# Only these fragment fields survive into the version blob. A full Código Civil
+# snapshot is 5.7 MB of JSON; 71 of them held in memory at once is several GB.
+_FRAG_FIELDS = (
+    "Id",
+    "FragmentoVersaoId",
+    "PaiId",
+    "Orderm",
+    "IndexOrdem",
+    "Name",
+    "Epigrafe",
+    "IsAnexo",
+)
+_VERSION_FIELDS = (
+    # FragmentoId is the article's stable identity across consolidations.
+    # ConsolidacaoFragmento.Id is NOT: it is the row id within one consolidation and
+    # changes every time DRE reconsolidates, so keying blocks on it produces one
+    # block per snapshot (158,186 instead of 2,895 for the Código Civil).
+    "FragmentoId",
+    "FragmentoPaiId",
+    "Id",
+    "Texto",
+    "Epigrafe",
+    "Identificacao",
+    "Ordem",
+    "Tituo",
+    "OmitTipo",
+    "TipoFragmentoId",
+    "VersaoEstadoId",
+    "DataEntradaVigor",
+    "DataProducaoEfeitos",
+    "DataSuspensao",
+    "DataVersao",
 )
 
+_shared_api: DREApi | None = None
+_shared_lock = threading.Lock()
 
-class DREApiError(RuntimeError):
-    """The DRE OutSystems API broke its contract.
 
-    Raised instead of degrading to an empty result, so a DRE redeploy fails
-    the daily run in red rather than recording a silent "no new norms" day
-    and advancing the state past legislation we never saw.
+def _shared_transport(**kwargs: Any) -> DREApi:
+    """One authenticated DRE session per process.
+
+    ``pipeline.generic_fetch_one`` builds a client per norm. Each DRE handshake costs
+    four GETs, so a per-norm session would add ~440,000 requests to a full bootstrap.
     """
+    global _shared_api
+    with _shared_lock:
+        if _shared_api is None:
+            _shared_api = DREApi(**kwargs)
+        return _shared_api
 
 
-def _split_sitemap_ref(ref: str) -> tuple[str, str]:
-    """Split a DRE sitemap path into the detail screen's (Tipo, Key) inputs.
-
-    ``/dr/detalhe/decreto-lei/169-2026-1159106557`` → ``("decreto-lei",
-    "169-2026-1159106557")``.  Accepts a full URL as well as a bare path.
-    """
-    match = _SITEMAP_REF_RE.search(ref or "")
-    if not match:
-        raise DREApiError(
-            f"Cannot read a document reference out of {ref!r}. Expected a DRE "
-            f"sitemap path like /dr/detalhe/decreto-lei/169-2026-1159106557."
+def parse_norm_id(norm_id: str) -> tuple[str, str, str]:
+    """``cons:decreto-lei:1966-34509075`` -> ``("cons", "decreto-lei", "1966-34509075")``."""
+    parts = (norm_id or "").split(":", 2)
+    if len(parts) != 3 or parts[0] not in (CONSOLIDATED, PUBLISHED):
+        raise ValueError(
+            f"Bad PT norm id {norm_id!r}. Expected 'cons:<tipo>:<ano>-<fragId>' or "
+            f"'pub:<tipo>:<key>'."
         )
-    return match.group(1), match.group(2)
+    return parts[0], parts[1], parts[2]
 
 
-def _nested_get(d: dict, *keys: str, default: str = "") -> str:
-    """Safely traverse nested dicts: _nested_get(d, 'a', 'b') → d['a']['b']."""
-    current = d
-    for k in keys:
-        if isinstance(current, dict):
-            current = current.get(k, default)
-        else:
-            return default
-    return str(current) if current != default else default
+def _pack(payload: Any) -> str:
+    return base64.b64encode(
+        gzip.compress(json.dumps(payload, ensure_ascii=False).encode())
+    ).decode()
 
 
-class DREHttpClient(HttpClient):
-    """HTTP client for Portuguese legislation via diariodarepublica.pt.
+def unpack(blob: str) -> Any:
+    return json.loads(gzip.decompress(base64.b64decode(blob)).decode("utf-8"))
 
-    Uses the OutSystems internal API to fetch document lists and full text.
-    Works without any local data — suitable for CI/daily updates.
-    """
 
-    @classmethod
-    def create(cls, country_config):
-        """Create DREHttpClient from CountryConfig."""
-        source = country_config.source
-        timeout = source.get("request_timeout", 30)
-        return cls(timeout=timeout)
-
-    def __init__(self, timeout: int = 30) -> None:
-        super().__init__(
-            request_timeout=timeout,
-            requests_per_second=2.0,
-            extra_headers={"Content-Type": "application/json; charset=UTF-8"},
+def _slim(items: list[dict]) -> list[dict]:
+    """Keep only the fragment fields the parser reads."""
+    out = []
+    for item in items:
+        frag = item.get("ConsolidacaoFragmento") or {}
+        version = item.get("FragmentoVersao") or {}
+        out.append(
+            {
+                "frag": {k: frag.get(k) for k in _FRAG_FIELDS},
+                "version": {k: version.get(k) for k in _VERSION_FIELDS},
+                "nota": (item.get("Nota") or {}).get("List") or [],
+                "alteracoes": (item.get("AlteracoesList") or {}).get("List") or [],
+            }
         )
-        self._csrf_token: str = ""
-        self._module_version: str = ""
-        # logical endpoint name → (absolute URL, apiVersion hash)
-        self._endpoints: dict[str, tuple[str, str]] = {}
-        self._request_count = 0
-        self._init_session()
-
-    def _init_session(self) -> None:
-        """Initialize session: CSRF token, module version, and screen endpoints.
-
-        Every piece here is a hard requirement: without a CSRF token or an
-        apiVersion hash the OutSystems endpoints answer with an HTML error page
-        instead of JSON.  Anything missing raises DREApiError rather than
-        leaving the client half-configured to fail later as "no results".
-        """
-        # 1. Get CSRF token from OutSystems.js
-        resp = self._request("GET", _OUTSYSTEMS_JS_URL)
-        for pattern in [
-            r'AnonymousCSRFToken\s*=\s*"([^"]+)"',  # Current format (2025+)
-            r'"X-CSRFToken","([^"]+)"',  # Legacy format
-            r'csrfTokenValue\s*=\s*"([^"]+)"',  # Older fallback
-        ]:
-            match = re.search(pattern, resp.text)
-            if match:
-                self._csrf_token = match.group(1)
-                break
-        if not self._csrf_token:
-            raise DREApiError(
-                f"No CSRF token found in {_OUTSYSTEMS_JS_URL} "
-                f"({len(resp.text)} bytes) — DRE changed the token format."
-            )
-        logger.info("CSRF token obtained: %s...", self._csrf_token[:8])
-
-        # 2. Get module version
-        resp = self._request("GET", _MODULE_VERSION_URL)
-        version_data = resp.json()
-        if isinstance(version_data, dict):
-            self._module_version = version_data.get("versionToken", "")
-        elif isinstance(version_data, list) and version_data:
-            self._module_version = version_data[0].get("versionToken", "")
-        if not self._module_version:
-            raise DREApiError(
-                f"No versionToken in {_MODULE_VERSION_URL} response: {version_data!r:.200}"
-            )
-        logger.info("Module version: %s", self._module_version)
-
-        # 3. Resolve each screen endpoint (URL + apiVersion) from its MVC JS.
-        self._endpoints = {}
-        js_cache: dict[str, str] = {}
-        for name, (js_url, prefixes) in _SCREEN_ENDPOINTS.items():
-            if js_url not in js_cache:
-                js_cache[js_url] = self._request("GET", js_url).text
-            self._endpoints[name] = self._resolve_endpoint(name, js_cache[js_url], js_url, prefixes)
-
-    def _resolve_endpoint(
-        self, name: str, js_text: str, js_url: str, prefixes: tuple[str, ...]
-    ) -> tuple[str, str]:
-        """Find the URL and apiVersion of one screen action inside its MVC JS."""
-        actions = {
-            m.group(1): (m.group(2), m.group(3)) for m in _CALL_DATA_ACTION_RE.finditer(js_text)
-        }
-        for prefix in prefixes:
-            for action_name, (path, api_version) in actions.items():
-                if action_name.startswith(prefix):
-                    logger.info("Resolved %s → %s (apiVersion %s)", name, action_name, api_version)
-                    return f"{_BASE}/{path.lstrip('/')}", api_version
-        raise DREApiError(
-            f"No action matching {prefixes} in {js_url} "
-            f"({len(js_text)} bytes, {len(actions)} actions found: "
-            f"{sorted(actions)}). DRE renamed the action — add the new prefix "
-            f"to _SCREEN_ENDPOINTS[{name!r}]."
-        )
-
-    def _post(self, endpoint: str, payload: dict) -> dict:
-        """POST JSON to a resolved OutSystems endpoint with CSRF + version info."""
-        self._request_count += 1
-
-        # Refresh session every 100 requests
-        if self._request_count % 100 == 0:
-            logger.info("Refreshing session after %d requests", self._request_count)
-            self._init_session()
-
-        url, api_version = self._endpoints[endpoint]
-
-        payload.setdefault("versionInfo", {})
-        payload["versionInfo"]["moduleVersion"] = self._module_version
-        payload["versionInfo"]["apiVersion"] = api_version
-
-        # Required since DRE OutSystems migration (2025)
-        payload.setdefault("clientVariables", {})
-
-        resp = self._request("POST", url, json=payload, headers={"X-CSRFToken": self._csrf_token})
-        try:
-            data = resp.json()
-        except ValueError as exc:
-            # A stale apiVersion/CSRF makes OutSystems answer with an HTML error
-            # page.  Left alone this surfaces as JSONDecodeError deep in a
-            # per-date try/except and the run still ends green.
-            raise DREApiError(
-                f"{endpoint} returned {resp.headers.get('Content-Type', '?')} "
-                f"instead of JSON (HTTP {resp.status_code}): {resp.text[:200]!r}"
-            ) from exc
-
-        if not isinstance(data, dict):
-            raise DREApiError(f"{endpoint} returned {type(data).__name__}, expected an object")
-
-        if data.get("exception"):
-            exc_info = data["exception"]
-            raise DREApiError(
-                f"{endpoint} raised a server exception: "
-                f"{exc_info.get('name', '?')}/{exc_info.get('specificType', '?')} — "
-                f"{exc_info.get('message', '?')}"
-            )
-        return data
-
-    @staticmethod
-    def _parse_json_out(data: dict, key: str = "Json_Out") -> dict:
-        """Parse a Json_Out Elasticsearch response string from the API.
-
-        Since the 2025 DRE migration, many endpoints return Elasticsearch
-        results wrapped in a JSON string field instead of structured data.
-        """
-        raw = data.get(key, "")
-        if isinstance(raw, str) and raw:
-            return json.loads(raw)
-        return {}
-
-    def get_journals_by_date(self, date_str: str) -> list[dict]:
-        """Get journal (Diario da Republica) entries for a date.
-
-        Args:
-            date_str: Date in YYYY-MM-DD format.
-
-        Returns:
-            List of journal dicts with series, number, date info.
-        """
-        payload = {
-            "viewName": "Home.home",
-            "screenData": {
-                "variables": {
-                    "DataCalendario": date_str,
-                    "_dataCalendarioInDataFetchStatus": 1,
-                    # Sentinel date required for Elasticsearch date filtering
-                    "DataUltimaPublicacao": "2099-11-26",
-                    "HasSerie1": True,
-                    "HasSerie2": True,
-                    "IsRendered": True,
-                }
-            },
-            "clientVariables": {
-                "Data": date_str,
-            },
-        }
-        result = self._post(JOURNALS_BY_DATE, payload)
-        data = result.get("data", {})
-
-        # New format (2025+): Elasticsearch response in Json_Out.
-        # An empty `hits` list is a legitimate answer (holidays, Sundays);
-        # a response we cannot read at all is not — see below.
-        es_data = self._parse_json_out(data)
-        if es_data:
-            journals = []
-            for hit in es_data.get("hits", {}).get("hits", []):
-                source = hit.get("_source", {})
-                journals.append(
-                    {
-                        "Id": source.get("dbId"),
-                        "DiarioId": source.get("dbId"),
-                        "Numero": source.get("numero", ""),
-                        "DataPublicacao": source.get("dataPublicacao", ""),
-                        "conteudoTitle": source.get("conteudoTitle", ""),
-                    }
-                )
-            return journals
-
-        # Legacy format: structured SerieI.List
-        serie1 = data.get("SerieI")
-        if isinstance(serie1, dict):
-            return serie1.get("List", [])
-        if isinstance(serie1, list):
-            return serie1
-
-        raise DREApiError(
-            f"{JOURNALS_BY_DATE} for {date_str} returned neither Json_Out nor "
-            f"SerieI — keys: {sorted(data)}. DRE changed the response shape."
-        )
-
-    def get_documents_by_journal(self, journal_id: int, is_serie1: bool = True) -> list[dict]:
-        """Get all documents from a journal issue.
-
-        Args:
-            journal_id: Internal journal ID.
-            is_serie1: Whether this is Series I (main legislation).
-
-        Returns:
-            List of document dicts with metadata.
-        """
-        payload = {
-            "viewName": "Legislacao_Conteudos.Conteudo_Detalhe",
-            "screenData": {
-                "variables": {
-                    "DetalheConteudo2": {"List": [], "EmptyListItem": {}},
-                    "ParteIdAux": "0",
-                    "IsFinished": False,
-                    "DiplomaIds": {"List": [], "EmptyListItem": "0"},
-                    "NumeroDeResultadosPorPagina": 2500,
-                    "DiarioIdAux": journal_id,
-                    "DiarioId": journal_id,
-                    "_diarioIdInDataFetchStatus": 1,
-                    "ParteId": "0",
-                    "_parteIdInDataFetchStatus": 1,
-                    "IsSerieI": is_serie1,
-                    "_isSerieIInDataFetchStatus": 1,
-                    "Diario_DetalheConteudo": {
-                        "Id": "",
-                        "Titulo": "",
-                        "DataPublicacao": "",
-                    },
-                    "_diario_DetalheConteudoInDataFetchStatus": 1,
-                }
-            },
-            "clientVariables": {
-                "Data": "",
-                "DiplomaConteudoId": "",
-            },
-        }
-        result = self._post(DOCUMENTS_BY_JOURNAL, payload)
-        data = result.get("data", {})
-
-        # Try structured response: DetalheConteudo.List (current format)
-        for key in ("DetalheConteudo", "DetalheConteudo2"):
-            container = data.get(key)
-            if isinstance(container, dict) and container.get("List"):
-                return container["List"]
-            if isinstance(container, list) and container:
-                return container
-
-        # Elasticsearch response fallback
-        es_data = self._parse_json_out(data)
-        if es_data:
-            return [hit.get("_source", {}) for hit in es_data.get("hits", {}).get("hits", [])]
-
-        raise DREApiError(
-            f"{DOCUMENTS_BY_JOURNAL} for journal {journal_id} returned no readable "
-            f"document list — keys: {sorted(data)}. A journal issue always has "
-            f"documents, so an unreadable response is a DRE change, not an empty day."
-        )
-
-    def get_document_detail(self, ref: str) -> dict:
-        """Fetch full document detail including text.
-
-        Args:
-            ref: The document's sitemap path as published in the document
-                list, e.g. ``/dr/detalhe/decreto-lei/169-2026-1159106557``.
-                The detail screen is URL-driven: its inputs are the *type*
-                and *key* segments of that path, not a raw id.
-
-        Returns:
-            Dict with document details including Texto/TextoFormatado.
-            Field names follow the new DRE API (2025+):
-            TipoDiploma, Emissor, ELI, Vigencia, etc.
-        """
-        tipo, key = _split_sitemap_ref(ref)
-        payload = {
-            "viewName": "Legislacao_Conteudos.Conteudo_Detalhe",
-            "screenData": {
-                "variables": {
-                    "Tipo": tipo,
-                    "_tipoInDataFetchStatus": 1,
-                    "Key": key,
-                    "_keyInDataFetchStatus": 1,
-                    "ParteId": "0",
-                    "_parteIdInDataFetchStatus": 1,
-                },
-            },
-            "clientVariables": {
-                "DiplomaConteudoId": "",
-            },
-        }
-        result = self._post(DOCUMENT_DETAIL, payload)
-        detail = result.get("data", {}).get("DetalheConteudo", {})
-
-        # DRE answers an unrecognised input with a fully-populated *default*
-        # record — Id 0, empty Numero, DataPublicacao 1900-01-01 — rather than
-        # an error.  Left alone that becomes a committed law with no title,
-        # no date and no text, so treat it as the API break it is.
-        if not isinstance(detail, dict) or not (
-            str(detail.get("Numero", "")).strip() or str(detail.get("ELI", "")).strip()
-        ):
-            raise DREApiError(
-                f"{DOCUMENT_DETAIL} returned an empty record for {ref} "
-                f"(Id={detail.get('Id') if isinstance(detail, dict) else detail!r}). "
-                f"The screen's Tipo/Key inputs no longer resolve — see docs/pt-dre-api.md."
-            )
-        return detail
-
-    def get_text(self, ref: str) -> bytes:
-        """Fetch the full text of a document by its sitemap path.
-
-        Returns HTML text as UTF-8 bytes, compatible with DRETextParser.
-        """
-        detail = self.get_document_detail(ref)
-        text = detail.get("Texto", "").strip()
-        if not text:
-            text = detail.get("TextoFormatado", "").strip()
-        if not text:
-            raise ValueError(f"No text found for {ref}")
-        return text.encode("utf-8")
-
-    def get_metadata(self, ref: str) -> bytes:
-        """Fetch metadata for a document by its sitemap path.
-
-        Returns JSON bytes compatible with DREMetadataParser.
-        Handles both legacy and new (2025+) field names from the API.
-        """
-        detail = self.get_document_detail(ref)
-
-        # Vigencia: "NAO_VIGENTE" means repealed
-        vigencia = detail.get("Vigencia", "")
-        in_force = vigencia != "NAO_VIGENTE"
-
-        # ELI URI (European Legislation Identifier) — preferred source URL
-        eli = detail.get("ELI", "")
-
-        # Map field names — new API (2025+) uses different names
-        # New: TipoDiploma, Emissor, Id  |  Old: TipoActo, Entidade, ConteudoId
-        doc_type = (
-            (
-                detail.get("TipoActo", "")
-                or detail.get("TipoDiploma", "")
-                or detail.get("TipoDiplomaExterno", "")
-            )
-            .strip()
-            .upper()
-        )
-
-        emiting_body = (detail.get("Entidade", "") or detail.get("Emissor", "")).strip()
-
-        dr_number = detail.get("DiarioNumero", "") or _nested_get(
-            detail, "DiarioRepublica", "Numero", default=""
-        )
-
-        meta = {
-            "claint": detail.get("ConteudoId", detail.get("Id", "")),
-            "doc_type": doc_type,
-            "number": detail.get("Numero", "").strip(),
-            "emiting_body": emiting_body,
-            "source": "Serie I",
-            "date": detail.get("DataPublicacao", "")[:10],
-            "notes": (detail.get("Sumario", "") or detail.get("Resumo", "")).strip(),
-            "in_force": in_force,
-            "series": 1,
-            "dr_number": dr_number,
-            "dre_pdf": detail.get("URL_PDF", ""),
-            "dre_key": "",
-            "eli": eli,
-            "parte": detail.get("Parte", ""),
-        }
-        return json.dumps(meta, ensure_ascii=False).encode("utf-8")
-
-
-# ─── SQLite client (for bootstrap) ───
+    return out
 
 
 class DREClient(LegislativeClient):
-    """Client for Portuguese legislation via dre.tretas.org SQLite dump.
-
-    The tretas.org project publishes weekly SQLite exports (~12 GB decompressed)
-    containing all legislation from the Diario da Republica since 1911.
-
-    Tables used:
-    - dreapp_document: metadata (id, doc_type, number, date, etc.)
-    - dreapp_documenttext: full HTML text (text field)
-    """
+    """Fetches Portuguese legislation from diariodarepublica.pt."""
 
     @classmethod
-    def create(cls, country_config):
-        """Create DREClient from CountryConfig.
-
-        Expects config.yaml:
-            pt:
-              source:
-                db_path: "/path/to/YYYY-MM-DD-DRE.sqlite3"
-        """
-        db_path = country_config.source.get("db_path", "")
-        if not db_path:
-            raise ValueError(
-                "Portugal requires source.db_path in config.yaml "
-                "pointing to the dre.tretas.org SQLite dump. "
-                "Download from https://uploads.tretas.org/"
-            )
-        return cls(db_path=db_path)
-
-    def __init__(self, db_path: str) -> None:
-        self._db_path = Path(db_path)
-        if not self._db_path.exists():
-            raise FileNotFoundError(
-                f"SQLite database not found: {self._db_path}. "
-                "Download the tretas.org dump and decompress it."
-            )
-        self._conn = sqlite3.connect(str(self._db_path))
-        self._conn.row_factory = sqlite3.Row
-        logger.info("Opened DRE SQLite database: %s", self._db_path)
-
-    def get_text(self, norm_id: str) -> bytes:
-        """Fetch the HTML text for a document by its ID.
-
-        Returns the raw HTML from dreapp_documenttext as UTF-8 bytes.
-        """
-        cursor = self._conn.execute(
-            """
-            SELECT dt.text
-            FROM dreapp_documenttext dt
-            WHERE dt.document_id = ?
-            ORDER BY dt.id DESC
-            LIMIT 1
-            """,
-            (int(norm_id),),
+    def create(cls, country_config) -> DREClient:
+        source = country_config.source or {}
+        return cls(
+            raw_dir=Path(country_config.data_dir) / "raw",
+            request_timeout=int(source.get("request_timeout", 60)),
+            requests_per_second=float(source.get("requests_per_second", 2.0)),
+            max_retries=int(source.get("max_retries", 3)),
         )
-        row = cursor.fetchone()
-        if not row or not row["text"]:
-            raise ValueError(f"No text found for id={norm_id}")
-        return row["text"].encode("utf-8")
+
+    def __init__(self, raw_dir: Path | str | None = None, **transport_kwargs: Any) -> None:
+        self._api = _shared_transport(**transport_kwargs)
+        self._headers: dict[str, dict] = {}
+        self._cache_lock = threading.Lock()
+        # The pipeline's own cache stores the *parsed* norm, so any parser change
+        # would mean re-downloading the whole corpus (~18 h). Keeping the raw
+        # envelopes turns that into a 20-minute reparse.
+        self._raw_dir = Path(raw_dir) if raw_dir else None
+        if self._raw_dir:
+            self._raw_dir.mkdir(parents=True, exist_ok=True)
+
+    # -------------------------------------------------------------- raw cache
+
+    def _raw_path(self, norm_id: str, kind: str) -> Path | None:
+        if not self._raw_dir:
+            return None
+        safe = norm_id.replace(":", "-").replace("/", "-")
+        return self._raw_dir / f"{safe}.{kind}.json.gz"
+
+    def _raw_load(self, norm_id: str, kind: str) -> Any | None:
+        path = self._raw_path(norm_id, kind)
+        if path and path.exists():
+            try:
+                with gzip.open(path, "rt", encoding="utf-8") as handle:
+                    return json.load(handle)
+            except Exception:
+                logger.warning("Corrupt raw cache, refetching: %s", path)
+        return None
+
+    def _raw_save(self, norm_id: str, kind: str, payload: Any) -> None:
+        path = self._raw_path(norm_id, kind)
+        if not path:
+            return
+        tmp = path.with_suffix(".tmp")
+        with gzip.open(tmp, "wt", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False)
+        tmp.replace(path)
+
+    # --------------------------------------------------------------- fetching
+
+    def _published(self, tipo: str, key: str) -> dict:
+        return self._api.published_detail(f"/dr/detalhe/{tipo}/{key}")
+
+    def _header(self, tipo: str, key: str) -> dict:
+        """The consolidated header, cached — three pipeline calls share one fetch."""
+        cache_key = f"{tipo}/{key}"
+        with self._cache_lock:
+            hit = self._headers.get(cache_key)
+        if hit is not None:
+            return hit
+        ano, frag_id = key.split("-", 1)
+        header = self._api.consolidated_header(tipo, int(ano), frag_id)
+        with self._cache_lock:
+            self._headers[cache_key] = header
+            # The pipeline processes one norm at a time per worker; keep the cache
+            # from growing across a 110k-norm run.
+            if len(self._headers) > 64:
+                self._headers.pop(next(iter(self._headers)))
+        return header
+
+    def _bundle(self, norm_id: str) -> dict:
+        """Everything the metadata parser needs, from both surfaces."""
+        cached = self._raw_load(norm_id, "meta")
+        if cached is not None:
+            return cached
+        bundle = self._build_bundle(norm_id)
+        self._raw_save(norm_id, "meta", bundle)
+        return bundle
+
+    def _build_bundle(self, norm_id: str) -> dict:
+        surface, tipo, key = parse_norm_id(norm_id)
+        if surface == PUBLISHED:
+            return {
+                "surface": PUBLISHED,
+                "tipo": tipo,
+                "key": key,
+                "published": self._published(tipo, key),
+            }
+
+        header = self._header(tipo, key)
+        detail = header.get("ConsolidadaConteudoDetalhe") or {}
+        published: dict = {}
+        ref = ((detail.get("DiplomaLegis") or {}).get("LinkSitemap") or "").strip()
+        if ref:
+            # The consolidated header has no Vigencia, no ELI RDFa, no page range and
+            # no signature date. The as-published record has all of them.
+            try:
+                published = self._api.published_detail(ref)
+            except DREApiError:
+                logger.warning("No as-published record for %s (%s)", norm_id, ref)
+        return {
+            "surface": CONSOLIDATED,
+            "tipo": tipo,
+            "key": key,
+            "header": detail,
+            "consolidation": {
+                k: header.get(k)
+                for k in (
+                    "CurrentConsolidacaoId",
+                    "LastConsolidacaoId",
+                    "DataUltimaConsolidada",
+                    "IsVersaoInicial",
+                    "IsMultipleConsolidation",
+                    "HasIndice",
+                    "HasFile",
+                    "HasJurisprudenciaAssociada",
+                    "URLPDF",
+                )
+            },
+            "published": published,
+        }
+
+    # ----------------------------------------------------- LegislativeClient
 
     def get_metadata(self, norm_id: str) -> bytes:
-        """Fetch metadata for a document by its ID.
+        return json.dumps(self._bundle(norm_id), ensure_ascii=False).encode("utf-8")
 
-        Returns a JSON dict with Document fields as UTF-8 bytes.
+    def get_text(self, norm_id: str) -> bytes:
+        """The current text. Real history comes from ``get_suvestine``."""
+        surface, tipo, key = parse_norm_id(norm_id)
+        if surface == PUBLISHED:
+            detail = self._published(tipo, key)
+            body = (detail.get("TextoFormatado") or detail.get("Texto") or "").strip()
+            if not body:
+                raise ValueError(f"No text for {norm_id}")
+            return body.encode("utf-8")
+        # For a consolidated diploma the text is assembled per version; the parser
+        # works off the suvestine blob, so this only has to be non-empty.
+        return b"{}"
+
+    def get_suvestine(self, norm_id: str) -> bytes:
+        """Every historical version of one diploma, as a single JSON blob.
+
+        Named to match the pipeline hook (``hasattr(client, "get_suvestine")``); the
+        semantics are Lithuania's and Belgium's — one source, many dated versions,
+        one reform per version.
+
+        A published-only diploma returns a one-version blob rather than raising, so
+        the pipeline has a single path and never falls through to the "commit the
+        current text as a fabricated original version" branch.
         """
-        cursor = self._conn.execute(
-            """
-            SELECT id, doc_type, number, emiting_body, source, date,
-                   notes, in_force, series, dr_number, dre_pdf
-            FROM dreapp_document
-            WHERE id = ?
-            """,
-            (int(norm_id),),
-        )
-        row = cursor.fetchone()
-        if not row:
-            raise ValueError(f"No document found for id={norm_id}")
+        cached = self._raw_load(norm_id, "versions")
+        if cached is not None:
+            return json.dumps(cached, ensure_ascii=False).encode("utf-8")
+        blob = self._build_suvestine(norm_id)
+        self._raw_save(norm_id, "versions", blob)
+        return json.dumps(blob, ensure_ascii=False).encode("utf-8")
 
-        data = dict(row)
-        # Alias 'id' as 'claint' for parser compatibility
-        data["claint"] = data["id"]
-        return json.dumps(data, ensure_ascii=False).encode("utf-8")
+    def _build_suvestine(self, norm_id: str) -> dict:
+        surface, tipo, key = parse_norm_id(norm_id)
+        bundle = self._bundle(norm_id)
+
+        if surface == PUBLISHED:
+            detail = bundle["published"]
+            return {
+                "norm_id": norm_id,
+                "surface": PUBLISHED,
+                "pdf_url": (detail.get("URL_PDF") or "").strip(),
+                "versions": [
+                    {
+                        "date": (detail.get("DataPublicacao") or "")[:10],
+                        "is_original": True,
+                        "amending": None,
+                        "html_b64": _pack(
+                            detail.get("TextoFormatado") or detail.get("Texto") or ""
+                        ),
+                    }
+                ],
+            }
+
+        ano, frag_id = key.split("-", 1)
+        detail = bundle["header"]
+        legis_id = str((detail.get("DiplomaLegis") or {}).get("Id") or "0")
+        header = self._header(tipo, key)
+
+        timeline = self._api.consolidated_timeline(legis_id, frag_id)
+        # date -> the act that made the change effective on that date
+        amendments: dict[str, dict] = {}
+        for act in timeline:
+            for mod in (act.get("ModificacaoList") or {}).get("List") or []:
+                when = (mod.get("DataEntradaVigor") or "")[:10]
+                if not when or when == _NO_DATE:
+                    continue
+                entry = amendments.setdefault(
+                    when,
+                    {
+                        "numero": act.get("Numero"),
+                        "tipo": act.get("TipoDiploma"),
+                        "title": act.get("Title"),
+                        "sumario": act.get("SumarioDiplomaLegis"),
+                        "published_at": (act.get("DataPublicacao") or "")[:10],
+                        "legis_id": act.get("DiplomaLegisId"),
+                        "link": act.get("LinkSitemap"),
+                        "articles": [],
+                    },
+                )
+                label = (mod.get("FragmentoDestinoModificacao") or "").strip()
+                if label and label not in entry["articles"]:
+                    entry["articles"].append(label)
+
+        original = ((bundle.get("published") or {}).get("DataPublicacao") or "")[:10] or (
+            (detail.get("DiplomaLegis") or {}).get("DataPublicacao") or ""
+        )[:10]
+        dates = sorted(amendments)
+        if original and (not dates or original < dates[0]):
+            dates = [original, *dates]
+        elif not dates:
+            dates = [original or _NO_DATE]
+
+        versions = []
+        for when in dates:
+            snapshot = self._api.consolidated_snapshot(
+                tipo, int(ano), frag_id, legis_id, when, header
+            )
+            fragments = (snapshot.get("LegConsBase") or {}).get("List") or []
+            if not fragments and when == dates[0]:
+                # 5 % of consolidated-sitemap entries (mostly acórdãos) are listed but
+                # never fragmented. Signal it so the caller can fall back to surface B.
+                raise DREApiError(f"{norm_id}: consolidated snapshot at {when} has no fragments")
+            versions.append(
+                {
+                    "date": when,
+                    "is_original": when not in amendments,
+                    "amending": amendments.get(when),
+                    "fragments_b64": _pack(_slim(fragments)),
+                }
+            )
+
+        return {
+            "norm_id": norm_id,
+            "surface": CONSOLIDATED,
+            "diploma_legis_id": legis_id,
+            "diploma_frag_id": frag_id,
+            "amending_acts": len(timeline),
+            "pdf_url": (
+                (bundle.get("published") or {}).get("URL_PDF")
+                or (bundle.get("consolidation") or {}).get("URLPDF")
+                or ""
+            ).strip(),
+            "versions": versions,
+        }
 
     def close(self) -> None:
-        """Close the SQLite connection."""
-        if self._conn:
-            self._conn.close()
-            logger.info("Closed DRE SQLite database")
+        """No-op: the transport is shared process-wide (see ``_shared_transport``)."""
+        return

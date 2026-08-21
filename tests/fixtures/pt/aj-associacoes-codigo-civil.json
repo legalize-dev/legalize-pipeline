@@ -1,0 +1,592 @@
+{
+ "modificacoes-162": {
+  "DiretasList": {
+   "List": [],
+   "EmptyListItem": {
+    "Data": "1900-01-01",
+    "Texto": "",
+    "AssociacaoAnaliseJuridicaId": "0",
+    "HasLink": false,
+    "HasInversa": false,
+    "DiplomaLinkId": "0.0",
+    "Numero": "",
+    "Tipo": ""
+   }
+  },
+  "CountDiretas": "0",
+  "DomainName": "https://diariodarepublica.pt",
+  "StaticContentPath": "https://files.diariodarepublica.pt/StaticContent",
+  "InversasList": {
+   "List": [
+    {
+     "Data": "2026-06-23",
+     "Texto": "Altera, a partir de 1 de julho de 2026, o artigo 1425.º do Código Civil, aprovado pelo Decreto-Lei n.º 47344, de 25 de novembro de 1966 pelo(a) Lei n.º 29/2026  - Diário da República n.º 119/2026, Série I de 2026-06-23",
+     "Sumario": "Cria o regime jurídico do contrato de aproveitamento energético renovável, determinando o deferimento tácito no licenciamento de unidades de produção para autoc...",
+     "Diploma": "Lei n.º 29/2026  - Diário da República n.º 119/2026, Série I de 2026-06-23",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/lei/29-2026-1135578391",
+     "DiplomaLegisId": "1135578391",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2025-04-01",
+     "Texto": "Alterados, a partir de 2 de abril de 2025, os artigos 125.º, 126.º, 128.º, 129.º, 1601.º, 1699.º, 1817.º, 1842.º, 1846.º, 1857.º, 1860.º, 1861.º, 1876.º, 1877.º, 1880.º, 1893.º, 1900.º, 1904.º-A, 1913.º, 1933.º, 1939.º, 1940.º, 1947.º, 1980.º, 1991.º, 2189.º e 2274.º e a  epígrafe da subsecção ii da secção v do capítulo i do subtítulo i do título ii do livro i, e revogados os artigos 132.º e 133.º, o n.º 2 do artigo 1597.º, a alínea a) do artigo 1604.º, o n.º 3 do artigo 1609.º, o artigo 1612.º, o artigo 1649.º, o n.º 2 do artigo 1708.º e a alínea b) do artigo 1961.º do Código Civil pelo(a) Lei n.º 39/2025  - Diário da República n.º 64/2025, Série I de 2025-04-01, nos termos do artigo 6.º desta",
+     "Sumario": "Proíbe o casamento de menores e inclui o casamento infantil, precoce ou forçado no conjunto das situações de perigo que legitimam a intervenção para promoção do...",
+     "Diploma": "Lei n.º 39/2025  - Diário da República n.º 64/2025, Série I de 2025-04-01",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/lei/39-2025-913223399",
+     "DiplomaLegisId": "913223399",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2024-07-25",
+     "Texto": "Alterado, a partir de 25 de agosto de 2024, o artigo 759.º do Código Civil pelo(a) Decreto-Lei n.º 48/2024  - Diário da República n.º 143/2024, Série I de 2024-07-25 nos termos do artigo 3.º deste",
+     "Sumario": "Limita as situações em que o direito de retenção prevalece sobre a hipoteca.",
+     "Diploma": "Decreto-Lei n.º 48/2024  - Diário da República n.º 143/2024, Série I de 2024-07-25",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/decreto-lei/48-2024-873371751",
+     "DiplomaLegisId": "873371751",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2024-01-08",
+     "Texto": "Alterado, a partir de 1 de janeiro de 2024, o artigo 1422.º e aditado o artigo 1422.º-B ao Código Civil, aprovado em anexo ao presente diploma pelo(a) Decreto-Lei n.º 10/2024  - Diário da República n.º 5/2024, Série I de 2024-01-08 nos termos do artigo 23.º deste",
+     "Sumario": "Procede à reforma e simplificação dos licenciamentos no âmbito do urbanismo, ordenamento do território e indústria",
+     "Diploma": "Decreto-Lei n.º 10/2024  - Diário da República n.º 5/2024, Série I de 2024-01-08",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/decreto-lei/10-2024-836222484",
+     "DiplomaLegisId": "836222484",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2023-12-29",
+     "Texto": "Alterado, a partir de 1 de janeiro de 2024, o artigo 1095.º do Código Civil pelo(a) Lei n.º 82/2023  - Diário da República n.º 250/2023, Série I de 2023-12-29",
+     "Sumario": "Orçamento do Estado para 2024",
+     "Diploma": "Lei n.º 82/2023  - Diário da República n.º 250/2023, Série I de 2023-12-29",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/lei/82-2023-835864042",
+     "DiplomaLegisId": "835864042",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    }
+   ]
+  },
+  "CountInversas": "90",
+  "ApplicationRoot": ""
+ },
+ "retificacoes-165": {
+  "DiretasList": {
+   "List": [],
+   "EmptyListItem": {
+    "Data": "1900-01-01",
+    "Texto": "",
+    "AssociacaoAnaliseJuridicaId": "0",
+    "HasLink": false,
+    "HasInversa": false,
+    "DiplomaLinkId": "0.0",
+    "Numero": "",
+    "Tipo": ""
+   }
+  },
+  "CountDiretas": "0",
+  "DomainName": "https://diariodarepublica.pt",
+  "StaticContentPath": "https://files.diariodarepublica.pt/StaticContent",
+  "InversasList": {
+   "List": [
+    {
+     "Data": "2012-10-12",
+     "Texto": " Retificada a Lei 31/2012 de 14-ago (que alterou o presente diploma)pela DECL-RECT.59-A/2012.12.10.2012.AR, DR.IS [198-Supl] de 12.10.2012, no referente ao seu art. 2º - na parte em que alterou o art. 1072º e o nº 2 do art. 1100º do Código Civil - e no referente ao anexo I - na republicação do nº 2 do art. 1100º e da al. b) do nº 6 do art. 1103º, ambos do Código Civil.\u0000\u0000",
+     "Sumario": "Declaração de retificação à Lei n.º 31/2012, de 14 de agosto, que «Procede à revisão do regime jurídico do arrendamento urbano, alterando o Código Civil, o Códi...",
+     "Diploma": "Declaração de Retificação n.º 59-A/2012  - Diário da República n.º 198/2012, 1º Suplemento, Série I de 2012-10-12",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/declaracao-retificacao/59-a-2012-406279",
+     "DiplomaLegisId": "406279",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2006-04-17",
+     "Texto": " Rectificado o art. 3.º da Lei 6/2006, de 27-Fev, bem como o anexo que republicou o cap. IV do tít. II do livro II, na parte em que conferem nova redacção à al. a) do n.º 1 do art. 1102.º do Código Civil, pela DECL-RECT.24/2006.17.04.2006.AR, DR.IS-A [75] de 17.04.2006\u0000\u0000",
+     "Sumario": "De ter sido rectificada a Lei n.º 6/2006, de 27 de Fevereiro [aprova o Novo Regime do Arrendamento Urbano (NRAU), que estabelece um regime especial de actualiza...",
+     "Diploma": "Declaração de Rectificação n.º 24/2006  - Diário da República n.º 75/2006, Série I-A de 2006-04-17",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/declaracao-rectificacao/24-2006-650957",
+     "DiplomaLegisId": "650957",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2003-04-30",
+     "Texto": " Rectificado o art. 5.º do Dec Lei 38/2003 de 08-Mar [na parte que mantém a epígrafe do art. 819.º e na que altera o mesmo art. do Código Civil, aprovado pelo presente diploma], pela DECL-RECT.5-C/2003.2003.04.30.PCM, DR.IS-A [100]3ºSupl \u0000\u0000",
+     "Sumario": "De ter sido rectificado o Decreto-Lei n.º 38/2003, do Ministério da Justiça, que, no uso da autorização legislativa concedida pela Lei n.º 23/2002, de 21 de Ago...",
+     "Diploma": "Declaração de Rectificação n.º 5-C/2003  - Diário da República n.º 100/2003, 3º Suplemento, Série I-A de 2003-04-30",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/declaracao-rectificacao/5-c-2003-235918",
+     "DiplomaLegisId": "235918",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2001-11-30",
+     "Texto": " Rectificado o art. 1.º do Dec Lei 273/2001 de 13-Out, na parte em que confere nova redacção ao n.º 1 do art. 1653.º do Código Civil, pela DECL-RECT.20-AS/2001.30.11.2001.PCM, DR.IS-B [278-3ºSupl] de 30.11.2001\u00001\u0000",
+     "Sumario": "De ter sido rectificado o Decreto-Lei n.º 273/2001, do Ministério da Justiça, que, ao abrigo da autorização legislativa concedida pela Lei n.º 82/2001, de 3 de ...",
+     "Diploma": "Declaração de Rectificação n.º 20-AS/2001  - Diário da República n.º 278/2001, 3º Suplemento, Série I-A de 2001-11-30",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/declaracao-rectificacao/20-as-2001-203233",
+     "DiplomaLegisId": "203233",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "1998-06-30",
+     "Texto": "Rectificado o art. 1.º do Dec Lei 120/98 de 08-mai (na parte em que confere nova redacção aos n.ºs 1, 2, 3 e 4 do art. 1979.º, ao n.º 2 do art. 1980.º, à al. a) do n.º 1 e al. c) do n.º 3 do art. 1981.º, à al. a) do art. 1984.º, aos n.º 1 e 2 do art. 1922.º do Código Civil), pela DECL-RECT.11-C/98.30.06.1998.PCM, DR.IS-A [148] de 30.06.1998",
+     "Sumario": "De ter sido rectificado o Decreto-Lei n.º 120/98, do Ministério da Justiça, que altera o Regime Jurídico da Adopção, publicado no Diário da República, 1.ª série...",
+     "Diploma": "Declaração de Rectificação n.º 11-C/98  - Diário da República n.º 148/1998, 2º Suplemento, Série I-A de 1998-06-30",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/declaracao-rectificacao/11-c-1998-291196",
+     "DiplomaLegisId": "291196",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    }
+   ]
+  },
+  "CountInversas": "9",
+  "ApplicationRoot": ""
+ },
+ "regulamentacao-164": {
+  "DiretasList": {
+   "List": [],
+   "EmptyListItem": {
+    "Data": "1900-01-01",
+    "Texto": "",
+    "AssociacaoAnaliseJuridicaId": "0",
+    "HasLink": false,
+    "HasInversa": false,
+    "DiplomaLinkId": "0.0",
+    "Numero": "",
+    "Tipo": ""
+   }
+  },
+  "CountDiretas": "0",
+  "DomainName": "https://diariodarepublica.pt",
+  "StaticContentPath": "https://files.diariodarepublica.pt/StaticContent",
+  "InversasList": {
+   "List": [],
+   "EmptyListItem": {
+    "Data": "1900-01-01",
+    "Texto": "",
+    "Sumario": "",
+    "Diploma": "",
+    "TipoDiploma": "",
+    "NumeroAJ": "",
+    "NumeroDiploma": "",
+    "LinkSitemapAnaliseJuridica": "",
+    "DiplomaLegisId": "0",
+    "DiplomaDGOId": "0",
+    "DiplomaRegTrabId": "0",
+    "DiplomaLegacorId": "0",
+    "DiplomaDGAPId": "0",
+    "ActoSocietarioId": "0",
+    "AcordaoSTADiplomaId": "0",
+    "ContratoPublicoId": "0"
+   }
+  },
+  "CountInversas": "0",
+  "ApplicationRoot": ""
+ },
+ "direito-uniao-europeia-158": {
+  "DiretasList": {
+   "List": [],
+   "EmptyListItem": {
+    "Data": "1900-01-01",
+    "Texto": "",
+    "AssociacaoAnaliseJuridicaId": "0",
+    "HasLink": false,
+    "HasInversa": false,
+    "DiplomaLinkId": "0.0",
+    "Numero": "",
+    "Tipo": ""
+   }
+  },
+  "CountDiretas": "0",
+  "DomainName": "https://diariodarepublica.pt",
+  "StaticContentPath": "https://files.diariodarepublica.pt/StaticContent",
+  "InversasList": {
+   "List": [],
+   "EmptyListItem": {
+    "Data": "1900-01-01",
+    "Texto": "",
+    "Sumario": "",
+    "Diploma": "",
+    "TipoDiploma": "",
+    "NumeroAJ": "",
+    "NumeroDiploma": "",
+    "LinkSitemapAnaliseJuridica": "",
+    "DiplomaLegisId": "0",
+    "DiplomaDGOId": "0",
+    "DiplomaRegTrabId": "0",
+    "DiplomaLegacorId": "0",
+    "DiplomaDGAPId": "0",
+    "ActoSocietarioId": "0",
+    "AcordaoSTADiplomaId": "0",
+    "ContratoPublicoId": "0"
+   }
+  },
+  "CountInversas": "0",
+  "ApplicationRoot": ""
+ },
+ "outros-tipos-157": {
+  "DiretasList": {
+   "List": [
+    {
+     "Data": "1900-01-01",
+     "Texto": " 1ª parte do nº 2 do art. 109º da CRP.\u0000\u0000",
+     "AssociacaoAnaliseJuridicaId": "33625661",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "0",
+     "Numero": "",
+     "Tipo": ""
+    }
+   ]
+  },
+  "CountDiretas": "1",
+  "DomainName": "https://diariodarepublica.pt",
+  "StaticContentPath": "https://files.diariodarepublica.pt/StaticContent",
+  "InversasList": {
+   "List": [
+    {
+     "Data": "2026-08-03",
+     "Texto": "Portaria n.º 325/2026/1  - Diário da República n.º 149/2026, Série I de 2026-08-04 (Artigo 167.º e seguintes do Código Civil)",
+     "Sumario": "Estabelece o regime específico dos apoios a conceder, ao abrigo do artigo 78.º do Regulamento (UE) 2021/2115, do Parlamento Europeu e do Conselho, no que se ref...",
+     "Diploma": "Portaria n.º 325/2026/1  - Diário da República n.º 149/2026, Série I de 2026-08-04",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/portaria/325-2026-1154275224",
+     "DiplomaLegisId": "1154275224",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2026-07-20",
+     "Texto": "Artigo 168.º do Código Civil, aprovado pelo Decreto-Lei n.º 47344, de 25 de novembro de 1966, Diário do Governo n.º 274/1966, Série I, na sua redação atual pelo(a) Aviso n.º 78/2026",
+     "Sumario": "Alteração dos Estatutos da Associação Humanitária de Bombeiros Voluntários da Ilha Graciosa.",
+     "Diploma": "Aviso n.º 78/2026",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/aviso/78-2026-1150076375",
+     "DiplomaLegisId": "0",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "1150076375",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2026-07-09",
+     "Texto": "Despacho n.º 8721/2026  - Diário da República n.º 132/2026, Série II de 2026-07-10 (N.º 2 do artigo 158.º do Código)",
+     "Sumario": "Reconhece a Fundação Futebol Clube do Porto.",
+     "Diploma": "Despacho n.º 8721/2026  - Diário da República n.º 132/2026, Série II de 2026-07-10",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/despacho/8721-2026-1145934528",
+     "DiplomaLegisId": "1145934528",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2026-07-03",
+     "Texto": "Decreto-Lei n.º 132/2026  - Diário da República n.º 127/2026, Série I de 2026-07-03",
+     "Sumario": "Procede à revisão do regime jurídico de acesso e permanência na atividade de inspeção técnica de veículos a motor e seus reboques e o regime de funcionamento do...",
+     "Diploma": "Decreto-Lei n.º 132/2026  - Diário da República n.º 127/2026, Série I de 2026-07-03",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/decreto-lei/132-2026-1143461618",
+     "DiplomaLegisId": "1143461618",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    },
+    {
+     "Data": "2026-06-30",
+     "Texto": "Despacho n.º 8136/2026  - Diário da República n.º 124/2026, Série II de 2026-06-30 (N.º 2 do artigo 158.º do Código Civil)",
+     "Sumario": "Reconhece a Fundação Máximo Silva.",
+     "Diploma": "Despacho n.º 8136/2026  - Diário da República n.º 124/2026, Série II de 2026-06-30",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/despacho/8136-2026-1139905357",
+     "DiplomaLegisId": "1139905357",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    }
+   ]
+  },
+  "CountInversas": "467",
+  "ApplicationRoot": ""
+ },
+ "outros-tipos-160": {
+  "DiretasList": {
+   "List": [
+    {
+     "Data": "2007-08-24",
+     "Texto": " NOTAJUR.35827/2006.24.08.2007.SCJ-DGO, Art. 557º e seguintes\u0000\u0000",
+     "AssociacaoAnaliseJuridicaId": "33625704",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "29942302",
+     "Numero": "35827/2006",
+     "Tipo": "nota-juridica"
+    },
+    {
+     "Data": "2007-05-30",
+     "Texto": " PARECERJUR.9150/2007.30.05.2007.SCJ-DGO,Art. 6º\u0000\u0000",
+     "AssociacaoAnaliseJuridicaId": "33625702",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "29942280",
+     "Numero": "9150/2007",
+     "Tipo": "parecer-juridico"
+    },
+    {
+     "Data": "2007-04-20",
+     "Texto": " PARECERJUR.9160/2007.20.04.2007.SCJ-DGO,Nº. 1 do art. 7º\u0000\u0000",
+     "AssociacaoAnaliseJuridicaId": "33625701",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "29941869",
+     "Numero": "9160/2007",
+     "Tipo": "parecer-juridico"
+    },
+    {
+     "Data": "2006-12-06",
+     "Texto": " PARECERJUR.31411/2006.06.12.2006.SCJ-DGO, Nº.s 2 e 3 do artº. 9.º\u0000\u0000",
+     "AssociacaoAnaliseJuridicaId": "33625700",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "29941837",
+     "Numero": "31411/2006",
+     "Tipo": "parecer-juridico"
+    },
+    {
+     "Data": "2006-05-16",
+     "Texto": " PARECERJUR.9867/2006.16.05.2006.SCJ-DGO (Art. 10.º)\u0000\u0000",
+     "AssociacaoAnaliseJuridicaId": "33625699",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "29941817",
+     "Numero": "9867/2006",
+     "Tipo": "parecer-juridico"
+    }
+   ]
+  },
+  "CountDiretas": "20",
+  "DomainName": "https://diariodarepublica.pt",
+  "StaticContentPath": "https://files.diariodarepublica.pt/StaticContent",
+  "InversasList": {
+   "List": [],
+   "EmptyListItem": {
+    "Data": "1900-01-01",
+    "Texto": "",
+    "Sumario": "",
+    "Diploma": "",
+    "TipoDiploma": "",
+    "NumeroAJ": "",
+    "NumeroDiploma": "",
+    "LinkSitemapAnaliseJuridica": "",
+    "DiplomaLegisId": "0",
+    "DiplomaDGOId": "0",
+    "DiplomaRegTrabId": "0",
+    "DiplomaLegacorId": "0",
+    "DiplomaDGAPId": "0",
+    "ActoSocietarioId": "0",
+    "AcordaoSTADiplomaId": "0",
+    "ContratoPublicoId": "0"
+   }
+  },
+  "CountInversas": "0",
+  "ApplicationRoot": ""
+ },
+ "outros-tipos-161": {
+  "DiretasList": {
+   "List": [
+    {
+     "Data": "2025-09-29",
+     "Texto": "Acórdão (extrato) n.º 652/2025, de 10 de julho, Diário da República n.º 187/2025, Série II / Processo n.º 271/25 (N.ºs 1 e 2 do Código Civil)",
+     "AssociacaoAnaliseJuridicaId": "937510641",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "0",
+     "Numero": "",
+     "Tipo": ""
+    },
+    {
+     "Data": "2025-09-26",
+     "Texto": "Acórdão (extrato) n.º 523/2025, de 17 de junho de 2025, Diário da República n.º 186/2025, Série II, 26 de setembro de 2025/Processo n.º 1312/23 (N.º 1 do artigo 1817.º do Código, na redação da Lei n.º 14/2009, de 1 de abril)",
+     "AssociacaoAnaliseJuridicaId": "936950485",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "0",
+     "Numero": "",
+     "Tipo": ""
+    },
+    {
+     "Data": "2025-09-26",
+     "Texto": "Acórdão (extrato) n.º 649/2025, de 10 de julho de 2025, Diário da República n.º 186/2025, Série II, de 26 de setembro de 2025/ Processo n.º 983/24 (N.º 2 do artigo 175.º do Código)",
+     "AssociacaoAnaliseJuridicaId": "936950486",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "0",
+     "Numero": "",
+     "Tipo": ""
+    },
+    {
+     "Data": "2024-10-15",
+     "Texto": "Acórdão do Supremo Tribunal de Justiça n.º 13/2024, de 12 de setembro de 2024, Diário da República n.º 200/2024, Série I, de 15 de outubro de 2024/Processo n.º 2218/18.0T8CHV-A.G1.S1 - Pleno da Secções Cíveis - Uniformização de jurisprudência (alínea e) do artigo 310.º do Código)",
+     "AssociacaoAnaliseJuridicaId": "897233233",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "0",
+     "Numero": "",
+     "Tipo": ""
+    },
+    {
+     "Data": "2023-08-02",
+     "Texto": "AC 7/2023 de 20-abr STJ DR.IS [149] de 02.08.2023/Processo n.º 3655/06.9TVLSB.L2.S1-A Uniformização de Jurisprudência (arts. 917.º e 918.º do Código Civil)",
+     "AssociacaoAnaliseJuridicaId": "216645176",
+     "HasLink": false,
+     "HasInversa": false,
+     "DiplomaLinkId": "0",
+     "Numero": "",
+     "Tipo": ""
+    }
+   ]
+  },
+  "CountDiretas": "83",
+  "DomainName": "https://diariodarepublica.pt",
+  "StaticContentPath": "https://files.diariodarepublica.pt/StaticContent",
+  "InversasList": {
+   "List": [
+    {
+     "Data": "2016-12-09",
+     "Texto": "AC 583/2016 de 09-dez do TCS/ (Proc.º 170/2016) DR.IIS [235] (norma extraída da alínea a) do n.º 1 do artigo 1091.º do Código Civil, na redação introduzida pela Lei n.º 6/2006, de 27 de fevereiro, interpretada no sentido de o arrendatário, há mais de três anos, de parte de prédio urbano não constituído em propriedade horizontal, não ter direito de preferência sobre a totalidade do prédio, na compra e venda desse mesmo prédio.) pelo(a) Acórdão n.º 583/2016  - Diário da República n.º 235/2016, Série II de 2016-12-09",
+     "Sumario": "Não julga inconstitucional a norma extraída da alínea a) do n.º 1 do artigo 1091.º do Código Civil, na redação introduzida pela Lei n.º 6/2006, de 27 de feverei...",
+     "Diploma": "Acórdão n.º 583/2016  - Diário da República n.º 235/2016, Série II de 2016-12-09",
+     "TipoDiploma": "",
+     "NumeroAJ": "",
+     "NumeroDiploma": "",
+     "LinkSitemapAnaliseJuridica": "/dr/analise-juridica/informacoes-gerais/acordao/583-2016-105335913",
+     "DiplomaLegisId": "105335913",
+     "DiplomaDGOId": "0",
+     "DiplomaRegTrabId": "0",
+     "DiplomaLegacorId": "0",
+     "DiplomaDGAPId": "0",
+     "ActoSocietarioId": "0",
+     "AcordaoSTADiplomaId": "0",
+     "ContratoPublicoId": "0"
+    }
+   ]
+  },
+  "CountInversas": "1",
+  "ApplicationRoot": ""
+ }
+}
