@@ -303,3 +303,53 @@ class TestDocumentDetail:
 # ─────────────────────────────────────────────
 # daily(): red job, state untouched
 # ─────────────────────────────────────────────
+
+
+class TestOutOfScopeRecords:
+    """DRE indexes the Jornal Oficial dos Açores but never digitised it: 6,597 of
+    the first 31,000 as-published ids are catalogue rows with no text, no PDF and
+    no ELI. They are out of scope (RESEARCH-PT-v2 §11) and must not reach the
+    corpus as text-less cards."""
+
+    @staticmethod
+    def _client():
+        from legalize.fetcher.pt.client import DREClient
+
+        return DREClient.__new__(DREClient)
+
+    def test_legacor_row_yields_no_text(self):
+        client = self._client()
+        bundle = {
+            "published": {
+                "Id": "30978201",
+                "Numero": "69/83",
+                "Titulo": "Despacho Normativo n.º 69/83",
+                "Resumo": "Efectua transferências de verbas.\x00",
+                "Texto": "\x00",
+                "TextoFormatado": "",
+                "URL_PDF": "",
+                "ELI": "",
+                "TipoConteudo": "DiplomaLegacor",
+                "DiplomaLegacor": {
+                    "FonteRegional": "JORNAL OFICIAL DOS AÇORES - 1.ª SÉRIE, Nº 24",
+                },
+            }
+        }
+        with patch.object(type(client), "_bundle", lambda self, _id: bundle):
+            with pytest.raises(ValueError, match="No text and no PDF"):
+                client.get_text("pub:despacho-normativo:69-1983-30978201")
+
+    def test_scan_only_diploma_is_kept(self):
+        """The same branch must not swallow the diplomas DRE has only as a scan —
+        those keep their metadata and a link to the official PDF."""
+        client = self._client()
+        bundle = {
+            "published": {
+                "Id": "559253",
+                "Texto": "",
+                "TextoFormatado": "",
+                "URL_PDF": "https://files.diariodarepublica.pt/1s/1932/07/16200/14471448.pdf",
+            }
+        }
+        with patch.object(type(client), "_bundle", lambda self, _id: bundle):
+            assert client.get_text("pub:acordao-doutrinario:1932-559253") == b""

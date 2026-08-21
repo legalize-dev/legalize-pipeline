@@ -1121,6 +1121,23 @@ in the README.
 - Binary assets in the repo (images stay links or counts).
 - OCR of the `URLPDF` scans of pre-1970 diplomas.
 - Séries II–V of the Diário da República (the repo is Série I only, correctly).
+- **The Jornal Oficial dos Açores.** 6,597 of the first 31,000 as-published ids —
+  21 % — are DRE catalogue rows for the Azorean gazette, marked
+  `TipoConteudo: DiplomaLegacor` and carrying `DiplomaLegacor.FonteRegional`
+  ("JORNAL OFICIAL DOS AÇORES - 1.ª SÉRIE, Nº 24-Supl, de 1983-07-05"). They span
+  1977–2025, 79 % are `VIGENTE`, and they are *not* duplicates of a DR diploma:
+  99.7 % are a distinct act that merely shares its number with one (checked against
+  every non-Legacor record of the same type and number). DRE never digitised them —
+  no `Texto`, no `URL_PDF`, no ELI — so all that exists is number, dates, the
+  regional citation, the issuing secretariat and a one-line `Resumo`
+  (~50 % transferências de verbas, ~14 % preços e taxas, ~10 % nomeações, ~20 %
+  actual regulation). Excluded, user decision 2026-08-22: legalize-pt is the Diário
+  da República, and this is a different gazette. The §14.4 trade for scan-only
+  diplomas does not carry over — there the PDF still holds the text, here nothing
+  does, so the stub would be a card you cannot read the law from. Enforced at
+  `client.get_text` and pinned by `TestOutOfScopeRecords`; the corpus keeps whatever
+  Açores legislation the DR itself publishes (decretos legislativos regionais and
+  the rest, jurisdiction `pt-20`).
 - Jurisprudence (`acordao-*`) beyond the handful DRE consolidates.
 - `dados.gov.pt` / PGDL / N-Lex as alternative sources — investigated only far enough
   to confirm DRE is the authoritative machine-readable one.
