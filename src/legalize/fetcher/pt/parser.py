@@ -81,6 +81,19 @@ _HEADING_TYPES = frozenset(FRAGMENT_TYPES) - {0, 7, 15, 16, 17, 18}
 # text layer (docs/pt-formatting-inventory.md §3). Link the PDF instead of lying.
 _VER_DOC_ORIGINAL = re.compile(r"\(\s*ver\s+documento\s+original\s*\)", re.IGNORECASE)
 
+# DRE publishes subject descriptors as numeric ids in eli:is_about and their labels
+# only through the AnaliseJuridica thesaurus (docs/pt-metadata-inventory.md §3).
+# Build the map once with scripts/pt_build_thesaurus.py and inject it before a
+# reparse; without it `subjects` stays empty rather than shipping opaque numbers.
+_THESAURUS: dict[str, str] = {}
+
+
+def set_thesaurus(mapping: dict[str, str]) -> None:
+    """Install the descriptor id -> Portuguese label map."""
+    _THESAURUS.clear()
+    _THESAURUS.update({str(k): v for k, v in (mapping or {}).items() if v})
+
+
 _RANK_FROM_ELI = {
     "lei": "lei",
     "lei-constitucional": "lei-constitucional",
@@ -692,12 +705,11 @@ class DREMetadataParser(MetadataParser):
             jurisdiction=jurisdiction,
             last_modified=_parse_date(consolidation.get("DataUltimaConsolidada")),
             pdf_url=pdf_url or None,
-            # eli:is_about yields numeric descriptor ids, not labels, and the
-            # authority URIs do not dereference. Opaque numbers in `subjects` are
-            # worse than an empty list, so they are parked in `extra` until the
-            # AnaliseJuridica ThesaurusTreeList lookup resolves them to Portuguese
-            # terms (docs/pt-metadata-inventory.md §3) — a reparse, no refetch.
-            subjects=(),
+            subjects=tuple(
+                label
+                for sid in (eli_meta.get("subjects") or ())
+                if (label := _THESAURUS.get(str(sid)))
+            ),
             summary=sumario,
             extra=tuple(extra),
         )

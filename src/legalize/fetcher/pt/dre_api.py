@@ -49,12 +49,15 @@ _CSRF_PATTERNS = (
 # known name prefixes rather than one exact name.
 _SCREEN_JS = (
     f"{BASE}/scripts/dr.Home.home.mvc.js",
+    f"{BASE}/scripts/dr.AnaliseJuridica.AnaliseJuridica.mvc.js",
     f"{BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Det_Diario.mvc.js",
     f"{BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc.js",
     f"{BASE}/scripts/dr.LegislacaoConsolidada.LegCons_Detalhe.mvc.js",
     f"{BASE}/scripts/dr.LegislacaoConsolidada.AlteracoesTimelineByDiplomaLegisId.mvc.js",
 )
 
+AJ_ELEMENT_TYPE = "aj_element_type"
+AJ_DATA = "aj_data"
 JOURNALS_BY_DATE = "journals_by_date"
 DOCUMENTS_BY_JOURNAL = "documents_by_journal"
 PUBLISHED_DETAIL = "published_detail"
@@ -62,6 +65,7 @@ CONS_HEADER = "cons_header"
 CONS_SNAPSHOT = "cons_snapshot"
 CONS_TIMELINE = "cons_timeline"
 
+_VIEW_AJ = "AnaliseJuridica.AnaliseJuridica"
 _VIEW_HOME = "Home.home"
 _VIEW_DIARIO = "Legislacao_Conteudos.Conteudo_Det_Diario"
 _VIEW_PUBLISHED = "Legislacao_Conteudos.Conteudo_Detalhe"
@@ -70,6 +74,8 @@ _VIEW_CONSOLIDATED = "LegislacaoConsolidada.LegCons_Detalhe"
 # logical name -> (action-name prefixes, viewName to post under)
 _ACTIONS: dict[str, tuple[tuple[str, ...], str]] = {
     JOURNALS_BY_DATE: (("DataActionGetDRByDataCalendario",), _VIEW_HOME),
+    AJ_ELEMENT_TYPE: (("DataActionGetElementTypeAndApplicationSettings",), _VIEW_AJ),
+    AJ_DATA: (("DataActionGetData",), _VIEW_AJ),
     DOCUMENTS_BY_JOURNAL: (("DataActionGetDadosAndApplicationSettings",), _VIEW_DIARIO),
     PUBLISHED_DETAIL: (
         ("DataActionGetConteudoData", "DataActionGetAllConteudoDetalhe"),
@@ -78,6 +84,12 @@ _ACTIONS: dict[str, tuple[tuple[str, ...], str]] = {
     CONS_HEADER: (("DataActionGetDiplomaFragByIdAndApplicationSetting",), _VIEW_CONSOLIDATED),
     CONS_SNAPSHOT: (("DataActionGetData",), _VIEW_CONSOLIDATED),
     CONS_TIMELINE: (("DataActionGetConsolidacaoByDiplomaFrag",), _VIEW_CONSOLIDATED),
+}
+
+# Actions whose name is ambiguous across screens must be resolved against one file.
+_SCREEN_OF: dict[str, str] = {
+    CONS_SNAPSHOT: f"{BASE}/scripts/dr.LegislacaoConsolidada.LegCons_Detalhe.mvc.js",
+    AJ_DATA: f"{BASE}/scripts/dr.AnaliseJuridica.AnaliseJuridica.mvc.js",
 }
 
 _SITEMAP_REF = re.compile(r"/dr/(?:detalhe|legislacao-consolidada)/([^/]+)/([^/?#]+)")
@@ -155,12 +167,18 @@ class DREApi(HttpClient):
         if not self._module_version:
             raise DREApiError(f"No versionToken in {_MODULE_VERSION}: {version!r:.200}")
 
-        combined = "\n".join(self._request("GET", url).text for url in _SCREEN_JS)
+        bodies = {url: self._request("GET", url).text for url in _SCREEN_JS}
+        combined = "\n".join(bodies.values())
 
         endpoints: dict[str, tuple[str, str, str]] = {}
         for logical, (prefixes, view) in _ACTIONS.items():
+            # Two screens both declare a "DataActionGetData"; those resolve against
+            # their own screen's JS, not the union, or one silently gets the other's
+            # apiVersion and DRE answers "No role validation found".
+            source = _SCREEN_OF.get(logical)
+            js_text = bodies[source] if source in bodies else combined
             url, api_version = self._resolve_endpoint(
-                logical, combined, "the DRE screen JS", prefixes
+                logical, js_text, source or "the DRE screen JS", prefixes
             )
             endpoints[logical] = (url, api_version, view)
         self._endpoints = endpoints
@@ -463,6 +481,79 @@ class DREApi(HttpClient):
             f"{DOCUMENTS_BY_JOURNAL} for issue {journal_id} returned no readable list "
             f"— keys: {sorted(data)}. An issue always has documents."
         )
+
+    # ----------------------------------------------------- análise jurídica
+
+    @staticmethod
+    def _aj_vars(tipo: str, key: str, associacao: str = "informacoes-gerais") -> dict:
+        """The AnaliseJuridica screen state.
+
+        The SPA splits the key ``47344-1966-477358`` into Numero/Year/ConteudoId
+        client-side *before* the first data action fires. Post Tipo/Key alone and DRE
+        answers ``IsNullElementType: true`` with every id 0 — a silent empty result.
+        """
+        parts = key.rsplit("-", 2)
+        numero, ano, conteudo_id = (parts + ["", "", ""])[:3] if len(parts) == 3 else ("", "", key)
+        return {
+            "Associacao": associacao,
+            "_associacaoInDataFetchStatus": 1,
+            "Tipo": tipo,
+            "_tipoInDataFetchStatus": 1,
+            "Key": key,
+            "_keyInDataFetchStatus": 1,
+            "ConteudoId": conteudo_id,
+            "Numero": numero,
+            "Year": int(ano) if ano.isdigit() else 0,
+            "TipoAssociacaoIdAux": "0",
+            "HasAssociacoesEcra": True,
+            "DiplomaFragId": "0",
+            "IsRended": True,
+            "DiplomaLegisId": "0",
+            "DiplomaDGOId": "0",
+            "DiplomaRegTrabId": "0",
+            "DiplomaLegacorId": "0",
+            "DiplomaDGAPId": "0",
+            "TipoAssociacaoId": "0",
+            "AssociacaoAnaliseJuridicaId": "0",
+            "IsWordExport": False,
+            "IsExcelExport": False,
+            "TipoExportacao": "",
+            "CountEcra": 0,
+            "HasJurisprudenciaAssociadaVar": False,
+            "IsDiretaChecked": True,
+            "IsInversaChecked": True,
+            "AssociacoesCounter": 0,
+            "IsPageTracked": True,
+            "IsShowConteudoRelacionado": True,
+            "Print": False,
+            "TotalAssociacoes": 0,
+            "HasAssociacoesFetched": False,
+        }
+
+    def descriptors(self, ref: str) -> dict[str, str]:
+        """``{"30215271": "Código Civil", …}`` for one diploma.
+
+        The keys are the same integers ``eli:is_about`` points at
+        (``…/authority/legal-subject/{id}``), which do not dereference anywhere else.
+        This is the only surface that publishes their labels.
+        """
+        tipo, key = split_sitemap_ref(ref)
+        variables = self._aj_vars(tipo, key)
+        element_type = self.call(AJ_ELEMENT_TYPE, variables)
+        if element_type.get("IsNullElementType"):
+            raise DREApiError(
+                f"analise-juridica did not resolve {ref} — it answers with a silent "
+                f"empty record rather than an error."
+            )
+        variables["GetElementTypeAndApplicationSettings"] = element_type
+        variables["DiplomaLegisId"] = element_type.get("DiplomaLegisIdOut", "0")
+        data = self.call(AJ_DATA, variables)
+        entries = (data.get("ThesaurusTreeList") or {}).get("List") or []
+        return {
+            str(entry.get("ThesaurusElementId")): (entry.get("ThesaurusElementName") or "").strip()
+            for entry in entries
+            if entry.get("ThesaurusElementId") and entry.get("ThesaurusElementName")
+        }
 
     # ---------------------------------------------------------------- helpers
 
