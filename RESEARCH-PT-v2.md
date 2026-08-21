@@ -83,7 +83,13 @@ Worse, this is invisible in the product twice over:
   Portuguese law.
 
 Both are cross-country bugs (they hit `[repeal]` and `[correction]` for every
-country), but Portugal is where they bite hardest.
+country), but Portugal is where they bite hardest. The root cause is a half-finished
+rename: `models.py::CommitType` was translated to English (`new`, `reform`, `repeal`,
+`correction`) but the DB-side parser still matches the Spanish names — and
+`engine/CLAUDE.md` still documents the Spanish list
+(`[bootstrap]`, `[reforma]`, `[nueva]`, `[derogacion]`, `[correccion]`,
+`[fix-pipeline]`) as the locked format. The docs, the emitter and the consumer
+disagree three ways.
 
 ### 1.3 Text quality — 600-file random sample
 
@@ -731,7 +737,7 @@ handles all of it:
 | Amendment notes | Yes — `AlteracoesList` per fragment | **Dropped** | decide: `extra` vs rendered note |
 | Anexos | Yes — `TipoFragmentoId` 14 | **No pattern** | `anexo_num` → `##` |
 | Signatories | Yes — `TipoFragmentoId` 7, `paragraph-italic-right` | **No pattern** | `firma` → `**bold**` |
-| Images | **96 in one law**, stable CDN URLs | Dropped, not counted | ES §11 policy: `![](url)` + `extra.images_linked` |
+| Images | **96 in one law**, stable CDN URLs | Dropped, not counted | ES §11 policy: `![](url)` + `extra.images_linked` — **note this contradicts `engine/CLAUDE.md`** ("images are explicitly skipped"), which Spain already overrode in `RESEARCH-ES-v2.md §11`. Needs the same explicit decision for PT, or the rule promoted engine-wide |
 | Formulas | Not seen; likely rendered as images | — | covered by the image policy |
 | `<style>` blocks | 4 in the fixtures | Passed through by the regex stripper | **strip** |
 | Line endings | `\r\n` in the source HTML | Not normalised | normalise to `\n` |
