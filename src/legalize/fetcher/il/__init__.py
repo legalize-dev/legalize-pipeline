@@ -1,0 +1,1 @@
+"""Israel fetcher components."""

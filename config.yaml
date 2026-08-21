@@ -55,6 +55,18 @@ countries:
       # Extract and set legi_dir to the root
       legi_dir: "../countries/data-fr/legi"
 
+  il:
+    repo_path: "../countries/il"
+    data_dir: "../countries/data-il"
+    max_workers: 2
+    source:
+      base_url: "https://knesset.gov.il/OdataV4/ParliamentInfo"
+      request_timeout: 60
+      max_retries: 5
+      requests_per_second: 1.0
+      user_agent: "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
+      is_basic_law_only: false
+
   se:
     repo_path: "../countries/se"
     data_dir: "../countries/data-se"
