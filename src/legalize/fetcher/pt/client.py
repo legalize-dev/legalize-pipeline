@@ -264,8 +264,11 @@ class DREClient(LegislativeClient):
             # of a second detail call for every one of 204,314 diplomas.
             detail = self._bundle(norm_id).get("published") or {}
             body = (detail.get("TextoFormatado") or detail.get("Texto") or "").strip()
-            if not body:
-                raise ValueError(f"No text for {norm_id}")
+            if not body and not (detail.get("URL_PDF") or "").strip():
+                raise ValueError(f"No text and no PDF for {norm_id}")
+            # Historical types (acórdãos doutrinários, cartas de lei, regimentos)
+            # exist at DRE only as a scan. Publishing the diploma with its metadata
+            # and a link to the official PDF beats leaving a hole in the corpus.
             return body.encode("utf-8")
         # For a consolidated diploma the text is assembled per version; the parser
         # works off the suvestine blob, so this only has to be non-empty.

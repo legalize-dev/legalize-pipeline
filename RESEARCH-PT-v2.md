@@ -1494,6 +1494,79 @@ caused it. `git show` on the 2025-04-02 commit is a diff from "dezasseis anos" t
 
 ---
 
+## §14 Rebuild status and how to continue
+
+Branch `feat/pt-v2`, worktree `engine-pt/`. Updated 2026-08-21.
+
+### 14.1 Done
+
+| | |
+|---|---|
+| `fetcher/pt/dre_api.py` | OutSystems transport, both screens + the journal walk. Thread-safe endpoint refresh (the old client rebuilt `_endpoints` in place and lost 32 % of requests at 8 workers). |
+| `fetcher/pt/client.py` | One norm-id space, `cons:{tipo}:{ano}-{fragId}` and `pub:{tipo}:{key}`. `get_suvestine` returns one point-in-time snapshot per effective date. Raw envelopes persisted under `{data_dir}/raw/` so a parser change is a reparse, not a refetch. |
+| `fetcher/pt/identifier.py` | ELI-derived ids, four-digit year always, DRE content id for numberless diplomas. |
+| `fetcher/pt/discovery.py` | Sitemap + journal walk, 1960+, 51 in-scope types. |
+| `fetcher/pt/parser.py` | Heading level from `TipoFragmentoId`; lxml with forced UTF-8; tables via `_tables` with `imageWrapper` detection; cross-reference links; ELI RDFa; per-version diff so no-op reforms produce no commit. |
+| `fetcher/pt/daily.py` | Re-consolidation detection via the sitemap `<lastmod>` diff, plus the day's new diplomas. |
+| `tests/` | 72 PT tests, each anchored to a measured defect of the old corpus. |
+| `config.yaml` | HTTP source, `max_workers: 8`, `requests_per_second: 5.0` (~10 % of measured capacity), `earliest_year: 1960`. |
+
+**Discovery result: 5,561 consolidated + 204,314 as-published = 209,875 norms**
+(the old repo has 109,929). Lists cached at `{data_dir}/discovery_{cons,pub,ids}.txt`.
+
+### 14.2 In flight
+
+Two background fetches, both writing to `../countries/data-pt/`:
+
+```bash
+python3 /tmp/pt_fetch_cons.py   # 5,561 consolidated,  ~31/min, ETA ~3 h
+python3 /tmp/pt_fetch_pub.py    # 204,314 as-published, ~282/min, ETA ~12 h
+```
+
+Both are resumable: `{data_dir}/json/` skips finished norms and `{data_dir}/raw/`
+skips the network for anything already downloaded. Re-running either script simply
+continues.
+
+### 14.3 Remaining, in order
+
+1. **Finish the fetch** (above).
+2. **Reparse** — `generic_fetch_one(..., force=True)` over every id replays from
+   `{data_dir}/raw/` with no network, so any parser fix lands in minutes. Do this
+   once at the end so the whole corpus is parsed by the final parser.
+3. **Resolve the descriptors.** `eli:is_about` gives numeric ids that do not
+   dereference; `AnaliseJuridica.DataActionGetData → ThesaurusTreeList` maps them to
+   Portuguese labels (recipe in `docs/pt-metadata-inventory.md` §3). Build the map
+   once, then fill `NormMetadata.subjects` on the reparse. Until then the ids live in
+   `extra.subject_ids` and `subjects` is empty — opaque numbers are worse than none.
+4. **Bootstrap the repo.** Wipe `../countries/pt`, `legalize bootstrap -c pt`, then
+   `legalize health -c pt` must report zero issues.
+5. **Push** to `legalize-dev/legalize-pt` (force; the history is rewritten) and tag
+   the old head `pre-v2` first.
+6. **Engine PR** from `feat/pt-v2`, CI green.
+7. **Two one-line fixes in `enrichment`**, without which none of this reaches the
+   site (see §1.2): add `[new`, `[repeal`, `[correction` to the accept-list in
+   `parse_reform_commit`, and `^#{1,6}\s+Artigo` to `_ARTICLE_PATTERNS`.
+8. **`law-sync full --repo ../countries/pt`** — every `reforms.sha` is invalidated by
+   the rewrite, so an incremental sync is not enough.
+9. **Redirect map** old id → new id for `legalize-web`; every filename changes (D2).
+
+### 14.4 Decisions taken while building
+
+- **Scan-only diplomas are published, not skipped.** Historical types (acórdãos
+  doutrinários, cartas de lei, regimentos) exist at DRE only as a scan: 9.25 % of the
+  first 2,000 as-published fetches raised "no text". They now get their metadata plus
+  a `nota_pie` linking the official PDF. A hole in the corpus is worse than a stub
+  that tells the truth and points at the scan.
+- **`(ver documento original)` is linked, not enriched.** Measured recoverability:
+  0/42 from the consolidated surface, 1/71 from as-published, 64.7 % of the PDFs are
+  scans with no text layer. The marker becomes a link to the exact PDF.
+- **Block identity is `FragmentoVersao.FragmentoId`, not `ConsolidacaoFragmento.Id`.**
+  The latter is the row id *within one consolidation* and changes every time DRE
+  reconsolidates; keying on it produced 158,186 blocks for the Código Civil instead
+  of 2,930, and collapsed 54 reforms into 1.
+- **`Version.publication_date` carries the effective date.** `effective_date` never
+  reaches the JSON cache — `save_structured_json` writes only `publication_date`.
+
 ## Artefacts produced by this research
 
 | Path | What |

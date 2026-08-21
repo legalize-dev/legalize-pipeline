@@ -462,9 +462,22 @@ class DRETextParser(TextParser):
     def _published_blocks(self, blob: dict, norm_id: str) -> tuple[list[Block], list[Reform]]:
         entry = blob["versions"][0]
         when = _parse_date(entry.get("date")) or date(1900, 1, 1)
-        paragraphs = _parse_published_html(unpack(entry["html_b64"]), blob.get("pdf_url", ""))
+        pdf_url = blob.get("pdf_url", "")
+        paragraphs = _parse_published_html(unpack(entry["html_b64"]), pdf_url)
         if not paragraphs:
-            return [], []
+            if not pdf_url:
+                return [], []
+            # DRE never digitised this one — it exists only as a scan. Say so, and
+            # link it, rather than dropping the diploma from the corpus.
+            paragraphs = [
+                Paragraph(
+                    css_class="nota_pie",
+                    text=(
+                        "O texto deste diploma não se encontra disponível em formato "
+                        f"eletrónico no Diário da República. [Ver documento original]({pdf_url})"
+                    ),
+                )
+            ]
         version = Version(
             norm_id=norm_id,
             publication_date=when,
