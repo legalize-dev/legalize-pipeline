@@ -18,11 +18,11 @@ REPO=${REPO:-../countries/pt}
 # file is not overwritten by the reparse, it is simply left behind — and
 # commit_all_fast reads the directory, not the id list, so every one of them would
 # ship as a ghost law. raw/ is the source of truth; json/ is derived. Wipe it.
-echo "==> wipe json/ ($(ls "$DATA"/json 2>/dev/null | wc -l | tr -d ' ') stale files)"
+echo "==> wipe json/ ($(find "$DATA/json" -name '*.json' 2>/dev/null | wc -l | tr -d ' ') stale files)"
 rm -rf "$DATA/json"
 mkdir -p "$DATA/json"
 
-echo "==> reparse ($(ls "$DATA"/raw/*.versions.json.gz | wc -l | tr -d ' ') cached norms)"
+echo "==> reparse ($(find "$DATA/raw" -name '*.versions.json.gz' | wc -l | tr -d ' ') cached norms)"
 CONFIG="$CONFIG" python3 scripts/pt_reparse.py
 
 echo "==> wipe and re-init the repo"

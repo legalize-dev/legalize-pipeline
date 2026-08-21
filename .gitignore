@@ -38,3 +38,4 @@ Thumbs.db
 
 # Pipeline run logs (bootstrap-*.log, fetch-*.log, commit-*.log, reprocess-*.log)
 *.log
+logs/
