@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import subprocess
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 
@@ -592,7 +593,8 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
         is_first = reform == reforms[0]
         commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-        markdown = render_norm_at_date(metadata, blocks, reform.date, include_all=is_first)
+        norm_meta = metadata if is_first else replace(metadata, last_amendment=reform.norm_id)
+        markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
         changed = repo.write_and_add(file_path, markdown)
 
         if not changed and not is_first:
@@ -777,7 +779,10 @@ def commit_all_fast(
                 is_first = reform_idx == 0
                 commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-                markdown = render_norm_at_date(metadata, blocks, reform.date, include_all=is_first)
+                norm_meta = (
+                    metadata if is_first else replace(metadata, last_amendment=reform.norm_id)
+                )
+                markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
                 file_path = norm_to_filepath(metadata)
 
                 info = build_commit_info(commit_type, metadata, reform, blocks, file_path, markdown)

@@ -66,7 +66,17 @@ source: "https://www.boe.es/eli/es/c/1978/12/27/(1)"
 
 Country-specific extras go in an `extra` sub-mapping (or as additional frontmatter keys for fields downstream consumers need).
 
-**Commit message types:** `[bootstrap]`, `[reforma]`, `[nueva]`, `[derogacion]`, `[correccion]`, `[fix-pipeline]`
+**Text state (Legalize Format Spec v0.3).** A file must say what its body actually is. Declared once per country in `countries.py::TEXT_STATE`, overridable per norm via `NormMetadata.text_state`:
+
+| Value | The body is |
+|---|---|
+| `point_in_time` | the law as in force on `last_updated` |
+| `current` | the latest text the source publishes, whatever the commit's date |
+| `as_enacted` | the act as published; amendments are not incorporated |
+
+`point_in_time` is the default and is **never written to the frontmatter** — a file without the field is `point_in_time`, which is why adding a country to `TEXT_STATE` changes its published output and forgetting to is the safe failure. `current` and `as_enacted` also emit a static notice below the H1; `as_enacted` additionally emits `last_amendment` (the ID of the most recent amending act), which is what makes two amendments published on the same date produce two commits instead of one.
+
+**Commit message types:** `[bootstrap]`, `[reform]`, `[new]`, `[repeal]`, `[correction]`, `[fix-pipeline]` — the values of `CommitType` in `models.py`. (They were Spanish until spec v0.2; existing commits keep their original labels.)
 
 **Commit trailers:** `Source-Id`, `Source-Date`, `Norm-Id`
 

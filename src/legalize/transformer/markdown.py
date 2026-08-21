@@ -19,7 +19,8 @@ from __future__ import annotations
 from datetime import date
 from typing import Callable
 
-from legalize.models import Block, NormMetadata, Paragraph
+from legalize.countries import text_state_for
+from legalize.models import Block, NormMetadata, Paragraph, TextState
 from legalize.transformer.frontmatter import render_frontmatter
 from legalize.transformer.xml_parser import get_block_at_date
 
@@ -85,6 +86,27 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "table": lambda t: f"{t}\n",
     "table_row": lambda t: f"{t}\n",
 }
+
+# ─────────────────────────────────────────────
+# Text-state notice (Legalize Format Spec v0.3)
+# ─────────────────────────────────────────────
+
+# Static on purpose: byte-identical in every file and every commit of a country.
+# Everything that changes when an amendment lands — the date, the amending act —
+# lives in the frontmatter, so the body of one of these files is written once at
+# bootstrap and never rewritten. A count here ("amended 95 times") would be wrong
+# on every later commit as soon as an older amendment is backfilled.
+_NOTICES: dict[TextState, str] = {
+    TextState.AS_ENACTED: (
+        "> **This is the law as enacted. Amendments are not incorporated below — each one is\n"
+        "> a separate file in this repository and a commit in this file's history.**\n"
+    ),
+    TextState.CURRENT: (
+        "> **This file always contains the latest consolidated text published by the source.\n"
+        "> It is not the text as it stood on the date of any given commit.**\n"
+    ),
+}
+
 
 # Paired classes: num + tit merge into one heading.
 _PAIRED_CLASSES: dict[str, tuple[str, str]] = {
@@ -152,6 +174,10 @@ def render_norm_at_date(
 
     title = metadata.title.rstrip(". ").strip()
     parts.append(f"# {title}\n\n")
+
+    notice = _NOTICES.get(metadata.text_state or text_state_for(metadata.country))
+    if notice:
+        parts.append(f"{notice}\n")
 
     for block in blocks:
         version = get_block_at_date(block, target_date)
