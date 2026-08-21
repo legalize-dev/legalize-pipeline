@@ -1072,6 +1072,137 @@ because D1 rebuilds the repository anyway, but the web app's existing deep links
 
 ---
 
+## §13 Before / after
+
+### 13.1 The corpus
+
+| | Before (today) | After |
+|---|---|---|
+| Source | `dre.tretas.org` SQLite mirror | `diariodarepublica.pt` + `data.dre.pt` (official) |
+| Laws | 109,929 | ~110,000 + the ~500 consolidated diplomas missing today (RCM, Lei Orgânica, Decreto do PR, Despacho Normativo, Acórdãos com força obrigatória geral, Declarações de Retificação) |
+| Commits | 109,932, of which **0 are reforms** | ~110,000 bootstrap + **~31,000 reform commits** |
+| Laws with version history | **0** | **5,528** (every consolidated diploma), mean 5.6 versions, max 71 |
+| Commit dates | 99.3 % are `1970-01-02` (epoch clamp) | the date each version entered into force (`DataEntradaVigor`) |
+| `Source-Id` | `PLACEHOLDER` in 99.3 % of commits | the amending diploma's id |
+| Commit language | Spanish, in a Portuguese repo | Portuguese |
+| Trailers | two incompatible schemas coexisting | one |
+| Author | a personal Gmail address on 109,347 commits | the Legalize bot |
+| Rows in the web `reforms` table | **0** | ~31,000 |
+| `article_count` in the DB | 0 for every law | real (needs the one-line `Artigo` pattern fix) |
+
+### 13.2 One file
+
+`pt/DRE-DL-47344.md` — the **Código Civil**. What legalize.dev serves today:
+
+```yaml
+---
+title: "Decreto-Lei n.º 47344"          # the words "Código Civil" appear nowhere
+identifier: "DRE-DL-47344"
+country: "pt"
+rank: "decreto-lei"
+publication_date: "1966-11-25"
+last_updated: "1900-01-01"              # placeholder
+status: "in_force"
+source: "https://dre.pt/application/file/477502"
+department: "Ministério da Justiça - Gabinete do Ministro"
+official_number: "47344"
+dr_number: "274/1966"
+---
+# Decreto-Lei n.º 47344
+
+TEXTO :                                  # scraper label
+
+Decreto-Lei n.º 47344                    # title, again
+…
+##### ARTIGO 1601.º
+São impedimentos dirimentes, obstando ao casamento da pessoa a quem respeitam
+com qualquer outra:
+
+a) A idade inferior a dezasseis ou a catorze anos, conforme se trate de
+   indivíduo do sexo masculino ou do sexo feminino;
+```
+
+`git log` on that file: **one commit, dated 1970-01-02, `Source-Id: PLACEHOLDER`.**
+
+That article text is the **1966 original**. It was amended in 1977 (sixteen for
+everyone), and again by **Lei n.º 39/2025**, which raised it to 18 precisely in order to
+ban child marriage. We publish the 1966 wording, marked `status: in_force`, with a
+`last_updated` of 1900. A Portuguese lawyer reading legalize.dev today is reading a text
+that stopped being the law 48 years ago.
+
+After the rebuild, the same file:
+
+```yaml
+---
+title: "Decreto-Lei n.º 47344"
+short_title: "Código Civil - CC"          # DiplomaFrag.Designacao, available and unused today
+identifier: "DRE-DEC-LEI-47344-1966"      # ELI-derived (D2)
+country: "pt"
+jurisdiction: null                        # from the ELI /p/ segment
+rank: "decreto-lei"
+publication_date: "1966-11-25"
+last_updated: "2026-06-23"                # DataUltimaConsolidada
+status: "in_force"
+source: "https://data.dre.pt/eli/dec-lei/47344/1966/p/cons/20260623/pt/html"
+pdf_url: "https://files.diariodarepublica.pt/1s/1966/11/27400/18832086.pdf"
+department: "Ministério da Justiça - Gabinete do Ministro"
+summary: "Aprova o Código Civil e regula a sua aplicação — Revoga, a partir da
+  data da entrada em vigor do novo Código Civil, toda a legislação civil relativa
+  às matérias que o mesmo abrange"
+subjects: [...]                           # eli:is_about
+eli: "https://data.dre.pt/eli/dec-lei/47344/1966/p/cons/20260623/pt/html"
+diario_republica: "Diário do Governo n.º 274/1966, Série I de 1966-11-25"
+consolidation_id: "1138226675"
+consolidated_at: "2026-06-23"
+amending_acts: 102
+…
+---
+# Decreto-Lei n.º 47344 — Código Civil
+
+##### Artigo 1601.º — (Impedimentos dirimentes absolutos)
+
+São impedimentos dirimentes, obstando ao casamento da pessoa a quem respeitam
+com qualquer outra:
+
+a) A idade inferior a 18 anos;
+…
+```
+
+and `git log -- pt/DRE-DEC-LEI-47344-1966.md`:
+
+```
+2026-07-01  [reform] Código Civil - CC — art. 1425.º        Source-Id: …lei/29-2026
+2025-04-02  [reform] Código Civil - CC — art. 1601.º, …     Source-Id: …lei/39-2025
+2024-07-25  [reform] Código Civil - CC — …                  Source-Id: …dec-lei/48-2024
+…
+1978-04-01  [reform] Código Civil - CC — art. 1601.º, …
+1967-06-01  [bootstrap] Código Civil - CC — original version 1966
+```
+
+**71 commits instead of 1**, each dated when it took effect, each naming the law that
+caused it. `git show` on the 2025-04-02 commit is a diff from "dezasseis anos" to
+"18 anos" — which is exactly the product legalize claims to sell.
+
+### 13.3 What does not change
+
+- The output contract: flat `{jurisdiction}/{identifier}.md`, the frontmatter key names,
+  the `[bootstrap]`/`[reform]` subject prefixes, the `Source-Id`/`Source-Date`/`Norm-Id`
+  trailer names.
+- The daily flow keeps running on `main` while the rebuild happens on `feat/pt-v2`.
+
+### 13.4 What breaks, and must be planned
+
+- **Every filename changes** (D2). The web app needs an old-id → new-id redirect map
+  generated at cutover, or ~110,000 deep links start 404-ing.
+- **The whole git history is rewritten.** Anyone with a local clone loses their copy's
+  ancestry. The README already warns about per-law rewrites.
+- **Every `reforms.sha` in the DB is invalidated** → a `law-sync full` is required after
+  cutover, not an incremental sync.
+- Bootstrap is a ~15–18 h run (~150,000 requests), so it needs checkpointing and a plan
+  for a DRE redeploy landing mid-run.
+
+---
+
 ## Artefacts produced by this research
 
 | Path | What |
