@@ -19,33 +19,16 @@ from pathlib import Path
 sys.path.insert(0, "src")
 
 from legalize.config import load_config  # noqa: E402
-from legalize.fetcher.pt import parser as pt_parser  # noqa: E402
+from legalize.fetcher.pt import analise_juridica  # noqa: E402
 from legalize.pipeline import generic_fetch_one  # noqa: E402
 
 config = load_config(os.environ.get("CONFIG", "config.yaml"))
 data_dir = Path(config.get_country("pt").data_dir)
 
-thesaurus_path = data_dir / "thesaurus.json"
-if thesaurus_path.exists():
-    terms = json.loads(thesaurus_path.read_text(encoding="utf-8"))
-    pt_parser.set_thesaurus(terms)
-    print(f"thesaurus: {len(terms)} terms", flush=True)
-else:
-    print("thesaurus: absent — subjects will stay empty", flush=True)
-
-amendments_path = data_dir / "amendments.json"
-if amendments_path.exists():
-    amendments = json.loads(amendments_path.read_text(encoding="utf-8"))
-    pt_parser.set_amendments(amendments)
-    print(f"amendments: {len(amendments)} laws with a known amender", flush=True)
-else:
-    print("amendments: absent — no last_amendment will be emitted", flush=True)
-
-overrides_path = data_dir / "subjects.json"
-if overrides_path.exists():
-    overrides = json.loads(overrides_path.read_text(encoding="utf-8"))
-    pt_parser.set_subject_overrides(overrides)
-    print(f"subject overrides: {sum(1 for v in overrides.values() if v)} diplomas", flush=True)
+# One place decides what the análise jurídica maps are and how they load, shared
+# with the daily — which needs exactly the same three and would otherwise drift.
+loaded = analise_juridica.install(data_dir)
+print(f"análise jurídica: {loaded or 'no maps found'}", flush=True)
 
 # The discovery lists say what belongs in the corpus; raw/ only says what has been
 # downloaded, and the two are not the same. Anything fetched before a scope rule was

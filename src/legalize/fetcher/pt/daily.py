@@ -103,6 +103,7 @@ def reconsolidated_since_last_run(client, data_dir: str | Path) -> tuple[list[st
 
 def daily(config: Config, target_date: date | None = None, dry_run: bool = False) -> int:
     """Daily processing for Portugal: new diplomas + re-consolidated ones."""
+    from legalize.fetcher.pt import analise_juridica
     from legalize.fetcher.pt.client import DREClient
     from legalize.fetcher.pt.discovery import DREDiscovery
     from legalize.fetcher.pt.dre_api import DREApiError
@@ -112,6 +113,13 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     cc = config.get_country("pt")
     state = StateStore(cc.state_path)
     state.load()
+
+    # Without these the daily quietly regresses every law it touches: descriptors
+    # come back as nothing, and an amendment lands as a new law with no reform
+    # recorded against the law it amended. They are corpus-wide maps, so nothing in
+    # the per-norm fetch path would load them.
+    loaded = analise_juridica.install(cc.data_dir)
+    console.print(f"  [dim]análise jurídica: {loaded or 'no maps found'}[/dim]")
 
     dates_to_process = resolve_dates_to_process(
         state, cc.repo_path, target_date, skip_weekdays=_SKIP_WEEKDAYS

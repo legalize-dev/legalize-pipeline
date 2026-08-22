@@ -139,3 +139,43 @@ class TestDailyWiring:
         with patch("legalize.fetcher.pt.daily.StateStore"):
             assert callable(daily)
         assert daily.__doc__ and "re-consolidated" in daily.__doc__
+
+
+class TestAnaliseJuridicaMaps:
+    """The maps are corpus-wide, so nothing in the per-norm fetch path loads them.
+    A daily that skips them republishes every law it touches with no subjects and
+    records no reform against a law that was just amended."""
+
+    def test_install_loads_all_three(self, tmp_path):
+        import json as _json
+
+        from legalize.fetcher.pt import analise_juridica, parser as pt_parser
+
+        (tmp_path / "thesaurus.json").write_text(_json.dumps({"1": "Código Civil"}))
+        (tmp_path / "subjects.json").write_text(_json.dumps({"/dr/detalhe/lei/1-2020-1": ["X"]}))
+        (tmp_path / "amendments.json").write_text(
+            _json.dumps({"pub:lei:1-2020-1": [["2021-01-01", "DRE-LEI-9-2021", "arts. 3.º"]]})
+        )
+        try:
+            loaded = analise_juridica.install(tmp_path)
+            assert loaded == {"thesaurus": 1, "subject_overrides": 1, "amendments": 1}
+            assert pt_parser._THESAURUS["1"] == "Código Civil"
+            assert pt_parser._AMENDMENTS["pub:lei:1-2020-1"][0][1] == "DRE-LEI-9-2021"
+        finally:
+            pt_parser.set_thesaurus({})
+            pt_parser.set_subject_overrides({})
+            pt_parser.set_amendments({})
+
+    def test_absent_maps_are_not_an_error(self, tmp_path):
+        """A fresh checkout has none of them; the fetch must still run."""
+        from legalize.fetcher.pt import analise_juridica
+
+        assert analise_juridica.install(tmp_path) == {}
+
+    def test_the_daily_installs_them(self):
+        """Pins the wiring, not the loader: this is the call that was missing."""
+        import inspect
+
+        from legalize.fetcher.pt import daily as pt_daily
+
+        assert "analise_juridica.install" in inspect.getsource(pt_daily.daily)
