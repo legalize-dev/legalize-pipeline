@@ -352,8 +352,8 @@ class TestTextState:
         parser_module.set_amendments(
             {
                 "pub:decreto-lei:16-1994-512030": [
-                    ["1994-11-11", "DRE-LEI-37-1994"],
-                    ["1999-03-23", "DRE-DEC-LEI-94-1999"],
+                    ["1994-11-11", "DRE-LEI-37-1994", "Alterados os arts. 5.º, 9.º e 14.º"],
+                    ["1999-03-23", "DRE-DEC-LEI-94-1999", ""],
                 ]
             }
         )

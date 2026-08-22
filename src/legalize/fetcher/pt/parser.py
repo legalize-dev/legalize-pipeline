@@ -115,16 +115,24 @@ def set_thesaurus(mapping: dict[str, str]) -> None:
 # by scripts/pt_amendments.py from DRE's eli:amended_by plus the targets the acts
 # link themselves, and injected before a reparse. Only as-published norms use it: a
 # consolidated one carries its amendments as Versions already.
-_AMENDMENTS: dict[str, tuple[tuple[str, str], ...]] = {}
+# Rows are (date, amending act, what DRE says it changed). The third is verbatim —
+# "Alterados os arts. 5º, 9º, 14º…" — and stays unparsed on purpose: the drafting
+# is a convention of one legislature, not a property of law, so a taxonomy invented
+# here is one to redo in 34 countries.
+_AMENDMENTS: dict[str, tuple[tuple[str, str, str], ...]] = {}
 
 
 def set_amendments(mapping: dict[str, list[list[str]]]) -> None:
-    """Install the {norm id: [(date, amending act)]} map (spec v0.3)."""
+    """Install the {norm id: [(date, amending act, wording)]} map (spec v0.3)."""
     _AMENDMENTS.clear()
-    for key, pairs in (mapping or {}).items():
-        rows = tuple((str(w), str(a)) for w, a in pairs if w and a)
-        if key and rows:
-            _AMENDMENTS[str(key)] = rows
+    for key, rows in (mapping or {}).items():
+        parsed = tuple(
+            (str(row[0]), str(row[1]), str(row[2]) if len(row) > 2 else "")
+            for row in rows
+            if len(row) >= 2 and row[0] and row[1]
+        )
+        if key and parsed:
+            _AMENDMENTS[str(key)] = parsed
 
 
 def set_subject_overrides(mapping: dict[str, list[str]]) -> None:
@@ -560,7 +568,7 @@ class DRETextParser(TextParser):
         # single commit while its own notice promises "a commit in this file's
         # history" for every amendment. The body stays as enacted; what each commit
         # records is that an act changed the law, and which one.
-        for raw_when, act in _AMENDMENTS.get(norm_id, ()):
+        for raw_when, act, _wording in _AMENDMENTS.get(norm_id, ()):
             amended_on = _parse_date(raw_when)
             if amended_on and amended_on > when:
                 reforms.append(Reform(date=amended_on, norm_id=act, affected_blocks=()))
