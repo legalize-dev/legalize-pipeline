@@ -50,12 +50,14 @@ _CSRF_PATTERNS = (
 _SCREEN_JS = (
     f"{BASE}/scripts/dr.Home.home.mvc.js",
     f"{BASE}/scripts/dr.AnaliseJuridica.AnaliseJuridica.mvc.js",
+    f"{BASE}/scripts/dr.AnaliseJuridica.WB_AnaliseJuridica_Associacoes.mvc.js",
     f"{BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Det_Diario.mvc.js",
     f"{BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Detalhe.mvc.js",
     f"{BASE}/scripts/dr.LegislacaoConsolidada.LegCons_Detalhe.mvc.js",
     f"{BASE}/scripts/dr.LegislacaoConsolidada.AlteracoesTimelineByDiplomaLegisId.mvc.js",
 )
 
+AJ_ASSOCIATIONS = "aj_associations"
 AJ_ELEMENT_TYPE = "aj_element_type"
 AJ_DATA = "aj_data"
 JOURNALS_BY_DATE = "journals_by_date"
@@ -76,6 +78,7 @@ _ACTIONS: dict[str, tuple[tuple[str, ...], str]] = {
     JOURNALS_BY_DATE: (("DataActionGetDRByDataCalendario",), _VIEW_HOME),
     AJ_ELEMENT_TYPE: (("DataActionGetElementTypeAndApplicationSettings",), _VIEW_AJ),
     AJ_DATA: (("DataActionGetData",), _VIEW_AJ),
+    AJ_ASSOCIATIONS: (("DataActionFetchAssociacoes",), _VIEW_AJ),
     DOCUMENTS_BY_JOURNAL: (("DataActionGetDadosAndApplicationSettings",), _VIEW_DIARIO),
     PUBLISHED_DETAIL: (
         ("DataActionGetConteudoData", "DataActionGetAllConteudoDetalhe"),
@@ -90,6 +93,7 @@ _ACTIONS: dict[str, tuple[tuple[str, ...], str]] = {
 _SCREEN_OF: dict[str, str] = {
     CONS_SNAPSHOT: f"{BASE}/scripts/dr.LegislacaoConsolidada.LegCons_Detalhe.mvc.js",
     AJ_DATA: f"{BASE}/scripts/dr.AnaliseJuridica.AnaliseJuridica.mvc.js",
+    AJ_ASSOCIATIONS: f"{BASE}/scripts/dr.AnaliseJuridica.WB_AnaliseJuridica_Associacoes.mvc.js",
 }
 
 _SITEMAP_REF = re.compile(r"/dr/(?:detalhe|legislacao-consolidada)/([^/]+)/([^/?#]+)")
@@ -529,6 +533,99 @@ class DREApi(HttpClient):
             "TotalAssociacoes": 0,
             "HasAssociacoesFetched": False,
         }
+
+    # DRE's own relation table. Every field the widget renders is echoed back, so
+    # the request is mostly empty scaffolding; the parts that matter are
+    # TipoAssociacaoId (162 = modificações, 165 = retificações) and ConteudoId.
+    _ASSOC_INVERSA_EMPTY = {
+        "Data": "",
+        "Texto": "",
+        "Sumario": "",
+        "Diploma": "",
+        "TipoDiploma": "",
+        "NumeroAJ": "",
+        "NumeroDiploma": "",
+        "LinkSitemapAnaliseJuridica": "",
+        "DiplomaLegisId": "0",
+        "DiplomaDGOId": "0",
+        "DiplomaRegTrabId": "0",
+        "DiplomaLegacorId": "0",
+        "DiplomaDGAPId": "0",
+        "ActoSocietarioId": "0",
+        "AcordaoSTADiplomaId": "0",
+        "ContratoPublicoId": "0",
+    }
+    _ASSOC_DIRETA_EMPTY = {
+        "Data": "1900-01-01",
+        "Texto": "",
+        "AssociacaoAnaliseJuridicaId": "0",
+        "HasLink": False,
+        "HasInversa": False,
+        "DiplomaLinkId": "0",
+        "Numero": "",
+        "Tipo": "",
+    }
+
+    def associations(self, ref: str, association_id: str = "162", limit: int = 1000) -> dict:
+        """One row per diploma related to this one, as DRE itself records it.
+
+        ``InversasList`` is what changed this law and ``DiretasList`` what this law
+        changed, both dated, both naming the other diploma, and both carrying a
+        ``Texto`` that says which articles moved — "Alterados os arts. 5º, 9º, 14º…".
+        That is the only place DRE publishes the relation as data rather than as
+        prose inside the amending act, and unlike ``eli:amended_by`` it is not
+        almost entirely rectifications.
+        """
+        tipo, key = split_sitemap_ref(ref)
+        _, _, content_id = key.rsplit("-", 2)
+        return self.call(
+            AJ_ASSOCIATIONS,
+            {
+                "MaxRecordsInversas": limit,
+                "MaxRecordsDiretas": limit,
+                "TableValuesInversas": {
+                    "List": [],
+                    "EmptyListItem": {"Data": "", "Diploma": "", "Link": "", "Texto": ""},
+                },
+                "TableValuesDiretas": {
+                    "List": [],
+                    "EmptyListItem": {"Data": "", "Diploma": "", "Texto": ""},
+                },
+                "StartIndex": 0,
+                "IsListaCompleta": True,
+                "StartIndexInversas": 0,
+                "InversasAuxList": {"List": [], "EmptyListItem": self._ASSOC_INVERSA_EMPTY},
+                "DiretasAuxList": {"List": [], "EmptyListItem": self._ASSOC_DIRETA_EMPTY},
+                "IsWordExportAux": False,
+                "IsExcelExportAux": False,
+                "IsRendered": True,
+                "IsDone": False,
+                "ListaCompletaDiretas": False,
+                "ListaCompletaInversas": False,
+                "TipoAssociacaoId": str(association_id),
+                "_tipoAssociacaoIdInDataFetchStatus": 1,
+                "ConteudoId": content_id,
+                "_conteudoIdInDataFetchStatus": 1,
+                "IsFrom": "AJ",
+                "_isFromInDataFetchStatus": 1,
+                "IsWordExport": False,
+                "_isWordExportInDataFetchStatus": 1,
+                "TipoExportacao": "",
+                "_tipoExportacaoInDataFetchStatus": 1,
+                "Titulo": "",
+                "_tituloInDataFetchStatus": 1,
+                "IsExcelExport": False,
+                "_isExcelExportInDataFetchStatus": 1,
+                "Tipo": "modificacoes",
+                "_tipoInDataFetchStatus": 1,
+                "Key": key,
+                "_keyInDataFetchStatus": 1,
+                "IsPrint": False,
+                "_isPrintInDataFetchStatus": 1,
+                "DataPublicacao": "1900-01-01",
+                "_dataPublicacaoInDataFetchStatus": 1,
+            },
+        )
 
     def descriptors(self, ref: str) -> dict[str, str]:
         """``{"30215271": "Código Civil", …}`` for one diploma.
