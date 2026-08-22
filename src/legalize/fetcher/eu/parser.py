@@ -302,6 +302,102 @@ def _parse_table(table_el: ET.Element) -> str:
     return "\n".join(lines)
 
 
+def _parse_norm_div(el: ET.Element) -> list[Paragraph]:
+    """解析合并文本（Consolidated XHTML）中的 norm div 编号段落与列表。
+
+    处理两种模式：
+    1. 简单编号段落：
+       <div class="norm">
+         <span class="no-parag">1.  </span>
+         <div class="norm inline-element">段落正文文本...</div>
+       </div>
+       → Paragraph("abs", "1. 段落正文文本...")
+
+    2. 包含列表或子段落的编号段落：
+       <div class="norm">
+         <span class="no-parag">1.  </span>
+         <div class="norm inline-element">
+           <p class="norm inline-element">前导句引言：</p>
+           <div class="grid-container grid-list">...</div>
+         </div>
+       </div>
+       → Paragraph("abs", "1. 前导句引言：")
+       → Paragraph("list", "(a) ...")
+    """
+    paragraphs: list[Paragraph] = []
+    marker = ""
+    for child in el:
+        ctag = _tag(child)
+        ccls = child.get("class", "")
+        if ctag == "span" and "no-parag" in ccls:
+            marker = _extract_text(child).strip()
+            break
+
+    # 寻找内部内容容器（通常为 <div class="norm inline-element">）
+    content_el = None
+    for child in el:
+        ctag = _tag(child)
+        ccls = child.get("class", "")
+        if ctag == "div" and "inline-element" in ccls:
+            content_el = child
+            break
+    if content_el is None:
+        content_el = el
+
+    # 检查是否包含块级子元素（grid-container、table 或 p）
+    has_blocks = False
+    for child in content_el:
+        ctag = _tag(child)
+        ccls = child.get("class", "")
+        if ctag in ("p", "table") or ("grid-container" in ccls and "grid-list" in ccls):
+            has_blocks = True
+            break
+
+    if not has_blocks:
+        # 纯文本段落：直接提取整体文本（包含 span.no-parag 及文本内容）
+        text = _extract_text(el).strip()
+        if text:
+            paragraphs.append(Paragraph("abs", text))
+        return paragraphs
+
+    # 包含块级子元素（例如前导 <p> 后跟若干列表项 <div class="grid-container grid-list">）
+    for child in content_el:
+        ctag = _tag(child)
+        ccls = child.get("class", "")
+
+        # 忽略修改标记与免责声明
+        if "arrow" in ccls or "disclaimer" in ccls or "modref" in ccls:
+            continue
+
+        if "grid-container" in ccls and "grid-list" in ccls:
+            text = _parse_list(child)
+            if text:
+                paragraphs.append(Paragraph("list", text))
+        elif ctag == "table":
+            if _is_list_table(child):
+                paragraphs.extend(_parse_list_table(child))
+            else:
+                text = _parse_table(child)
+                if text:
+                    paragraphs.append(Paragraph("table", text))
+        elif ctag == "p":
+            text = _extract_text(child).strip()
+            if text:
+                if marker:
+                    text = _normalize_list_marker(f"{marker} {text}")
+                    marker = ""
+                paragraphs.append(Paragraph("abs", text))
+        else:
+            text = _extract_text(child).strip()
+            if text:
+                if marker:
+                    text = _normalize_list_marker(f"{marker} {text}")
+                    marker = ""
+                paragraphs.append(Paragraph("abs", text))
+
+    return paragraphs
+
+
 def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
     """Recursively walk the XHTML body and convert to paragraphs.
 
@@ -445,6 +541,12 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
         return paragraphs
 
     # ─── Consolidated text format classes ───
+    # 合并文本格式中的编号段落与列表（div.norm）
+    if tag == "div" and (
+        "norm" in cls or "tbl-norm" in cls or "item-none" in cls or cls == "normal"
+    ):
+        return _parse_norm_div(el)
+
     # Indented divs with margin-left (old consolidated format for list items).
     # Pattern: <div style="margin-left: 30pt; text-indent: -30pt"><p class="norm">(a) ...</p></div>
     if tag == "div" and not cls:
