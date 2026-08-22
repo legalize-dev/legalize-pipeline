@@ -66,10 +66,21 @@ for path in sorted((data_dir / "raw").glob("*.versions.json.gz")):
 if stale:
     print(f"{stale} cached norms are no longer in scope, skipping", flush=True)
 
-print(f"{len(ids)} norms to reparse", flush=True)
-work: queue.Queue = queue.Queue()
-for norm_id in ids:
-    work.put(norm_id)
+# A diploma DRE consolidates is reachable from both surfaces and both resolve to the
+# same identifier, so both write the same {identifier}.json and the last one wins.
+# The as-published record is a single snapshot with no history; the consolidated one
+# carries a Version per effective date. Letting as-published land last cost the
+# Código Civil its 2,930 blocks and 54 reforms and left it a one-block stub — the
+# exact failure the whole rewrite exists to prevent (§3, version history is the
+# gate). Published first, consolidated second, with a barrier between: ordering
+# inside a phase is not guaranteed with eight workers, so it has to be two phases
+# rather than a sort.
+published = [n for n in ids if not n.startswith("cons:")]
+consolidated = [n for n in ids if n.startswith("cons:")]
+print(
+    f"{len(ids)} norms to reparse ({len(published)} published, {len(consolidated)} consolidated)",
+    flush=True,
+)
 lock, t0 = threading.Lock(), time.time()
 stats = {"ok": 0, "skipped": 0, "err": 0, "n": 0}
 # One in five ids is an out-of-scope Açores row, and generic_fetch_one reports that
@@ -121,10 +132,39 @@ def _out_of_scope(norm_id: str) -> bool:
     return (published.get("TipoConteudo") or "") == "DiplomaLegacor"
 
 
-threads = [threading.Thread(target=worker, daemon=True) for _ in range(8)]
-[t.start() for t in threads]
-[t.join() for t in threads]
+for phase, batch in (("published", published), ("consolidated", consolidated)):
+    if not batch:
+        continue
+    print(f"-- {phase}: {len(batch)}", flush=True)
+    work = queue.Queue()
+    for norm_id in batch:
+        work.put(norm_id)
+    threads = [threading.Thread(target=worker, daemon=True) for _ in range(8)]
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+
 print("DONE", stats, f"in {(time.time() - t0) / 60:.1f} min", flush=True)
+
+# The check that would have caught the overwrite: almost every consolidated diploma
+# is also reachable as-published, both write {identifier}.json, and if the wrong one
+# lands last the law silently loses its whole history. Count what actually survived.
+survived = 0
+for path in (data_dir / "json").glob("*.json"):
+    try:
+        with path.open(encoding="utf-8") as handle:
+            meta = json.load(handle).get("metadata") or {}
+    except Exception:
+        continue
+    if ((meta.get("extra") or {}).get("surface")) == "cons":
+        survived += 1
+print(f"consolidated laws in the corpus: {survived} of {len(consolidated)} reparsed", flush=True)
+if consolidated and survived < len(consolidated) * 0.9:
+    print(
+        "FAIL: consolidated diplomas are being overwritten by their as-published "
+        "twin — the corpus would ship without version history",
+        flush=True,
+    )
+    raise SystemExit(1)
 if failures:
     print(f"failures ({len(failures)} shown):", flush=True)
     for norm_id in failures:
