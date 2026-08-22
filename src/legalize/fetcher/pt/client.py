@@ -38,6 +38,23 @@ PUBLISHED = "pub"
 # from the original text report DataEntradaVigor 1900-01-01.
 _NO_DATE = "1900-01-01"
 
+
+def published_date_of(detail: dict) -> str:
+    """The day a diploma reached the public, as DRE actually recorded it.
+
+    DataPublicacao is the answer almost always, but on some records DRE leaves the
+    1900-01-01 sentinel there and puts the real day in DataDistribuicao. The sentinel
+    parses as a valid date, so an `or` chain never falls through it — the diploma
+    just publishes as 1900-01-01, sorts to the very front of the repository history
+    and claims to predate the Diário da República.
+    """
+    for field in ("DataPublicacao", "DataDistribuicao", "DataDisponibilizacao"):
+        value = (detail.get(field) or "")[:10]
+        if value and value != _NO_DATE:
+            return value
+    return ""
+
+
 # Only these fragment fields survive into the version blob. A full Código Civil
 # snapshot is 5.7 MB of JSON; 71 of them held in memory at once is several GB.
 _FRAG_FIELDS = (
@@ -316,7 +333,7 @@ class DREClient(LegislativeClient):
                 "pdf_url": (detail.get("URL_PDF") or "").strip(),
                 "versions": [
                     {
-                        "date": (detail.get("DataPublicacao") or "")[:10],
+                        "date": published_date_of(detail),
                         "is_original": True,
                         "amending": None,
                         "html_b64": _pack(
@@ -356,9 +373,9 @@ class DREClient(LegislativeClient):
                 if label and label not in entry["articles"]:
                     entry["articles"].append(label)
 
-        original = ((bundle.get("published") or {}).get("DataPublicacao") or "")[:10] or (
-            (detail.get("DiplomaLegis") or {}).get("DataPublicacao") or ""
-        )[:10]
+        original = published_date_of(bundle.get("published") or {}) or published_date_of(
+            detail.get("DiplomaLegis") or {}
+        )
         dates = sorted(amendments)
         if original and (not dates or original < dates[0]):
             dates = [original, *dates]

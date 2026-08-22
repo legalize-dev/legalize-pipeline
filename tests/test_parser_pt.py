@@ -776,3 +776,33 @@ class TestChangeNote:
         )
         reform = Reform(date=date(2021, 1, 1), norm_id="A", affected_blocks=())
         assert "Change:" not in _build_body(CommitType.REFORM, metadata, reform, "N/A")
+
+
+class TestPublicationDate:
+    """israel found `last_updated: "1900-01-01"` in the live repo, and ar and gr
+    have the same. The sentinel parses as a valid date, so an `or` chain never falls
+    through it and the diploma publishes claiming to predate the Diário da República
+    — sorting to the very front of the repository's history."""
+
+    def test_the_sentinel_falls_through_to_the_real_date(self):
+        from legalize.fetcher.pt.client import published_date_of
+
+        assert (
+            published_date_of({"DataPublicacao": "1900-01-01", "DataDistribuicao": "2025-08-29"})
+            == "2025-08-29"
+        )
+
+    def test_a_real_publication_date_always_wins(self):
+        from legalize.fetcher.pt.client import published_date_of
+
+        assert (
+            published_date_of({"DataPublicacao": "1994-01-22", "DataDistribuicao": "2025-08-29"})
+            == "1994-01-22"
+        )
+
+    def test_nothing_usable_stays_empty(self):
+        """Empty, not the sentinel: the caller decides, and 84 of the 87 diplomas in
+        this state are already excluded for having no text either."""
+        from legalize.fetcher.pt.client import published_date_of
+
+        assert published_date_of({"DataPublicacao": "1900-01-01"}) == ""

@@ -27,7 +27,7 @@ from lxml import html as lxml_html
 from legalize.fetcher._tables import render_table
 from legalize.fetcher._text import clean, collapse_inline_whitespace
 from legalize.fetcher.base import MetadataParser, TextParser
-from legalize.fetcher.pt.client import CONSOLIDATED, PUBLISHED, unpack
+from legalize.fetcher.pt.client import CONSOLIDATED, PUBLISHED, published_date_of, unpack
 from legalize.fetcher.pt.identifier import build_identifier, jurisdiction_from_eli
 from legalize.models import (
     Block,
@@ -684,8 +684,8 @@ class DREMetadataParser(MetadataParser):
         numero = (legis.get("Numero") or published.get("Numero") or "").strip()
         tipo_slug = bundle.get("tipo", "")
         pub_date = (
-            _parse_date(published.get("DataPublicacao"))
-            or _parse_date(legis.get("DataPublicacao"))
+            _parse_date(published_date_of(published))
+            or _parse_date(published_date_of(legis))
             or date(1900, 1, 1)
         )
 
