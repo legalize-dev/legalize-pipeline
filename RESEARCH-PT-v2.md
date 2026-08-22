@@ -1544,6 +1544,14 @@ scripts/pt_overnight.sh <fetch pids>   # logs/pt-overnight.log
 It waits out the jobs already running, then: close the fetch gap twice ·
 close the descriptor gap · reparse · rebuild · health.
 
+**Completeness, measured at 06:46**: 203,831 discovered · 185,914 cached ·
+23,542 out of scope · **239 missing** (0.12 %). Out of scope is the Açores gazette
+plus the diplomas DRE holds neither text nor a scan for — both are refused at
+`get_text`, so neither ever gets a versions envelope and both would otherwise sit in
+the "missing" count for ever, which is why `--report` now classifies them.
+Of the 239, 185 are in the corpus already under their as-published id, so the
+diplomas genuinely absent number about 54.
+
 | Job | State at 01:24 |
 |---|---|
 | Consolidated (5,561) | finished, 5,318 cached — the 243 it dropped are the gap pass's job |
@@ -1620,6 +1628,7 @@ The corpus only shows these when it is read back as a whole; each one is now a t
 | The flagship law had no subjects at all | 12 % of consolidated diplomas return an empty `ELIMetadataHTML`, so `eli:is_about` names nothing — 579 of them, the Código Civil included. AnaliseJuridica has descriptors for 95 %, keyed by LinkSitemap. |
 | The 1960 cutoff never applied to numberless diplomas | Their key is `{year}-{dre id}`, with no number in front, so `_KEY_YEAR` found nothing and `if year is not None` waved them through: 6,056 in the as-published list, 5,596 from the 1910s, 2,380 already fetched. 96.9 % of them are a PDF scan with no text — the reason the cutoff exists. |
 | The reparse trusted the cache over the scope | It walked `raw/` rather than the discovery lists, so anything downloaded before a scope rule was corrected went into the repo anyway. |
+| A "fall back to surface B" that never fell back | `_build_suvestine` raises when DRE lists a diploma as consolidated but never fragmented it, and the comment says the caller should then publish it as-published. The caller catches every exception and skips the norm. 243 diplomas, of which 185 were already in the corpus under their as-published id; 12 more were recovered by deriving that id from `published.LinkSitemap` in the bundle already cached. The remaining 46 have no LinkSitemap. **Still to fix in the client** — this build worked around it in the data. |
 | Cache eviction was quadratic | `commit_all_fast` re-scanned the remaining reform list every iteration to find each norm's last one. Free at a thousand reforms, ~9 minutes of waste at Portugal's 230,000, and it affects every country. |
 
 ## Artefacts produced by this research

@@ -27,6 +27,7 @@ from pathlib import Path
 sys.path.insert(0, "src")
 
 from legalize.config import load_config  # noqa: E402
+from legalize.fetcher._text import clean  # noqa: E402
 from legalize.pipeline import generic_fetch_one  # noqa: E402
 
 
@@ -35,10 +36,12 @@ def _safe(norm_id: str) -> str:
 
 
 def _out_of_scope(raw_dir: Path, norm_id: str) -> bool:
-    """Deliberately dropped, so not a gap: DRE's legacy Açores catalogue (§11).
+    """Deliberately dropped, so not a gap. Mirrors the two guards in get_text.
 
-    These never reach get_suvestine — get_text raises first — so they have no
-    versions envelope and would otherwise look missing on every single run.
+    Neither kind ever reaches get_suvestine — get_text raises first — so neither has
+    a versions envelope, and both would otherwise look missing on every single run.
+    That matters: the whole point of --report is to answer "did the fetch finish",
+    and 23,000 permanent non-answers in the count make it unreadable.
     """
     path = raw_dir / f"{_safe(norm_id)}.meta.json.gz"
     try:
@@ -46,7 +49,12 @@ def _out_of_scope(raw_dir: Path, norm_id: str) -> bool:
             published = json.load(handle).get("published") or {}
     except Exception:
         return False
-    return (published.get("TipoConteudo") or "") == "DiplomaLegacor"
+    # DRE's legacy Açores catalogue (RESEARCH-PT-v2 §11).
+    if (published.get("TipoConteudo") or "") == "DiplomaLegacor":
+        return True
+    # Nothing to publish: DRE holds neither the text nor a scan of it.
+    body = clean(published.get("TextoFormatado") or published.get("Texto") or "").strip()
+    return not body and not (published.get("URL_PDF") or "").strip()
 
 
 def main() -> int:
