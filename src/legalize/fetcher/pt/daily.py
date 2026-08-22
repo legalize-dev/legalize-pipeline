@@ -133,6 +133,10 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     discovery = DREDiscovery.create({**cc.source, "cache_dir": cc.data_dir})
     commits_created = 0
     errors: list[str] = []
+    # Laws today's diplomas say they change. Collected as we go and resolved once at
+    # the end, because the record of the amendment lives on the amended law's page,
+    # not on the act's, so it has to be looked up per law rather than per act.
+    amended_today: set[str] = set()
 
     with DREClient.create(cc) as client:
         # ---- 1. diplomas DRE re-consolidated: one commit per new reform ----
@@ -176,6 +180,27 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
             if not norm_ids:
                 console.print("    No new norms found")
                 state.last_summary_date = current_date
+
+        # ---- 3. the laws today's acts amended: one commit each, body unchanged ----
+        if amended_today and not dry_run:
+            try:
+                changed_laws = analise_juridica.refresh_amendments(
+                    client._api, cc.data_dir, amended_today
+                )
+            except Exception as exc:
+                errors.append(f"Error refreshing amendments: {exc}")
+                logger.exception("Error refreshing amendments")
+                changed_laws = set()
+            if changed_laws:
+                console.print(f"\n[bold]{len(changed_laws)} law(s) amended today[/bold]")
+            for law_id in sorted(changed_laws):
+                try:
+                    commits_created += _commit_versions(
+                        config, repo, client, law_id, generic_fetch_one
+                    )
+                except Exception as exc:
+                    errors.append(f"Error recording amendment on {law_id}: {exc}")
+                    logger.exception("Error recording amendment on %s", law_id)
                 continue
             console.print(f"    {len(norm_ids)} norm(s) found")
 
@@ -205,6 +230,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                     if repo.commit(info):
                         commits_created += 1
                         console.print(f"    [green]✓[/green] {info.subject}")
+                    amended_today |= analise_juridica.targets_named_by(markdown)
                 except DREApiError:
                     logger.exception("DRE API contract broken — aborting daily run")
                     raise

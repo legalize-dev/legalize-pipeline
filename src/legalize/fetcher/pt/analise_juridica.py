@@ -24,6 +24,7 @@ from __future__ import annotations
 import gzip
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any
 
@@ -40,6 +41,47 @@ THESAURUS_FILE = "thesaurus.json"
 SUBJECTS_FILE = "subjects.json"
 AMENDMENTS_FILE = "amendments.json"
 RELATIONS_DIR = "relations"
+
+
+# ── the amendment index ───────────────────────────────────────────────────────
+# Built here rather than in a script because the daily has to rebuild it too: an
+# act published this morning amends a law whose relation row only exists on the
+# amended law's record, so the index is not a bootstrap artefact but something
+# that changes every day.
+
+_RDFA = re.compile(r'about="([^"]*)"\s+property="eli:(amended_by|amends)"\s+resource="([^"]*)"')
+_ELI_PATH = re.compile(r"/eli/([^/]+)/([^/]+)/(\d{4})")
+# DRE quotes this attribute with single quotes and the neighbouring ones with
+# double. Matching only one finds nothing at all.
+_HREF = re.compile(r"""href=["']/dr/detalhe/([^/"']+)/([^"'?#]+)["']""")
+_AMENDING = re.compile(
+    r"^\s*(altera|revoga|adita|republica|retifica|rectifica|derroga|prorroga|suspende)",
+    re.I,
+)
+_UNSAFE = re.compile(r"[^A-Z0-9]+")
+_DETALHE = re.compile(r"/dr/detalhe/([^/)\"'\s]+)/([^/)\"'\s?#]+)")
+
+
+def _from_eli(uri: str) -> str | None:
+    """``…/eli/dec-lei/16/1994/…`` -> ``DRE-DEC-LEI-16-1994``."""
+    match = _ELI_PATH.search(uri or "")
+    if not match:
+        return None
+    kind, number, year = match.groups()
+    return (
+        f"DRE-{_UNSAFE.sub('-', kind.upper()).strip('-')}"
+        f"-{_UNSAFE.sub('-', number.upper()).strip('-')}-{year}"
+    )
+
+
+def targets_named_by(markdown: str) -> set[str]:
+    """The norm ids an act links to, which are its candidate amendment targets.
+
+    A DRE detail link is ``/dr/detalhe/{tipo}/{key}`` and an as-published norm id is
+    ``pub:{tipo}:{key}``, so no lookup is needed. 73.7 % of amending acts link the
+    law they change.
+    """
+    return {f"pub:{tipo}:{key}" for tipo, key in _DETALHE.findall(markdown or "")}
 
 
 def safe_name(norm_id: str) -> str:
@@ -117,3 +159,91 @@ def read_relations(data_dir: str | Path) -> dict[str, list[dict[str, Any]]]:
             if rows:
                 out.setdefault(path.name[: -len(".json.gz")], []).extend(rows)
     return out
+
+
+def _identifier_of(data_dir: Path, norm_id: str) -> str | None:
+    """The official identifier of a diploma already in the raw cache."""
+    from datetime import date as _date
+
+    from legalize.fetcher.pt.identifier import build_identifier
+
+    path = data_dir / "raw" / f"{safe_name(norm_id)}.meta.json.gz"
+    try:
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            bundle = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    published = bundle.get("published") or {}
+    when = (published.get("DataPublicacao") or "")[:10]
+    try:
+        year = _date.fromisoformat(when).year
+    except ValueError:
+        year = 1900
+    return build_identifier(
+        (published.get("ELI") or "").strip(),
+        (published.get("Numero") or "").strip(),
+        bundle.get("tipo", ""),
+        year,
+        (published.get("TipoDiplomaAcronimo") or "").strip(),
+        str(published.get("Id") or ""),
+    )
+
+
+def refresh_amendments(api: Any, data_dir: str | Path, targets: set[str]) -> set[str]:
+    """Re-read DRE's relation table for these laws and fold it into the index.
+
+    The daily needs this and a bootstrap-time index cannot give it. An act published
+    this morning names the laws it amends, but the resolvable record of that
+    amendment lives on the *amended* law's análise jurídica page, not on the act's —
+    ``DiretasList`` carries no resolvable target on any row. So the only way to learn
+    that yesterday's law changed is to ask DRE about the law, not about the act.
+
+    Returns the norm ids whose amendment list actually grew, which are the laws the
+    caller has to re-render and commit.
+    """
+    root = Path(data_dir)
+    index = _read_json(root / AMENDMENTS_FILE)
+    changed: set[str] = set()
+
+    for norm_id in sorted(targets):
+        if not norm_id.startswith("pub:"):
+            continue  # a consolidated diploma carries its amendments as Versions
+        _, tipo, key = norm_id.split(":", 2)
+        rows: dict[str, tuple[str, str]] = {}
+        for association_id in AMENDMENT_TYPES:
+            try:
+                payload = api.associations(f"/dr/detalhe/{tipo}/{key}", association_id)
+            except Exception:
+                logger.warning("relation lookup failed for %s [%s]", norm_id, association_id)
+                continue
+            cache = root / RELATIONS_DIR / association_id
+            cache.mkdir(parents=True, exist_ok=True)
+            with gzip.open(cache / f"{safe_name(norm_id)}.json.gz", "wt", encoding="utf-8") as fh:
+                json.dump(payload, fh, ensure_ascii=False)
+            for row in relation_rows(payload):
+                parts = (row.get("LinkSitemapAnaliseJuridica") or "").strip("/").split("/")
+                if len(parts) < 2:
+                    continue
+                act = _identifier_of(root, f"pub:{parts[-2]}:{parts[-1]}")
+                when = (row.get("Data") or "")[:10]
+                if act and when:
+                    note = " ".join((row.get("Texto") or "").replace("\x00", "").split())
+                    rows[act] = (when, note)
+
+        if not rows:
+            continue
+        known = {r[1] for r in index.get(norm_id, [])}
+        merged = {r[1]: (r[0], r[2] if len(r) > 2 else "") for r in index.get(norm_id, [])}
+        merged.update(rows)
+        if set(merged) != known:
+            index[norm_id] = [
+                [w, a, n] for a, (w, n) in sorted(merged.items(), key=lambda kv: kv[1][0])
+            ]
+            changed.add(norm_id)
+
+    if changed:
+        (root / AMENDMENTS_FILE).write_text(
+            json.dumps(index, ensure_ascii=False, sort_keys=True), encoding="utf-8"
+        )
+        pt_parser.set_amendments(index)
+    return changed

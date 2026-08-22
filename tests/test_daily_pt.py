@@ -179,3 +179,111 @@ class TestAnaliseJuridicaMaps:
         from legalize.fetcher.pt import daily as pt_daily
 
         assert "analise_juridica.install" in inspect.getsource(pt_daily.daily)
+
+
+class TestAmendmentPropagation:
+    """A bootstrap-time index freezes on the day it was built. The act published
+    this morning names the law it changes, but the resolvable record of that change
+    lives on the amended law's page — DiretasList has no resolvable target on any
+    row — so the daily has to ask DRE about the law, not about the act."""
+
+    def test_targets_are_read_off_the_rendered_act(self):
+        from legalize.fetcher.pt import analise_juridica
+
+        markdown = (
+            "Altera o [Decreto-Lei n.º 16/94]"
+            "(https://diariodarepublica.pt/dr/detalhe/decreto-lei/16-1994-512030), "
+            "e a [Portaria n.º 5/99]"
+            "(https://diariodarepublica.pt/dr/detalhe/portaria/5-1999-661750)."
+        )
+        assert analise_juridica.targets_named_by(markdown) == {
+            "pub:decreto-lei:16-1994-512030",
+            "pub:portaria:5-1999-661750",
+        }
+
+    def test_refresh_folds_a_new_amendment_into_the_index(self, tmp_path, monkeypatch):
+        import gzip as _gzip
+        import json as _json
+
+        from legalize.fetcher.pt import analise_juridica, parser as pt_parser
+
+        raw = tmp_path / "raw"
+        raw.mkdir()
+        with _gzip.open(raw / "pub-lei-37-1994-533820.meta.json.gz", "wt", encoding="utf-8") as fh:
+            _json.dump(
+                {
+                    "tipo": "lei",
+                    "key": "37-1994-533820",
+                    "published": {
+                        "Id": "533820",
+                        "Numero": "37/94",
+                        "TipoDiplomaAcronimo": "lei",
+                        "DataPublicacao": "1994-11-11",
+                    },
+                },
+                fh,
+            )
+
+        class _Api:
+            def associations(self, ref, association_id):
+                if association_id != "162":
+                    return {}
+                return {
+                    "InversasList": {
+                        "List": [
+                            {
+                                "Data": "1994-11-11",
+                                "Texto": "Alterados os arts. 5.º, 9.º\x00",
+                                "LinkSitemapAnaliseJuridica": (
+                                    "/dr/analise-juridica/informacoes-gerais/lei/37-1994-533820"
+                                ),
+                            }
+                        ]
+                    }
+                }
+
+        try:
+            changed = analise_juridica.refresh_amendments(
+                _Api(), tmp_path, {"pub:decreto-lei:16-1994-512030"}
+            )
+            assert changed == {"pub:decreto-lei:16-1994-512030"}
+            index = _json.loads((tmp_path / "amendments.json").read_text())
+            assert index["pub:decreto-lei:16-1994-512030"] == [
+                ["1994-11-11", "DRE-LEI-37-1994", "Alterados os arts. 5.º, 9.º"]
+            ]
+            # and it is live in the parser, not just on disk
+            assert pt_parser._AMENDMENTS["pub:decreto-lei:16-1994-512030"][0][1] == (
+                "DRE-LEI-37-1994"
+            )
+        finally:
+            pt_parser.set_amendments({})
+
+    def test_a_known_amendment_produces_no_new_commit(self, tmp_path):
+        """Re-running the same day must not re-commit what is already recorded."""
+        import json as _json
+
+        from legalize.fetcher.pt import analise_juridica, parser as pt_parser
+
+        (tmp_path / "raw").mkdir()
+        (tmp_path / "amendments.json").write_text(
+            _json.dumps({"pub:lei:1-2020-1": [["2021-01-01", "DRE-LEI-9-2021", ""]]})
+        )
+
+        class _Api:
+            def associations(self, ref, association_id):
+                return {}
+
+        try:
+            assert (
+                analise_juridica.refresh_amendments(_Api(), tmp_path, {"pub:lei:1-2020-1"}) == set()
+            )
+        finally:
+            pt_parser.set_amendments({})
+
+    def test_the_daily_propagates(self):
+        import inspect
+
+        from legalize.fetcher.pt import daily as pt_daily
+
+        source = inspect.getsource(pt_daily.daily)
+        assert "targets_named_by" in source and "refresh_amendments" in source
