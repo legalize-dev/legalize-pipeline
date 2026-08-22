@@ -26,7 +26,7 @@ from legalize.fetcher.pt.parser import (
     _fragment_paragraphs,
     _parse_published_html,
 )
-from legalize.models import NormStatus
+from legalize.models import NormStatus, TextState
 from legalize.transformer.markdown import render_norm_at_date
 
 FIXTURES = Path(__file__).parent / "fixtures" / "pt"
@@ -303,6 +303,62 @@ class TestPublishedHtml:
         line inside one desyncs the parallel css_classes list."""
         html = "<p>Uma<br/><br/>linha</p><table><tr><td>a</td><td>b</td></tr></table>"
         assert all("\n\n" not in p.text for p in _parse_published_html(html))
+
+
+class TestTextState:
+    """Spec v0.3. DRE consolidates 5,561 diplomas and publishes the other 159,000
+    as enacted, so a PT file that says nothing would be claiming to be the law in
+    force when it is a 1994 text with two later amendments left out."""
+
+    @staticmethod
+    def _bundle(surface: str) -> bytes:
+        return json.dumps(
+            {
+                "tipo": "decreto-lei",
+                "key": "16-1994-512030",
+                "surface": surface,
+                "published": {
+                    "Id": "512030",
+                    "Numero": "16/94",
+                    "TipoDiploma": "Decreto-Lei",
+                    "TipoDiplomaAcronimo": "dec-lei",
+                    "DataPublicacao": "1994-01-22",
+                    "Sumario": "Aprova o Estatuto do Ensino Superior Particular e Cooperativo",
+                },
+            }
+        ).encode("utf-8")
+
+    def test_as_published_declares_as_enacted_and_names_the_last_amendment(self):
+        parser_module.set_amendments(
+            {"DRE-DEC-LEI-16-1994": ["DRE-LEI-37-1994", "DRE-DEC-LEI-94-1999"]}
+        )
+        try:
+            meta = DREMetadataParser().parse(self._bundle("pub"), "pub:decreto-lei:16-1994-512030")
+            assert meta.text_state is None  # the country default already says as_enacted
+            assert meta.last_amendment == "DRE-DEC-LEI-94-1999"
+            extra = dict(meta.extra)
+            assert extra["amended_by"] == "DRE-LEI-37-1994; DRE-DEC-LEI-94-1999"
+            assert extra["amended_by_count"] == "2"
+        finally:
+            parser_module.set_amendments({})
+
+    def test_consolidated_overrides_back_to_point_in_time(self):
+        """Its amendments are Versions in the file's own history, so naming one in
+        the frontmatter would duplicate the timeline and contradict the body."""
+        parser_module.set_amendments({"DRE-DEC-LEI-16-1994": ["DRE-LEI-37-1994"]})
+        try:
+            meta = DREMetadataParser().parse(self._bundle("cons"), "cons:decreto-lei:1994-512030")
+            assert meta.text_state is TextState.POINT_IN_TIME
+            assert meta.last_amendment is None
+            assert "amended_by" not in dict(meta.extra)
+        finally:
+            parser_module.set_amendments({})
+
+    def test_unknown_amendments_emit_nothing(self):
+        """Absence is a claim we can back: no act in the corpus names this law."""
+        meta = DREMetadataParser().parse(self._bundle("pub"), "pub:decreto-lei:16-1994-512030")
+        assert meta.last_amendment is None
+        assert "amended_by" not in dict(meta.extra)
 
 
 class TestSubjectOverrides:

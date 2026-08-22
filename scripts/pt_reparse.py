@@ -33,6 +33,14 @@ if thesaurus_path.exists():
 else:
     print("thesaurus: absent — subjects will stay empty", flush=True)
 
+amendments_path = data_dir / "amendments.json"
+if amendments_path.exists():
+    amendments = json.loads(amendments_path.read_text(encoding="utf-8"))
+    pt_parser.set_amendments(amendments)
+    print(f"amendments: {len(amendments)} laws with a known amender", flush=True)
+else:
+    print("amendments: absent — no last_amendment will be emitted", flush=True)
+
 overrides_path = data_dir / "subjects.json"
 if overrides_path.exists():
     overrides = json.loads(overrides_path.read_text(encoding="utf-8"))

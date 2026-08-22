@@ -43,6 +43,10 @@ TEXT_STATE: dict[str, TextState] = {
     "de": TextState.CURRENT,  # gesetze-im-internet: current text, undated standangabe
     "dk": TextState.AS_ENACTED,  # Retsinformation: each act is its own document
     "gr": TextState.AS_ENACTED,  # each FEK A' issue is an atomic act
+    # DRE consolidates 5,561 diplomas and publishes the other 159,000 as enacted.
+    # The country default is the majority; the parser overrides the consolidated
+    # ones back to POINT_IN_TIME per norm.
+    "pt": TextState.AS_ENACTED,
     "se": TextState.CURRENT,  # SFS gives one current text + an amendment register
     "uy": TextState.CURRENT,  # IMPO: consolidated text, single bootstrap point
 }

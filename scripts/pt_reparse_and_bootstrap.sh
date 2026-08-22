@@ -22,6 +22,11 @@ echo "==> wipe json/ ($(find "$DATA/json" -name '*.json' 2>/dev/null | wc -l | t
 rm -rf "$DATA/json"
 mkdir -p "$DATA/json"
 
+# Built before the reparse: last_amendment turns an as_enacted file from a silent
+# 1994 text into one that names the act that changed it.
+echo "==> amendment index"
+CONFIG="$CONFIG" python3 scripts/pt_amendments.py || echo "    (amendment index failed, continuing without last_amendment)"
+
 echo "==> reparse ($(find "$DATA/raw" -name '*.versions.json.gz' | wc -l | tr -d ' ') cached norms)"
 CONFIG="$CONFIG" python3 scripts/pt_reparse.py
 
