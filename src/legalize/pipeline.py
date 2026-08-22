@@ -33,6 +33,7 @@ from legalize.models import (
     NormMetadata,
     ParsedNorm,
     Reform,
+    TextState,
 )
 from legalize.state.store import StateStore, resolve_dates_to_process
 from legalize.storage import load_norma_from_json, save_structured_json
@@ -98,6 +99,23 @@ def finalize_daily(
         console.print(f"[yellow]⚠ {len(errors)} errors[/yellow]")
 
     return commits_created
+
+
+def _with_last_amendment(metadata: NormMetadata, reform: Reform) -> NormMetadata:
+    """Name the amending act on a body that does not change when one lands.
+
+    Only for AS_ENACTED. On a point-in-time norm the amendments *are* the versions,
+    so putting one in the frontmatter states the timeline twice and contradicts the
+    body. And a parser that already knows the official ID keeps it: reform.norm_id
+    is an internal dedupe key on some countries — Portugal's is
+    "DRE-133879986@2020-05-17" — while the field is documented as the official ID.
+    """
+    from legalize.countries import text_state_for
+
+    state = metadata.text_state or text_state_for(metadata.country)
+    if state is not TextState.AS_ENACTED or metadata.last_amendment:
+        return metadata
+    return replace(metadata, last_amendment=reform.norm_id)
 
 
 def generic_daily(
@@ -593,7 +611,7 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
         is_first = reform == reforms[0]
         commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-        norm_meta = metadata if is_first else replace(metadata, last_amendment=reform.norm_id)
+        norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
         markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
         changed = repo.write_and_add(file_path, markdown)
 
@@ -783,9 +801,7 @@ def commit_all_fast(
                 is_first = reform_idx == 0
                 commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-                norm_meta = (
-                    metadata if is_first else replace(metadata, last_amendment=reform.norm_id)
-                )
+                norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
                 markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
                 file_path = norm_to_filepath(metadata)
 

@@ -163,3 +163,120 @@ class TestConformance:
     @pytest.mark.parametrize("code", sorted(REGISTRY))
     def test_every_country_resolves(self, code):
         assert isinstance(text_state_for(code), TextState)
+
+
+class TestOverrideSurvivesTheRoundTrip:
+    """commit_all_fast renders from the JSON, not from the parser's output, so a
+    per-norm override that is not persisted is silently replaced by the country
+    default — the opposite claim on every consolidated norm inside an as_enacted
+    country."""
+
+    def _norm(self, tmp_path, **kw):
+        from datetime import date
+
+        from legalize.models import (
+            Block,
+            NormMetadata,
+            NormStatus,
+            Paragraph,
+            ParsedNorm,
+            Rank,
+            Version,
+        )
+
+        meta = NormMetadata(
+            title="T",
+            short_title="T",
+            identifier="X-1",
+            country="pt",
+            rank=Rank("lei"),
+            publication_date=date(2020, 1, 1),
+            status=NormStatus.IN_FORCE,
+            department="Ministério",
+            source="https://example.test",
+            **kw,
+        )
+        block = Block(
+            id="a1",
+            block_type="artigo",
+            title="Artigo 1.º",
+            versions=(
+                Version(
+                    norm_id="X-1",
+                    publication_date=date(2020, 1, 1),
+                    effective_date=date(2020, 1, 1),
+                    paragraphs=(Paragraph(css_class="parrafo", text="Texto."),),
+                ),
+            ),
+        )
+        return ParsedNorm(metadata=meta, blocks=(block,), reforms=())
+
+    def test_point_in_time_override_round_trips(self, tmp_path):
+        from legalize.models import TextState
+        from legalize.storage import load_norma_from_json, save_structured_json
+
+        path = save_structured_json(
+            tmp_path, self._norm(tmp_path, text_state=TextState.POINT_IN_TIME)
+        )
+        assert load_norma_from_json(path).metadata.text_state is TextState.POINT_IN_TIME
+
+    def test_last_amendment_round_trips(self, tmp_path):
+        from legalize.storage import load_norma_from_json, save_structured_json
+
+        path = save_structured_json(tmp_path, self._norm(tmp_path, last_amendment="DRE-LEI-9-2021"))
+        assert load_norma_from_json(path).metadata.last_amendment == "DRE-LEI-9-2021"
+
+    def test_absent_state_stays_absent(self, tmp_path):
+        from legalize.storage import load_norma_from_json, save_structured_json
+
+        path = save_structured_json(tmp_path, self._norm(tmp_path))
+        assert load_norma_from_json(path).metadata.text_state is None
+
+
+class TestLastAmendmentIsGuardedByState:
+    def _meta(self, **kw):
+        from datetime import date
+
+        from legalize.models import NormMetadata, NormStatus, Rank
+
+        return NormMetadata(
+            title="T",
+            short_title="T",
+            identifier="X-1",
+            country="pt",
+            rank=Rank("lei"),
+            publication_date=date(2020, 1, 1),
+            status=NormStatus.IN_FORCE,
+            department="Ministério",
+            source="https://example.test",
+            **kw,
+        )
+
+    def _reform(self):
+        from datetime import date
+
+        from legalize.models import Reform
+
+        return Reform(date=date(2021, 1, 1), norm_id="DRE-133879986@2021-01-01", affected_blocks=())
+
+    def test_point_in_time_norm_is_left_alone(self):
+        """Its amendments are the versions; naming one states the timeline twice."""
+        from legalize.models import TextState
+        from legalize.pipeline import _with_last_amendment
+
+        meta = self._meta(text_state=TextState.POINT_IN_TIME)
+        assert _with_last_amendment(meta, self._reform()).last_amendment is None
+
+    def test_as_enacted_norm_gets_the_reform_id(self):
+        from legalize.pipeline import _with_last_amendment
+
+        got = _with_last_amendment(self._meta(), self._reform())
+        assert got.last_amendment == "DRE-133879986@2021-01-01"
+
+    def test_an_official_id_the_parser_found_is_not_overwritten(self):
+        """reform.norm_id is an internal dedupe key on some countries; the field is
+        documented as the official ID of the amending act."""
+        from legalize.pipeline import _with_last_amendment
+
+        meta = self._meta(last_amendment="DRE-DEC-LEI-94-1999")
+        assert _with_last_amendment(meta, self._reform()).last_amendment == "DRE-DEC-LEI-94-1999"

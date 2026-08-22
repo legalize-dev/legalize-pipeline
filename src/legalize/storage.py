@@ -22,6 +22,7 @@ from legalize.models import (
     ParsedNorm,
     Rank,
     Reform,
+    TextState,
     Version,
 )
 
@@ -112,6 +113,16 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             extra_dict[key] = value
     if extra_dict:
         metadata_dict["extra"] = extra_dict
+
+    # Spec v0.3. Both are per-norm overrides of a country-level default, so they
+    # have to survive the round-trip: commit_all_fast renders from the JSON, not
+    # from the parser's output, and a dropped override silently republishes the
+    # country default — which is the opposite claim on every consolidated norm
+    # inside an as_enacted country.
+    if meta.text_state is not None:
+        metadata_dict["text_state"] = meta.text_state.value
+    if meta.last_amendment:
+        metadata_dict["last_amendment"] = meta.last_amendment
 
     # Articles with all their versions
     articles = []
@@ -211,6 +222,8 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
         pdf_url=pdf_url,
         subjects=subjects,
         extra=extra,
+        text_state=TextState(meta["text_state"]) if meta.get("text_state") else None,
+        last_amendment=meta.get("last_amendment"),
     )
 
     blocks = []
