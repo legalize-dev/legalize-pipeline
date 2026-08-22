@@ -1579,7 +1579,13 @@ here means the network, not the CPU.
    the rewrite, so an incremental sync is not enough.
 9. **Redirect map** old id → new id for `legalize-web`; every filename changes (D2),
    and note the type prefix moved again in §14.5 — build the map from the pushed
-   repo, not from an earlier run.
+   repo, not from an earlier run. The old side is already cached, taken at head
+   `495d62b` before anything is force-pushed over it:
+   `{data_dir}/migration/old-paths.txt`, 90,651 `.md` files under the old 19-code
+   scheme (46,712 `DRE-P-`, 23,626 `DRE-DL-`, 9,166 `DRE-D-`, …). Mapping is a
+   filename transform — old code + number + 2-digit year → `TYPE_TOKENS` + number +
+   4-digit year — except where the old scheme was lossy: the numbers it deleted
+   characters out of, and the two `*-UNKNOWN` files. Those get no redirect.
 
 ### 14.4 Decisions taken while building
 
