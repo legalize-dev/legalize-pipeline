@@ -1,0 +1,65 @@
+{
+  "msg": "操作成功",
+  "code": 200,
+  "data": {
+    "bbbs": "ff8081819ff54a6401a01df735565134",
+    "ossFile": {
+      "ossWordPath": "prod/20260810/bd0926e0e129442291bd6e4be1b6f15a.docx",
+      "ossWordOfdPath": "prod/20260810/bd0926e0e129442291bd6e4be1b6f15a.ofd",
+      "ossWordOfdSize": 132461,
+      "ossPdfPath": null,
+      "ossPdfOfdPath": null,
+      "ossPdfOfdSize": null
+    },
+    "xgwj": [],
+    "lsyg": [
+      {
+        "bbbs": "ff8081819ff54a6401a01df735565134",
+        "title": "住房公积金管理条例",
+        "gbrq": "2026-08-10",
+        "highLight": true
+      },
+      {
+        "bbbs": "ff8080816f3cbb3c016f40fc7b680ff2",
+        "title": "住房公积金管理条例",
+        "gbrq": "2019-03-24",
+        "highLight": false
+      }
+    ],
+    "xgzl": [
+      {
+        "fileId": "cd30b76874c74c0787f66b2804400802",
+        "title": "中华人民共和国国务院令第844号",
+        "titleHighLight": null,
+        "busiType": "国务院令",
+        "fileType": "docx",
+        "titleHightLightList": null
+      },
+      {
+        "fileId": "28292475d2ce42749e91860d4e190270",
+        "title": "国务院关于修改《住房公积金管理条例》的决定",
+        "titleHighLight": null,
+        "busiType": "修改决定",
+        "fileType": "docx",
+        "titleHightLightList": null
+      },
+      {
+        "fileId": "5b44771950c74761a537a9ccb9df31e2",
+        "title": "其他",
+        "titleHighLight": null,
+        "busiType": "其他",
+        "fileType": "pdf",
+        "titleHightLightList": null
+      }
+    ],
+    "flfg": null,
+    "flxz": "行政法规",
+    "zdjgName": "国务院",
+    "gbrq": "2026-08-10",
+    "sxrq": "2026-09-20",
+    "title": "住房公积金管理条例",
+    "sxx": 4,
+    "content": null,
+    "xfFlag": 0
+  }
+}

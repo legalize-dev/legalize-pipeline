@@ -97,6 +97,18 @@ countries:
         - "terviktekst"
         - "algtekst-terviktekst"
 
+  cn:
+    repo_path: "../countries/cn"
+    data_dir: "../countries/data-cn"
+    cache_dir: ".cache"
+    max_workers: 4
+    source:
+      base_url: "https://flk.npc.gov.cn"
+      request_timeout: 30
+      max_retries: 5
+      requests_per_second: 3.0
+      scope: "national"
+
   it:
     repo_path: "../countries/it"
     data_dir: "../countries/data-it"
