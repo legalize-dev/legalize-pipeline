@@ -35,11 +35,18 @@ from pathlib import Path
 sys.path.insert(0, "src")
 
 from legalize.config import load_config  # noqa: E402
+from legalize.fetcher.pt.client import unpack  # noqa: E402
 from legalize.fetcher.pt.identifier import build_identifier  # noqa: E402
 
 _RDFA = re.compile(r'about="([^"]*)"\s+property="eli:(amended_by|amends)"\s+resource="([^"]*)"')
 _ELI_PATH = re.compile(r"/eli/([^/]+)/([^/]+)/(\d{4})")
-_LINK = re.compile(r"\]\(https://diariodarepublica\.pt/dr/detalhe/([^/]+)/([^)]+)\)")
+# The href as DRE writes it in the act's own HTML. Read from raw/ and never from a
+# rendered file: the index must be a pure function of the cache, or it silently
+# degrades to the RDFa alone whenever it runs before the reparse — which is when it
+# runs, because the reparse consumes it. That mistake cost 19,254 laws.
+# DRE quotes this attribute with single quotes, and the neighbouring ones with
+# double. Accept either — matching only one silently finds nothing.
+_HREF = re.compile(r"""href=["']/dr/detalhe/([^/"']+)/([^"'?#]+)["']""")
 _AMENDING = re.compile(
     r"^\s*(altera|revoga|adita|republica|retifica|rectifica|derroga|prorroga|suspende)",
     re.I,
@@ -65,10 +72,11 @@ def main() -> int:
 
     config = load_config(os.environ.get("CONFIG", "config.yaml"))
     data_dir = Path(config.get_country("pt").data_dir)
-    raw_dir, json_dir = data_dir / "raw", data_dir / "json"
+    raw_dir = data_dir / "raw"
 
     # -- pass 1: identity, date and summary of every cached diploma ------------
-    ident_of: dict[str, str] = {}  # dre detail key -> identifier
+    ident_of: dict[str, str] = {}  # "tipo/key" as DRE links it -> identifier
+    ident_of_norm: dict[str, str] = {}  # "surface:tipo:key" -> identifier
     published_on: dict[str, str] = {}
     summary_of: dict[str, str] = {}
     amended: dict[str, set[str]] = defaultdict(set)
@@ -98,6 +106,8 @@ def main() -> int:
             ident_of[
                 link.rstrip("/").rsplit("/", 2)[-2] + "/" + link.rstrip("/").rsplit("/", 1)[-1]
             ] = ident
+        surface = "cons" if path.name.startswith("cons-") else "pub"
+        ident_of_norm[f"{surface}:{bundle.get('tipo', '')}:{bundle.get('key', '')}"] = ident
         published_on[ident] = when
         summary_of[ident] = (published.get("Sumario") or published.get("Resumo") or "").replace(
             "\x00", ""
@@ -119,21 +129,28 @@ def main() -> int:
     # The body links its target ("[Decreto-Lei n.º 16/94](https://…/16-1994-512030)"),
     # which is exact; the summary is the fallback and only names it in prose.
     linked = 0
-    for path in json_dir.glob("*.json"):
-        ident = path.stem
-        if not _AMENDING.match(summary_of.get(ident, "")):
-            continue
+    for path in raw_dir.glob("*.versions.json.gz"):
         try:
-            body = path.read_text(encoding="utf-8")
+            with gzip.open(path, "rt", encoding="utf-8") as handle:
+                blob = json.load(handle)
         except Exception:
             continue
-        for tipo, key in set(_LINK.findall(body)):
-            target = ident_of.get(f"{tipo}/{key}")
-            if target and target != ident:
-                amended[target].add(ident)
-                linked += 1
+        ident = ident_of_norm.get(blob.get("norm_id", ""))
+        if not ident or not _AMENDING.match(summary_of.get(ident, "")):
+            continue
+        for entry in blob.get("versions") or []:
+            if not entry.get("html_b64"):
+                continue
+            html = unpack(entry["html_b64"])
+            if not isinstance(html, str):
+                continue
+            for tipo, key in set(_HREF.findall(html)):
+                target = ident_of.get(f"{tipo}/{key}")
+                if target and target != ident:
+                    amended[target].add(ident)
+                    linked += 1
 
-    print(f"{linked} target links read off amending-act bodies")
+    print(f"{linked} target links read off the acts' own HTML")
     inferred_only = len(set(amended) - set(dre_only))
     print(
         f"laws with a known amender: {len(amended)} "
@@ -142,13 +159,31 @@ def main() -> int:
     if args.report:
         return 0
 
-    # -- write: newest amending act last, so the parser can take [-1] ----------
-    out: dict[str, list[str]] = {}
+    # -- write ------------------------------------------------------------------
+    # Keyed by the amended law's *norm id*, because the text parser is what consumes
+    # this and a norm id is all it has. Values carry the date so each amendment can
+    # become a Reform, and the official identifier of the act, which is what
+    # last_amendment is documented to hold.
+    #
+    # Only the as-published side is emitted. A consolidated diploma already carries
+    # its amendments as Versions, and the reparse writes it after its as-published
+    # twin, so anything emitted for the twin is overwritten anyway.
+    norm_id_of = {
+        ident: norm_id for norm_id, ident in ident_of_norm.items() if norm_id.startswith("pub:")
+    }
+    out: dict[str, list[list[str]]] = {}
     for law, acts in amended.items():
-        out[law] = [a for _, a in sorted((published_on.get(a, ""), a) for a in acts)]
+        norm_id = norm_id_of.get(law)
+        if not norm_id:
+            continue
+        dated = sorted((published_on.get(a, ""), a) for a in acts)
+        out[norm_id] = [[when, act] for when, act in dated if when]
     target = data_dir / "amendments.json"
     target.write_text(json.dumps(out, ensure_ascii=False, sort_keys=True), encoding="utf-8")
-    print(f"wrote {target} — {len(out)} laws, {sum(len(v) for v in out.values())} relations")
+    print(
+        f"wrote {target} — {len(out)} as-published laws, "
+        f"{sum(len(v) for v in out.values())} amendments"
+    )
     return 0
 
 

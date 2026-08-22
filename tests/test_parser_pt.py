@@ -40,6 +40,17 @@ def _load_fixture(name: str) -> dict:
         return json.load(handle)
 
 
+def _pack_published(when: str, html: str) -> bytes:
+    """A minimal as-published suvestine blob, packed the way the client writes it."""
+    return json.dumps(
+        {
+            "surface": "pub",
+            "pdf_url": "",
+            "versions": [{"date": when, "html_b64": _pack(html), "is_original": True}],
+        }
+    ).encode("utf-8")
+
+
 class TestIdentifier:
     """The old scheme wrote the year with two digits for 55,742 files and four for
     32,650, funnelled every numberless diploma into two ``*-UNKNOWN`` files, and
@@ -328,31 +339,57 @@ class TestTextState:
             }
         ).encode("utf-8")
 
-    def test_as_published_declares_as_enacted_and_names_the_last_amendment(self):
+    def test_as_published_takes_the_country_default(self):
+        meta = DREMetadataParser().parse(self._bundle("pub"), "pub:decreto-lei:16-1994-512030")
+        assert meta.text_state is None  # the country default already says as_enacted
+        assert meta.last_amendment is None  # set per reform by the pipeline, not here
+        assert "amended_by" not in dict(meta.extra)
+
+    def test_each_amendment_becomes_a_reform(self):
+        """The body of an as-enacted file never changes, so without a reform per
+        amendment its own notice — "a commit in this file's history" — is false."""
+        blob = _pack_published("1994-01-22", "<p>Texto original.</p>")
         parser_module.set_amendments(
-            {"DRE-DEC-LEI-16-1994": ["DRE-LEI-37-1994", "DRE-DEC-LEI-94-1999"]}
+            {
+                "pub:decreto-lei:16-1994-512030": [
+                    ["1994-11-11", "DRE-LEI-37-1994"],
+                    ["1999-03-23", "DRE-DEC-LEI-94-1999"],
+                ]
+            }
         )
         try:
-            meta = DREMetadataParser().parse(self._bundle("pub"), "pub:decreto-lei:16-1994-512030")
-            assert meta.text_state is None  # the country default already says as_enacted
-            assert meta.last_amendment == "DRE-DEC-LEI-94-1999"
-            extra = dict(meta.extra)
-            assert extra["amended_by"] == "DRE-LEI-37-1994; DRE-DEC-LEI-94-1999"
-            assert extra["amended_by_count"] == "2"
+            _, reforms = DRETextParser().parse_suvestine(blob, "pub:decreto-lei:16-1994-512030")
+            assert [r.norm_id for r in reforms] == [
+                "pub:decreto-lei:16-1994-512030",
+                "DRE-LEI-37-1994",
+                "DRE-DEC-LEI-94-1999",
+            ]
+            assert [r.date.isoformat() for r in reforms] == [
+                "1994-01-22",
+                "1994-11-11",
+                "1999-03-23",
+            ]
+        finally:
+            parser_module.set_amendments({})
+
+    def test_an_amendment_before_publication_is_ignored(self):
+        """A mis-resolved reference must not date a commit before the law existed."""
+        blob = _pack_published("1994-01-22", "<p>Texto.</p>")
+        parser_module.set_amendments(
+            {"pub:decreto-lei:16-1994-512030": [["1990-01-01", "DRE-LEI-1-1990"]]}
+        )
+        try:
+            _, reforms = DRETextParser().parse_suvestine(blob, "pub:decreto-lei:16-1994-512030")
+            assert len(reforms) == 1
         finally:
             parser_module.set_amendments({})
 
     def test_consolidated_overrides_back_to_point_in_time(self):
-        """Its amendments are Versions in the file's own history, so naming one in
-        the frontmatter would duplicate the timeline and contradict the body."""
-        parser_module.set_amendments({"DRE-DEC-LEI-16-1994": ["DRE-LEI-37-1994"]})
-        try:
-            meta = DREMetadataParser().parse(self._bundle("cons"), "cons:decreto-lei:1994-512030")
-            assert meta.text_state is TextState.POINT_IN_TIME
-            assert meta.last_amendment is None
-            assert "amended_by" not in dict(meta.extra)
-        finally:
-            parser_module.set_amendments({})
+        """Its amendments are Versions in the file's own history, so declaring
+        as_enacted over them would contradict the body."""
+        meta = DREMetadataParser().parse(self._bundle("cons"), "cons:decreto-lei:1994-512030")
+        assert meta.text_state is TextState.POINT_IN_TIME
+        assert meta.last_amendment is None
 
     def test_unknown_amendments_emit_nothing(self):
         """Absence is a claim we can back: no act in the corpus names this law."""

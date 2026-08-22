@@ -111,17 +111,20 @@ def set_thesaurus(mapping: dict[str, str]) -> None:
     _THESAURUS.update({str(k): v for k, v in (mapping or {}).items() if v})
 
 
-# {law identifier: [amending act identifiers, oldest first]}. Built by
-# scripts/pt_amendments.py from DRE's eli:amended_by plus the targets the amending
-# acts name themselves, and injected before a reparse. Only as-published norms use
-# it: a consolidated one carries its amendments as Versions instead.
-_AMENDMENTS: dict[str, tuple[str, ...]] = {}
+# {as-published norm id: [(date, amending act identifier), …]}, oldest first. Built
+# by scripts/pt_amendments.py from DRE's eli:amended_by plus the targets the acts
+# link themselves, and injected before a reparse. Only as-published norms use it: a
+# consolidated one carries its amendments as Versions already.
+_AMENDMENTS: dict[str, tuple[tuple[str, str], ...]] = {}
 
 
-def set_amendments(mapping: dict[str, list[str]]) -> None:
-    """Install the {law: amending acts} map used for ``last_amendment`` (spec v0.3)."""
+def set_amendments(mapping: dict[str, list[list[str]]]) -> None:
+    """Install the {norm id: [(date, amending act)]} map (spec v0.3)."""
     _AMENDMENTS.clear()
-    _AMENDMENTS.update({str(k): tuple(v) for k, v in (mapping or {}).items() if k and v})
+    for key, pairs in (mapping or {}).items():
+        rows = tuple((str(w), str(a)) for w, a in pairs if w and a)
+        if key and rows:
+            _AMENDMENTS[str(key)] = rows
 
 
 def set_subject_overrides(mapping: dict[str, list[str]]) -> None:
@@ -552,7 +555,16 @@ class DRETextParser(TextParser):
             paragraphs=tuple(paragraphs),
         )
         block = Block(id="texto", block_type="texto", title="", versions=(version,))
-        return [block], [Reform(date=when, norm_id=norm_id, affected_blocks=())]
+        reforms = [Reform(date=when, norm_id=norm_id, affected_blocks=())]
+        # An as-enacted body never changes, so without these the file would have a
+        # single commit while its own notice promises "a commit in this file's
+        # history" for every amendment. The body stays as enacted; what each commit
+        # records is that an act changed the law, and which one.
+        for raw_when, act in _AMENDMENTS.get(norm_id, ()):
+            amended_on = _parse_date(raw_when)
+            if amended_on and amended_on > when:
+                reforms.append(Reform(date=amended_on, norm_id=act, affected_blocks=()))
+        return [block], reforms
 
     # -- surface A: one snapshot per effective date --------------------------
 
@@ -745,12 +757,13 @@ class DREMetadataParser(MetadataParser):
         # Spec v0.3. The country default is AS_ENACTED because 159,000 of the
         # 165,000 diplomas are exactly that; a consolidated one is the law at a
         # date, so it says nothing and takes the POINT_IN_TIME default.
-        consolidated = bundle.get("surface") == CONSOLIDATED
-        text_state = TextState.POINT_IN_TIME if consolidated else None
-        amenders = () if consolidated else _AMENDMENTS.get(identifier, ())
-        if amenders:
-            add("amended_by", "; ".join(amenders[-20:]))
-            add("amended_by_count", len(amenders))
+        #
+        # No cumulative "amended_by" list here on purpose: rendered at each commit
+        # it would be the amendment table this spec already rejected, just moved
+        # into the frontmatter, and one backfilled old amendment would falsify every
+        # later commit. The single last_amendment pointer the pipeline sets per
+        # reform is correct at each commit by construction.
+        text_state = TextState.POINT_IN_TIME if bundle.get("surface") == CONSOLIDATED else None
 
         status = _STATUS.get((published.get("Vigencia") or "").strip().upper(), NormStatus.IN_FORCE)
         rank_token = (eli_meta.get("type_document") or eli or "").rsplit("/", 1)[-1] or acronimo
@@ -780,7 +793,6 @@ class DREMetadataParser(MetadataParser):
             summary=sumario,
             extra=tuple(extra),
             text_state=text_state,
-            last_amendment=amenders[-1] if amenders else None,
         )
 
 
