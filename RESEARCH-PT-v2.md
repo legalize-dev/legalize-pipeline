@@ -1617,6 +1617,10 @@ The corpus only shows these when it is read back as a whole; each one is now a t
 | A malformed span dropped a whole law | `rowspan=2>` unquoted, lxml recovers the rest of the row into the attribute value, `int()` raises out of `render_table`, `generic_fetch_one` skips the norm. ~250 diplomas across the corpus. Fixed in the shared `_tables.py`, so every country. |
 | A lone NUL is not empty text | DRE writes `"\x00"` into `Texto` on rows it has nothing for, and `"\x00".strip()` is truthy, so those were shipping as laws with no content. |
 | Partial subject lists that read as complete | The sampled thesaurus labelled 4,724 of 11,258 ids; 57 % of diplomas with subjects resolved only partially. §14.2. |
+| The flagship law had no subjects at all | 12 % of consolidated diplomas return an empty `ELIMetadataHTML`, so `eli:is_about` names nothing — 579 of them, the Código Civil included. AnaliseJuridica has descriptors for 95 %, keyed by LinkSitemap. |
+| The 1960 cutoff never applied to numberless diplomas | Their key is `{year}-{dre id}`, with no number in front, so `_KEY_YEAR` found nothing and `if year is not None` waved them through: 6,056 in the as-published list, 5,596 from the 1910s, 2,380 already fetched. 96.9 % of them are a PDF scan with no text — the reason the cutoff exists. |
+| The reparse trusted the cache over the scope | It walked `raw/` rather than the discovery lists, so anything downloaded before a scope rule was corrected went into the repo anyway. |
+| Cache eviction was quadratic | `commit_all_fast` re-scanned the remaining reform list every iteration to find each norm's last one. Free at a thousand reforms, ~9 minutes of waste at Portugal's 230,000, and it affects every country. |
 
 ## Artefacts produced by this research
 
