@@ -1535,65 +1535,78 @@ Branch `feat/pt-v2`, worktree `engine-pt/`. Updated 2026-08-21.
 
 ### 14.2 In flight
 
-One chain, started 2026-08-22 01:24 and unattended to the end. It does **not** push.
+**One job: `scripts/pt_relations.py`**, started 2026-08-22 15:37, log
+`logs/pt-relations.log`. 362,072 calls (181,036 diplomas x association types 162
+modificações and 165 retificações) at 10 req/s, about 10 h, resumable through a
+per-response cache under `{data_dir}/relations/`. DRE answers in 0.10 s, so the
+rate is a politeness choice; 10 req/s is what it already absorbed for eight hours
+during the corpus fetch. Nothing else is running.
 
-```bash
-scripts/pt_overnight.sh <fetch pids>   # logs/pt-overnight.log
-```
+The rebuild is **not** running. It was started twice and stopped twice on purpose:
+once because its output predated spec v0.3, once to wait for this harvest. Restart
+it with `scripts/pt_reparse_and_bootstrap.sh` — reparse, wipe, bootstrap, health,
+no push — once the harvest is done and `scripts/pt_amendments.py` has been re-run
+over the complete relation cache.
 
-It waits out the jobs already running, then: close the fetch gap twice ·
-close the descriptor gap · reparse · rebuild · health.
+### 14.2b State of the corpus data
 
-**Completeness, measured at 06:46**: 203,831 discovered · 185,914 cached ·
-23,542 out of scope · **239 missing** (0.12 %). Out of scope is the Açores gazette
-plus the diplomas DRE holds neither text nor a scan for — both are refused at
-`get_text`, so neither ever gets a versions envelope and both would otherwise sit in
-the "missing" count for ever, which is why `--report` now classifies them.
-Of the 239, 185 are in the corpus already under their as-published id, so the
-diplomas genuinely absent number about 54.
+| Under `{data_dir}/` | What | State |
+|---|---|---|
+| `raw/` | source envelopes, one meta + one versions per norm | complete, 185,914 norms |
+| `relations/{162,165}/` | DRE's relation table, one response per norm | harvesting |
+| `thesaurus.json` | descriptor id -> Portuguese label | complete, 15,630 terms, 0 unresolved |
+| `subjects.json` | LinkSitemap -> subjects, for the 12 % of consolidated diplomas with no ELI RDFa | complete, 548 filled, 26 genuinely none, 5 errors |
+| `amendments.json` | norm id -> [(date, amending act, DRE's wording)] | rebuilt from the first tenth of the harvest; **re-run after it finishes** |
+| `json/` | derived, wiped and rewritten by every reparse | empty |
+| `migration/old-paths.txt` | the old repo's 90,651 paths at head `495d62b` | for the redirect map, taken before any force-push |
 
-| Job | State at 01:24 |
-|---|---|
-| Consolidated (5,561) | finished, 5,318 cached — the 243 it dropped are the gap pass's job |
-| As-published (204,314) | ~40,000 cached, running front-to-back (`/tmp/pt_fetch_pub.py`) |
-| Same, back-to-front | `pt_fetch_missing.py --reverse`, so the two meet in the middle |
-| Descriptor thesaurus | sampled run finished at 4,724 labels; `pt_thesaurus_gap.py` going after the other 6,612 |
-
-`{data_dir}/raw/` is the source of truth and skips the network for anything already
-downloaded. `{data_dir}/json/` is derived and gets wiped before the reparse — it is
-keyed by identifier, and the identifier scheme changed under it, so a stale file
-would not be overwritten but published (`commit_all_fast` reads the directory, not
-the id list).
-
-Note that `generic_fetch_one`'s resume check looks for `{norm_id}.json` while
-`save_structured_json` writes `{identifier}.json`, so it never fires for PT and a
-re-run re-parses everything. Cheap — it is all cache reads — but it means "resumable"
-here means the network, not the CPU.
+Coverage last measured: 203,831 discovered, 185,914 cached, 23,542 out of scope,
+239 missing (0.12 %), of which 185 are already in the corpus under their
+as-published id. `scripts/pt_fetch_missing.py --report` recomputes it.
 
 ### 14.3 Remaining, in order
 
-1. ~~Finish the fetch~~ · 2. ~~Reparse~~ · 3. ~~Resolve the descriptors~~ ·
-   4. ~~Bootstrap~~ — all four are the chain in §14.2. Read `logs/pt-overnight.log`
-   for where it got to, and `pt_fetch_missing.py --report` for whether the corpus is
-   actually complete.
-5. **Push** to `legalize-dev/legalize-pt` (force; the history is rewritten) and tag
-   the old head `pre-v2` first.
-6. **Engine PR** from `feat/pt-v2`, CI green.
-7. **Two one-line fixes in `enrichment`**, without which none of this reaches the
-   site (see §1.2): add `[new`, `[repeal`, `[correction` to the accept-list in
-   `parse_reform_commit`, and `^#{1,6}\s+Artigo` to `_ARTICLE_PATTERNS`.
-   Done on `fix/pt-reform-commits-and-article-count`, with tests.
-8. **`law-sync full --repo ../countries/pt`** — every `reforms.sha` is invalidated by
-   the rewrite, so an incremental sync is not enough.
-9. **Redirect map** old id → new id for `legalize-web`; every filename changes (D2),
-   and note the type prefix moved again in §14.5 — build the map from the pushed
-   repo, not from an earlier run. The old side is already cached, taken at head
-   `495d62b` before anything is force-pushed over it:
-   `{data_dir}/migration/old-paths.txt`, 90,651 `.md` files under the old 19-code
-   scheme (46,712 `DRE-P-`, 23,626 `DRE-DL-`, 9,166 `DRE-D-`, …). Mapping is a
-   filename transform — old code + number + 2-digit year → `TYPE_TOKENS` + number +
-   4-digit year — except where the old scheme was lossy: the numbers it deleted
-   characters out of, and the two `*-UNKNOWN` files. Those get no redirect.
+1. **Finish the harvest** (§14.2), then `scripts/pt_amendments.py` over the complete
+   cache, then `scripts/pt_reparse_and_bootstrap.sh`. Health must be clean.
+2. **Push** to `legalize-dev/legalize-pt` (force; the history is rewritten) and tag
+   the old head `pre-v2` first. Waiting on the user, deliberately.
+3. **Engine PR** from `feat/pt-v2`, CI green. `fix/text-state-round-trip` is already
+   cherry-picked from `main` and green (1,814 tests) — a generic fix should not
+   wait behind a country, and #88's author asked for it separately.
+4. **Two one-line fixes in `enrichment`** (§1.2), on
+   `fix/pt-reform-commits-and-article-count`, with tests.
+5. **`law-sync full --repo ../countries/pt`** — every `reforms.sha` is invalidated by
+   the rewrite, and the daily cron cannot do this: API mode spends one GitHub call
+   per commit and the job is capped at 15 minutes. Exclude `pt` from the cron until
+   the full sync has run.
+6. **Redirect map** old id -> new id (D2, and the type prefix moved again in §14.5).
+   Old side cached at `{data_dir}/migration/old-paths.txt`.
+7. **The web cannot describe this corpus yet** — see `PLAN-WEB-TEXT-STATE.md`.
+   Blocking before publishing: the Portuguese copy says "legislação consolidada"
+   and "texto em vigor" over a corpus that is 97 % as-enacted
+   (`web/src/legalize/web/countries.py:404-410`); the history view compares bodies
+   with the frontmatter stripped (`github.py:218`), so all 86,876 amendment commits
+   would render "no changes detected"; `extract_articles_affected` matches only the
+   Spanish literal (`enrichment/.../frontmatter.py:174`) while the engine emits
+   English, so `reforms.articles_affected` is empty for every country. And the sync
+   has been writing to the dead Neon instance since May, which makes the whole
+   database half of that plan a no-op until it is repointed.
+
+### 14.3b Open, for the user and #87
+
+- **v0.4**: the `.legalize.yml` manifest (a repo-level default so external repos can
+  declare their own `text_state`, which `countries.py` cannot do for them), and the
+  mixed-country criterion below. Proposed by #88's author; the decision is the
+  user's.
+- **The mixed-country rule, as formulated here**: the criterion is the surface the
+  norm came from, and there must be an assertion from the source confirming it; a
+  country that can point at neither does not have a mixed corpus, it has a guess.
+  Portugal has three that agree — the sitemap the norm came from, `HasLegCons` on
+  the análise jurídica record, and `eli:consolidated_by` on 4,910 laws.
+- **Where a relation is stored versus where it comes from.** It is recorded on the
+  amending act, where it is immutable, and derived on the amended law, where it
+  grows. But it can only be *sourced* from the amended law: `DiretasList` carries no
+  resolvable target on any row.
 
 ### 14.4 Decisions taken while building
 
@@ -1629,6 +1642,8 @@ The corpus only shows these when it is read back as a whole; each one is now a t
 | The 1960 cutoff never applied to numberless diplomas | Their key is `{year}-{dre id}`, with no number in front, so `_KEY_YEAR` found nothing and `if year is not None` waved them through: 6,056 in the as-published list, 5,596 from the 1910s, 2,380 already fetched. 96.9 % of them are a PDF scan with no text — the reason the cutoff exists. |
 | The reparse trusted the cache over the scope | It walked `raw/` rather than the discovery lists, so anything downloaded before a scope rule was corrected went into the repo anyway. |
 | A "fall back to surface B" that never fell back | `_build_suvestine` raises when DRE lists a diploma as consolidated but never fragmented it, and the comment says the caller should then publish it as-published. The caller catches every exception and skips the norm. 243 diplomas, of which 185 were already in the corpus under their as-published id; 12 more were recovered by deriving that id from `published.LinkSitemap` in the bundle already cached. The remaining 46 have no LinkSitemap. **Still to fix in the client** — this build worked around it in the data. |
+| The daily loaded none of the corpus-wide maps | The thesaurus, the subject overrides and the amendment index lived in `scripts/`, which `daily.py` cannot import, so only the reparse installed them. Every law the daily touched would have been republished with no subjects and no reform recorded against the law it amended — a real commit per regression, starting the morning after launch. Moved to `fetcher/pt/analise_juridica.py`. |
+| storage.py dropped three fields in a row | `text_state`, `last_amendment` and `change_note` were each resolved by the parser and each silently absent from the JSON, and `commit_all_fast` renders from the JSON. Every one looked correct at the parser and produced nothing in the output. |
 | Cache eviction was quadratic | `commit_all_fast` re-scanned the remaining reform list every iteration to find each norm's last one. Free at a thousand reforms, ~9 minutes of waste at Portugal's 230,000, and it affects every country. |
 
 ## Artefacts produced by this research
