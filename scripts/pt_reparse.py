@@ -39,15 +39,32 @@ if overrides_path.exists():
     pt_parser.set_subject_overrides(overrides)
     print(f"subject overrides: {sum(1 for v in overrides.values() if v)} diplomas", flush=True)
 
+# The discovery lists say what belongs in the corpus; raw/ only says what has been
+# downloaded, and the two are not the same. Anything fetched before a scope rule was
+# corrected is still sitting in the cache — 2,380 pre-1960 scan-only diplomas, say —
+# and reparsing the directory rather than the lists would put them back in the repo.
+in_scope: set[str] = set()
+for name in ("discovery_cons.txt", "discovery_pub.txt"):
+    path = data_dir / name
+    if path.exists():
+        in_scope |= {line.strip() for line in path.read_text().splitlines() if line.strip()}
+
 # The filename cannot be reversed into a norm id (the tipo itself contains hyphens),
 # so read the id back out of each envelope.
 ids: list[str] = []
+stale = 0
 for path in sorted((data_dir / "raw").glob("*.versions.json.gz")):
     try:
         with gzip.open(path, "rt", encoding="utf-8") as handle:
-            ids.append(json.load(handle)["norm_id"])
+            norm_id = json.load(handle)["norm_id"]
     except Exception:
         continue
+    if in_scope and norm_id not in in_scope:
+        stale += 1
+        continue
+    ids.append(norm_id)
+if stale:
+    print(f"{stale} cached norms are no longer in scope, skipping", flush=True)
 
 print(f"{len(ids)} norms to reparse", flush=True)
 work: queue.Queue = queue.Queue()

@@ -16,6 +16,7 @@ import pytest
 
 from legalize.countries import get_metadata_parser, get_text_parser
 from legalize.fetcher.pt.client import _pack, unpack
+from legalize.fetcher.pt.discovery import _year_of
 from legalize.fetcher.pt.identifier import build_identifier, jurisdiction_from_eli, parse_eli
 from legalize.fetcher.pt import parser as parser_module
 from legalize.fetcher.pt.parser import (
@@ -134,6 +135,30 @@ class TestIdentifier:
     def test_unknown_type_still_falls_back(self):
         """A type DRE has not published an ELI for must still get an identifier."""
         assert build_identifier("", "3/2020", "tipo-novo", 2020, "tn") == "DRE-TN-3-2020"
+
+
+class TestScopeYear:
+    """`earliest_year` is 1960 because 96.9 % of what DRE holds before it is a PDF
+    scan with no text layer. The filter has to actually see the year."""
+
+    def test_numberless_key_still_yields_its_year(self):
+        """Portugal published thousands of numberless acts ("Decreto de 12 de Maio de
+        1911"), whose key is {year}-{dre id} with no number in front. The pattern
+        only knew {number}-{year}-{dre id}, so 6,056 of them sailed past the cutoff —
+        5,596 from the 1910s alone."""
+        assert _year_of("1912-249008") == 1912
+
+    @pytest.mark.parametrize(
+        "key, expected",
+        [
+            ("7-1980-30993000", 1980),
+            ("31095-1940-1", 1940),
+            ("82-D-2014-12345", 2014),
+            ("29-2026-1135578391", 2026),
+        ],
+    )
+    def test_numbered_keys_are_unaffected(self, key, expected):
+        assert _year_of(key) == expected
 
 
 class TestJurisdiction:

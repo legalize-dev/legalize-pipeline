@@ -112,10 +112,16 @@ _DETALHE = re.compile(r"/dr/detalhe/([^/]+)/([^/?#]+)")
 _CONS = re.compile(r"/dr/legislacao-consolidada/([^/]+)/(\d{4})-(\d+)")
 # /dr/detalhe/lei/29-2026-1135578391 -> the 2026 is the publication year
 _KEY_YEAR = re.compile(r"-(\d{4})-\d+$")
+# Portugal published thousands of numberless acts ("Decreto de 12 de Maio de 1911"),
+# and their key is {year}-{dre id} with no number in front, so the pattern above
+# finds nothing and every one of them used to sail past the earliest_year filter:
+# 6,056 of them in the as-published list, 5,596 from the 1910s alone, of which
+# 96.9 % are a PDF scan with no text — which is the reason the cutoff is 1960.
+_KEY_YEAR_NUMBERLESS = re.compile(r"^(\d{4})-\d+$")
 
 
 def _year_of(key: str) -> int | None:
-    match = _KEY_YEAR.search(key)
+    match = _KEY_YEAR.search(key) or _KEY_YEAR_NUMBERLESS.match(key)
     return int(match.group(1)) if match else None
 
 
