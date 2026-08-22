@@ -719,3 +719,60 @@ class TestCountryDispatch:
     def test_registry(self):
         assert isinstance(get_text_parser("pt"), DRETextParser)
         assert isinstance(get_metadata_parser("pt"), DREMetadataParser)
+
+
+class TestChangeNote:
+    """What DRE says a reform changed travels verbatim into the commit body, on its
+    own line — half of those notes are not about articles at all."""
+
+    def test_the_note_reaches_the_commit_body(self):
+        from legalize.committer.message import build_commit_info
+        from legalize.models import CommitType, Reform
+
+        metadata = DREMetadataParser().parse(
+            json.dumps(
+                {
+                    "tipo": "decreto-lei",
+                    "key": "16-1994-512030",
+                    "surface": "pub",
+                    "published": {
+                        "Id": "512030",
+                        "Numero": "16/94",
+                        "TipoDiploma": "Decreto-Lei",
+                        "TipoDiplomaAcronimo": "dec-lei",
+                        "DataPublicacao": "1994-01-22",
+                        "Sumario": "Aprova o Estatuto",
+                    },
+                }
+            ).encode("utf-8"),
+            "pub:decreto-lei:16-1994-512030",
+        )
+        reform = Reform(
+            date=date(1994, 11, 11),
+            norm_id="DRE-LEI-37-1994",
+            affected_blocks=(),
+            change_note="Alterados os arts. 5.º, 9.º e 14.º",
+        )
+        info = build_commit_info(CommitType.REFORM, metadata, reform, (), "pt/x.md", "body")
+        assert "Change: Alterados os arts. 5.º, 9.º e 14.º" in info.body
+        # The structural line stays what it always was: nothing was diffed here.
+        assert "Affected articles: N/A" in info.body
+
+    def test_no_note_means_no_line(self):
+        """No country's output changes until its fetcher fills the field."""
+        from legalize.committer.message import _build_body
+        from legalize.models import CommitType, NormMetadata, NormStatus, Rank, Reform
+
+        metadata = NormMetadata(
+            title="T",
+            short_title="T",
+            identifier="X-1",
+            country="pt",
+            rank=Rank("lei"),
+            publication_date=date(2020, 1, 1),
+            status=NormStatus.IN_FORCE,
+            department="",
+            source="https://example.test",
+        )
+        reform = Reform(date=date(2021, 1, 1), norm_id="A", affected_blocks=())
+        assert "Change:" not in _build_body(CommitType.REFORM, metadata, reform, "N/A")

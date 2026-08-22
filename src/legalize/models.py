@@ -191,6 +191,18 @@ class Reform:
     date: date
     norm_id: str
     affected_blocks: tuple[str, ...]
+    # What the source says this reform changed, in the source's own words and
+    # unparsed: "Alterados os arts. 5º, 9º, 14º…", "in section 6(e), after X shall
+    # come Y". Separate from affected_blocks because the two are different kinds of
+    # fact. affected_blocks is ours and verifiable — those blocks differ between
+    # this commit and the last. This is the source's claim about a text we may not
+    # hold consolidated at all, which is the normal case in an as_enacted country,
+    # where the body does not change and there is nothing to diff.
+    #
+    # Deliberately a free string. Amendment drafting is a convention of one
+    # legislature, not a property of law, so any taxonomy invented here is one to
+    # redo in 34 countries the first time it does not fit.
+    change_note: str = ""
 
 
 # ─────────────────────────────────────────────

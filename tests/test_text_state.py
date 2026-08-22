@@ -285,3 +285,56 @@ class TestLastAmendmentIsGuardedByState:
 
         meta = self._meta(last_amendment="DRE-DEC-LEI-94-1999")
         assert _with_last_amendment(meta, self._reform()).last_amendment == "DRE-DEC-LEI-94-1999"
+
+
+class TestChangeNoteRoundTrip:
+    def test_the_note_survives_the_json(self, tmp_path):
+        """Third field in a row to be dropped here. commit_all_fast renders from the
+        JSON, so anything the parser resolved and storage omits never reaches a
+        commit — and the index still looked correct while the output was empty."""
+        from datetime import date
+
+        from legalize.models import (
+            Block,
+            NormMetadata,
+            NormStatus,
+            Paragraph,
+            ParsedNorm,
+            Rank,
+            Reform,
+            Version,
+        )
+        from legalize.storage import load_norma_from_json, save_structured_json
+
+        meta = NormMetadata(
+            title="T",
+            short_title="T",
+            identifier="X-1",
+            country="pt",
+            rank=Rank("lei"),
+            publication_date=date(1994, 1, 22),
+            status=NormStatus.IN_FORCE,
+            department="",
+            source="https://example.test",
+        )
+        version = Version(
+            norm_id="X-1",
+            publication_date=date(1994, 1, 22),
+            effective_date=date(1994, 1, 22),
+            paragraphs=(Paragraph(css_class="parrafo", text="Texto."),),
+        )
+        norm = ParsedNorm(
+            metadata=meta,
+            blocks=(Block(id="texto", block_type="texto", title="", versions=(version,)),),
+            reforms=(
+                Reform(
+                    date=date(1994, 11, 11),
+                    norm_id="DRE-LEI-37-1994",
+                    affected_blocks=(),
+                    change_note="Alterados os arts. 5.º, 9.º e 14.º",
+                ),
+            ),
+        )
+        path = save_structured_json(tmp_path, norm)
+        back = load_norma_from_json(path)
+        assert back.reforms[0].change_note == "Alterados os arts. 5.º, 9.º e 14.º"

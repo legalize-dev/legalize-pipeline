@@ -568,10 +568,17 @@ class DRETextParser(TextParser):
         # single commit while its own notice promises "a commit in this file's
         # history" for every amendment. The body stays as enacted; what each commit
         # records is that an act changed the law, and which one.
-        for raw_when, act, _wording in _AMENDMENTS.get(norm_id, ()):
+        for raw_when, act, wording in _AMENDMENTS.get(norm_id, ()):
             amended_on = _parse_date(raw_when)
             if amended_on and amended_on > when:
-                reforms.append(Reform(date=amended_on, norm_id=act, affected_blocks=()))
+                reforms.append(
+                    Reform(
+                        date=amended_on,
+                        norm_id=act,
+                        affected_blocks=(),
+                        change_note=wording,
+                    )
+                )
         return [block], reforms
 
     # -- surface A: one snapshot per effective date --------------------------

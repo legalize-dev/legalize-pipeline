@@ -167,14 +167,18 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             if b and b.title:
                 affected.append(b.title)
 
-        reforms.append(
-            {
-                "date": reform.date.isoformat(),
-                "source_id": reform.norm_id,
-                "articles_affected": affected,
-                "affected_block_ids": list(reform.affected_blocks),
-            }
-        )
+        row = {
+            "date": reform.date.isoformat(),
+            "source_id": reform.norm_id,
+            "articles_affected": affected,
+            "affected_block_ids": list(reform.affected_blocks),
+        }
+        # Same reason text_state is written here: commit_all_fast renders from this
+        # file, not from the parser's output, so anything the parser resolved and
+        # this drops is simply lost on the way to the commit.
+        if reform.change_note:
+            row["change_note"] = reform.change_note
+        reforms.append(row)
 
     return {
         "metadata": metadata_dict,
@@ -272,6 +276,7 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 date=date.fromisoformat(r["date"]),
                 norm_id=r["source_id"],
                 affected_blocks=affected,
+                change_note=r.get("change_note", ""),
             )
         )
 
