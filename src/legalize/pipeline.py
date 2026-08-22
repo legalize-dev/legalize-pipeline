@@ -751,8 +751,12 @@ def commit_all_fast(
         console.print("[yellow]dry-run: skipping fast-import[/yellow]")
         return len(all_reforms)
 
-    # Cache loaded norms to avoid re-reading JSON
+    # Cache loaded norms to avoid re-reading JSON, and drop each one the moment its
+    # last reform has been queued. Where that last one is has to be worked out up
+    # front: scanning the remaining list per iteration is quadratic, which is free at
+    # a thousand reforms and about nine minutes of pure waste at Portugal's 230,000.
     norm_cache: dict[str, ParsedNorm] = {}
+    last_reform_index = {norm_id: idx for idx, (_, norm_id, _, _) in enumerate(all_reforms)}
     errors = 0
 
     with FastImporter(cc.repo_path, config.git.committer_name, config.git.committer_email) as fi:
@@ -798,10 +802,8 @@ def commit_all_fast(
                 )
 
             # Free norm from cache once all its reforms are queued
-            if norm_id in norm_cache:
-                remaining = sum(1 for _, nid, _, _ in all_reforms[idx + 1 :] if nid == norm_id)
-                if remaining == 0:
-                    del norm_cache[norm_id]
+            if last_reform_index.get(norm_id) == idx:
+                norm_cache.pop(norm_id, None)
 
     console.print(f"\n[bold green]✓ {fi.commit_count} commits created (fast-import)[/bold green]")
     if errors:
