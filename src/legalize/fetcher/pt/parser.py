@@ -89,11 +89,23 @@ _VER_DOC_ORIGINAL = re.compile(r"\(\s*ver\s+documento\s+original\s*\)", re.IGNOR
 # reparse; without it `subjects` stays empty rather than shipping opaque numbers.
 _THESAURUS: dict[str, str] = {}
 
+# 12 % of consolidated diplomas — the Código Civil among them — come back with an
+# empty ELIMetadataHTML, so eli:is_about names nothing and they would ship with no
+# subjects at all. AnaliseJuridica still has them (40 for the Código Civil), keyed
+# by LinkSitemap. Built by scripts/pt_subjects_gap.py and injected for the reparse.
+_SUBJECT_OVERRIDES: dict[str, tuple[str, ...]] = {}
+
 
 def set_thesaurus(mapping: dict[str, str]) -> None:
     """Install the descriptor id -> Portuguese label map."""
     _THESAURUS.clear()
     _THESAURUS.update({str(k): v for k, v in (mapping or {}).items() if v})
+
+
+def set_subject_overrides(mapping: dict[str, list[str]]) -> None:
+    """Install the LinkSitemap -> subject labels map for diplomas with no ELI RDFa."""
+    _SUBJECT_OVERRIDES.clear()
+    _SUBJECT_OVERRIDES.update({str(k): tuple(v) for k, v in (mapping or {}).items() if k and v})
 
 
 _RANK_FROM_ELI = {
@@ -725,10 +737,13 @@ class DREMetadataParser(MetadataParser):
             jurisdiction=jurisdiction,
             last_modified=_parse_date(consolidation.get("DataUltimaConsolidada")),
             pdf_url=pdf_url or None,
-            subjects=tuple(
-                label
-                for sid in (eli_meta.get("subjects") or ())
-                if (label := _THESAURUS.get(str(sid)))
+            # The override answers "this diploma declares no subject at all", not
+            # "the thesaurus has no label for it" — otherwise a hole in the
+            # thesaurus would quietly be papered over with the other source.
+            subjects=(
+                tuple(label for sid in eli_meta["subjects"] if (label := _THESAURUS.get(str(sid))))
+                if eli_meta.get("subjects")
+                else _SUBJECT_OVERRIDES.get((published.get("LinkSitemap") or "").strip(), ())
             ),
             summary=sumario,
             extra=tuple(extra),

@@ -37,6 +37,12 @@ python3 scripts/pt_fetch_missing.py --report
 say "descriptor gap"
 python3 scripts/pt_thesaurus_gap.py || say "thesaurus gap exited non-zero, continuing"
 
+# 12 % of consolidated diplomas come back with an empty ELIMetadataHTML — the
+# Código Civil among them — so eli:is_about names nothing and they would ship with
+# no subjects. AnaliseJuridica still has them.
+say "subject gap (consolidated)"
+python3 scripts/pt_subjects_gap.py || say "subject gap exited non-zero, continuing"
+
 say "reparse + rebuild"
 bash scripts/pt_reparse_and_bootstrap.sh
 say "done (nothing pushed)"

@@ -17,6 +17,7 @@ import pytest
 from legalize.countries import get_metadata_parser, get_text_parser
 from legalize.fetcher.pt.client import _pack, unpack
 from legalize.fetcher.pt.identifier import build_identifier, jurisdiction_from_eli, parse_eli
+from legalize.fetcher.pt import parser as parser_module
 from legalize.fetcher.pt.parser import (
     FRAGMENT_TYPES,
     DREMetadataParser,
@@ -277,6 +278,57 @@ class TestPublishedHtml:
         line inside one desyncs the parallel css_classes list."""
         html = "<p>Uma<br/><br/>linha</p><table><tr><td>a</td><td>b</td></tr></table>"
         assert all("\n\n" not in p.text for p in _parse_published_html(html))
+
+
+class TestSubjectOverrides:
+    """12 % of consolidated diplomas come back with an empty ELIMetadataHTML — the
+    Código Civil among them — so eli:is_about names nothing and they would ship with
+    no subjects. AnaliseJuridica still has them, keyed by LinkSitemap."""
+
+    @staticmethod
+    def _bundle(eli_metadata: str) -> bytes:
+        return json.dumps(
+            {
+                "tipo": "decreto-lei",
+                "key": "1966-34509075",
+                "surface": "cons",
+                "published": {
+                    "Id": "477358",
+                    "Numero": "47344",
+                    "TipoDiploma": "Decreto-Lei",
+                    "TipoDiplomaAcronimo": "dec-lei",
+                    "DataPublicacao": "1966-11-25",
+                    "Sumario": "Código Civil",
+                    "LinkSitemap": "/dr/detalhe/decreto-lei/47344-1966-477358",
+                    "ELIMetadataHTML": eli_metadata,
+                },
+            }
+        ).encode("utf-8")
+
+    def test_override_fills_a_diploma_with_no_eli_subjects(self):
+        parser_module.set_subject_overrides(
+            {"/dr/detalhe/decreto-lei/47344-1966-477358": ["Código Civil", "Divórcio"]}
+        )
+        try:
+            meta = DREMetadataParser().parse(self._bundle(""), "cons:decreto-lei:1966-34509075")
+            assert meta.subjects == ("Código Civil", "Divórcio")
+        finally:
+            parser_module.set_subject_overrides({})
+
+    def test_override_never_shadows_a_declared_subject(self):
+        """It answers "declares nothing", not "the thesaurus had no label" — or a
+        hole in the thesaurus would quietly be papered over from the other source."""
+        rdfa = '<span property="eli:is_about" resource="http://x/999"></span>'
+        parser_module.set_thesaurus({})
+        parser_module.set_subject_overrides(
+            {"/dr/detalhe/decreto-lei/47344-1966-477358": ["Wrong"]}
+        )
+        try:
+            meta = DREMetadataParser().parse(self._bundle(rdfa), "cons:decreto-lei:1966-34509075")
+            assert meta.subjects == ()
+            assert dict(meta.extra)["subject_ids"] == "999"
+        finally:
+            parser_module.set_subject_overrides({})
 
 
 class TestFragment:

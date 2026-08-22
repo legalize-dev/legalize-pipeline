@@ -33,6 +33,12 @@ if thesaurus_path.exists():
 else:
     print("thesaurus: absent — subjects will stay empty", flush=True)
 
+overrides_path = data_dir / "subjects.json"
+if overrides_path.exists():
+    overrides = json.loads(overrides_path.read_text(encoding="utf-8"))
+    pt_parser.set_subject_overrides(overrides)
+    print(f"subject overrides: {sum(1 for v in overrides.values() if v)} diplomas", flush=True)
+
 # The filename cannot be reversed into a norm id (the tipo itself contains hyphens),
 # so read the id back out of each envelope.
 ids: list[str] = []
