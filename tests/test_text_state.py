@@ -268,10 +268,15 @@ class TestLastAmendmentIsGuardedByState:
         assert _with_last_amendment(meta, self._reform()).last_amendment is None
 
     def test_as_enacted_norm_gets_the_reform_id(self):
+        """Declared on the norm, not read from the registry: which countries are
+        as_enacted is a separate decision from whether this helper works."""
+        from legalize.models import TextState
         from legalize.pipeline import _with_last_amendment
 
-        got = _with_last_amendment(self._meta(), self._reform())
-        assert got.last_amendment == "DRE-133879986@2021-01-01"
+        meta = self._meta(text_state=TextState.AS_ENACTED)
+        assert _with_last_amendment(meta, self._reform()).last_amendment == (
+            "DRE-133879986@2021-01-01"
+        )
 
     def test_an_official_id_the_parser_found_is_not_overwritten(self):
         """reform.norm_id is an internal dedupe key on some countries; the field is
