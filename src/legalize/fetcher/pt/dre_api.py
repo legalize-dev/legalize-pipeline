@@ -577,7 +577,11 @@ class DREApi(HttpClient):
         almost entirely rectifications.
         """
         tipo, key = split_sitemap_ref(ref)
-        _, _, content_id = key.rsplit("-", 2)
+        # The DRE content id is the last segment whatever the shape: "16-1994-512030"
+        # for a numbered diploma, "216-2024-1-1154275224" when the number carries a
+        # third component, and "1984-264280" for the thousands of numberless ones —
+        # which have no year-and-number pair to unpack and were raising here.
+        content_id = key.rsplit("-", 1)[-1]
         return self.call(
             AJ_ASSOCIATIONS,
             {

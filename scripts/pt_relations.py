@@ -121,6 +121,9 @@ def main() -> int:
         pending.put(item)
     lock, start = threading.Lock(), time.time()
     stats = {"ok": 0, "err": 0, "n": 0, "rows": 0}
+    # Counted failures with no example are unactionable: the first run lost every
+    # numberless diploma to one unpacking error and the count alone did not say so.
+    failures: list[str] = []
 
     def worker() -> None:
         while True:
@@ -138,8 +141,11 @@ def main() -> int:
                 with gzip.open(target, "wt", encoding="utf-8") as handle:
                     json.dump(payload, handle, ensure_ascii=False)
                 outcome = "ok"
-            except (DREApiError, OSError, ValueError):
+            except (DREApiError, OSError, ValueError) as exc:
                 outcome = "err"
+                with lock:
+                    if len(failures) < 50:
+                        failures.append(f"{norm_id} [{association_id}] {type(exc).__name__}: {exc}")
             with lock:
                 stats["n"] += 1
                 stats[outcome] += 1
@@ -157,6 +163,8 @@ def main() -> int:
     [t.start() for t in threads]
     [t.join() for t in threads]
     print("DONE", stats, f"in {(time.time() - start) / 3600:.2f}h", flush=True)
+    for line in failures:
+        print("   failed:", line, flush=True)
     return 0
 
 
