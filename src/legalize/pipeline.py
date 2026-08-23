@@ -24,7 +24,7 @@ import requests
 
 from rich.console import Console
 
-from legalize.committer.git_ops import FastImporter, GitRepo
+from legalize.committer.git_ops import FastImportDied, FastImporter, GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
 from legalize.models import (
@@ -808,6 +808,8 @@ def commit_all_fast(
                 info = build_commit_info(commit_type, metadata, reform, blocks, file_path, markdown)
                 fi.commit(file_path, markdown, info)
 
+            except FastImportDied:
+                raise
             except Exception:
                 errors += 1
                 logger.error("Error processing %s reform %d", norm_id, reform_idx, exc_info=True)

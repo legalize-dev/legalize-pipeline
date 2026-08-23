@@ -39,7 +39,7 @@ from pathlib import Path
 from lxml import etree
 from rich.console import Console
 
-from legalize.committer.git_ops import FastImporter
+from legalize.committer.git_ops import FastImportDied, FastImporter
 from legalize.committer.message import build_commit_info
 from legalize.config import Config, CountryConfig
 from legalize.fetcher.uk.client import NS, _extract_enacted_date, split_norm_id
@@ -440,6 +440,8 @@ def _commit_si_norms(
                     commit_type, norm.metadata, reform, norm.blocks, file_path, markdown
                 )
                 fi.commit(file_path, markdown, info)
+            except FastImportDied:
+                raise
             except Exception:
                 errors += 1
                 logger.error("Commit error on %s reform %d", norm_id, reform_idx, exc_info=True)

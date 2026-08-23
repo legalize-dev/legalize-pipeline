@@ -218,6 +218,16 @@ class GitRepo:
         return self._run(args, check=False)
 
 
+class FastImportDied(RuntimeError):
+    """git fast-import is gone, so every later write fails the same way.
+
+    Distinct from a per-law error on purpose: callers loop over hundreds of
+    thousands of reforms inside ``except Exception`` and would otherwise log one
+    traceback per remaining reform and still report a number at the end. The
+    import is over the moment the pipe breaks; the run has to stop and say so.
+    """
+
+
 class FastImporter:
     """Bulk commit generator using git fast-import.
 
@@ -275,7 +285,6 @@ class FastImporter:
             cwd=self._path,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             env=_clean_git_env(),
         )
         return self
@@ -283,7 +292,12 @@ class FastImporter:
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         if self._proc is None:
             return
-        self._proc.stdin.close()
+        try:
+            self._proc.stdin.close()
+        except BrokenPipeError:
+            # fast-import is already gone; closing our end must not mask the
+            # FastImportDied that is on its way up.
+            pass
         self._proc.wait()
         if exc_type is None and self._commit_count > 0:
             if self._proc.returncode != 0:
@@ -308,7 +322,13 @@ class FastImporter:
 
     def _write(self, data: bytes) -> None:
         """Write data directly to git fast-import stdin."""
-        self._proc.stdin.write(data)
+        try:
+            self._proc.stdin.write(data)
+        except BrokenPipeError as exc:
+            raise FastImportDied(
+                f"git fast-import died after {self._commit_count} commits "
+                "(its own error is on stderr, above)"
+            ) from exc
 
     def commit(
         self,
