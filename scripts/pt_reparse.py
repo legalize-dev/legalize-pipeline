@@ -21,6 +21,10 @@ sys.path.insert(0, "src")
 from legalize.config import load_config  # noqa: E402
 from legalize.fetcher.pt import analise_juridica  # noqa: E402
 from legalize.pipeline import generic_fetch_one  # noqa: E402
+from legalize.storage import (  # noqa: E402
+    overwritten_identifiers,
+    reset_write_tracking,
+)
 
 config = load_config(os.environ.get("CONFIG", "config.yaml"))
 data_dir = Path(config.get_country("pt").data_dir)
@@ -130,9 +134,23 @@ for phase, batch in (("published", published), ("consolidated", consolidated)):
     work = queue.Queue()
     for norm_id in batch:
         work.put(norm_id)
+    # Per phase, so that the consolidated pass is judged on its own: a consolidated
+    # diploma landing on its as-published twin is the whole point of the ordering and
+    # must not be reported as a clash. Two norms clashing inside one phase is the
+    # thing worth knowing — that is one law shadowing another.
+    reset_write_tracking()
     threads = [threading.Thread(target=worker, daemon=True) for _ in range(8)]
     [t.start() for t in threads]
     [t.join() for t in threads]
+    clashes = overwritten_identifiers()
+    if clashes:
+        sample = ", ".join(sorted(clashes)[:5])
+        print(
+            f"   {len(clashes)} identifiers claimed by two {phase} norms, "
+            f"only the last survives: {sample}"
+            f"{' …' if len(clashes) > 5 else ''}",
+            flush=True,
+        )
 
 print("DONE", stats, f"in {(time.time() - t0) / 60:.1f} min", flush=True)
 

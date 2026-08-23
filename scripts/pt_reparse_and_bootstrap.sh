@@ -13,6 +13,13 @@ CONFIG=${CONFIG:-config.yaml}
 DATA=${DATA:-../countries/data-pt}
 REPO=${REPO:-../countries/pt}
 
+# Set when json/ is already right and only the repo has to be rebuilt — after a
+# repair that touched a handful of norms, say. The history is chronological, so the
+# commit half is all-or-nothing even when the parse half is not.
+if [ "${ONLY_COMMIT:-0}" = "1" ]; then
+  echo "==> ONLY_COMMIT: keeping json/ as it is ($(find "$DATA/json" -name '*.json' | wc -l | tr -d ' ') files)"
+else
+
 # json/ is keyed by identifier, and the identifier scheme changed under it (one
 # prefix per type now, and the Jornal Oficial dos Açores is out of scope). A stale
 # file is not overwritten by the reparse, it is simply left behind — and
@@ -29,6 +36,8 @@ CONFIG="$CONFIG" python3 scripts/pt_amendments.py || echo "    (amendment index 
 
 echo "==> reparse ($(find "$DATA/raw" -name '*.versions.json.gz' | wc -l | tr -d ' ') cached norms)"
 CONFIG="$CONFIG" python3 scripts/pt_reparse.py
+
+fi
 
 echo "==> wipe and re-init the repo"
 rm -rf "$REPO"

@@ -11,6 +11,10 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import tempfile
+import threading
+from collections import Counter
 from datetime import date
 from pathlib import Path
 
@@ -27,6 +31,43 @@ from legalize.models import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Which identifiers have been written in this process, and which of them a second
+# norm landed on. Two norms resolving to one identifier is a real thing — a diploma
+# reachable from both DRE surfaces, two acts sharing a number — and the file can
+# only hold one of them, so the other is lost. Counting it is the difference between
+# knowing that and not.
+_written_identifiers: set[str] = set()
+_overwrites: Counter[str] = Counter()
+_write_lock = threading.Lock()
+
+
+def _claim(identifier: str) -> bool:
+    """Register a write. True if some other norm already wrote this identifier."""
+    with _write_lock:
+        if identifier in _written_identifiers:
+            _overwrites[identifier] += 1
+            return True
+        _written_identifiers.add(identifier)
+        return False
+
+
+def overwritten_identifiers() -> dict[str, int]:
+    """Identifiers a later norm wrote over in this process, and how many times.
+
+    Some overwrites are by design: a consolidated diploma is meant to land on top
+    of its as-published twin. Anything beyond that is one law shadowing another, so
+    this is a number to explain rather than an error to raise.
+    """
+    with _write_lock:
+        return dict(_overwrites)
+
+
+def reset_write_tracking() -> None:
+    """Forget what has been written. For tests and for per-phase snapshots."""
+    with _write_lock:
+        _written_identifiers.clear()
+        _overwrites.clear()
 
 
 def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
@@ -63,12 +104,27 @@ def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
     }
     """
     data = _norm_to_dict(norm)
-    path = Path(data_dir) / "json" / f"{norm.metadata.identifier}.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
+    directory = Path(data_dir) / "json"
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / f"{norm.metadata.identifier}.json"
 
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    # Write somewhere private and rename into place. Where two norms share an
+    # identifier — and Portugal has 128 such pairs — eight workers otherwise open
+    # the same file at once, both truncate it, both write from their own offset, and
+    # what lands is neither of them: a JSON document with another one's tail stuck to
+    # it, which every later reader skips. The rename is atomic, so the loser is
+    # replaced whole instead of interleaved.
+    fd, tmp = tempfile.mkstemp(dir=directory, prefix=f".{path.stem}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        os.replace(tmp, path)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
 
+    if _claim(norm.metadata.identifier):
+        logger.debug("JSON overwritten by a second norm: %s", path)
     logger.debug("JSON saved: %s", path)
     return path
 
