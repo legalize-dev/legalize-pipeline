@@ -28,7 +28,7 @@ from legalize.fetcher._tables import render_table
 from legalize.fetcher._text import clean, collapse_inline_whitespace
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.fetcher.pt.client import CONSOLIDATED, PUBLISHED, published_date_of, unpack
-from legalize.fetcher.pt.identifier import build_identifier, jurisdiction_from_eli
+from legalize.fetcher.pt.identifier import build_identifier, jurisdiction_from_eli, serie_of
 from legalize.models import (
     Block,
     NormMetadata,
@@ -695,7 +695,10 @@ class DREMetadataParser(MetadataParser):
             or ""
         ).strip()
         dre_id = str(published.get("Id") or legis.get("Id") or "").strip()
-        identifier = build_identifier(eli, numero, tipo_slug, pub_date.year, acronimo, dre_id)
+        serie = serie_of(published, legis)
+        identifier = build_identifier(
+            eli, numero, tipo_slug, pub_date.year, acronimo, dre_id, serie
+        )
         emissor = (published.get("Emissor") or legis.get("Emissor") or "").strip()
         jurisdiction = jurisdiction_from_eli(eli, numero, emissor)
 

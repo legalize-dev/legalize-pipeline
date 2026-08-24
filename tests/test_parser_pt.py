@@ -17,7 +17,12 @@ import pytest
 from legalize.countries import get_metadata_parser, get_text_parser
 from legalize.fetcher.pt.client import _pack, unpack
 from legalize.fetcher.pt.discovery import _year_of
-from legalize.fetcher.pt.identifier import build_identifier, jurisdiction_from_eli, parse_eli
+from legalize.fetcher.pt.identifier import (
+    build_identifier,
+    jurisdiction_from_eli,
+    parse_eli,
+    serie_of,
+)
 from legalize.fetcher.pt import parser as parser_module
 from legalize.fetcher.pt.parser import (
     FRAGMENT_TYPES,
@@ -123,6 +128,36 @@ class TestIdentifier:
             "https://data.dre.pt/eli/resolassrep/50/2020/p/dre/pt/html", "50/2020"
         )
         assert rcm != rar
+
+    def test_the_serie_tells_two_acts_with_one_number_apart(self):
+        """Portugal numbers the séries of the Diário da República independently.
+
+        "Portaria n.º 953/2008" is a hunting concession in Série I and a table of
+        insurance fees in Série II. 6,862 pairs like it shared one identifier, one
+        file and one Markdown name, so one of the two left the corpus in silence.
+        """
+        serie_i = build_identifier("", "953/2008", "portaria", 2008, "port", "453567", "I")
+        serie_ii = build_identifier("", "953/2008", "portaria", 2008, "port", "2280971", "II")
+        assert serie_i == "DRE-PORT-953-2008"
+        assert serie_ii == "DRE-PORT-953-2008-II"
+
+    def test_serie_i_keeps_the_bare_name_including_the_1976_split(self):
+        """Between 1976 and 1999 Série I was published as I-A and I-B. Both are
+        Série I: suffixing them would rename 44,000 files for nothing."""
+        for serie in ("I", "I-A", "I-B", ""):
+            built = build_identifier("", "500/1994", "portaria", 1994, "port", "1", serie)
+            assert built == "DRE-PORT-500-1994", serie
+
+    def test_serie_read_off_the_record(self):
+        assert serie_of({"Serie": "II"}) == "II"
+        assert serie_of({"Serie": "I-A"}) == "I"
+        # DRE leaves Serie empty on plenty of records; Publicacao always spells it.
+        assert (
+            serie_of({"Publicacao": "Diário da República n.º 242/2008, Série II de 2008-12-16"})
+            == "II"
+        )
+        assert serie_of({}, {"Serie": "II"}) == "II"
+        assert serie_of({}) == ""
 
     def test_filesystem_safe(self):
         built = build_identifier("", "1/94-1ªsecção", "lei", 1994, "lei")

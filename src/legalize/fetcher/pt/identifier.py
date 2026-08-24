@@ -138,6 +138,30 @@ def jurisdiction_from_eli(eli: str, numero: str = "", emissor: str = "") -> str 
     return None
 
 
+_SERIE = re.compile(r"Série\s+([IVX]+)")
+_ROMAN = re.compile(r"[IVX]+")
+
+
+def serie_of(*sources: dict) -> str:
+    """The Diário da República série an act was published in: "I", "II", "".
+
+    DRE fills ``Serie`` on some records and not others, but ``Publicacao`` always
+    spells it out ("Diário da República n.º 242/2008, Série II de 2008-12-16"), so
+    the string is the fallback. Only the roman numeral is kept: between 1976 and
+    1999 Série I was split into I-A and I-B, and those are the same série.
+    """
+    for source in sources:
+        if not source:
+            continue
+        declared = str(source.get("Serie") or "").strip().upper().split("-")[0]
+        if _ROMAN.fullmatch(declared):
+            return declared
+        found = _SERIE.search(source.get("Publicacao") or "")
+        if found:
+            return found.group(1)
+    return ""
+
+
 def build_identifier(
     eli: str,
     numero: str,
@@ -145,6 +169,7 @@ def build_identifier(
     ano: str | int = "",
     acronimo: str = "",
     dre_id: str = "",
+    serie: str = "",
 ) -> str:
     """Build the filesystem-safe identifier for a diploma.
 
@@ -160,6 +185,14 @@ def build_identifier(
         lei      + "82-D/2014"        -> DRE-LEI-82-D-2014
         port     + "216/2024/1"       -> DRE-PORT-216-2024-1
         declegreg+ "2/2025/M"         -> DRE-DECLEGREG-2-2025-M
+        port     + "953/2008" + II    -> DRE-PORT-953-2008-II
+
+    The série is appended when it is not Série I. Portugal numbers the two séries
+    of the Diário da República independently, so 6,862 pairs of unrelated acts —
+    a portaria regulating animal health and a promotion to lieutenant colonel —
+    share a number and a year and resolved to one identifier, one file, one law.
+    Série I keeps the bare name because it is the legislation proper and 82 % of
+    the corpus; the I-A/I-B split of 1976-1999 is Série I and keeps it too.
     """
     parsed = parse_eli(eli)
     # The as-published ELI only exists from about 1990 (0/16 diplomas before, 42/42
@@ -179,6 +212,7 @@ def build_identifier(
         # "Portaria n.º 216/2024/1" and the "/M" of "DLR n.º 2/2025/M".
         parts = ["DRE", type_token or "X", _slug(parsed["number"]), str(parsed["year"])]
         parts += [_slug(c) for c in components[2:]]
+        parts += _serie_suffix(serie)
         return "-".join(p for p in parts if p)
 
     # No ELI (everything before ~1990). Rebuild from Numero, normalising the
@@ -205,4 +239,11 @@ def build_identifier(
         parts.append(year)
         if dre_id:
             parts.append(_slug(dre_id))
+    parts += _serie_suffix(serie)
     return "-".join(p for p in parts if p)
+
+
+def _serie_suffix(serie: str) -> list[str]:
+    """The série as an identifier component — empty for Série I and for no série."""
+    token = _slug((serie or "").split("-")[0])
+    return [token] if token and token != "I" else []

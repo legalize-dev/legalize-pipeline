@@ -165,7 +165,7 @@ def _identifier_of(data_dir: Path, norm_id: str) -> str | None:
     """The official identifier of a diploma already in the raw cache."""
     from datetime import date as _date
 
-    from legalize.fetcher.pt.identifier import build_identifier
+    from legalize.fetcher.pt.identifier import build_identifier, serie_of
 
     path = data_dir / "raw" / f"{safe_name(norm_id)}.meta.json.gz"
     try:
@@ -186,6 +186,7 @@ def _identifier_of(data_dir: Path, norm_id: str) -> str | None:
         year,
         (published.get("TipoDiplomaAcronimo") or "").strip(),
         str(published.get("Id") or ""),
+        serie_of(published),
     )
 
 
