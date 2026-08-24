@@ -9,14 +9,14 @@ from __future__ import annotations
 
 import json
 import subprocess
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from legalize.fetcher.at.client import RISClient
 from legalize.pipeline import generic_daily
-from legalize.state.store import infer_last_date_from_git
-from legalize.fetcher.at.discovery import RISDiscovery
+from legalize.state.store import MAX_LOOKBACK_DAYS, infer_last_date_from_git
+from legalize.fetcher.at.discovery import _RIS_WINDOWS, RISDiscovery, _ris_window
 
 
 # ─────────────────────────────────────────────
@@ -184,9 +184,43 @@ class TestRISDiscoverDaily:
         mock_client.get_page.return_value = _ris_empty_response()
 
         discovery = RISDiscovery()
-        list(discovery.discover_daily(mock_client, date(2026, 4, 1)))
+        list(discovery.discover_daily(mock_client, date.today()))
 
-        mock_client.get_page.assert_called_with(page=1, page_size=100, ImRisSeit="EinerWoche")
+        _, kwargs = mock_client.get_page.call_args
+        assert kwargs["ImRisSeit"] in dict(_RIS_WINDOWS).values()
+
+    def test_window_covers_the_whole_lookback(self):
+        """The window RIS is asked for must reach the oldest day the daily walks.
+
+        `EinerWoche` is 7 days and the daily walks back MAX_LOOKBACK_DAYS, so
+        its three oldest days used to ask for changes the query never returned
+        — no error, just nothing.
+        """
+        spans = dict((name, span) for span, name in _RIS_WINDOWS)
+        oldest = date.today() - timedelta(days=MAX_LOOKBACK_DAYS)
+
+        assert spans[_ris_window(oldest)] > MAX_LOOKBACK_DAYS
+
+    def test_an_older_explicit_date_widens_the_window(self):
+        spans = dict((name, span) for span, name in _RIS_WINDOWS)
+        recent = _ris_window(date.today() - timedelta(days=MAX_LOOKBACK_DAYS))
+        old = _ris_window(date.today() - timedelta(days=100))
+
+        assert spans[old] > spans[recent]
+
+    def test_the_window_is_fetched_once_for_the_whole_run(self):
+        """One pagination per run, not one per date — the 55-minute timeout."""
+        mock_client = self._mock_client()
+        mock_client.get_page.return_value = _ris_response(
+            hits=1, refs=[{"gesnr": "10002333"}], geaendert=date.today().isoformat()
+        )
+
+        discovery = RISDiscovery()
+        days = [date.today() - timedelta(days=n) for n in range(MAX_LOOKBACK_DAYS + 1)]
+        found = [gesnr for day in days for gesnr in discovery.discover_daily(mock_client, day)]
+
+        assert found == ["10002333"], "only the day that actually changed"
+        assert mock_client.get_page.call_count == 1
 
 
 # ─────────────────────────────────────────────
