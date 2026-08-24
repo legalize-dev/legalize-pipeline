@@ -159,10 +159,11 @@ way:
   ref 75K commits behind reality and pushed a tip the remote was already past.
   Git calls that "non-fast-forward", which describes the ref and hides the cause.
   `legalize push` fetches first.
-- **Bigger slices are cheaper, not more dangerous.** Every slice re-walks the
-  commits before it to exclude them, and delta bases across slice boundaries
-  can't be reused. Use the biggest slice that stays under 2 GiB. ~25000 commits
-  of consolidated law lands around 240 MB, so there is room.
+- **Slice size is linear, so pick it by what a failure costs.** Measured on
+  Portugal: 2000 commits pack in 81s and 16.6 MB, 25000 in ~19 min and ~207 MB.
+  A bigger slice buys no efficiency and only raises the price of a dropped
+  connection — at 25000 that was 19 minutes of compression thrown away, twice in
+  one evening. The default of 5000 keeps a failure under five minutes.
 - **Slicing is faster than the single push it replaces**, because each
   enumeration only covers what the remote doesn't have yet instead of walking the
   whole object graph. Expect later slices to take longer anyway: the exclusion

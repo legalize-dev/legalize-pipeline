@@ -17,6 +17,8 @@ import json
 import logging
 import os
 import subprocess
+import sys
+import threading
 import time
 from dataclasses import replace
 from datetime import date
@@ -1014,24 +1016,41 @@ def write_repo_meta(config: Config, country: str) -> None:
 # ─────────────────────────────────────────────
 
 # GitHub refuses any pack over 2.00 GiB. What you see instead is "the remote end
-# hung up unexpectedly", because pack-objects computes deltas for 20-30 minutes
-# in silence and the remote closes the idle connection first — a message that
+# hung up unexpectedly", because pack-objects computes deltas for many minutes in
+# silence and the remote closes the idle connection first — a message that
 # describes the socket, not the pack. Portugal cost an afternoon to that in
 # August 2026: 1.2M objects, 2.86 GiB in one push.
 #
-# ~25000 commits of consolidated law lands around 240 MB, so the default leaves
-# room. Bigger slices are cheaper, not riskier: each slice re-walks everything
-# before it to exclude it, and delta bases do not cross slice boundaries. Use
-# the biggest slice that stays under the limit.
-DEFAULT_SLICE = 25000
+# Slice size is close to linear in every phase, measured on that repo: 2000
+# commits pack in 81s and 16.6 MB, 25000 in ~19min and ~207 MB. So a bigger
+# slice buys no efficiency — it only raises what a failure costs. At 25000 a
+# dropped connection threw away 19 minutes of compression twice in one evening.
+#
+# 5000 keeps a failure under five minutes and stays orders of magnitude below
+# the limit. Raise it only if the per-push overhead starts to dominate, which
+# means many slices of very few objects.
+DEFAULT_SLICE = 5000
 
 # pack-objects goes quiet for minutes; without keepalives the connection dies
 # mid-computation and the real error never arrives.
 _SSH_KEEPALIVE = "ssh -o ServerAliveInterval=15 -o ServerAliveCountMax=20 -o TCPKeepAlive=yes"
 
-# A push can also hang with the connection alive, waiting on a remote that never
-# answers — 1h27m of nothing, observed. Cap it rather than wait forever.
-PUSH_TIMEOUT_S = 2700
+# A push can hang with the connection alive and the remote never answering —
+# 1h27m of nothing, observed. But an idle client is NOT proof of a hang: after
+# the pack is sent, the server spends a long quiet stretch on `Resolving
+# deltas`, and during it the client burns no CPU, holds no pack-objects child
+# and moves almost no traffic. Those signals look identical to a hang, and
+# acting on them killed a healthy push at 46% of a server-side resolve.
+#
+# The one signal that does separate them is git's own progress: --progress
+# streams while it counts, compresses and writes, and the server's resolve
+# progress arrives over the sideband too. A truly stuck push prints nothing at
+# all. So the guard is silence, not duration, not CPU, and not traffic.
+#
+# Generous on purpose: the server can also go quiet between the end of the
+# resolve and the ref update. This only has to catch a push that has genuinely
+# stopped talking, not one that is merely slow.
+STALL_TIMEOUT_S = 900
 
 # Waits between attempts. A slice spends 15-25 minutes compressing before it
 # sends a byte, and a failure throws all of that away — so the retry has to
@@ -1050,6 +1069,46 @@ def slice_boundaries(commits: list[str], slice_size: int) -> list[str]:
     if slice_size < 1:
         raise ValueError("slice_size must be >= 1")
     return [commits[i - 1] for i in range(slice_size, len(commits) + 1, slice_size)] + ["HEAD"]
+
+
+def _push_until_stalled(repo: Path, args: list[str], env: dict) -> tuple[bool, str]:
+    """Run a git push, killing it if it goes silent for STALL_TIMEOUT_S.
+
+    git's progress goes to stderr and is echoed through so a long compression is
+    visible. Progress uses carriage returns, so this reads chunks, not lines.
+    """
+    proc = subprocess.Popen(
+        ["git", "-C", str(repo), *args],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        env=env,
+    )
+    last_output = time.monotonic()
+    last_line = "no output from git"
+
+    def pump() -> None:
+        nonlocal last_output, last_line
+        assert proc.stderr is not None
+        while chunk := proc.stderr.read(4096):
+            last_output = time.monotonic()
+            text = chunk.decode("utf-8", "replace")
+            sys.stderr.write(text)
+            sys.stderr.flush()
+            if line := text.replace("\r", "\n").strip().splitlines()[-1:]:
+                last_line = line[0]
+
+    reader = threading.Thread(target=pump, daemon=True)
+    reader.start()
+
+    while proc.poll() is None:
+        if time.monotonic() - last_output > STALL_TIMEOUT_S:
+            proc.kill()
+            reader.join(timeout=5)
+            return False, f"no progress for {STALL_TIMEOUT_S}s — killed"
+        time.sleep(1)
+
+    reader.join(timeout=5)
+    return proc.returncode == 0, last_line
 
 
 def push_all(
@@ -1107,22 +1166,19 @@ def push_all(
 
         console.print(f"[bold]{label}[/bold]")
         refspec = f"{sha}:refs/heads/{branch}"
-        started = time.monotonic()
         for attempt in range(len(RETRY_WAITS_S) + 1):
-            try:
-                result = git("push", *flags, "origin", refspec, env=env, timeout=PUSH_TIMEOUT_S)
-            except subprocess.TimeoutExpired:
-                console.print(f"  [yellow]timed out after {PUSH_TIMEOUT_S}s[/yellow]")
-                result = None
-            if result is not None and result.returncode == 0:
-                elapsed = int(time.monotonic() - started)
+            started = time.monotonic()
+            ok, last_line = _push_until_stalled(repo, ["push", *flags, "origin", refspec], env)
+            elapsed = int(time.monotonic() - started)
+            if ok:
                 console.print(
                     f"  [green]slice {n}/{total} ok ({elapsed // 60}m {elapsed % 60}s)[/green]"
                 )
                 pushed += 1
                 break
-            if result is not None and result.stderr.strip():
-                console.print(f"  [yellow]{result.stderr.strip().splitlines()[-1]}[/yellow]")
+            console.print(
+                f"  [yellow]{last_line} (after {elapsed // 60}m {elapsed % 60}s)[/yellow]"
+            )
             if attempt == len(RETRY_WAITS_S):
                 console.print(
                     f"[red]slice {n} failed {attempt + 1} times — resume with --start {n}[/red]"

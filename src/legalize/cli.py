@@ -143,7 +143,7 @@ def fetch(
 @click.option("--limit", default=None, type=int, help="Max norms to process.")
 @click.option("--offset", default=0, type=int, help="Skip first N norms.")
 @click.option(
-    "--batch", default=None, type=int, help="Process N norms at a time, push after each batch."
+    "--batch", default=None, type=int, help="Process N norms at a time (incremental, resumable)."
 )
 @click.option("--dry-run", is_flag=True, help="Simulate without creating commits.")
 @click.option("--repo-path", default=None, type=str, help="Override output repo directory.")
@@ -167,7 +167,7 @@ def commit(
     Examples:
         legalize commit -c fr --all                    # Fast bootstrap (default)
         legalize commit -c fr --all --no-fast          # Incremental (skips existing)
-        legalize commit -c fr --all --batch 10         # 10 at a time, push after each
+        legalize commit -c fr --all --batch 10         # 10 at a time, resumable
         legalize commit -c fr --all --limit 10         # Only first 10
         legalize commit -c fr --all --offset 10 --limit 10  # Norms 11-20
     """
@@ -203,8 +203,13 @@ def _commit_in_batches(
     limit: int | None,
     dry_run: bool,
 ) -> None:
-    """Process norms in batches, pushing after each one."""
-    import subprocess
+    """Process norms in batches, so a long run reports progress and can resume.
+
+    This used to push after every batch, which is how a flag named --batch came
+    to move a public branch. Pushing is `legalize push` now: it slices by commit
+    rather than by norm, targets the branch you name instead of whatever HEAD
+    happens to be, and skips what the remote already has.
+    """
     from pathlib import Path
 
     from legalize.pipeline import commit_all
@@ -231,21 +236,7 @@ def _commit_in_batches(
         )
         console.print(f"[bold]{'=' * 50}[/bold]\n")
 
-        commits = commit_all(config, country, dry_run=dry_run, limit=size, offset=current_offset)
-
-        if not dry_run and commits > 0:
-            console.print(f"\n  [dim]Pushing batch {batch_num} ({commits} commits)...[/dim]")
-            try:
-                subprocess.run(
-                    ["git", "push", "origin", "HEAD"],
-                    cwd=cc.repo_path,
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
-                console.print(f"  [green]Batch {batch_num} pushed.[/green]")
-            except subprocess.CalledProcessError as e:
-                console.print(f"  [red]Push failed: {e.stderr}[/red]")
+        commit_all(config, country, dry_run=dry_run, limit=size, offset=current_offset)
 
         current_offset += size
         remaining -= size
