@@ -134,34 +134,44 @@ approaches the limit. It forces the incremental path — no `git fast-import` �
 it is slower per commit. That is the trade. `legalize bootstrap` has **no**
 `--batch` flag: it commits everything and leaves you one enormous push.
 
-**Recovery — history already committed locally.** Push it in slices with
-`scripts/push_slices.sh`:
+**Recovery — history already committed locally.** `legalize push` sends it in
+slices, one push and one short-lived connection each:
 
 ```bash
-scripts/push_slices.sh ../countries/xx --dry-run   # see the slices first
-scripts/push_slices.sh ../countries/xx             # 25000 commits per slice
+legalize push -c xx --dry-run     # list the slices first
+legalize push -c xx               # 25000 commits per slice
+legalize push -c xx --start 7     # resume at slice 7
 ```
 
-Four things that script encodes, each learned the hard way:
+Already-pushed slices are detected and skipped, so re-running after a failure is
+safe and costs nothing. Four things the command encodes, each learned the hard
+way:
 
 - **Keepalives are mandatory.** `GIT_SSH_COMMAND="ssh -o ServerAliveInterval=15
   -o ServerAliveCountMax=20 -o TCPKeepAlive=yes"`. Without them the connection
   dies during the silent delta computation and you never get the real error.
 - **Cap each push and retry once.** A push can hang with the connection alive,
-  waiting on a remote that never answers — 1h27m of nothing, observed. The script
-  uses `timeout 2700`, retries once, then stops and tells you the `START=` value
-  to resume from.
+  waiting on a remote that never answers — 1h27m of nothing, observed. Each slice
+  gets 45 minutes and one retry, then stops and tells you the `--start` value to
+  resume from.
+- **Refresh `origin/main` before deciding anything.** A stale remote-tracking ref
+  makes every skip decision wrong: a resumed run once recomputed its start from a
+  ref 75K commits behind reality and pushed a tip the remote was already past.
+  Git calls that "non-fast-forward", which describes the ref and hides the cause.
+  `legalize push` fetches first.
 - **Bigger slices are cheaper, not more dangerous.** Every slice re-walks the
   commits before it to exclude them, and delta bases across slice boundaries
   can't be reused. Use the biggest slice that stays under 2 GiB. ~25000 commits
   of consolidated law lands around 240 MB, so there is room.
 - **Slicing is faster than the single push it replaces**, because each
   enumeration only covers what the remote doesn't have yet instead of walking the
-  whole object graph.
+  whole object graph. Expect later slices to take longer anyway: the exclusion
+  walk grows with how much the remote already holds, while the transfer per slice
+  stays flat.
 
 If you are re-pushing a rebuilt history with no common ancestor, empty the remote
-first and run with `FORCE=1`. That rewrites a public repo — be sure that is what
-you mean.
+first and pass `--force`. That rewrites a public repo — be sure that is what you
+mean.
 
 ## 9.5 Open the engine PR
 

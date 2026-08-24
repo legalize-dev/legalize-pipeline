@@ -555,6 +555,54 @@ def bootstrap_jurisdiction(
 # ─────────────────────────────────────────────
 
 
+# ─────────────────────────────────────────────
+# PUSH
+# ─────────────────────────────────────────────
+
+
+@cli.command()
+@_country_option()
+@click.option("--slice", "slice_size", default=None, type=int, help="Commits per slice.")
+@click.option("--start", default=1, type=int, help="Resume at slice N.")
+@click.option("--branch", default="main", help="Remote branch to advance.")
+@click.option("--dry-run", is_flag=True, help="List the slices without pushing.")
+@click.option("--force", is_flag=True, help="Push with --force. Rewrites the public repo.")
+@click.pass_context
+def push(
+    ctx: click.Context,
+    country: str,
+    slice_size: int | None,
+    start: int,
+    branch: str,
+    dry_run: bool,
+    force: bool,
+) -> None:
+    """Push a country repo's history to origin in slices.
+
+    GitHub refuses any pack over 2.00 GiB, and a first bootstrap of a large
+    country exceeds it. Each slice is a separate push and a short-lived
+    connection, so the pack never approaches the limit. Already-pushed slices
+    are detected and skipped, so this is safe to re-run.
+
+    Examples:
+        legalize push -c pt --dry-run       # list the slices first
+        legalize push -c pt                 # 25000 commits per slice
+        legalize push -c pt --slice 10000   # smaller slices
+        legalize push -c pt --start 7       # resume at slice 7
+    """
+    from legalize.pipeline import DEFAULT_SLICE, push_all
+
+    push_all(
+        ctx.obj["config"],
+        country,
+        slice_size=slice_size or DEFAULT_SLICE,
+        start=start,
+        branch=branch,
+        dry_run=dry_run,
+        force=force,
+    )
+
+
 @cli.command()
 @_country_option()
 @click.option("--sample", default=500, type=int, help="Number of recent commits to sample.")

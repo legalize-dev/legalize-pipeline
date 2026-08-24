@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import subprocess
+import time
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
@@ -1005,3 +1007,130 @@ def write_repo_meta(config: Config, country: str) -> None:
     )
     repo.commit(info)
     console.print(f"  [dim]Committed repo meta: {', '.join(changed)}[/dim]")
+
+
+# ─────────────────────────────────────────────
+# PUSH
+# ─────────────────────────────────────────────
+
+# GitHub refuses any pack over 2.00 GiB. What you see instead is "the remote end
+# hung up unexpectedly", because pack-objects computes deltas for 20-30 minutes
+# in silence and the remote closes the idle connection first — a message that
+# describes the socket, not the pack. Portugal cost an afternoon to that in
+# August 2026: 1.2M objects, 2.86 GiB in one push.
+#
+# ~25000 commits of consolidated law lands around 240 MB, so the default leaves
+# room. Bigger slices are cheaper, not riskier: each slice re-walks everything
+# before it to exclude it, and delta bases do not cross slice boundaries. Use
+# the biggest slice that stays under the limit.
+DEFAULT_SLICE = 25000
+
+# pack-objects goes quiet for minutes; without keepalives the connection dies
+# mid-computation and the real error never arrives.
+_SSH_KEEPALIVE = "ssh -o ServerAliveInterval=15 -o ServerAliveCountMax=20 -o TCPKeepAlive=yes"
+
+# A push can also hang with the connection alive, waiting on a remote that never
+# answers — 1h27m of nothing, observed. Cap it rather than wait forever.
+PUSH_TIMEOUT_S = 2700
+
+# Waits between attempts. A slice spends 15-25 minutes compressing before it
+# sends a byte, and a failure throws all of that away — so the retry has to
+# outlast an ordinary connection drop, not just a blip. Portugal lost a 19-minute
+# compression to a home connection going down, then burned its only retry 30
+# seconds later against a DNS that had not come back yet.
+RETRY_WAITS_S = (30, 300)
+
+
+def slice_boundaries(commits: list[str], slice_size: int) -> list[str]:
+    """Every slice_size-th commit, oldest first, then the remainder as HEAD.
+
+    ``commits`` is the full history oldest-first. Each boundary is pushed as an
+    intermediate advance of the branch, so the pack only ever holds one slice.
+    """
+    if slice_size < 1:
+        raise ValueError("slice_size must be >= 1")
+    return [commits[i - 1] for i in range(slice_size, len(commits) + 1, slice_size)] + ["HEAD"]
+
+
+def push_all(
+    config: Config,
+    country: str,
+    slice_size: int = DEFAULT_SLICE,
+    start: int = 1,
+    branch: str = "main",
+    dry_run: bool = False,
+    force: bool = False,
+) -> int:
+    """Push a country repo's history in slices. Returns slices pushed."""
+    cc = config.get_country(country)
+    repo = Path(cc.repo_path)
+    if not (repo / ".git").exists():
+        console.print(f"[red]{repo} is not a git repository.[/red]")
+        return 0
+
+    def git(*args: str, **kwargs) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            ["git", "-C", str(repo), *args], capture_output=True, text=True, **kwargs
+        )
+
+    commits = git("rev-list", "--reverse", "HEAD").stdout.split()
+    if not commits:
+        console.print("[red]No commits to push.[/red]")
+        return 0
+    boundaries = slice_boundaries(commits, slice_size)
+
+    # Refresh the remote-tracking ref before deciding what to skip. A stale ref
+    # makes every skip decision wrong: a resumed run once recomputed its start
+    # from a ref 75k commits behind and pushed a tip the remote was already
+    # past, which git reports as "non-fast-forward" — again, the wrong noun.
+    if not dry_run and git("fetch", "--quiet", "origin").returncode != 0:
+        console.print("[yellow]fetch failed — skip detection may be stale[/yellow]")
+
+    env = {**os.environ, "GIT_SSH_COMMAND": _SSH_KEEPALIVE}
+    flags = ["--progress"] + (["--force"] if force else [])
+    total = len(boundaries)
+    pushed = 0
+
+    for n, sha in enumerate(boundaries, 1):
+        label = f"slice {n}/{total} -> {sha[:12]}"
+        if n < start:
+            continue
+        if (
+            sha != "HEAD"
+            and git("merge-base", "--is-ancestor", sha, f"origin/{branch}").returncode == 0
+        ):
+            console.print(f"  [dim]{label} already on remote, skipping[/dim]")
+            continue
+        if dry_run:
+            console.print(f"  {label}")
+            continue
+
+        console.print(f"[bold]{label}[/bold]")
+        refspec = f"{sha}:refs/heads/{branch}"
+        started = time.monotonic()
+        for attempt in range(len(RETRY_WAITS_S) + 1):
+            try:
+                result = git("push", *flags, "origin", refspec, env=env, timeout=PUSH_TIMEOUT_S)
+            except subprocess.TimeoutExpired:
+                console.print(f"  [yellow]timed out after {PUSH_TIMEOUT_S}s[/yellow]")
+                result = None
+            if result is not None and result.returncode == 0:
+                elapsed = int(time.monotonic() - started)
+                console.print(
+                    f"  [green]slice {n}/{total} ok ({elapsed // 60}m {elapsed % 60}s)[/green]"
+                )
+                pushed += 1
+                break
+            if result is not None and result.stderr.strip():
+                console.print(f"  [yellow]{result.stderr.strip().splitlines()[-1]}[/yellow]")
+            if attempt == len(RETRY_WAITS_S):
+                console.print(
+                    f"[red]slice {n} failed {attempt + 1} times — resume with --start {n}[/red]"
+                )
+                return pushed
+            wait = RETRY_WAITS_S[attempt]
+            console.print(f"  [dim]retrying in {wait}s[/dim]")
+            time.sleep(wait)
+
+    console.print(f"[bold green]{pushed} slice(s) pushed.[/bold green]")
+    return pushed
