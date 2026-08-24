@@ -20,7 +20,7 @@ that's what GitHub uses to auto-assign reviewers on PRs.
 
 You don't need to ask permission to ship a country. The path is:
 
-1. **Build the fetcher.** Follow [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md)
+1. **Build the fetcher.** Follow [adding-a-country/](adding-a-country/README.md)
    end to end. The first bootstrap always runs locally; CI takes over
    once the country repo is live.
 2. **Open the engine PR.** Add your country to `countries.py`,
@@ -87,7 +87,7 @@ You do not own:
   captures a stale parent.
 - **Quality gate is non-negotiable.** Before any bootstrap touches
   production data, run the 5-sample AI review from
-  [ADDING_A_COUNTRY.md §7](ADDING_A_COUNTRY.md). Don't skip it,
+  [the Step 7 quality gate](adding-a-country/step-7-quality-gate.md). Don't skip it,
   even if you've shipped countries before.
 
 ## Stepping down

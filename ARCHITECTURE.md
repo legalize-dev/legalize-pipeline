@@ -1,6 +1,6 @@
 # Architecture
 
-Module-by-module reference for `src/legalize/`. For project rules and conventions see [CLAUDE.md](CLAUDE.md). For the country onboarding playbook see [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
+Module-by-module reference for `src/legalize/`. For project rules and conventions see [CLAUDE.md](CLAUDE.md). For the country onboarding playbook see [adding-a-country/](adding-a-country/README.md).
 
 ## Pipeline flow
 

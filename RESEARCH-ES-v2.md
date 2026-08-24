@@ -101,7 +101,7 @@ Match or exceed the best peer parser on every axis:
 
 | Axis | Peer reference | Today | Target |
 |---|---|---|---|
-| Tables with rowspan/colspan | `fetcher/lv/parser.py:232-307` (canonical per `ADDING_A_COUNTRY.md`) | ❌ | ✅ pipe tables for all BOE `<table>` and `cuerpo_tabla_*` flat groups |
+| Tables with rowspan/colspan | `fetcher/lv/parser.py:232-307` (canonical per `adding-a-country/`) | ❌ | ✅ pipe tables for all BOE `<table>` and `cuerpo_tabla_*` flat groups |
 | Footnotes | `fetcher/ch/parser.py:177-196` `_NoteCollector` | ❌ (dropped) | ✅ `[^n]` inline + `## Notas` block |
 | Blockquotes / citas | `fetcher/ch/parser.py:602-607` | ❌ | ✅ `>` prefix for `cita_con_pleca`, `cita`, `cita_ley`, `cita_art` |
 | Cross-ref links | `fetcher/ch/parser.py:253-258` | ❌ (href stripped) | ✅ `[text](url)` with resolved BOE URL |

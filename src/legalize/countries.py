@@ -4,7 +4,7 @@ To add a new country:
 1. Create fetcher/{code}/ with client.py, discovery.py, parser.py
 2. Register the import paths in REGISTRY below
 
-See ADDING_A_COUNTRY.md for full walkthrough.
+See adding-a-country/README.md for full walkthrough.
 """
 
 from __future__ import annotations
@@ -259,7 +259,7 @@ REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
     # To add a new country:
     # 1. Create fetcher/{code}/ with client.py, discovery.py, parser.py
     # 2. Register here
-    # See ADDING_A_COUNTRY.md
+    # See adding-a-country/README.md
 }
 
 

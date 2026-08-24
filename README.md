@@ -166,7 +166,7 @@ legalize status
 3. Register in `countries.py` REGISTRY
 4. Add `countries:` section to `config.yaml`
 
-See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md) for the full walkthrough.
+See [adding-a-country/](adding-a-country/README.md) for the full walkthrough.
 
 ## Countries
 
@@ -202,12 +202,12 @@ See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md) for the full walkthrough.
 | United States | Live | [OLRC](https://uscode.house.gov/) | — | [legalize-us](https://github.com/legalize-dev/legalize-us) |
 | Uruguay | Live | [IMPO](https://www.impo.com.uy/) | — | [legalize-uy](https://github.com/legalize-dev/legalize-uy) |
 
-Want to add your country? See [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
+Want to add your country? See [adding-a-country/](adding-a-country/README.md).
 
 ## Contributing
 
 We welcome contributions, especially new country parsers. See
-[CONTRIBUTING.md](CONTRIBUTING.md) and [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
+[CONTRIBUTING.md](CONTRIBUTING.md) and [adding-a-country/](adding-a-country/README.md).
 If you want to look after a country long-term, [MAINTAINERS.md](MAINTAINERS.md)
 explains the federated model.
 

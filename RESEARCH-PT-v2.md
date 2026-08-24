@@ -6,7 +6,7 @@ Date: 2026-08-21
 
 This document is to Portugal what `RESEARCH-ES-v2.md` was to Spain: the audit of
 what we shipped, the evidence for what the source actually offers, and the plan to
-close the gap. It follows the Step 0 structure of `ADDING_A_COUNTRY.md`.
+close the gap. It follows the Step 0 structure of `adding-a-country/`.
 
 ---
 
@@ -40,7 +40,7 @@ scratch.
    (memory: `feedback_commit_integrity`, `feedback_format`).
 2. **Official source only.** `dre.tretas.org` is a community mirror; every `source:`
    URL in the repo must point at `diariodarepublica.pt` / `data.dre.pt`.
-3. **Historical versions are non-negotiable** (`ADDING_A_COUNTRY.md` priority #2,
+3. **Historical versions are non-negotiable** (`adding-a-country/` priority #2,
    memory: `feedback_versions_mandatory`). Portugal currently fails this outright.
 4. Every number in this document was measured. The command is given next to it.
 
@@ -629,7 +629,7 @@ is why `config.yaml` still points at a file dated `2026-03-01`. Retire it.
 
 ## §3 Version history — the GATE
 
-### 3.1 The spike (ADDING_A_COUNTRY.md §0.5) — PASSED
+### 3.1 The spike (adding-a-country/step-0-research.md §0.5) — PASSED
 
 Law: **Código Civil, Decreto-Lei n.º 47344 de 1966-11-25**
 `DiplomaLegisId 477358` / `DiplomaFragId 34509075`
@@ -879,7 +879,7 @@ That is genuine legal annotation currently thrown away.
 
 ### 4.4 The rule
 
-`ADDING_A_COUNTRY.md` §0.3: *if the source provides it, you capture it*. Every field
+`adding-a-country/step-0-research.md` §0.3: *if the source provides it, you capture it*. Every field
 above goes into `NormMetadata` or `extra` with an English snake_case key, before the
 bootstrap — adding one afterwards means regenerating 100k+ commits.
 

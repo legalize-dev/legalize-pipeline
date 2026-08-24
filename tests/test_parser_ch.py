@@ -362,7 +362,7 @@ def test_pdf_bv_2020_fixture() -> None:
     """Sanity-check the PDF parser on the BV 2020-01-01 fixture.
 
     This is the evidence anchor for the cross-format fidelity promise
-    (ADDING_A_COUNTRY.md §0.7): a PDF-A-only version of the same law
+    (adding-a-country/step-0-research.md §0.7): a PDF-A-only version of the same law
     produces Markdown whose article headings, paragraph numbering and
     list items are structurally identical to the XML parser's output.
     """

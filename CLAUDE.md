@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Project-wide rules and policies live here. For module-by-module code reference see [ARCHITECTURE.md](ARCHITECTURE.md). For the end-to-end country onboarding playbook see [ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md).
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Project-wide rules and policies live here. For module-by-module code reference see [ARCHITECTURE.md](ARCHITECTURE.md). For the end-to-end country onboarding playbook see [adding-a-country/](adding-a-country/README.md).
 
 ## Project Overview
 
@@ -90,27 +90,21 @@ Each law's git history must contain ONLY commits that correspond to real legisla
 
 ## Adding new countries
 
-[ADDING_A_COUNTRY.md](ADDING_A_COUNTRY.md) is the **end-to-end playbook**. Follow every step — it takes a country from name-only to merged PR and live on legalize.dev. Do not improvise shortcuts.
+[adding-a-country/](adding-a-country/README.md) is the **end-to-end playbook**: one
+file per step, read in order, with gates you do not skip. Start at its `README.md`
+and follow the chain. Do not improvise shortcuts, and do not work from a summary of
+it — including this one.
 
-High-level order:
+The steps and the parser rules are **not** restated here on purpose. Two copies of a
+ten-step procedure drift, and the copy that gets read is the one that is wrong. What
+you need to know before opening it:
 
-0. **Research the source** — save 5 fixtures, inventory every metadata field and every rich-formatting construct into `RESEARCH-{CC}.md`.
-1. Create `fetcher/{code}/` with `client.py`, `discovery.py`, `parser.py` implementing the 4 interfaces from `fetcher/base.py`.
-2. Register in `countries.py` REGISTRY.
-3. Add a `countries:` section to `config.yaml`.
-4. Create the GitHub repo `legalize-dev/legalize-{code}`.
-5. (Optional) Custom `daily.py` if the country has a non-standard daily flow.
-6. Write parser tests against the 5 fixtures.
-7. **Quality gate (mandatory):** fetch 5 sample laws, render to Markdown, and run an AI review covering TEXT correctness, METADATA completeness, STRUCTURE, RICH FORMATTING preservation, and ENCODING. Do not proceed until 5/5 PASS.
-8. Tune `max_workers` against a 50-law benchmark.
-9. Full bootstrap → `legalize health` → push country repo → open engine PR → verify on https://legalize.dev/{code}.
-
-**Non-negotiable rules for the parser:**
-
-- **Metadata completeness:** every field the source exposes must be captured (generic fields in `NormMetadata`, source-specific in `extra` with English snake_case keys). Regenerating commit history to add a forgotten field is expensive, so we capture everything up front.
-- **Rich formatting preservation:** tables → Markdown pipe tables (see `fetcher/lv/parser.py` for the canonical implementation), bold → `**...**`, italic → `*...*`, lists → `- ...`, cross-references → `[text](url)`, quoted amending text → `> ...`, signatories → `firma_rey` css class. Inline bold/italic must be pre-wrapped in the parser (the CSS→MD map is paragraph-level).
-- **Images are explicitly skipped** — we are not ready for binary assets. Drop image nodes and count them in `extra.images_dropped`.
-- **Encoding is UTF-8 only** — decode source bytes explicitly, strip C0/C1 control chars, normalize whitespace at paragraph boundaries. Never rely on `requests` auto-detection.
+- It takes a country from name-only to merged PR and live on legalize.dev.
+- Three gates will stop you: the version-history spike (§0.5), format coverage
+  (§0.7), and the 5-law quality review (§7). Failing one means going back, not
+  filing a follow-up.
+- Copy its `PROGRESS-template.md` to `PROGRESS.md` and tick it as you go. A country
+  onboarding outlives any single context window.
 
 ## Local storage & working without local repos
 

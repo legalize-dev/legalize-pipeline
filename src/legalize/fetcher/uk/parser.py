@@ -9,7 +9,7 @@ Input:
 
 Output:
 - NormMetadata with every field the source exposes, as required by
-  ADDING_A_COUNTRY.md §0.3.
+  adding-a-country/step-0-research.md §0.3.
 - A list of Blocks, one per ``<P1>`` section and one per ``<Schedule>``.
   Each Block has one Version per point-in-time snapshot the blob contained.
   Paragraphs inside a Version use css_class values that the generic

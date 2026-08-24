@@ -6,7 +6,7 @@ This is the fallback path for laws / versions that Fedlex does not expose
 as Akoma Ntoso XML (roughly 40% of the classified compilation, including
 all consolidations dated before 2021 for most laws).
 
-**Fidelity contract (see `ADDING_A_COUNTRY.md §0.7`):** the output must
+**Fidelity contract (see `adding-a-country/step-0-research.md §0.7`):** the output must
 be structurally indistinguishable from the XML parser's output for the
 same law at an adjacent effective date — same heading depths, same
 article template (``##### **Art. N** Title``), same paragraph numbering
