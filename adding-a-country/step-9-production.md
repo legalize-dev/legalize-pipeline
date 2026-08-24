@@ -106,13 +106,21 @@ git -C ../countries/xx push origin main
 
 ### The 2 GiB pack limit — read this before bootstrapping a large country
 
-**GitHub refuses any single pack larger than 2.00 GiB.** The push dies with
-`fatal: the remote end hung up unexpectedly` after uploading for several minutes,
-and nothing in the error names the real cause. A first push of a country with tens
-of thousands of laws and a full version history will hit it.
+**GitHub refuses any pack larger than 2.00 GiB.** The real message is
+`remote: fatal: pack exceeds maximum allowed size (2.00 GiB)`, but you will
+almost never see it. `pack-objects` spends 20–30 minutes computing deltas before
+a single byte leaves your machine, GitHub's sshd closes the idle connection
+first, and what you get is:
 
-There is no way to split a push after the fact that is as cheap as not creating the
-problem, so **for any country over ~20K laws, do not commit with `legalize
+```
+fatal: the remote end hung up unexpectedly
+```
+
+That message names the connection, not the pack, and it will send you debugging
+the wrong problem. Portugal cost an afternoon and four failed attempts this way
+(2026-08-24): 1.2M objects, 2.86 GiB in one pack.
+
+**Prevention — for any country over ~20K laws, don't commit with `legalize
 bootstrap`.** Split fetch from commit and let the CLI push as it goes:
 
 ```bash
@@ -121,29 +129,39 @@ legalize commit -c xx --all --batch 2000      # commit 2000 norms, push, repeat
 ```
 
 `--batch` is implemented in `_commit_in_batches` (`src/legalize/cli.py`): it runs
-the incremental committer, pushes `HEAD` after every batch, and continues. Each
-push carries one batch, so no pack ever approaches the limit. Note that `--batch`
-forces the incremental path — it does not use `git fast-import`, so it is slower
-per commit. That is the trade you are making.
+the incremental committer and pushes `HEAD` after every batch, so no pack ever
+approaches the limit. It forces the incremental path — no `git fast-import` — so
+it is slower per commit. That is the trade. `legalize bootstrap` has **no**
+`--batch` flag: it commits everything and leaves you one enormous push.
 
-`legalize bootstrap` has **no** `--batch` flag: it fetches and commits everything,
-then leaves you with one enormous push to make.
-
-**If the history is already committed locally** and the first push is rejected,
-push in slices of commits instead of re-running anything:
+**Recovery — history already committed locally.** Push it in slices with
+`scripts/push_slices.sh`:
 
 ```bash
-# Push every 5000th commit as an intermediate advance of main, then the rest.
-git -C ../countries/xx rev-list --reverse main \
-  | awk 'NR % 5000 == 0' \
-  | while read -r sha; do
-      git -C ../countries/xx push origin "$sha:refs/heads/main" || break
-    done
-git -C ../countries/xx push origin main
+scripts/push_slices.sh ../countries/xx --dry-run   # see the slices first
+scripts/push_slices.sh ../countries/xx             # 25000 commits per slice
 ```
 
-Each push sends only the commits since the previous one. Lower 5000 if a slice
-still exceeds the limit — laws with large annexes make heavy commits.
+Four things that script encodes, each learned the hard way:
+
+- **Keepalives are mandatory.** `GIT_SSH_COMMAND="ssh -o ServerAliveInterval=15
+  -o ServerAliveCountMax=20 -o TCPKeepAlive=yes"`. Without them the connection
+  dies during the silent delta computation and you never get the real error.
+- **Cap each push and retry once.** A push can hang with the connection alive,
+  waiting on a remote that never answers — 1h27m of nothing, observed. The script
+  uses `timeout 2700`, retries once, then stops and tells you the `START=` value
+  to resume from.
+- **Bigger slices are cheaper, not more dangerous.** Every slice re-walks the
+  commits before it to exclude them, and delta bases across slice boundaries
+  can't be reused. Use the biggest slice that stays under 2 GiB. ~25000 commits
+  of consolidated law lands around 240 MB, so there is room.
+- **Slicing is faster than the single push it replaces**, because each
+  enumeration only covers what the remote doesn't have yet instead of walking the
+  whole object graph.
+
+If you are re-pushing a rebuilt history with no common ancestor, empty the remote
+first and run with `FORCE=1`. That rewrites a public repo — be sure that is what
+you mean.
 
 ## 9.5 Open the engine PR
 
