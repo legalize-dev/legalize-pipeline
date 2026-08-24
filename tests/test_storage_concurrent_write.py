@@ -15,6 +15,7 @@ then rename into place, so the destination goes from one whole document to anoth
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import date
 
 import pytest
@@ -85,9 +86,42 @@ def test_a_write_that_dies_halfway_leaves_the_previous_file_whole(tmp_path, monk
     assert [p.name for p in (tmp_path / "json").iterdir()] == [path.name]
 
 
-def test_a_shadowed_law_is_counted(tmp_path):
+def test_the_same_norm_written_twice_is_not_a_clash(tmp_path):
+    """A retry or a duplicate discovery entry must not fork the file."""
     reset_write_tracking()
-    save_structured_json(tmp_path, _norm(1))
+    first = save_structured_json(tmp_path, _norm(1))
+    second = save_structured_json(tmp_path, _norm(2))
+
+    assert first == second
     assert overwritten_identifiers() == {}
-    save_structured_json(tmp_path, _norm(2))
+    assert [p.name for p in (tmp_path / "json").iterdir()] == [first.name]
+
+
+def test_a_second_law_on_one_identifier_is_kept_beside_the_first(tmp_path):
+    """Portugal published two unrelated acts as "Portaria n.º 953/2008".
+
+    One is in Série I and concessions hunting rights; the other is in Série II and
+    sets insurance fees. Before this, the second write replaced the first — and
+    because the file name is also the Markdown name, the law disappeared from the
+    corpus with nothing to show it had ever been there. 6,862 of them.
+    """
+    reset_write_tracking()
+    first = save_structured_json(tmp_path, _norm(1))
+    other = _norm(1)
+    other = ParsedNorm(
+        metadata=replace(
+            other.metadata,
+            publication_date=date(2010, 6, 30),
+            source="https://diariodarepublica.pt/otro",
+        ),
+        blocks=other.blocks,
+        reforms=other.reforms,
+    )
+    second = save_structured_json(tmp_path, other)
+
+    assert first.name == f"{IDENTIFIER}.json"
+    assert second.name == f"{IDENTIFIER}-20100630.json"
     assert overwritten_identifiers() == {IDENTIFIER: 1}
+    # Both laws are readable, and each one keeps its own identifier.
+    assert json.loads(first.read_text())["metadata"]["identifier"] == IDENTIFIER
+    assert json.loads(second.read_text())["metadata"]["identifier"] == f"{IDENTIFIER}-20100630"

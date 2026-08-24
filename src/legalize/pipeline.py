@@ -36,7 +36,11 @@ from legalize.models import (
     TextState,
 )
 from legalize.state.store import StateStore, resolve_dates_to_process
-from legalize.storage import load_norma_from_json, save_structured_json
+from legalize.storage import (
+    load_norma_from_json,
+    overwritten_identifiers,
+    save_structured_json,
+)
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
 from legalize.transformer.xml_parser import extract_reforms, parse_text_xml
@@ -446,6 +450,19 @@ def generic_fetch_all(
     console.print(f"\n[bold green]✓ {len(fetched)} norms fetched[/bold green]")
     if errors:
         console.print(f"[yellow]⚠ {errors} errors[/yellow]")
+
+    # Two norms claiming one identifier used to be invisible: the second write
+    # replaced the first and the law left the corpus without a word. Nothing is
+    # lost now, but a suffixed file name is not the name the country's rule
+    # promised, so the count belongs on screen next to the errors.
+    clashes = overwritten_identifiers()
+    if clashes:
+        sample = ", ".join(sorted(clashes)[:5])
+        console.print(
+            f"[yellow]⚠ {len(clashes)} identifier(s) claimed by more than one norm; "
+            f"each extra one saved under a suffixed name: {sample}"
+            f"{' …' if len(clashes) > 5 else ''}[/yellow]"
+        )
 
     return fetched
 

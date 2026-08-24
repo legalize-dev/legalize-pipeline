@@ -12,6 +12,7 @@ from __future__ import annotations
 import calendar
 import logging
 import os
+import re
 import subprocess
 from datetime import date as date_type
 from pathlib import Path
@@ -44,6 +45,30 @@ def _clean_git_env(extra: dict | None = None) -> dict:
     if extra:
         env.update(extra)
     return env
+
+
+_PUBLISHED_ON = re.compile(r"^publication_date:\s*\"?(\d{4}-\d{2}-\d{2})", re.MULTILINE)
+
+
+def _published_on(markdown: str) -> str | None:
+    """The publication date off a rendered norm's frontmatter."""
+    match = _PUBLISHED_ON.search(markdown)
+    return match.group(1) if match else None
+
+
+def _is_another_act(existing: str, incoming: str) -> bool:
+    """Whether these two documents are different acts sharing one identifier.
+
+    A law keeps its publication date forever: a new version of the same law carries
+    the date it was published, whatever changed in the body. Two documents under one
+    file name with two publication dates are therefore two acts, and writing the
+    second one destroys the first — which is how Portugal ended up with military
+    promotions published under the file name of the portaria they shadowed. Both
+    dates have to be readable for the check to fire, so a country that does not
+    write one is left exactly as it was.
+    """
+    old, new = _published_on(existing), _published_on(incoming)
+    return bool(old and new and old != new)
 
 
 class GitRepo:
@@ -107,6 +132,17 @@ class GitRepo:
             existing = file_path.read_text(encoding="utf-8")
             if existing == content:
                 return False  # unchanged — no need to stage
+            if _is_another_act(existing, content):
+                logger.error(
+                    "%s already holds an act published on %s and this one is from %s: "
+                    "two different acts resolve to the same identifier. Refusing to "
+                    "overwrite — the published law stays, this one is not written. "
+                    "The country's identifier rule needs a discriminator.",
+                    rel_path,
+                    _published_on(existing),
+                    _published_on(content),
+                )
+                return False
 
         file_path.write_text(content, encoding="utf-8")
         self._run(["add", rel_path])
@@ -280,8 +316,20 @@ class FastImporter:
                 "FastImporter: extending refs/heads/main from %s",
                 self._initial_parent[:12],
             )
+        # --depth: 87 % of Portugal's 12.55 GiB pack was directory trees, not law
+        # text. A flat directory of 157,504 files is one 8 MB tree object that every
+        # commit rewrites, and fast-import cuts delta chains at depth 50, so every
+        # 50th commit stores those 8 MB whole. Measured on a bench that reproduces
+        # the shape (157,504 files, 20,000 commits, one file touched each):
+        #
+        #     depth  50 (default)  1,345.9 s   0.257 GiB   13.5 KiB/commit
+        #     depth 500            1,312.6 s   0.036 GiB    1.9 KiB/commit
+        #
+        # Seven times smaller for the same import time — the cost is that reading a
+        # long chain needs more hops. It scales with files per directory, so it pays
+        # off everywhere: es has 12,000, lv 15,000, pt 157,504.
         self._proc = subprocess.Popen(
-            ["git", "fast-import", "--quiet"],
+            ["git", "fast-import", "--quiet", "--depth=500"],
             cwd=self._path,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,

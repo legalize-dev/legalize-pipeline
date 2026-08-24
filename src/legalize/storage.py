@@ -9,12 +9,14 @@ without re-downloading or re-parsing anything.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
 import tempfile
 import threading
 from collections import Counter
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 
@@ -32,32 +34,37 @@ from legalize.models import (
 
 logger = logging.getLogger(__name__)
 
-# Which identifiers have been written in this process, and which of them a second
-# norm landed on. Two norms resolving to one identifier is a real thing — a diploma
-# reachable from both DRE surfaces, two acts sharing a number — and the file can
-# only hold one of them, so the other is lost. Counting it is the difference between
-# knowing that and not.
-_written_identifiers: set[str] = set()
+# Which identifiers this process has written and which norm owns each one. Two
+# norms resolving to one identifier is a real thing — a diploma reachable from both
+# DRE surfaces, two acts sharing a number — and a file can only hold one of them.
+# The owner is the norm's official URL, so re-saving the same norm (a retry, a
+# duplicate discovery entry) is not mistaken for a second law.
+_written_identifiers: dict[str, str] = {}
 _overwrites: Counter[str] = Counter()
 _write_lock = threading.Lock()
 
 
-def _claim(identifier: str) -> bool:
-    """Register a write. True if some other norm already wrote this identifier."""
+def _claim(identifier: str, owner: str = "") -> bool:
+    """Register a write. True if a *different* norm already wrote this identifier."""
     with _write_lock:
-        if identifier in _written_identifiers:
-            _overwrites[identifier] += 1
-            return True
-        _written_identifiers.add(identifier)
-        return False
+        current = _written_identifiers.get(identifier)
+        if current is None:
+            _written_identifiers[identifier] = owner
+            return False
+        if current == owner:
+            return False
+        _overwrites[identifier] += 1
+        return True
 
 
 def overwritten_identifiers() -> dict[str, int]:
-    """Identifiers a later norm wrote over in this process, and how many times.
+    """Identifiers more than one norm of this phase claimed, and how many times.
 
-    Some overwrites are by design: a consolidated diploma is meant to land on top
-    of its as-published twin. Anything beyond that is one law shadowing another, so
-    this is a number to explain rather than an error to raise.
+    Nothing is lost any more — the second norm is written beside the first (see
+    ``_disambiguated``) — but every entry here is a law whose file name is not the
+    one its country's rule promised, so it is a number to explain rather than
+    silence. A consolidated diploma landing on its as-published twin does not
+    appear: the pipeline resets the tracking between phases.
     """
     with _write_lock:
         return dict(_overwrites)
@@ -103,9 +110,10 @@ def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
         ]
     }
     """
-    data = _norm_to_dict(norm)
     directory = Path(data_dir) / "json"
     directory.mkdir(parents=True, exist_ok=True)
+    norm = _disambiguated(norm)
+    data = _norm_to_dict(norm)
     path = directory / f"{norm.metadata.identifier}.json"
 
     # Write somewhere private and rename into place. Where two norms share an
@@ -123,10 +131,47 @@ def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
         Path(tmp).unlink(missing_ok=True)
         raise
 
-    if _claim(norm.metadata.identifier):
-        logger.debug("JSON overwritten by a second norm: %s", path)
     logger.debug("JSON saved: %s", path)
     return path
+
+
+def _disambiguated(norm: ParsedNorm) -> ParsedNorm:
+    """Give the norm a free identifier when another one already took its own.
+
+    Two norms of the same phase resolving to one identifier is one law shadowing
+    another — Portugal lost 6,862 of them without a word, because the second write
+    simply replaced the first and the file name is also the Markdown name, so both
+    the data and the published law went. A norm that arrives second is written
+    beside the first instead: an ugly file name is visible and fixable, a missing
+    law is neither. The country's own identifier rule is still the real fix (pt
+    tells the two apart by the série of the Diário da República).
+
+    The suffix is the publication date, which is a property of the act and does not
+    change between runs. A consolidated norm landing on its as-published twin is
+    not this: it is the same law from a richer surface, and the pipeline keeps the
+    two apart by resetting the tracking between phases.
+
+    Only what this process wrote is known here, so it does not catch a daily run
+    where a new act lands on a law written months ago; GitRepo.write_and_add
+    refuses that one.
+    """
+    identifier = norm.metadata.identifier
+    owner = norm.metadata.source
+    if not _claim(identifier, owner):
+        return norm
+
+    candidate = f"{identifier}-{norm.metadata.publication_date:%Y%m%d}"
+    if _claim(candidate, owner):
+        digest = hashlib.sha1(owner.encode("utf-8")).hexdigest()[:8]
+        candidate = f"{identifier}-{digest}"
+        _claim(candidate, owner)
+    logger.warning(
+        "identifier %s was already written by another norm in this run; "
+        "saving this one as %s — the country's identifier rule needs a discriminator",
+        identifier,
+        candidate,
+    )
+    return replace(norm, metadata=replace(norm.metadata, identifier=candidate))
 
 
 def _norm_to_dict(norm: ParsedNorm) -> dict:

@@ -147,7 +147,7 @@ for phase, batch in (("published", published), ("consolidated", consolidated)):
         sample = ", ".join(sorted(clashes)[:5])
         print(
             f"   {len(clashes)} identifiers claimed by two {phase} norms, "
-            f"only the last survives: {sample}"
+            f"the second one saved under a suffixed name: {sample}"
             f"{' …' if len(clashes) > 5 else ''}",
             flush=True,
         )
