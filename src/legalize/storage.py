@@ -9,8 +9,14 @@ without re-downloading or re-parsing anything.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
+import os
+import tempfile
+import threading
+from collections import Counter
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 
@@ -22,10 +28,53 @@ from legalize.models import (
     ParsedNorm,
     Rank,
     Reform,
+    TextState,
     Version,
 )
 
 logger = logging.getLogger(__name__)
+
+# Which identifiers this process has written and which norm owns each one. Two
+# norms resolving to one identifier is a real thing — a diploma reachable from both
+# DRE surfaces, two acts sharing a number — and a file can only hold one of them.
+# The owner is the norm's official URL, so re-saving the same norm (a retry, a
+# duplicate discovery entry) is not mistaken for a second law.
+_written_identifiers: dict[str, str] = {}
+_overwrites: Counter[str] = Counter()
+_write_lock = threading.Lock()
+
+
+def _claim(identifier: str, owner: str = "") -> bool:
+    """Register a write. True if a *different* norm already wrote this identifier."""
+    with _write_lock:
+        current = _written_identifiers.get(identifier)
+        if current is None:
+            _written_identifiers[identifier] = owner
+            return False
+        if current == owner:
+            return False
+        _overwrites[identifier] += 1
+        return True
+
+
+def overwritten_identifiers() -> dict[str, int]:
+    """Identifiers more than one norm of this phase claimed, and how many times.
+
+    Nothing is lost any more — the second norm is written beside the first (see
+    ``_disambiguated``) — but every entry here is a law whose file name is not the
+    one its country's rule promised, so it is a number to explain rather than
+    silence. A consolidated diploma landing on its as-published twin does not
+    appear: the pipeline resets the tracking between phases.
+    """
+    with _write_lock:
+        return dict(_overwrites)
+
+
+def reset_write_tracking() -> None:
+    """Forget what has been written. For tests and for per-phase snapshots."""
+    with _write_lock:
+        _written_identifiers.clear()
+        _overwrites.clear()
 
 
 def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
@@ -61,15 +110,68 @@ def save_structured_json(data_dir: str | Path, norm: ParsedNorm) -> Path:
         ]
     }
     """
+    directory = Path(data_dir) / "json"
+    directory.mkdir(parents=True, exist_ok=True)
+    norm = _disambiguated(norm)
     data = _norm_to_dict(norm)
-    path = Path(data_dir) / "json" / f"{norm.metadata.identifier}.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
+    path = directory / f"{norm.metadata.identifier}.json"
 
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    # Write somewhere private and rename into place. Where two norms share an
+    # identifier — and Portugal has 128 such pairs — eight workers otherwise open
+    # the same file at once, both truncate it, both write from their own offset, and
+    # what lands is neither of them: a JSON document with another one's tail stuck to
+    # it, which every later reader skips. The rename is atomic, so the loser is
+    # replaced whole instead of interleaved.
+    fd, tmp = tempfile.mkstemp(dir=directory, prefix=f".{path.stem}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        os.replace(tmp, path)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
 
     logger.debug("JSON saved: %s", path)
     return path
+
+
+def _disambiguated(norm: ParsedNorm) -> ParsedNorm:
+    """Give the norm a free identifier when another one already took its own.
+
+    Two norms of the same phase resolving to one identifier is one law shadowing
+    another — Portugal lost 6,862 of them without a word, because the second write
+    simply replaced the first and the file name is also the Markdown name, so both
+    the data and the published law went. A norm that arrives second is written
+    beside the first instead: an ugly file name is visible and fixable, a missing
+    law is neither. The country's own identifier rule is still the real fix (pt
+    tells the two apart by the série of the Diário da República).
+
+    The suffix is the publication date, which is a property of the act and does not
+    change between runs. A consolidated norm landing on its as-published twin is
+    not this: it is the same law from a richer surface, and the pipeline keeps the
+    two apart by resetting the tracking between phases.
+
+    Only what this process wrote is known here, so it does not catch a daily run
+    where a new act lands on a law written months ago; GitRepo.write_and_add
+    refuses that one.
+    """
+    identifier = norm.metadata.identifier
+    owner = norm.metadata.source
+    if not _claim(identifier, owner):
+        return norm
+
+    candidate = f"{identifier}-{norm.metadata.publication_date:%Y%m%d}"
+    if _claim(candidate, owner):
+        digest = hashlib.sha1(owner.encode("utf-8")).hexdigest()[:8]
+        candidate = f"{identifier}-{digest}"
+        _claim(candidate, owner)
+    logger.warning(
+        "identifier %s was already written by another norm in this run; "
+        "saving this one as %s — the country's identifier rule needs a discriminator",
+        identifier,
+        candidate,
+    )
+    return replace(norm, metadata=replace(norm.metadata, identifier=candidate))
 
 
 def _norm_to_dict(norm: ParsedNorm) -> dict:
@@ -112,6 +214,16 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             extra_dict[key] = value
     if extra_dict:
         metadata_dict["extra"] = extra_dict
+
+    # Spec v0.3. Both are per-norm overrides of a country-level default, so they
+    # have to survive the round-trip: commit_all_fast renders from the JSON, not
+    # from the parser's output, and a dropped override silently republishes the
+    # country default — which is the opposite claim on every consolidated norm
+    # inside an as_enacted country.
+    if meta.text_state is not None:
+        metadata_dict["text_state"] = meta.text_state.value
+    if meta.last_amendment:
+        metadata_dict["last_amendment"] = meta.last_amendment
 
     # Articles with all their versions
     articles = []
@@ -156,14 +268,18 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             if b and b.title:
                 affected.append(b.title)
 
-        reforms.append(
-            {
-                "date": reform.date.isoformat(),
-                "source_id": reform.norm_id,
-                "articles_affected": affected,
-                "affected_block_ids": list(reform.affected_blocks),
-            }
-        )
+        row = {
+            "date": reform.date.isoformat(),
+            "source_id": reform.norm_id,
+            "articles_affected": affected,
+            "affected_block_ids": list(reform.affected_blocks),
+        }
+        # Same reason text_state is written here: commit_all_fast renders from this
+        # file, not from the parser's output, so anything the parser resolved and
+        # this drops is simply lost on the way to the commit.
+        if reform.change_note:
+            row["change_note"] = reform.change_note
+        reforms.append(row)
 
     return {
         "metadata": metadata_dict,
@@ -211,6 +327,8 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
         pdf_url=pdf_url,
         subjects=subjects,
         extra=extra,
+        text_state=TextState(meta["text_state"]) if meta.get("text_state") else None,
+        last_amendment=meta.get("last_amendment"),
     )
 
     blocks = []
@@ -259,6 +377,7 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 date=date.fromisoformat(r["date"]),
                 norm_id=r["source_id"],
                 affected_blocks=affected,
+                change_note=r.get("change_note", ""),
             )
         )
 

@@ -121,7 +121,7 @@ def _build_body(
             f"Source: {metadata.source}"
         )
 
-    return (
+    body = (
         f"Norm: {metadata.identifier}\n"
         f"Disposition: {reform.norm_id}\n"
         f"Date: {date_str}\n"
@@ -129,6 +129,13 @@ def _build_body(
         f"\n"
         f"Affected articles: {affected_str}"
     )
+    # Its own line, not folded into "Affected articles", because it answers a
+    # different question and often is not about articles at all — half of DRE's
+    # notes read "Revogado a partir de 10.10.2007". Emitted only when the source
+    # said something, so no country's output changes until its fetcher fills it.
+    if reform.change_note:
+        body += f"\nChange: {reform.change_note}"
+    return body
 
 
 def _abbreviate_articles(articles: list[str]) -> str:

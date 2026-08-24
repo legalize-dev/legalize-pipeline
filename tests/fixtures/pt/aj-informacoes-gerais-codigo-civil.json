@@ -1,0 +1,290 @@
+{
+ "DetalheAJ": {
+  "Id": "477358",
+  "Titulo": "Decreto-Lei n.º 47344 ",
+  "TipoDiploma": "Decreto-Lei",
+  "Numero": "47344",
+  "Resumo": "Aprova o Código Civil e regula a sua aplicação.�",
+  "Fonte": "DIARIO DO GOVERNO - 1.ª SERIE, Nº 274, de 1966-11-25, Pág. 1883 - 2086",
+  "Vigencia": "3",
+  "VigenciaDescricao": "Em vigor",
+  "FonteRegional": "",
+  "EntidadeEmitente": {
+   "List": [
+    "Ministério da Justiça"
+   ]
+  },
+  "DataEntradaVigor": "",
+  "ProducaoEfeitos": "",
+  "Notas": "1 - O código não é aplicável às acções que estejam pendentes nos tribunais no dia da sua entrada em vigor, salvo o disposto nos artigos 17.º e 21.º do presente decreto-lei.\r\n2 - Todas as remissões feitas em diplomas legislativos para o Código Civil de 1867 consideram-se feitas para as disposições correspondentes do novo código.\r\n3 - A Portaria n.º 22869, de 4 de Setembro de 1967, torna extensivo o Código Civil aprovado pelo presente diploma, às províncias ultramarinas e determina a entrada em vigor no território ultramarino a 01.01.1968, sem prejuízo do disposto no n.º 2º da mencionada portaria.\r\n4 - O Decreto-Lei n.º 268/94, 25 de Outubro, estabelece normas regulamentares do regime da propriedade horizontal.\r\n5- Nos termos do art. 2.º, da Lei 43/2019 de 21 de junho, para efeitos de interpretação do n.º 7 do art. 1041.º do Código Civil, aditado pelo art. 2.º da Lei n.º 13/2019, de 12 de fevereiro, considera-se que os contratos abrangidos pelo referido n.º 7 do art. 1041.º são os contratos sujeitos a regimes de renda de cariz social, designadamente o regime de arrendamento apoiado, de renda apoiada ou de renda social.",
+  "Nota_TextoIntegral": "",
+  "Tratamento": false,
+  "TipoConteudoId": 0,
+  "ConteudoId": "0",
+  "IsDiplomaLegis": true,
+  "DiarioRepublica": {
+   "ConteudoTitle": "Diário do Governo n.º 274/1966, Série I de 1966-11-25",
+   "LinkSitemap": "/dr/detalhe/diario-republica/274-1966-67121",
+   "Numero": "274",
+   "DataPublicacao": "1966-11-25T00:00:00Z",
+   "Id": "67121"
+  },
+  "DiplomaLegis": {
+   "Emissor": "Ministério da Justiça - Gabinete do Ministro",
+   "Referencia": "19662116",
+   "Serie": "I",
+   "Visibility": "PUBLIC",
+   "IsNoIndex": false
+  }
+ },
+ "HasLegCons": false,
+ "DRNumero": "",
+ "DRAno": "1966-11-25",
+ "FragId": "0",
+ "HasJurisprudenciaAssociada": true,
+ "ThesaurusTreeList": {
+  "List": [
+   {
+    "ThesaurusElementId": "30215271",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Código Civil",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30225711",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Interpretação do Direito",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30233745",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Direito Civil",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30233746",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Direito de Família",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220415",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Direito ao NOME",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220451",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Direito de Servidão de Vistas",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220470",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Direito Internacional Privado",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220478",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Direito Privado",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30217529",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Contrato de Mútuo",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30231671",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Contrato de Trabalho",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220578",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Doação",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220573",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Divórcio",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30235399",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Testamento",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30213778",
+    "ThesaurusBroaderElementId": "30212707",
+    "ThesaurusElementName": "Jogos de Fortuna e Azar",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30221018",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Enfiteuse",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30233744",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Casamento",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30226259",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Filiação",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30232509",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Renda Vitalícia",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30231663",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Regime de Prescrição",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30216801",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Cônjuge",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30230133",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Procuração",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30228530",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Tutela de Menores",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30212659",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Nacionalidade",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30229521",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Poder Paternal",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30226949",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Menoridade",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30231693",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Regime Jurídico",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30221786",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Estatuto Jurídico",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220589",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Documento Autentico",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30232321",
+    "ThesaurusBroaderElementId": "30213164",
+    "ThesaurusElementName": "Associação",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30220561",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Dívida",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30235588",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Herança",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30231736",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Propriedade de BENS",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30212948",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Assento",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30217546",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Contrato Promessa",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30236232",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Venda",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30236115",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Usufruto",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30212038",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Adopção",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30217530",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Contrato de Prestação de Serviços",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30235015",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Arrendamento Urbano para Habitação",
+    "ThesaurusElementType": "Descriptor"
+   },
+   {
+    "ThesaurusElementId": "30217509",
+    "ThesaurusBroaderElementId": "0",
+    "ThesaurusElementName": "Arrendamento Urbano não Habitacional",
+    "ThesaurusElementType": "Descriptor"
+   }
+  ]
+ },
+ "HaveEmissor_DecisaoJudicial": false
+}

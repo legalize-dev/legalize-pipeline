@@ -1,0 +1,62 @@
+{
+ "versionInfo": {
+  "hasModuleVersionChanged": false,
+  "hasApiVersionChanged": false
+ },
+ "data": {
+  "IsPublished": true,
+  "DomainName": "https://diariodarepublica.pt",
+  "IsSitemapErro": false,
+  "NewFragmentoVersaoId": "0",
+  "DataSelecionadaOut": "1900-01-01",
+  "EnvironmentName": "PRD",
+  "ApplicationRoot": "/dr",
+  "ConsolidadaConteudoDetalhe": {
+   "DiplomaFrag": {
+    "ConteudoTitle": "Decreto-Lei n.º 47344 ",
+    "Designacao": "Código Civil - CC",
+    "ELI": "https://data.dre.pt/eli/dec-lei/47344/1966/p/cons/20260623/pt/html",
+    "FormattedTitle": "Decreto-Lei n.º 47344  - Diário do Governo n.º 274/1966, Série I de 1966-11-25",
+    "Nota": "",
+    "DiplomaConsolidacaoEstadoId": "4",
+    "EmAtualizacao": false,
+    "DiplomaLegisId": "477358"
+   },
+   "DiarioRepublica": {
+    "ConteudoTitle": "Diário do Governo n.º 274/1966, Série I de 1966-11-25",
+    "LinkSitemap": "/dr/detalhe/diario-republica/274-1966-67121",
+    "DataPublicacao": "1966-11-25T00:00:00Z"
+   },
+   "DiplomaLegis": {
+    "AnaliseJuridicaPublica": "True",
+    "Consolidado": "True",
+    "ConteudoTitle": "Decreto-Lei n.º 47344 ",
+    "Emissor": "Ministério da Justiça - Gabinete do Ministro",
+    "EmissorAcronimo": "",
+    "FormattedTitle": "Decreto-Lei n.º 47344  - Diário do Governo n.º 274/1966, Série I de 1966-11-25",
+    "LinkSitemap": "/dr/detalhe/decreto-lei/47344-1966-477358",
+    "Numero": "47344",
+    "Resumo": "",
+    "Sumario": "Aprova o Código Civil e regula a sua aplicação - Revoga, a partir da data da entrada em vigor do novo Código Civil, toda a legislação civil relativa às matérias que o mesmo abrange",
+    "Vigencia": "",
+    "Id": "477358",
+    "DataAlteracao": "2026-08-04T12:13:30Z",
+    "DataCriacao": "2014-04-01T13:09:09.987Z",
+    "DataPublicacao": "1966-11-25T00:00:00Z",
+    "IsDiploma": true,
+    "IsIncludedInSiteMap": true,
+    "IsNoIndex": false,
+    "IsRegional": false
+   },
+   "Serie": {
+    "Nome": "I"
+   },
+   "TipoDiploma": {
+    "Acronimo": "dec-lei",
+    "Tipo": "Decreto-Lei"
+   }
+  },
+  "HaveEmissor_DecisaoJudicial": false
+ },
+ "rolesInfo": ","
+}

@@ -24,7 +24,7 @@ import requests
 
 from rich.console import Console
 
-from legalize.committer.git_ops import FastImporter, GitRepo
+from legalize.committer.git_ops import FastImportDied, FastImporter, GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
 from legalize.models import (
@@ -33,9 +33,14 @@ from legalize.models import (
     NormMetadata,
     ParsedNorm,
     Reform,
+    TextState,
 )
 from legalize.state.store import StateStore, resolve_dates_to_process
-from legalize.storage import load_norma_from_json, save_structured_json
+from legalize.storage import (
+    load_norma_from_json,
+    overwritten_identifiers,
+    save_structured_json,
+)
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
 from legalize.transformer.xml_parser import extract_reforms, parse_text_xml
@@ -69,6 +74,10 @@ _SKIP_WEEKDAYS: dict[str, set[int]] = {
 }
 
 
+class ShadowedLaw(RuntimeError):
+    """A law could not be published because another act holds its file name."""
+
+
 def finalize_daily(
     repo: GitRepo,
     state: StateStore,
@@ -83,6 +92,12 @@ def finalize_daily(
 
     Call this at the end of any daily() function (generic or custom).
     """
+    # A refusal means a real act was not published because another one already
+    # holds its file name.
+    refused = list(getattr(repo, "refused", []))
+    for rel_path in refused:
+        errors.append(f"{rel_path}: another act already holds this file name, not written")
+
     if not dry_run and push and commits_created > 0:
         repo.push()
 
@@ -97,7 +112,36 @@ def finalize_daily(
     if errors:
         console.print(f"[yellow]⚠ {len(errors)} errors[/yellow]")
 
+    # Everything that could be published is committed, pushed and recorded before
+    # this: the day's work is not lost. But a law that exists and cannot be
+    # written because another act holds its file name is a defect in the
+    # country's identifier rule, and the only way that gets fixed is if the run
+    # ends red instead of leaving a line in a log nobody reads.
+    if refused:
+        raise ShadowedLaw(
+            f"{len(refused)} act(s) could not be published — another act already holds "
+            f"the same file name: {', '.join(refused[:5])}"
+            f"{' …' if len(refused) > 5 else ''}"
+        )
+
     return commits_created
+
+
+def _with_last_amendment(metadata: NormMetadata, reform: Reform) -> NormMetadata:
+    """Name the amending act on a body that does not change when one lands.
+
+    Only for AS_ENACTED. On a point-in-time norm the amendments *are* the versions,
+    so putting one in the frontmatter states the timeline twice and contradicts the
+    body. And a parser that already knows the official ID keeps it: reform.norm_id
+    is an internal dedupe key on some countries — Portugal's is
+    "DRE-133879986@2020-05-17" — while the field is documented as the official ID.
+    """
+    from legalize.countries import text_state_for
+
+    state = metadata.text_state or text_state_for(metadata.country)
+    if state is not TextState.AS_ENACTED or metadata.last_amendment:
+        return metadata
+    return replace(metadata, last_amendment=reform.norm_id)
 
 
 def generic_daily(
@@ -429,6 +473,19 @@ def generic_fetch_all(
     if errors:
         console.print(f"[yellow]⚠ {errors} errors[/yellow]")
 
+    # Two norms claiming one identifier used to be invisible: the second write
+    # replaced the first and the law left the corpus without a word. Nothing is
+    # lost now, but a suffixed file name is not the name the country's rule
+    # promised, so the count belongs on screen next to the errors.
+    clashes = overwritten_identifiers()
+    if clashes:
+        sample = ", ".join(sorted(clashes)[:5])
+        console.print(
+            f"[yellow]⚠ {len(clashes)} identifier(s) claimed by more than one norm; "
+            f"each extra one saved under a suffixed name: {sample}"
+            f"{' …' if len(clashes) > 5 else ''}[/yellow]"
+        )
+
     return fetched
 
 
@@ -593,7 +650,7 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
         is_first = reform == reforms[0]
         commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-        norm_meta = metadata if is_first else replace(metadata, last_amendment=reform.norm_id)
+        norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
         markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
         changed = repo.write_and_add(file_path, markdown)
 
@@ -751,8 +808,12 @@ def commit_all_fast(
         console.print("[yellow]dry-run: skipping fast-import[/yellow]")
         return len(all_reforms)
 
-    # Cache loaded norms to avoid re-reading JSON
+    # Cache loaded norms to avoid re-reading JSON, and drop each one the moment its
+    # last reform has been queued. Where that last one is has to be worked out up
+    # front: scanning the remaining list per iteration is quadratic, which is free at
+    # a thousand reforms and about nine minutes of pure waste at Portugal's 230,000.
     norm_cache: dict[str, ParsedNorm] = {}
+    last_reform_index = {norm_id: idx for idx, (_, norm_id, _, _) in enumerate(all_reforms)}
     errors = 0
 
     with FastImporter(cc.repo_path, config.git.committer_name, config.git.committer_email) as fi:
@@ -779,15 +840,15 @@ def commit_all_fast(
                 is_first = reform_idx == 0
                 commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-                norm_meta = (
-                    metadata if is_first else replace(metadata, last_amendment=reform.norm_id)
-                )
+                norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
                 markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
                 file_path = norm_to_filepath(metadata)
 
                 info = build_commit_info(commit_type, metadata, reform, blocks, file_path, markdown)
                 fi.commit(file_path, markdown, info)
 
+            except FastImportDied:
+                raise
             except Exception:
                 errors += 1
                 logger.error("Error processing %s reform %d", norm_id, reform_idx, exc_info=True)
@@ -798,10 +859,8 @@ def commit_all_fast(
                 )
 
             # Free norm from cache once all its reforms are queued
-            if norm_id in norm_cache:
-                remaining = sum(1 for _, nid, _, _ in all_reforms[idx + 1 :] if nid == norm_id)
-                if remaining == 0:
-                    del norm_cache[norm_id]
+            if last_reform_index.get(norm_id) == idx:
+                norm_cache.pop(norm_id, None)
 
     console.print(f"\n[bold green]✓ {fi.commit_count} commits created (fast-import)[/bold green]")
     if errors:

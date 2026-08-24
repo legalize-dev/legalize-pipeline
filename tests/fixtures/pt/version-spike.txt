@@ -1,0 +1,41 @@
+Portugal — version history spike (ADDING_A_COUNTRY.md §0.5)
+Date: 2026-08-21
+Law: Código Civil — Decreto-Lei n.º 47344, de 1966-11-25
+ELI: https://data.dre.pt/eli/dec-lei/47344/1966/p/cons/20260623/pt/html
+DiplomaLegisId 477358 / DiplomaFragId 34509075
+Source: diariodarepublica.pt, module dr.LegislacaoConsolidada (OutSystems screenservices)
+Reproduce: python3 scripts/pt_spike_consolidada.py out.json
+           python3 scripts/pt_spike_timeline.py 477358 34509075 out.json
+
+RESULT — point-in-time consolidated text, two distinct versions of the same article:
+
+version 1: date 2000-01-01 snapshot, 2868 fragments
+  Artigo 1601.º (Impedimentos dirimentes absolutos)
+  FragmentoVersaoId 58403586, DataEntradaVigor 1978-04-01, DataVersao 1977-11-25
+  "...a) A idade inferior a dezasseis anos; b) A demência notória, mesmo durante os
+   intervalos lúcidos, e a interdição ou inabilitação..."
+
+version 2: date 2026-06-23 snapshot, 2895 fragments
+  Artigo 1601.º (Impedimentos dirimentes absolutos)
+  FragmentoVersaoId 1115206175, DataEntradaVigor 2025-04-02, DataVersao 2025-04-01
+  "...a) A idade inferior a 18 anos; b) A demência notória, mesmo durante os intervalos
+   lúcidos, e a decisão de acompanhamento..."
+
+REFORM TIMELINE for the same diploma (AlteracoesTimelineByDiplomaLegisId):
+  102 amending diplomas, 1165 individual modifications
+  71 distinct entry-into-force dates, range 1900-01-01 .. 2026-07-01
+  1038 distinct target fragment versions
+  Each modification carries: TipoModificacao (Altera/Revoga/Aditado/...), target article,
+  FragmentoVersaoDestinoId, structural path, DataEntradaVigor, and the amending diploma's
+  number, type, summary, publication date and LinkSitemap.
+
+GATE: PASSED — >= 2 distinct versions with dates extracted from one law, plus a complete
+per-reform timeline with effective dates and the amending diploma for every change.
+
+PROTOCOL NOTE (the non-obvious bit): DataActionGetData raises
+System.NullReferenceException unless the screen variable
+"GetDiplomaFragByIdAndApplicationSetting" carries back the full output of the preceding
+DataActionGetDiplomaFragByIdAndApplicationSetting call. Block actions
+(AlteracoesTimelineByDiplomaLegisId) must be posted with viewName
+"LegislacaoConsolidada.LegCons_Detalhe" — posting the block's own name returns
+{"exception": "No role validation found"}.

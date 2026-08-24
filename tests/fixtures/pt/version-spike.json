@@ -1,0 +1,28 @@
+{
+  "diploma": "Decreto-Lei n.º 47344  - Diário do Governo n.º 274/1966, Série I de 1966-11-25",
+  "eli": "https://data.dre.pt/eli/dec-lei/47344/1966/p/cons/20260623/pt/html",
+  "diploma_legis_id": "477358",
+  "diploma_frag_id": "34509075",
+  "snapshots": {
+    "2000-01-01": {
+      "fragments": 2868,
+      "art_1601": {
+        "fragmento_versao_id": "58403586",
+        "data_entrada_vigor": "1978-04-01T00:00:00Z",
+        "data_versao": "1977-11-25T00:00:00Z",
+        "epigrafe": "(Impedimentos dirimentes absolutos)",
+        "texto": "São impedimentos dirimentes, obstando ao casamento da pessoa a quem respeitam com qualquer outra: a) A idade inferior a dezasseis anos; b) A demência notória, mesmo durante os intervalos lúcidos, e a "
+      }
+    },
+    "2026-06-23": {
+      "fragments": 2895,
+      "art_1601": {
+        "fragmento_versao_id": "1115206175",
+        "data_entrada_vigor": "2025-04-02T00:00:00Z",
+        "data_versao": "2025-04-01T01:00:00Z",
+        "epigrafe": "(Impedimentos dirimentes absolutos)",
+        "texto": "São impedimentos dirimentes, obstando ao casamento da pessoa a quem respeitam com qualquer outra: a) A idade inferior a 18 anos; b) A demência notória, mesmo durante os intervalos lúcidos, e a decisão"
+      }
+    }
+  }
+}

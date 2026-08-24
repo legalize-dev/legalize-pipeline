@@ -10,9 +10,26 @@ sup/sub/bold/italic/links survive into the cell text.
 
 from __future__ import annotations
 
+import re
 from typing import Callable
 
 from lxml import etree
+
+_LEADING_DIGITS = re.compile(r"\d+")
+
+
+def _span(element, name: str) -> int:
+    """A span attribute, from sources that do not always quote it.
+
+    An unquoted ``rowspan=2>`` leaves lxml recovering the rest of the row as the
+    attribute value — "2></td><td style='" — and a bare int() on that raised, which
+    lost the whole norm rather than one table. Read the leading digits and move on.
+    """
+    raw = element.get(name) or element.get(name.upper()) or ""
+    match = _LEADING_DIGITS.match(raw.strip())
+    if not match:
+        return 1
+    return max(1, min(int(match.group()), 1000))
 
 
 def _cells_of(tr) -> list[tuple[etree._Element, int, int]]:
@@ -21,9 +38,7 @@ def _cells_of(tr) -> list[tuple[etree._Element, int, int]]:
         tag = (child.tag or "").lower() if isinstance(child.tag, str) else ""
         if tag not in ("td", "th"):
             continue
-        colspan = int(child.get("colspan") or child.get("COLSPAN") or 1)
-        rowspan = int(child.get("rowspan") or child.get("ROWSPAN") or 1)
-        out.append((child, colspan, rowspan))
+        out.append((child, _span(child, "colspan"), _span(child, "rowspan")))
     return out
 
 
