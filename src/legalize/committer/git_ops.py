@@ -78,6 +78,10 @@ class GitRepo:
         self._path = Path(path)
         self._committer_name = committer_name
         self._committer_email = committer_email
+        # Files this run declined to overwrite because they hold a different act.
+        # finalize_daily turns them into errors: a law that cannot be published
+        # has to make the run red, not just leave a line in the log.
+        self.refused: list[str] = []
 
     def _run(self, args: list[str], env: dict | None = None, check: bool = True) -> str:
         """Runs a git command and returns stdout.
@@ -142,6 +146,7 @@ class GitRepo:
                     _published_on(existing),
                     _published_on(content),
                 )
+                self.refused.append(rel_path)
                 return False
 
         file_path.write_text(content, encoding="utf-8")
@@ -435,8 +440,8 @@ class FastImporter:
         """Ensure git repo exists."""
         self._path.mkdir(parents=True, exist_ok=True)
         git_dir = self._path / ".git"
+        env = _clean_git_env()
         if not git_dir.exists():
-            env = _clean_git_env()
             subprocess.run(
                 ["git", "init"],
                 cwd=self._path,
@@ -458,6 +463,19 @@ class FastImporter:
                 check=True,
                 env=env,
             )
+        # Set every time, not only at init: fast-import writes its deltas at
+        # depth 500 (see FastImporter), but pack-objects enforces the configured
+        # depth on the chains it reuses, so a push or a gc with the default 50
+        # would break them apart and write the pack back out whole — the 12.55
+        # GiB this is there to avoid. The config is what keeps the repo, the
+        # push and the maintenance runs telling the same story.
+        subprocess.run(
+            ["git", "config", "pack.depth", "500"],
+            cwd=self._path,
+            capture_output=True,
+            check=True,
+            env=env,
+        )
 
     def _checkout(self) -> None:
         """Sync index + working tree with the new main tip after fast-import.

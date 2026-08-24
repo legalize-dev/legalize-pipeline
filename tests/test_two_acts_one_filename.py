@@ -13,7 +13,11 @@ daily goes through.
 
 from __future__ import annotations
 
+import pytest
+
 from legalize.committer.git_ops import GitRepo
+from legalize.pipeline import ShadowedLaw, finalize_daily
+from legalize.state.store import StateStore
 
 FIRST = """---
 title: "Portaria n.º 953/2008"
@@ -66,3 +70,32 @@ def test_a_file_without_a_publication_date_is_left_alone(tmp_path):
 
     assert repo.write_and_add("README.md", "# two\n") is True
     assert (tmp_path / "repo" / "README.md").read_text(encoding="utf-8") == "# two\n"
+
+
+def test_a_refused_act_ends_the_run_red(tmp_path):
+    """Everything publishable is committed and pushed first — then it fails.
+
+    A law that exists and cannot be written is a defect in the country's
+    identifier rule. Left as a log line it survives for months; as a red run it
+    gets fixed.
+    """
+    repo = _repo(tmp_path)
+    path = "pt/DRE-PORT-953-2008.md"
+    repo.write_and_add(path, FIRST)
+    repo.write_and_add(path, SECOND)
+
+    state = StateStore(tmp_path / "state.json")
+    errors: list[str] = []
+    with pytest.raises(ShadowedLaw, match="already holds"):
+        finalize_daily(repo, state, [], 0, errors, dry_run=True)
+
+    # The refusal is in the run record too, not only in the exception.
+    assert any("another act already holds" in e for e in errors)
+
+
+def test_a_clean_run_does_not_raise(tmp_path):
+    repo = _repo(tmp_path)
+    repo.write_and_add("pt/DRE-PORT-953-2008.md", FIRST)
+
+    state = StateStore(tmp_path / "state.json")
+    assert finalize_daily(repo, state, [], 1, [], dry_run=True) == 1

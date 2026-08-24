@@ -74,6 +74,10 @@ _SKIP_WEEKDAYS: dict[str, set[int]] = {
 }
 
 
+class ShadowedLaw(RuntimeError):
+    """A law could not be published because another act holds its file name."""
+
+
 def finalize_daily(
     repo: GitRepo,
     state: StateStore,
@@ -88,6 +92,12 @@ def finalize_daily(
 
     Call this at the end of any daily() function (generic or custom).
     """
+    # A refusal means a real act was not published because another one already
+    # holds its file name.
+    refused = list(getattr(repo, "refused", []))
+    for rel_path in refused:
+        errors.append(f"{rel_path}: another act already holds this file name, not written")
+
     if not dry_run and push and commits_created > 0:
         repo.push()
 
@@ -101,6 +111,18 @@ def finalize_daily(
     console.print(f"\n[bold green]✓ {commits_created} commits[/bold green]")
     if errors:
         console.print(f"[yellow]⚠ {len(errors)} errors[/yellow]")
+
+    # Everything that could be published is committed, pushed and recorded before
+    # this: the day's work is not lost. But a law that exists and cannot be
+    # written because another act holds its file name is a defect in the
+    # country's identifier rule, and the only way that gets fixed is if the run
+    # ends red instead of leaving a line in a log nobody reads.
+    if refused:
+        raise ShadowedLaw(
+            f"{len(refused)} act(s) could not be published — another act already holds "
+            f"the same file name: {', '.join(refused[:5])}"
+            f"{' …' if len(refused) > 5 else ''}"
+        )
 
     return commits_created
 
