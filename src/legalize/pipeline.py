@@ -49,7 +49,12 @@ from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
 from legalize.transformer.xml_parser import extract_reforms, parse_text_xml
 
-console = Console()
+# Line-buffered on purpose: piped to a log or a tee, block buffering makes the
+# progress lines land minutes late and out of order against git's own output,
+# which goes to stderr unbuffered. A push log you cannot trust the timing of is
+# how a healthy push got read as a hang and killed.
+console = Console(soft_wrap=True)
+console.file.reconfigure(line_buffering=True)
 logger = logging.getLogger(__name__)
 
 

@@ -18,7 +18,8 @@ from legalize.config import load_config
 from legalize.countries import supported_countries
 from legalize.models import NormMetadata, NormStatus, Rank
 
-console = Console()
+console = Console(soft_wrap=True)
+console.file.reconfigure(line_buffering=True)
 
 
 def _get_jurisdiction_codes(country: str) -> list[str]:
