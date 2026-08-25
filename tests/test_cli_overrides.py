@@ -223,3 +223,88 @@ class TestFresh:
             ["git", "remote", "get-url", "origin"], cwd=repo, capture_output=True, text=True
         )
         assert "legalize-pt" in remote.stdout
+
+
+class TestCrossReferences:
+    """`amends` and `last_amendment` name other laws. Nothing checked they exist.
+
+    That is how Portugal came within one command of publishing 46,750 laws whose
+    `last_amendment` named a diploma in a scheme the corpus had left months
+    earlier: every file valid, every path right, every date sane, and every
+    cross-reference pointing at nothing.
+    """
+
+    LAW = (
+        '---\ntitle: "t"\nidentifier: "{id}"\ncountry: "pt"\nyear: "2001"\n'
+        'text_state: "as_enacted"\n{refs}---\n\n# t\n'
+    )
+
+    def _repo(self, tmp_path, laws):
+        import subprocess
+
+        repo = tmp_path / "repo"
+        (repo / "pt" / "2001").mkdir(parents=True)
+        for law_id, refs in laws:
+            (repo / "pt" / "2001" / f"{law_id}.md").write_text(
+                self.LAW.format(id=law_id, refs=refs)
+            )
+        subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+        subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+        subprocess.run(
+            ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "i"],
+            cwd=repo,
+            check=True,
+        )
+        subprocess.run(
+            ["git", "remote", "add", "origin", "git@github.com:legalize-dev/legalize-pt.git"],
+            cwd=repo,
+            check=True,
+        )
+        return repo
+
+    def _run(self, tmp_path, repo):
+        config = tmp_path / "config.yaml"
+        config.write_text(
+            f'countries:\n  pt:\n    repo_path: "{repo}"\n    data_dir: "{tmp_path / "d"}"\n'
+        )
+        return CliRunner().invoke(cli, ["--config", str(config), "health", "-c", "pt", "--deep"])
+
+    def test_a_scheme_that_moved_without_its_references_is_an_error(self, tmp_path):
+        """The Portuguese failure: every reference in the old naming scheme."""
+        laws = [
+            ("DRE-2001-1-111", 'last_amendment: "DRE-DECLRECTIF-1-2008"\n'),
+            ("DRE-2001-2-222", 'last_amendment: "DRE-DECLRECTIF-2-2008"\n'),
+        ]
+        result = self._run(tmp_path, self._repo(tmp_path, laws))
+        assert "name no law in this repo" in result.output, result.output
+        assert "100.0%" in result.output
+        assert result.exit_code == 1
+
+    def test_an_act_outside_the_corpus_is_only_a_warning(self, tmp_path):
+        """Portugal's real rate is 1.7 %: out-of-scope acts genuinely exist."""
+        laws = [("DRE-2001-1-111", 'last_amendment: "DRE-1974-25-404040"\n')]
+        laws += [
+            (f"DRE-2001-{i}-{i}{i}{i}", 'last_amendment: "DRE-2001-1-111"\n') for i in range(2, 12)
+        ]
+        result = self._run(tmp_path, self._repo(tmp_path, laws))
+        assert "name no law in this repo" in result.output, result.output
+        assert result.exit_code == 0, result.output
+
+    def test_amends_must_always_resolve(self, tmp_path):
+        """The spec makes it a list of identifiers 'as this repo names them'."""
+        laws = [
+            ("DRE-2001-1-111", 'amends: ["DRE-2001-2-222", "DRE-2001-9-999"]\n'),
+            ("DRE-2001-2-222", ""),
+        ]
+        result = self._run(tmp_path, self._repo(tmp_path, laws))
+        assert "amends reference(s) name no law" in result.output, result.output
+        assert result.exit_code == 1
+
+    def test_references_that_all_resolve_are_silent(self, tmp_path):
+        laws = [
+            ("DRE-2001-1-111", 'last_amendment: "DRE-2001-2-222"\n'),
+            ("DRE-2001-2-222", ""),
+        ]
+        result = self._run(tmp_path, self._repo(tmp_path, laws))
+        assert "name no law in this repo" not in result.output, result.output
+        assert result.exit_code == 0

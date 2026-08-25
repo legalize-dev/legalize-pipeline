@@ -970,11 +970,30 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
             have = path.relative_to(repo).as_posix()
             return None if want == have else (have, f"belongs at {want}")
 
+        def _references(path: Path) -> tuple[str, list[tuple[str, str]]]:
+            """The identifiers this file names, and the identifier it goes by."""
+            front = _read_frontmatter(path) or {}
+            out: list[tuple[str, str]] = []
+            if front.get("last_amendment"):
+                out.append(("last_amendment", str(front["last_amendment"])))
+            amends = front.get("amends")
+            if isinstance(amends, list):
+                out.extend(("amends", str(a)) for a in amends)
+            elif amends:
+                out.append(("amends", str(amends)))
+            return str(front.get("identifier") or ""), out
+
         with ThreadPoolExecutor(max_workers=workers) as pool:
             misplaced = [r for r in pool.map(_placed, md_files) if r]
             published: set[int] = set()
             for values in pool.map(_published_values, md_files):
                 published |= values
+            identifiers: set[str] = set()
+            references: list[tuple[str, str]] = []
+            for own, refs in pool.map(_references, md_files):
+                if own:
+                    identifiers.add(own)
+                references.extend(refs)
 
         # The manifest is a promise: fill in what it declares and you get the
         # file. A repo that breaks it resolves every law's metadata and 404s
@@ -983,6 +1002,44 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
             issues.append(("ERROR", f"{len(misplaced)} file(s) not where the manifest says"))
             for where, why in misplaced[:10]:
                 issues.append(("ERROR", f"  {where} — {why}"))
+
+        # ── Cross-references: a name that names nothing ──
+        #
+        # `amends` and `last_amendment` hold identifiers of other laws in this
+        # same repo, and nothing until now checked that they resolve. That is how
+        # Portugal came within one command of publishing 46,750 laws whose
+        # `last_amendment` named a diploma in an identifier scheme the corpus had
+        # left months earlier: every file valid, every path right, every date
+        # sane, and every cross-reference pointing at nothing.
+        #
+        # Not every miss is a fault. An amending act can be genuinely outside the
+        # corpus — an out-of-scope type, a regional gazette a country does not
+        # publish — and Portugal's real rate is 1.7 %. What is never ordinary is
+        # most of them missing at once: that is not scope, that is a scheme that
+        # moved without its references. So the rate is always reported and the
+        # majority is where it turns red.
+        for field, expected in (("amends", True), ("last_amendment", False)):
+            refs = [ident for name, ident in references if name == field]
+            if not refs:
+                continue
+            missing = [ident for ident in refs if ident not in identifiers]
+            if not missing:
+                continue
+            rate = len(missing) / len(refs)
+            sample = ", ".join(sorted(set(missing))[:5])
+            # The spec makes `amends` resolvable by definition: it is a list of
+            # identifiers "as this repo names them", for a consumer that has the
+            # file and not the history. One that does not resolve is a broken
+            # promise, not a law out of scope.
+            level = "ERROR" if expected or rate > 0.5 else "WARN"
+            issues.append(
+                (
+                    level,
+                    f"{len(missing)} of {len(refs)} {field} reference(s) "
+                    f"name no law in this repo ({rate:.1%}): {sample}"
+                    f"{' …' if len(set(missing)) > 5 else ''}",
+                )
+            )
 
         # A value the source states that no published file anywhere repeats is a
         # value the pipeline drops on the floor. Portugal's `Resumo` was one:
