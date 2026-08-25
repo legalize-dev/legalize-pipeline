@@ -24,5 +24,4 @@ def norm_to_filepath(metadata: NormMetadata) -> str:
     so a consumer holding a law's metadata can rebuild the path without
     listing the repo (spec v0.4, §Directories).
     """
-    directory = metadata.jurisdiction or metadata.country
-    return law_path(directory, metadata.identifier, layout_for(metadata.country))
+    return law_path(metadata, layout_for(metadata.country))

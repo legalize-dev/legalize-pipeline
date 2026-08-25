@@ -85,13 +85,30 @@ legalize-{code}/
   LICENSE         # MIT
 ```
 
-**Decide the layout here, and only here.** The spec defines two shapes
-([§Directory layout](https://github.com/legalize-dev/legalize/blob/main/SPEC.md#directory-layout)):
+**Decide the layout here, and only here.** A layout is a path template
+([§Directory layout](https://github.com/legalize-dev/legalize/blob/main/SPEC.md#directory-layout)).
+The two shapes most countries want:
 
 ```
 {directory}/{identifier}.md                 flat
 {directory}/{id_sha1_2}/{identifier}.md     sharded — 256 buckets by sha1 of the identifier
 ```
+
+A placeholder is either a value the spec derives — `{directory}`, `{identifier}`,
+`{id_sha1_2}` — or **any key of the law's own frontmatter**, used verbatim. So a country
+whose corpus wants a different shape can have one without touching the spec, at any
+depth:
+
+```
+{directory}/{series}/{id_sha1_2}/{identifier}.md
+```
+
+Two rules if you reach for a field. It must be one the source **cannot revise**: a path
+built from a correctable value moves the file when the value is corrected, and that
+rename lands in the history as a change no legislature made — prefer something the
+identifier itself carries, since identifiers are stable within a major version. And it
+must be present on **every** norm, or the path cannot be built at all; there is no
+fallback bucket and `norm_to_filepath()` raises rather than guess.
 
 **Sharded is the default answer.** Measured across 100 to 157,504 files, sharding is
 never slower than flat and never produces a bigger pack; below ~250 files it simply

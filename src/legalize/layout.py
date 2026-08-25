@@ -1,9 +1,21 @@
 """Where a law file lives — Legalize Format Spec v0.4.
 
 The spec makes a repo declare its own shape instead of a consumer assuming one:
-``.legalize.yml`` carries a path template drawn from a closed vocabulary of
-placeholders, and a consumer holding only an identifier fills it in to find the
-file. See the hub's ``SPEC.md``, §Directory layout.
+``.legalize.yml`` carries a path template, and a consumer fills it in to find
+the file. See the hub's ``SPEC.md``, §Directory layout.
+
+A placeholder is one of two things, and the difference is the whole design:
+
+* a **derived** value the spec defines for every country — ``{directory}``,
+  ``{identifier}``, ``{id_sha1_2}``;
+* a **field**, which is any key of the law's own YAML frontmatter, used
+  verbatim.
+
+Opening it to fields is what lets a country choose a shape nobody anticipated
+without a spec change, and it costs nothing to specify: the value is written in
+the file it names, so a consumer holding the law's metadata can rebuild the path
+with no country-specific code. It is also what the layout already did — the
+``{directory}`` of v0.3 was the ``jurisdiction`` field under another name.
 
 This module is the engine's single copy of that rule. It builds the paths *and*
 writes the manifest that tells consumers how to rebuild them, from the same
@@ -15,32 +27,113 @@ resolving while every body 404s.
 from __future__ import annotations
 
 import hashlib
+import string
+from datetime import date
+
+from legalize.models import NormMetadata
 
 SPEC_VERSION = "0.4"
 
-# The two shapes in use. A country's template is a plain string so that a new
-# one costs an entry in LAYOUT and nothing else.
+# The shapes in use. A country's template is a plain string so that a new one
+# costs an entry in LAYOUT and nothing else.
 FLAT = "{directory}/{identifier}.md"
 SHARDED = "{directory}/{id_sha1_2}/{identifier}.md"
 
+# Values the spec defines for every country, whatever its frontmatter holds.
+# Anything else in a template is a frontmatter field, read from the law itself.
+DERIVED = {
+    "directory": lambda m: m.jurisdiction or m.country,
+    "identifier": lambda m: m.identifier,
+    "id_sha1_2": lambda m: hashlib.sha1(m.identifier.encode("utf-8")).hexdigest()[:2],
+}
 
-def _values(directory: str, identifier: str) -> dict[str, str]:
-    """The closed placeholder vocabulary, resolved for one norm.
+# A path segment is a directory name, so a value carrying a separator or a
+# traversal would silently write outside the tree it was meant to. The values
+# come from official sources, which is exactly why this is checked rather than
+# trusted: the parser is the only thing between a source's free-text field and
+# a file path, and it changes every time a country is onboarded.
+_FORBIDDEN = ("/", "\\", "\x00")
 
-    Every placeholder MUST be computable from the identifier alone, because an
-    identifier is all a public URL carries: a consumer that has to look up a
-    date or a rank first cannot resolve the path at all. Adding an entry here
-    is a minor version of the spec, and it must be added to the spec's own
-    vocabulary table in the same change.
+
+class TemplateError(ValueError):
+    """A template that cannot be resolved. Never a guess, always a stop.
+
+    A wrong path returns a 404 for a law that exists, which is the hardest
+    failure here to notice: the metadata still resolves and only the body is
+    missing, on every page at once.
     """
-    return {
-        "directory": directory,
-        "identifier": identifier,
-        "id_sha1_2": hashlib.sha1(identifier.encode("utf-8")).hexdigest()[:2],
-    }
 
 
-PLACEHOLDERS = frozenset(_values("", ""))  # derived, so it cannot drift from _values
+def placeholders_of(template: str) -> list[str]:
+    """The placeholder names a template uses, in order."""
+    return [name for _, name, _, _ in string.Formatter().parse(template) if name]
+
+
+def _field(metadata: NormMetadata, name: str) -> str:
+    """One frontmatter field, as it is written in the file."""
+    value = getattr(metadata, name, None)
+    if value is None:
+        value = dict(metadata.extra).get(name)
+    if value is None:
+        raise TemplateError(
+            f"{metadata.identifier}: the template needs {{{name}}}, which is neither a "
+            f"value the spec derives nor a field this law carries"
+        )
+    return value.isoformat() if isinstance(value, date) else str(value)
+
+
+def _values(metadata: NormMetadata, template: str) -> dict[str, str]:
+    """Resolve every placeholder a template uses, or refuse to build a path."""
+    out: dict[str, str] = {}
+    for name in placeholders_of(template):
+        derive = DERIVED.get(name)
+        raw = derive(metadata) if derive else _field(metadata, name)
+        value = str(raw or "").strip()
+        if not value:
+            raise TemplateError(
+                f"{metadata.identifier}: {{{name}}} is empty, which would collapse a path segment"
+            )
+        if any(c in value for c in _FORBIDDEN) or value.strip(".") == "":
+            raise TemplateError(
+                f"{metadata.identifier}: {{{name}}} = {value!r} is not a path segment"
+            )
+        out[name] = value
+    return out
+
+
+def layout_for(country_code: str) -> str:
+    """The path template for a country. Absent means flat (spec v0.4)."""
+    return LAYOUT.get(country_code, FLAT)
+
+
+def law_path(metadata: NormMetadata, template: str) -> str:
+    """Build a law's path from its template."""
+    return template.format(**_values(metadata, template))
+
+
+def manifest(country_code: str) -> str:
+    """The ``.legalize.yml`` for a country repo.
+
+    One entry covering ``*``: the engine gives every directory of a repo the
+    same shape, so there is nothing to enumerate and nothing that goes stale
+    when a country gains a jurisdiction.
+    """
+    return f"""\
+# Legalize Format Spec v{SPEC_VERSION} — https://github.com/legalize-dev/legalize/blob/main/SPEC.md
+#
+# How to build the path to any law in this repo. A placeholder is either a value
+# the spec derives ({", ".join(sorted(DERIVED))}) or a key of the law's own
+# frontmatter, used verbatim.
+# Generated by the pipeline; do not edit by hand.
+
+spec_version: "{SPEC_VERSION}"
+country: "{country_code}"
+
+layout:
+  - directories: ["*"]
+    path: "{layout_for(country_code)}"
+"""
+
 
 # What shape each country's repo is in. A country absent from this map is FLAT,
 # which is what every repo built before spec v0.4 already is — so adding a
@@ -57,51 +150,16 @@ LAYOUT: dict[str, str] = {
     # 164,278 files in one directory, an 8 MB tree that each of 300,732 commits
     # rewrites. Measured: 3 h 22 min of commit phase, 27 min of enumeration per
     # push, 74 min for the ``--name-only`` walk the DB seed needs, and a pack
-    # GitHub rejects for exceeding 2.00 GiB. Sharded, the diff touches 926 tree
-    # entries instead of 164,278.
+    # GitHub rejects for exceeding 2.00 GiB.
     "pt": SHARDED,
 }
 
 
-def layout_for(country_code: str) -> str:
-    """The path template for a country. Absent means flat (spec v0.4)."""
-    return LAYOUT.get(country_code, FLAT)
-
-
-def law_path(directory: str, identifier: str, template: str) -> str:
-    """Build a law's path from its template.
-
-    ``str.format`` raises ``KeyError`` on a placeholder the vocabulary does not
-    define, which is the loud failure the spec asks for: a template quietly
-    resolved with a guess yields a path that is wrong rather than absent, and a
-    404 for a law that exists is the hardest failure here to notice.
-    """
-    return template.format(**_values(directory, identifier))
-
-
-def manifest(country_code: str) -> str:
-    """The ``.legalize.yml`` for a country repo.
-
-    One entry covering ``*``: the engine gives every directory of a repo the
-    same shape, so there is nothing to enumerate and nothing that goes stale
-    when a country gains a jurisdiction.
-    """
-    return f"""\
-# Legalize Format Spec v{SPEC_VERSION} — https://github.com/legalize-dev/legalize/blob/main/SPEC.md
-#
-# How to build the path to any law in this repo from its identifier alone.
-# Generated by the pipeline; do not edit by hand.
-
-spec_version: "{SPEC_VERSION}"
-country: "{country_code}"
-
-layout:
-  - directories: ["*"]
-    path: "{layout_for(country_code)}"
-"""
-
-
-# A typo in LAYOUT should fail here, at import, and not four hours into a
-# bootstrap. Uses the real function so the check cannot drift from it.
+# A template that cannot parse should fail here, at import, and not four hours
+# into a bootstrap. A field name that no law carries cannot be caught until a
+# law is in hand; that one fails loudly on the first norm instead.
 for _code, _template in LAYOUT.items():
-    law_path("x", "y", _template)
+    if not placeholders_of(_template):
+        raise TemplateError(f"{_code}: {_template!r} has no placeholders")
+    if "{identifier}" not in _template:
+        raise TemplateError(f"{_code}: {_template!r} does not use the identifier")

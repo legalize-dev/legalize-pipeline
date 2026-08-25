@@ -15,14 +15,16 @@ import pytest
 import yaml
 
 from legalize.layout import (
+    DERIVED,
     FLAT,
     LAYOUT,
-    PLACEHOLDERS,
     SHARDED,
     SPEC_VERSION,
+    TemplateError,
     law_path,
     layout_for,
     manifest,
+    placeholders_of,
 )
 from legalize.models import NormMetadata, NormStatus, Rank
 from legalize.transformer.slug import norm_to_filepath
@@ -37,28 +39,71 @@ SPEC_VECTORS = [
 
 @pytest.mark.parametrize("identifier,bucket", SPEC_VECTORS)
 def test_spec_test_vectors(identifier, bucket):
-    assert law_path("xx", identifier, SHARDED) == f"xx/{bucket}/{identifier}.md"
+    assert law_path(_meta(identifier, "xx"), SHARDED) == f"xx/{bucket}/{identifier}.md"
 
 
-def test_vocabulary_is_closed():
-    assert PLACEHOLDERS == {"directory", "identifier", "id_sha1_2"}
+def test_the_spec_derives_these_for_every_country():
+    assert set(DERIVED) == {"directory", "identifier", "id_sha1_2"}
 
 
-def test_unknown_placeholder_fails_loudly():
-    """A guess here yields a path that is wrong rather than absent."""
-    with pytest.raises(KeyError):
-        law_path("xx", "X", "{directory}/{year}/{identifier}.md")
+def test_anything_else_is_a_frontmatter_field():
+    """The point of the open vocabulary: a country picks a shape nobody
+    anticipated, and the value is written in the file the path names."""
+    meta = _meta("X-1", "xx", extra=(("series", "II"),))
+    assert law_path(meta, "{directory}/{series}/{identifier}.md") == "xx/II/X-1.md"
+    assert law_path(meta, "{directory}/{rank}/{identifier}.md") == "xx/ley/X-1.md"
+
+
+def test_a_date_field_is_written_the_way_the_frontmatter_writes_it():
+    assert (
+        law_path(_meta("X-1", "xx"), "{directory}/{publication_date}/{identifier}.md")
+        == "xx/2020-01-01/X-1.md"
+    )
+
+
+def test_a_field_no_law_carries_fails_loudly():
+    """A guess here yields a path that is wrong rather than absent, and a 404 for
+    a law that exists is the hardest failure here to notice."""
+    with pytest.raises(TemplateError, match="nonesuch"):
+        law_path(_meta("X-1", "xx"), "{directory}/{nonesuch}/{identifier}.md")
+
+
+def test_an_empty_field_fails_rather_than_collapsing_a_segment():
+    with pytest.raises(TemplateError, match="empty"):
+        law_path(_meta("X-1", "xx", extra=(("series", "  "),)), "{series}/{identifier}.md")
+
+
+@pytest.mark.parametrize("bad", ["a/b", "..", ".", "a\\b"])
+def test_a_field_cannot_escape_the_directory_it_names(bad):
+    """The parser is the only thing between a source's free text and a path."""
+    with pytest.raises(TemplateError, match="not a path segment"):
+        law_path(_meta("X-1", "xx", extra=(("series", bad),)), "{series}/{identifier}.md")
+
+
+def test_depth_is_the_country_s_business():
+    """v0.4 capped it at one level. Every level makes the tree git rewrites
+    smaller, so the cap was prudence and not cost."""
+    meta = _meta("BOE-A-1978-31229", "xx", extra=(("series", "II"),))
+    template = "{directory}/{rank}/{series}/{id_sha1_2}/{identifier}.md"
+    assert law_path(meta, template) == "xx/ley/II/bb/BOE-A-1978-31229.md"
+
+
+def test_placeholders_are_read_off_the_template():
+    assert placeholders_of(FLAT) == ["directory", "identifier"]
+    assert placeholders_of(SHARDED) == ["directory", "id_sha1_2", "identifier"]
 
 
 def test_absent_country_is_flat():
     assert layout_for("no-such-country") == FLAT
-    assert law_path("fr", "LEGITEXT000006069414", FLAT) == "fr/LEGITEXT000006069414.md"
+    meta = _meta("LEGITEXT000006069414", "fr")
+    assert law_path(meta, FLAT) == "fr/LEGITEXT000006069414.md"
 
 
 def test_every_declared_layout_is_resolvable():
-    """A typo in LAYOUT must fail here, not four hours into a bootstrap."""
+    """A typo in LAYOUT must fail at import, not four hours into a bootstrap."""
     for code, template in LAYOUT.items():
-        assert law_path(code, "X", template).endswith("/X.md")
+        assert "{identifier}" in template
+        assert placeholders_of(template)
 
 
 # Real identifiers, one per directory of the built repo, with the bucket their
@@ -85,7 +130,7 @@ def test_portugals_manifest_says_sharded():
     assert yaml.safe_load(manifest("pt"))["layout"][0]["path"] == SHARDED
 
 
-def _meta(identifier: str, country: str, jurisdiction: str | None = None) -> NormMetadata:
+def _meta(identifier: str, country: str, jurisdiction: str | None = None, **kw) -> NormMetadata:
     return NormMetadata(
         title="t",
         short_title="t",
@@ -97,6 +142,7 @@ def _meta(identifier: str, country: str, jurisdiction: str | None = None) -> Nor
         department="",
         source="https://example.org",
         jurisdiction=jurisdiction,
+        **kw,
     )
 
 
