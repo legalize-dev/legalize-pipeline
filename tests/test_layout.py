@@ -24,6 +24,7 @@ from legalize.layout import (
     law_path,
     layout_for,
     manifest,
+    path_from_frontmatter,
     placeholders_of,
 )
 from legalize.models import NormMetadata, NormStatus, Rank
@@ -86,6 +87,26 @@ def test_depth_is_the_country_s_business():
     meta = _meta("BOE-A-1978-31229", "xx", extra=(("series", "II"),))
     template = "{directory}/{rank}/{series}/{id_sha1_2}/{identifier}.md"
     assert law_path(meta, template) == "xx/ley/II/bb/BOE-A-1978-31229.md"
+
+
+def test_a_consumer_rebuilds_the_path_from_the_file_itself():
+    """The spec's own side of the rule: given a law's frontmatter and the template
+    its repo declares, fill it in. The engine and the consumer resolving this
+    differently is what makes every law's metadata work and every body 404, so
+    both sides run the same code."""
+    meta = _meta("DRE-2026-16-901234567", "pt", extra=(("year", "2026"),))
+    frontmatter = {"identifier": meta.identifier, "country": "pt", "year": "2026"}
+    assert path_from_frontmatter(frontmatter, layout_for("pt")) == norm_to_filepath(meta)
+
+
+def test_a_consumer_reads_the_jurisdiction_the_same_way_the_engine_writes_it():
+    frontmatter = {"identifier": "X-1", "country": "pt", "jurisdiction": "pt-20", "year": "1976"}
+    assert path_from_frontmatter(frontmatter, layout_for("pt")) == "pt-20/1976/X-1.md"
+
+
+def test_a_consumer_refuses_a_file_it_cannot_place():
+    with pytest.raises(TemplateError, match="year"):
+        path_from_frontmatter({"identifier": "X-1", "country": "pt"}, layout_for("pt"))
 
 
 def test_placeholders_are_read_off_the_template():

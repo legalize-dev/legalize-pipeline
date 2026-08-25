@@ -41,10 +41,16 @@ SHARDED = "{directory}/{id_sha1_2}/{identifier}.md"
 
 # Values the spec defines for every country, whatever its frontmatter holds.
 # Anything else in a template is a frontmatter field, read from the law itself.
+#
+# Each takes a lookup function rather than an object, so the same definitions
+# serve both sides of the spec: the publisher resolving them from a norm it is
+# about to write, and a consumer resolving them from the frontmatter of a file
+# it has read. Two implementations of one rule is the failure this whole module
+# exists to prevent, so there is one.
 DERIVED = {
-    "directory": lambda m: m.jurisdiction or m.country,
-    "identifier": lambda m: m.identifier,
-    "id_sha1_2": lambda m: hashlib.sha1(m.identifier.encode("utf-8")).hexdigest()[:2],
+    "directory": lambda get: get("jurisdiction") or get("country"),
+    "identifier": lambda get: get("identifier"),
+    "id_sha1_2": lambda get: hashlib.sha1(str(get("identifier")).encode("utf-8")).hexdigest()[:2],
 }
 
 # A path segment is a directory name, so a value carrying a separator or a
@@ -69,34 +75,34 @@ def placeholders_of(template: str) -> list[str]:
     return [name for _, name, _, _ in string.Formatter().parse(template) if name]
 
 
-def _field(metadata: NormMetadata, name: str) -> str:
-    """One frontmatter field, as it is written in the file."""
-    value = getattr(metadata, name, None)
-    if value is None:
-        value = dict(metadata.extra).get(name)
-    if value is None:
-        raise TemplateError(
-            f"{metadata.identifier}: the template needs {{{name}}}, which is neither a "
-            f"value the spec derives nor a field this law carries"
-        )
-    return value.isoformat() if isinstance(value, date) else str(value)
+def _norm_lookup(metadata: NormMetadata):
+    """Field lookup for a norm the pipeline is about to write."""
+
+    def get(name: str):
+        value = getattr(metadata, name, None)
+        return dict(metadata.extra).get(name) if value is None else value
+
+    return get
 
 
-def _values(metadata: NormMetadata, template: str) -> dict[str, str]:
+def _values(get, template: str, whose: str) -> dict[str, str]:
     """Resolve every placeholder a template uses, or refuse to build a path."""
     out: dict[str, str] = {}
     for name in placeholders_of(template):
         derive = DERIVED.get(name)
-        raw = derive(metadata) if derive else _field(metadata, name)
-        value = str(raw or "").strip()
+        raw = derive(get) if derive else get(name)
+        if raw is None:
+            raise TemplateError(
+                f"{whose}: the template needs {{{name}}}, which is neither a value the "
+                f"spec derives nor a field this law carries"
+            )
+        value = (raw.isoformat() if isinstance(raw, date) else str(raw)).strip()
         if not value:
             raise TemplateError(
-                f"{metadata.identifier}: {{{name}}} is empty, which would collapse a path segment"
+                f"{whose}: {{{name}}} is empty, which would collapse a path segment"
             )
         if any(c in value for c in _FORBIDDEN) or value.strip(".") == "":
-            raise TemplateError(
-                f"{metadata.identifier}: {{{name}}} = {value!r} is not a path segment"
-            )
+            raise TemplateError(f"{whose}: {{{name}}} = {value!r} is not a path segment")
         out[name] = value
     return out
 
@@ -107,8 +113,19 @@ def layout_for(country_code: str) -> str:
 
 
 def law_path(metadata: NormMetadata, template: str) -> str:
-    """Build a law's path from its template."""
-    return template.format(**_values(metadata, template))
+    """Where the pipeline writes a norm — the publisher's side of the rule."""
+    return template.format(**_values(_norm_lookup(metadata), template, metadata.identifier))
+
+
+def path_from_frontmatter(frontmatter: dict, template: str) -> str:
+    """Where a law file should be, read from the file itself.
+
+    The consumer's side of the same rule, and the one the spec describes: given a
+    law's frontmatter and the template its repo declares, fill the template in.
+    A repo conforms when this agrees with where the file actually is.
+    """
+    whose = str(frontmatter.get("identifier") or "?")
+    return template.format(**_values(frontmatter.get, template, whose))
 
 
 def manifest(country_code: str) -> str:

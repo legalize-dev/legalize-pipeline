@@ -595,21 +595,121 @@ def push(
     )
 
 
+def _read_frontmatter(path) -> dict | None:
+    """The YAML block at the top of a law file, or None if there is not one.
+
+    Read line by line and stopped at the closing fence: a law's body runs to
+    hundreds of kilobytes and none of it is needed here.
+    """
+    import yaml
+
+    lines: list[str] = []
+    try:
+        with open(path, encoding="utf-8") as handle:
+            if handle.readline().rstrip("\n") != "---":
+                return None
+            for line in handle:
+                if line.rstrip("\n") == "---":
+                    break
+                lines.append(line)
+            else:
+                return None
+    except OSError:
+        return None
+    try:
+        parsed = yaml.safe_load("".join(lines))
+    except yaml.YAMLError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
+def _normalised(value) -> str:
+    """One value, in the shape two layers of the pipeline can be compared on.
+
+    Matching source fields to published ones by *name* does not work — the
+    source calls it ``Titulo`` and the file calls it ``title`` — so they are
+    matched by value instead, which needs the spellings reconciled: a source
+    writes ``2025-02-14T00:00:00`` where a file writes ``2025-02-14``, and
+    ``Portaria`` where a file writes ``portaria``.
+    """
+    text = " ".join(str(value).split()).lower()
+    if len(text) >= 19 and text[10] == "t" and text[4] == "-":
+        text = text[:10]
+    return text
+
+
+def _published_values(path) -> set:
+    """Every value a published file states, hashed to keep the corpus in memory."""
+    front = _read_frontmatter(path)
+    if not front:
+        return set()
+    out = set()
+    for value in front.values():
+        for item in value if isinstance(value, list) else [value]:
+            text = _normalised(item)
+            if text:
+                out.add(hash(text))
+    return out
+
+
+def _source_fields(path) -> dict:
+    """What the source actually stated on one cached record, by dotted path.
+
+    Nulls, empty strings and empty containers do not count as stated: a source
+    returns its whole schema on every record and most of it is holes.
+    """
+    import gzip
+    import json
+
+    def walk(node, prefix=""):
+        found = {}
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if isinstance(value, dict):
+                    found.update(walk(value, f"{prefix}{key}."))
+                elif isinstance(value, bool):
+                    continue  # a flag is structure, not content
+                elif isinstance(value, (str, int, float)) and str(value).strip():
+                    # A body is transformed on its way into the file — HTML to
+                    # Markdown — so comparing it by value says nothing. Only
+                    # field-sized values can be looked for verbatim.
+                    if len(str(value)) <= 200:
+                        found[f"{prefix}{key}"] = value
+        return found
+
+    try:
+        opener = gzip.open if str(path).endswith(".gz") else open
+        with opener(path, "rt", encoding="utf-8") as handle:
+            return walk(json.load(handle))
+    except (OSError, ValueError):
+        return {}
+
+
 @cli.command()
 @_country_option()
 @click.option("--sample", default=500, type=int, help="Number of recent commits to sample.")
+@click.option(
+    "--deep",
+    is_flag=True,
+    help="Also read file contents: layout conformance and unpublished source fields. Minutes, not seconds.",
+)
 @click.pass_context
-def health(ctx: click.Context, country: str, sample: int) -> None:
-    """Run health checks on a country repo.
+def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
+    """Run health checks on a country repo. Exits non-zero on any error.
 
-    Checks for: anomalous commit dates, empty/tiny files,
-    dirty working tree, missing remote, orphan JSON data.
+    Two costs. By default it reads names — counts per stage, laws that lost
+    their data or never reached the repo, duplicate identifiers, empty files,
+    anomalous dates — and takes seconds. ``--deep`` also reads contents: whether
+    every file is where the manifest promises, and which fields the source fills
+    that no published file carries. That one walks the whole cache.
 
     Examples:
         legalize health -c es
+        legalize health -c pt --deep
         legalize health -c se --sample 1000
     """
     import subprocess
+    from collections import Counter
     from datetime import date
     from pathlib import Path
 
@@ -637,23 +737,48 @@ def health(ctx: click.Context, country: str, sample: int) -> None:
     console.print(f"  Markdown files: {len(md_files)}")
     console.print(f"  Git commits:    {commit_count}")
 
+    # Every law is a file named after its identifier, so two files with one stem
+    # means two laws answer to one name — the failure that cost 6,862 Portuguese
+    # laws, where the second write replaced the first and left no trace.
+    stems: dict[str, list[Path]] = {}
+    for f in md_files:
+        stems.setdefault(f.stem, []).append(f)
+    clashes = {k: v for k, v in stems.items() if len(v) > 1}
+    if clashes:
+        issues.append(("ERROR", f"{len(clashes)} identifier(s) claimed by more than one file"))
+        for name, paths in list(clashes.items())[:5]:
+            issues.append(
+                ("ERROR", f"  {name}: {', '.join(str(x.relative_to(repo)) for x in paths)}")
+            )
+
     if data_dir:
         json_dir = data_dir / "json"
-        json_count = len(list(json_dir.glob("*.json"))) if json_dir.exists() else 0
-        console.print(f"  JSON data:      {json_count}")
+        json_stems = {f.stem for f in json_dir.glob("*.json")} if json_dir.exists() else set()
+        console.print(f"  JSON data:      {len(json_stems)}")
 
-        # Orphan JSONs (have data but no markdown)
-        if json_count > 0 and len(md_files) > 0:
+        raw_dir = data_dir / "raw"
+        if raw_dir.exists():
+            raw_count = sum(1 for _ in raw_dir.glob("*.meta.json*"))
+            console.print(f"  Raw envelopes:  {raw_count}")
+
+        # A law with data but no file never reached the repo, and nothing else
+        # says so: it is dropped in silence somewhere between parse and commit.
+        # A law with a file but no data is the reverse — a file the pipeline can
+        # no longer rebuild, which is what a stale identifier scheme leaves behind.
+        if json_stems and md_files:
             md_stems = {f.stem for f in md_files}
-            json_stems = {f.stem for f in json_dir.glob("*.json")}
-            orphans = json_stems - md_stems
-            if orphans:
-                issues.append(("WARN", f"{len(orphans)} JSON files without corresponding Markdown"))
-                if len(orphans) <= 5:
-                    for o in sorted(orphans):
-                        issues.append(("WARN", f"  orphan: {o}"))
-        elif json_count > 0 and len(md_files) == 0:
-            issues.append(("WARN", f"{json_count} JSON files but 0 Markdown — commit never ran?"))
+            for missing, label in (
+                (json_stems - md_stems, "have data but never reached the repo"),
+                (md_stems - json_stems - {"README"}, "are in the repo with no data behind them"),
+            ):
+                if missing:
+                    issues.append(("ERROR", f"{len(missing)} law(s) {label}"))
+                    for name in sorted(missing)[:5]:
+                        issues.append(("ERROR", f"  {name}"))
+        elif json_stems and not md_files:
+            issues.append(
+                ("ERROR", f"{len(json_stems)} JSON files but 0 Markdown — commit never ran?")
+            )
 
     # ── 3. Working tree ──
     status_out = _git("status", "--porcelain").stdout.strip()
@@ -683,6 +808,88 @@ def health(ctx: click.Context, country: str, sample: int) -> None:
         issues.append(("WARN", f"{len(tiny)} Markdown file(s) under 50 bytes"))
         for f in tiny[:5]:
             issues.append(("WARN", f"  tiny: {f.relative_to(repo)}"))
+
+    # ── 6. Deep: read the files, not just their names ──
+    if deep:
+        from concurrent.futures import ThreadPoolExecutor
+
+        from legalize.layout import TemplateError, layout_for, path_from_frontmatter
+
+        workers = getattr(cc, "max_workers", 1) or 1
+        template = layout_for(country)
+        console.print(f"\n  Reading {len(md_files)} files with {workers} workers...")
+
+        def _placed(path: Path) -> tuple[str, str] | None:
+            """The file's own answer to where it should be, against where it is."""
+            front = _read_frontmatter(path)
+            if front is None:
+                return (str(path.relative_to(repo)), "no frontmatter")
+            try:
+                want = path_from_frontmatter(front, template)
+            except TemplateError as exc:
+                return (str(path.relative_to(repo)), str(exc).split(": ", 1)[-1])
+            have = path.relative_to(repo).as_posix()
+            return None if want == have else (have, f"belongs at {want}")
+
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            misplaced = [r for r in pool.map(_placed, md_files) if r]
+            published: set[int] = set()
+            for values in pool.map(_published_values, md_files):
+                published |= values
+
+        # The manifest is a promise: fill in what it declares and you get the
+        # file. A repo that breaks it resolves every law's metadata and 404s
+        # every body — 171,735 pages that look fine and are empty.
+        if misplaced:
+            issues.append(("ERROR", f"{len(misplaced)} file(s) not where the manifest says"))
+            for where, why in misplaced[:10]:
+                issues.append(("ERROR", f"  {where} — {why}"))
+
+        # A value the source states that no published file anywhere repeats is a
+        # value the pipeline drops on the floor. Portugal's `Resumo` was one:
+        # filled on 12.9 % of records, and on 11.8 % it was the only prose
+        # description of the law there was. Compared by value and not by name,
+        # because the two layers do not agree on names and never will.
+        raw_dir = data_dir / "raw" if data_dir else None
+        if raw_dir and raw_dir.exists() and published:
+            # Sampled: the answer is a rate, and a few thousand records settle
+            # it as well as two hundred thousand do. Evenly spaced rather than
+            # taken off the front, because the cache is ordered by type.
+            cached = sorted(raw_dir.glob("*.meta.json*"))
+            envelopes = cached[:: max(1, len(cached) // 4000)]
+            console.print(f"  Sampling {len(envelopes)} of {len(cached)} source envelopes...")
+            seen: Counter = Counter()
+            dropped: Counter = Counter()
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                for fields in pool.map(_source_fields, envelopes):
+                    for key, value in fields.items():
+                        seen[key] += 1
+                        if hash(_normalised(value)) not in published:
+                            dropped[key] += 1
+
+            # Reported only where the field is both common and consistently
+            # absent: a value that reaches the file in most records and not in a
+            # handful is the source being irregular, not the pipeline losing it.
+            lost = [
+                (k, n, seen[k])
+                for k, n in dropped.most_common()
+                if n / (seen[k] or 1) > 0.9 and seen[k] / len(envelopes) >= 0.01
+            ]
+            if lost:
+                issues.append(
+                    (
+                        "WARN",
+                        f"{len(lost)} source field(s) never appear verbatim in a published file "
+                        f"(sampled; a field the pipeline reshapes rather than copies shows up here too)",
+                    )
+                )
+                for key, n, total in lost[:15]:
+                    issues.append(
+                        (
+                            "WARN",
+                            f"  {key} — stated on {100 * total / len(envelopes):.1f}% of records, none published",
+                        )
+                    )
 
     # ── 6. Anomalous commit dates ──
     console.print(f"\n  Sampling {sample} recent commits for date anomalies...")
@@ -745,6 +952,11 @@ def health(ctx: click.Context, country: str, sample: int) -> None:
         console.print(
             f"  [bold]{len(errors)} error(s), {len(warns)} warning(s), {len(infos)} info(s)[/bold]"
         )
+        # A bootstrap runs for hours and nobody reads the scroll. Printing the
+        # problem and exiting 0 is how three Portuguese laws vanished from the
+        # corpus with a warning on screen that said so.
+        if errors:
+            raise SystemExit(1)
 
 
 # ─────────────────────────────────────────────
