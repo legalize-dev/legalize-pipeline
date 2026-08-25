@@ -207,6 +207,13 @@ approaches the limit. It forces the incremental path — no `git fast-import` �
 it is slower per commit. That is the trade. `legalize bootstrap` has **no**
 `--batch` flag: it commits everything and leaves you one enormous push.
 
+Reach for it when you want the pushing interleaved. You do **not** need it to
+survive a dead run: the fast path commits in chunks of 25,000 and picks up from
+the branch tip, so re-running the same command continues rather than restarting.
+Portugal's commit phase was killed three times in one evening — at 35,000, 10,000
+and 85,000 of 302,333 — and before this each death cost the whole history, because
+`git fast-import` moves the ref when its stdin closes and not one commit sooner.
+
 **Recovery — history already committed locally.** `legalize push` sends it in
 slices, one push and one short-lived connection each:
 

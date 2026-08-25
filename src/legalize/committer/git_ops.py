@@ -291,7 +291,18 @@ class FastImporter:
         # On exit: closes stdin, waits for fast-import to finish, then checkout.
     """
 
-    def __init__(self, path: str | Path, committer_name: str, committer_email: str):
+    def __init__(
+        self,
+        path: str | Path,
+        committer_name: str,
+        committer_email: str,
+        checkout: bool = True,
+    ):
+        # checkout=False for every session but the last of a chunked import:
+        # _checkout is a `git reset --hard`, which materialises the whole tree,
+        # and doing that once per chunk over 171,725 files costs more than the
+        # import it follows.
+        self._checkout_on_exit = checkout
         self._path = Path(path)
         self._committer_name = committer_name
         self._committer_email = committer_email
@@ -358,7 +369,8 @@ class FastImporter:
                 logger.error("git fast-import failed: %s", stderr)
             else:
                 logger.info("git fast-import: %d commits imported", self._commit_count)
-                self._checkout()
+                if self._checkout_on_exit:
+                    self._checkout()
 
     @property
     def commit_count(self) -> int:

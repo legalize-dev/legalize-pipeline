@@ -198,6 +198,7 @@ def commit(
         legalize commit -c fr --all --offset 10 --limit 10  # Norms 11-20
     """
     from legalize.pipeline import (
+        HistoryMismatch,
         UnwritableLaw,
         commit_all,
         commit_all_fast,
@@ -231,7 +232,7 @@ def commit(
                 commit_all_fast(config, country, limit=limit, offset=offset)
             else:
                 commit_all(config, country, dry_run=dry_run, limit=limit, offset=offset)
-        except UnwritableLaw as exc:
+        except (UnwritableLaw, HistoryMismatch) as exc:
             lost = exc
         finally:
             if not dry_run:
@@ -375,7 +376,12 @@ def _start_fresh(cc, country: str) -> None:
         shutil.rmtree(repo)
 
     repo.mkdir(parents=True)
-    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    # -b main, not the machine's init.defaultBranch. fast-import writes to
+    # refs/heads/main; where git init made `master` instead, that ref did not
+    # exist, the importer found no tip to anchor on, and the history came out
+    # orphaned on a second branch with the init commit stranded on the first.
+    # The shape of the repo depended on a global git config.
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, check=True)
     subprocess.run(
         ["git", "commit", "-q", "--allow-empty", "-m", f"[bootstrap] Init legalize-{country}"],
         cwd=repo,

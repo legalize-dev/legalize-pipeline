@@ -91,6 +91,17 @@ class UnwritableLaw(RuntimeError):
     """A law had data and could not be written into the repo."""
 
 
+class HistoryMismatch(RuntimeError):
+    """The branch holds commits this run cannot continue from."""
+
+
+# One fast-import session per chunk. The session is the unit of durability: the
+# ref only moves when it ends, so a run killed mid-session loses that session and
+# nothing before it. Portugal died three times in one evening at 35,000, 10,000
+# and 85,000 of 302,333 commits, and each time restarted from zero.
+_IMPORT_CHUNK = 25_000
+
+
 def finalize_daily(
     repo: GitRepo,
     state: StateStore,
@@ -780,6 +791,47 @@ def commit_all(
 # ─────────────────────────────────────────────
 
 
+def _resume_index(repo_path: str | Path, all_reforms: list) -> int:
+    """How many of ``all_reforms`` the branch already holds.
+
+    The stream is deterministic — every reform, sorted by date — so the commits
+    on ``refs/heads/main`` are always a prefix of it, and the tip names which
+    one. Read back from the tip's own trailers rather than counting commits: a
+    reform that failed to render produced no commit, and a count would then
+    resume one law early for every one of them.
+    """
+    import subprocess
+
+    tip = subprocess.run(
+        ["git", "-C", str(repo_path), "log", "-1", "--format=%b", "refs/heads/main"],
+        capture_output=True,
+        text=True,
+    )
+    if tip.returncode != 0 or not tip.stdout.strip():
+        return 0  # no branch, or nothing on it: this is a first run
+
+    trailer = {}
+    for line in tip.stdout.splitlines():
+        key, sep, value = line.partition(":")
+        if sep:
+            trailer.setdefault(key.strip(), value.strip())
+    key = (trailer.get("Source-Date", ""), trailer.get("Norm-Id", ""))
+
+    # Last occurrence, not first: one law can carry two reforms on one date, and
+    # resuming from the earlier of them would commit the later one twice.
+    seen = {}
+    for idx, (when, identifier, _reform_idx, _path) in enumerate(all_reforms):
+        seen[(when.isoformat(), identifier)] = idx
+    if key not in seen:
+        raise HistoryMismatch(
+            f"refs/heads/main ends at {key[1] or '?'} ({key[0] or 'no date'}), which is "
+            f"not part of the history this run would build. Committing on top would "
+            f"stack a second history on the first. Start from an empty repo "
+            f"(`bootstrap --fresh`) or point --repo-path somewhere else."
+        )
+    return seen[key] + 1
+
+
 def commit_all_fast(
     config: Config,
     country: str,
@@ -789,11 +841,14 @@ def commit_all_fast(
 ) -> int:
     """Generate commits for ALL laws using git fast-import.
 
-    10-50x faster than commit_all() for bootstrap. Generates a single
-    fast-import stream with all commits in chronological order.
+    10-50x faster than commit_all() for bootstrap. Commits go out in
+    chronological order across every law, in chunks of _IMPORT_CHUNK.
 
-    Does NOT support idempotency (skipping existing commits) — use only
-    for fresh bootstrap on an empty repo.
+    Resumable, and only in the one direction that is safe: a branch holding a
+    prefix of this exact stream is continued from where it stops, and a branch
+    holding anything else raises HistoryMismatch rather than stacking a second
+    history on the first. It still does not skip individual commits — the unit
+    is the prefix, not the file.
     """
     cc = config.get_country(country)
     json_dir = Path(cc.data_dir) / "json"
@@ -852,54 +907,84 @@ def commit_all_fast(
     norm_cache: dict[str, ParsedNorm] = {}
     last_reform_index = {norm_id: idx for idx, (_, norm_id, _, _) in enumerate(all_reforms)}
     errors = 0
+    imported = 0
 
-    with FastImporter(cc.repo_path, config.git.committer_name, config.git.committer_email) as fi:
-        for idx, (reform_date, norm_id, reform_idx, json_file) in enumerate(all_reforms):
-            try:
-                if norm_id not in norm_cache:
-                    loaded = load_norma_from_json(json_file)
-                    r = loaded.reforms
-                    if not r and loaded.blocks:
-                        r = (
-                            Reform(
-                                date=loaded.metadata.publication_date,
-                                norm_id=loaded.metadata.identifier,
-                                affected_blocks=(),
-                            ),
-                        )
-                    norm_cache[norm_id] = (loaded, r)
+    # One import is one all-or-nothing session: fast-import moves the ref when its
+    # stdin closes, so a run killed before that leaves an empty branch however far
+    # it got. Chunking makes the ref advance every _IMPORT_CHUNK commits, and
+    # _resume_index reads it back, so a death costs the current chunk instead of
+    # the whole history. The stream stays chronological because the chunks are
+    # slices of the already-sorted list, not of the laws.
+    start = _resume_index(cc.repo_path, all_reforms)
+    if start:
+        console.print(
+            f"  [green]resuming: {start} of {len(all_reforms)} already on the branch[/green]\n"
+        )
+        imported = start
 
-                norm, reforms_cached = norm_cache[norm_id]
-                metadata = norm.metadata
-                blocks = norm.blocks
-                reform = reforms_cached[reform_idx]
+    for chunk_start in range(start, len(all_reforms), _IMPORT_CHUNK):
+        chunk_end = min(chunk_start + _IMPORT_CHUNK, len(all_reforms))
+        with FastImporter(
+            cc.repo_path,
+            config.git.committer_name,
+            config.git.committer_email,
+            checkout=chunk_end == len(all_reforms),
+        ) as fi:
+            for idx in range(chunk_start, chunk_end):
+                reform_date, norm_id, reform_idx, json_file = all_reforms[idx]
+                try:
+                    if norm_id not in norm_cache:
+                        loaded = load_norma_from_json(json_file)
+                        r = loaded.reforms
+                        if not r and loaded.blocks:
+                            r = (
+                                Reform(
+                                    date=loaded.metadata.publication_date,
+                                    norm_id=loaded.metadata.identifier,
+                                    affected_blocks=(),
+                                ),
+                            )
+                        norm_cache[norm_id] = (loaded, r)
 
-                is_first = reform_idx == 0
-                commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
+                    norm, reforms_cached = norm_cache[norm_id]
+                    metadata = norm.metadata
+                    blocks = norm.blocks
+                    reform = reforms_cached[reform_idx]
 
-                norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
-                markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
-                file_path = norm_to_filepath(metadata)
+                    is_first = reform_idx == 0
+                    commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-                info = build_commit_info(commit_type, metadata, reform, blocks, file_path, markdown)
-                fi.commit(file_path, markdown, info)
+                    norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
+                    markdown = render_norm_at_date(
+                        norm_meta, blocks, reform.date, include_all=is_first
+                    )
+                    file_path = norm_to_filepath(metadata)
 
-            except FastImportDied:
-                raise
-            except Exception:
-                errors += 1
-                logger.error("Error processing %s reform %d", norm_id, reform_idx, exc_info=True)
+                    info = build_commit_info(
+                        commit_type, metadata, reform, blocks, file_path, markdown
+                    )
+                    fi.commit(file_path, markdown, info)
 
-            if (idx + 1) % 5000 == 0:
-                console.print(
-                    f"  [dim][{idx + 1}/{len(all_reforms)}] queued, {errors} errors[/dim]"
-                )
+                except FastImportDied:
+                    raise
+                except Exception:
+                    errors += 1
+                    logger.error(
+                        "Error processing %s reform %d", norm_id, reform_idx, exc_info=True
+                    )
 
-            # Free norm from cache once all its reforms are queued
-            if last_reform_index.get(norm_id) == idx:
-                norm_cache.pop(norm_id, None)
+                if (idx + 1) % 5000 == 0:
+                    console.print(
+                        f"  [dim][{idx + 1}/{len(all_reforms)}] queued, {errors} errors[/dim]"
+                    )
 
-    console.print(f"\n[bold green]✓ {fi.commit_count} commits created (fast-import)[/bold green]")
+                # Free norm from cache once all its reforms are queued
+                if last_reform_index.get(norm_id) == idx:
+                    norm_cache.pop(norm_id, None)
+
+        imported += fi.commit_count
+
+    console.print(f"\n[bold green]✓ {imported} commits created (fast-import)[/bold green]")
 
     # Every law that could be written is in the repo before this line, the same
     # order finalize_daily uses for a shadowed act: the run's work is not thrown
@@ -913,7 +998,9 @@ def commit_all_fast(
             f"{fi.commit_count} commit(s) were created. See the logged tracebacks."
         )
 
-    return fi.commit_count
+    # imported, not fi.commit_count: that is the last chunk's tally, and it does
+    # not exist at all on a run that had nothing left to do.
+    return imported
 
 
 # ─────────────────────────────────────────────
