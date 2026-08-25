@@ -354,7 +354,16 @@ def generic_fetch_one(
             if hasattr(text_parser, "parse_suvestine") and hasattr(client, "get_suvestine"):
                 try:
                     suvestine_data = client.get_suvestine(norm_id)
-                    sv_blocks, sv_reforms = text_parser.parse_suvestine(suvestine_data, norm_id)
+                    # A parser that can take the resolved publication date gets it,
+                    # the same way get_text is handed the metadata above. A source
+                    # that leaves a version undated is not a law published on some
+                    # floor date; it is this law, published when the metadata says.
+                    sv_kwargs = {}
+                    if "published_on" in text_parser.parse_suvestine.__code__.co_varnames:
+                        sv_kwargs["published_on"] = metadata.publication_date
+                    sv_blocks, sv_reforms = text_parser.parse_suvestine(
+                        suvestine_data, norm_id, **sv_kwargs
+                    )
                 except Exception:
                     logger.error(
                         "Suvestine fetch/parse failed for %s; skipping norm "

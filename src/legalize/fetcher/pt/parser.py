@@ -497,6 +497,13 @@ class DRETextParser(TextParser):
         paragraphs = _parse_published_html(raw)
         if not paragraphs:
             return []
+        # These dates are never published and never can be: the pipeline replaces
+        # this block wholesale with ``parse_suvestine``'s, and if that fails the
+        # norm is skipped rather than committed (see ``generic_fetch_one``). They
+        # exist because ``Version`` requires them. Nothing here reaches a file, so
+        # they are a placeholder rather than the invented publication dates the
+        # spec forbids — the two that were real are fixed above.
+        placeholder = date(1900, 1, 1)
         return [
             Block(
                 id="texto",
@@ -505,8 +512,8 @@ class DRETextParser(TextParser):
                 versions=(
                     Version(
                         norm_id="",
-                        publication_date=date(1900, 1, 1),
-                        effective_date=date(1900, 1, 1),
+                        publication_date=placeholder,
+                        effective_date=placeholder,
                         paragraphs=tuple(paragraphs),
                     ),
                 ),
@@ -514,7 +521,7 @@ class DRETextParser(TextParser):
         ]
 
     def parse_suvestine(
-        self, suvestine_data: bytes, norm_id: str
+        self, suvestine_data: bytes, norm_id: str, published_on: date | None = None
     ) -> tuple[list[Block], list[Reform]]:
         """Turn the version blob into merged Blocks and one Reform per version.
 
@@ -532,14 +539,28 @@ class DRETextParser(TextParser):
             return [], []
 
         if blob.get("surface") == PUBLISHED:
-            return self._published_blocks(blob, norm_id)
+            return self._published_blocks(blob, norm_id, published_on)
         return self._consolidated_blocks(blob, norm_id)
 
     # -- surface B: a published text has exactly one version -----------------
 
-    def _published_blocks(self, blob: dict, norm_id: str) -> tuple[list[Block], list[Reform]]:
+    def _published_blocks(
+        self, blob: dict, norm_id: str, published_on: date | None = None
+    ) -> tuple[list[Block], list[Reform]]:
         entry = blob["versions"][0]
-        when = _parse_date(entry.get("date")) or date(1900, 1, 1)
+        # DRE writes 1900-01-01 where it has no date, and ``_parse_date`` already
+        # reads that as absent. What used to happen next was inventing the very
+        # sentinel that had just been rejected: the date became the Reform's, the
+        # Reform's became ``last_updated``, and three diplomas published as having
+        # been amended in 1900. The metadata pass has already resolved the real
+        # day out of DataDistribuicao, so use it — an as-published body has one
+        # version and that version is the publication.
+        when = _parse_date(entry.get("date")) or published_on
+        if when is None:
+            raise ValueError(
+                f"{norm_id}: neither the version nor the metadata carries a date, "
+                f"and a published date is not something to guess"
+            )
         pdf_url = blob.get("pdf_url", "")
         paragraphs = _parse_published_html(unpack(entry["html_b64"]), pdf_url)
         if not paragraphs:
@@ -683,11 +704,17 @@ class DREMetadataParser(MetadataParser):
         eli = (frag.get("ELI") or published.get("ELI") or "").strip()
         numero = (legis.get("Numero") or published.get("Numero") or "").strip()
         tipo_slug = bundle.get("tipo", "")
-        pub_date = (
-            _parse_date(published_date_of(published))
-            or _parse_date(published_date_of(legis))
-            or date(1900, 1, 1)
+        # ``published_date_of`` already walks DataPublicacao -> DataDistribuicao ->
+        # DataDisponibilizacao past DRE's sentinel, so reaching the end means the
+        # record genuinely carries no date. Publishing 1900-01-01 there put an
+        # invented value in a mandatory field and, through ``build_identifier``,
+        # into the diploma's name. Measured over the 164,278 published files: it
+        # never happened once, which is what makes refusing cheap.
+        pub_date = _parse_date(published_date_of(published)) or _parse_date(
+            published_date_of(legis)
         )
+        if pub_date is None:
+            raise ValueError(f"{norm_id}: DRE gives this diploma no publication date")
 
         acronimo = (
             published.get("TipoDiplomaAcronimo")

@@ -820,3 +820,43 @@ class TestPublicationDate:
         from legalize.fetcher.pt.client import published_date_of
 
         assert published_date_of({"DataPublicacao": "1900-01-01"}) == ""
+
+
+class TestUndatedVersion:
+    """DRE writes 1900-01-01 where it has no date, and the parser used to keep it.
+
+    Measured on the published corpus: three Declarações de Rectificação carried
+    ``last_updated: "1900-01-01"`` while their own ``publication_date`` was right,
+    because the version blob's date is the sentinel and the metadata pass had
+    already walked past it into DataDistribuicao. The reform took the sentinel,
+    and the reform's date is what becomes ``last_updated``.
+    """
+
+    def test_falls_back_to_the_publication_date(self):
+        from datetime import date
+
+        from legalize.fetcher.pt.parser import DRETextParser
+
+        blob = _pack_published("1900-01-01", "<p>Texto.</p>")
+        _, reforms = DRETextParser().parse_suvestine(
+            blob, "pub:x:1-2023-1", published_on=date(2023, 9, 29)
+        )
+        assert [r.date for r in reforms] == [date(2023, 9, 29)]
+
+    def test_a_real_version_date_still_wins(self):
+        from datetime import date
+
+        from legalize.fetcher.pt.parser import DRETextParser
+
+        blob = _pack_published("2023-01-15", "<p>Texto.</p>")
+        _, reforms = DRETextParser().parse_suvestine(
+            blob, "pub:x:1-2023-1", published_on=date(2023, 9, 29)
+        )
+        assert [r.date for r in reforms] == [date(2023, 1, 15)]
+
+    def test_no_date_anywhere_refuses_rather_than_inventing(self):
+        from legalize.fetcher.pt.parser import DRETextParser
+
+        blob = _pack_published("1900-01-01", "<p>Texto.</p>")
+        with pytest.raises(ValueError, match="not something to guess"):
+            DRETextParser().parse_suvestine(blob, "pub:x:1-2023-1")
