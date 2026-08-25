@@ -37,16 +37,17 @@ The local `countries/` directory may be empty. Do not assume repos or data dirs 
 
 The output format (filenames, frontmatter, commit messages, author/committer, trailers) is **locked**. Changing any of this requires regenerating ALL commits across every country repo. Do not "improve" it without explicit user approval.
 
-**Repository structure is defined by the Legalize Format Spec**, §Directory layout — read it there, in `hub/SPEC.md`, not here. A path is a template the repo declares in its own `.legalize.yml`. A placeholder is either a value the spec derives (`{directory}`, `{identifier}`, `{id_sha1_2}`) or a key of the law's own frontmatter, used verbatim — so a country can pick a shape the spec never anticipated. Two common shapes:
+**Repository structure is defined by the Legalize Format Spec**, §Directory layout — read it there, in `hub/SPEC.md`, not here. A path is a template the repo declares in its own `.legalize.yml`. A placeholder is either a value the spec derives (`{directory}`, `{identifier}`, `{id_sha1_2}`) or a key of the law's own frontmatter, used verbatim — so a country can pick a shape the spec never anticipated. The shapes:
 
 ```
-{directory}/{identifier}.md                 fr/LEGITEXT000006069414.md
-{directory}/{id_sha1_2}/{identifier}.md     pt/a1/DRE-DEC-16-2026.md
+{directory}/{identifier}.md              fr/LEGITEXT000006069414.md         every repo but pt
+{directory}/{year}/{identifier}.md       pt/2026/DRE-2026-1-1005948604.md   pt
+{directory}/{id_sha1_2}/{identifier}.md  xx/a1/XX-0001823.md                the spec default, unused so far
 ```
 
-`{directory}` is the law's `jurisdiction` when it has one and its `country` otherwise; `{id_sha1_2}` is the first two hex characters of `sha1(identifier)`, giving 256 buckets. Depth is the country's choice. A field used in a path should be one the source cannot revise: a path built from a correctable value moves the file when the value is corrected, and that rename enters the history as a change no legislature made.
+`{directory}` is the law's `jurisdiction` when it has one and its `country` otherwise; `{id_sha1_2}` is the first two hex characters of `sha1(identifier)`, giving 256 buckets. Portugal is the only sharded repo today and it shards by `year`, which is the point of an open vocabulary: `year` is not a value the spec derives, it is a field of the law's own frontmatter, so a country can shard by something legible without a spec change. Depth is the country's choice. A field used in a path should be one the source cannot revise: a path built from a correctable value moves the file when the value is corrected, and that rename enters the history as a change no legislature made.
 
-This repo's single implementation of that rule is `src/legalize/layout.py`, which builds the paths *and* writes the manifest from the same dict. A country's shape is one entry in its `LAYOUT`; absent means flat, which is what every repo built before spec v0.4 is. Sharding is recommended for every directory and it is what Portugal uses — but changing a country's entry rewrites every path in its repo, so it goes in with a full rebuild and never on its own.
+This repo's single implementation of that rule is `src/legalize/layout.py`, which builds the paths *and* writes the manifest from the same dict. A country's shape is one entry in its `LAYOUT`; absent means flat, which is what every repo built before spec v0.4 is. Sharding is recommended for every directory — but changing a country's entry rewrites every path in its repo, so it goes in with a full rebuild and never on its own.
 
 **Frontmatter (mandatory keys):**
 

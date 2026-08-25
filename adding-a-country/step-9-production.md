@@ -61,6 +61,61 @@ metadata (step 1), since it varies per source.
 
 ## 9.2 Run the full bootstrap
 
+### Rehearse on a subset first
+
+A bootstrap is hours. A rehearsal is seconds, and it fails for the same reasons.
+Commit a few hundred laws into a throwaway repo and look at what comes out before
+spending the afternoon on the other 170,000.
+
+This is not the 5-law sandbox of Step 7. That one judges the parser's prose, from
+rendered Markdown. This one judges the shape of the *repo* — layout, manifest,
+identifiers, health — none of which exists until the commit phase has run.
+
+`-o KEY=VALUE` overrides any config value, dotted, and is repeatable. Point the
+repo somewhere disposable and leave the data directory alone:
+
+```bash
+REHEARSAL=/tmp/xx-rehearsal
+rm -rf "$REHEARSAL"; git init -q "$REHEARSAL"
+git -C "$REHEARSAL" commit -q --allow-empty -m "[bootstrap] Init"
+git -C "$REHEARSAL" remote add origin git@github.com:legalize-dev/legalize-xx.git
+
+legalize -o countries.xx.repo_path=$REHEARSAL commit -c xx --all --limit 800
+legalize -o countries.xx.repo_path=$REHEARSAL health -c xx --deep
+```
+
+Measured on Portugal: 800 laws, 1,342 commits, 22 seconds.
+
+There is deliberately no copy of the fetch cache here. An earlier version of this
+section built one out of symlinks, and it was both slower and dangerous: a run
+writes into `{data_dir}` — `json/`, `country_meta.yaml`, and whatever else a
+country adds — and writing through a symlink destroys the real file on the other
+end. `commit` only reads `json/`, so pointing the repo away is enough.
+
+What to look at:
+
+```bash
+cat "$REHEARSAL/.legalize.yml"                 # manifest, with the template you meant
+find "$REHEARSAL" -name '*.md' | head          # a path that matches that template
+grep -rh '^identifier:' "$REHEARSAL" | head    # identifiers the shape you meant
+```
+
+Two things to know before reading the output:
+
+- **`--limit` makes `health` report orphans.** "N law(s) have data but never
+  reached the repo" is the limit doing its job, not a fault — the other laws have
+  JSON and no commit because you asked for 800. Everything else must be zero, and
+  `health` exits non-zero when it is not.
+- **A percentage measured here is not a corpus percentage.** `--limit` takes the
+  first N by filename, which is not a random sample. A subset proves a field is
+  emitted at all; it says nothing about how often.
+
+Pick the subset on purpose when the default ordering hides something. `--offset`
+walks to a different part of the corpus, and a country with more than one
+jurisdiction or fetch surface deserves a run that reaches each — the layout is per
+`{directory}`, so a rehearsal that only ever sees one directory has not rehearsed
+the layout.
+
 **Always run the first bootstrap locally, never via the `bootstrap.yml`
 CI workflow.** The CI bootstrap job is for incremental re-runs and
 recovery once the country is live. First runs are multi-hour operations
@@ -92,11 +147,18 @@ Watch `bootstrap-xx.log` for:
 ```bash
 legalize health -c xx                  # full scan
 legalize health -c xx --sample 500     # sampled scan for big repos
+legalize health -c xx --deep           # reads every file, not just its name
 ```
 
 `health` verifies: commit dates, empty files, remote configured, orphan files
-(files in repo with no entry in state), frontmatter validity. **Every issue
-reported must be zero before pushing.**
+(files in repo with no entry in state), frontmatter validity. `--deep` adds the
+check that matters most after a layout change: it fills in the template the
+manifest declares from each law's own frontmatter and compares it to where the
+file actually is. A repo that fails it serves every law's metadata and 404s every
+body — the hardest failure here to notice, because the pages look fine.
+
+**Every issue reported must be zero before pushing.** `health` exits non-zero when
+there are errors, so it can gate a script.
 
 ## 9.4 Push to origin
 
