@@ -29,13 +29,12 @@ import os
 import re
 import sys
 from collections import defaultdict
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, "src")
 
 from legalize.config import load_config  # noqa: E402
-from legalize.fetcher.pt.client import unpack  # noqa: E402
+from legalize.fetcher.pt.client import published_date_of, unpack  # noqa: E402
 from legalize.fetcher.pt.identifier import build_identifier  # noqa: E402
 
 _RDFA = re.compile(r'about="([^"]*)"\s+property="eli:(amended_by|amends)"\s+resource="([^"]*)"')
@@ -59,15 +58,26 @@ def _safe(norm_id: str) -> str:
     return norm_id.replace(":", "-").replace("/", "-")
 
 
-def _from_eli(uri: str) -> str | None:
-    """``…/eli/dec-lei/16/1994/…`` -> ``DRE-DEC-LEI-16-1994``."""
+def _eli_key(uri: str) -> str | None:
+    """``…/eli/dec-lei/16/1994/…`` -> ``DEC-LEI/16/1994``, a join key.
+
+    Not an identifier. An ELI names a diploma by type, number and year, and the
+    identifier is DRE's own name for the *document*, which carries a document id
+    an ELI does not have. This used to return something identifier-shaped, and
+    the shape was the bug: it looked like a name, so it was published as one.
+    Every reference the index carried was in a scheme the corpus had left —
+    150,102 of them, and nothing said so.
+
+    So it stays a key, and a key is only ever looked up in ``ident_by_eli``,
+    built from the ELI of each diploma the cache holds.
+    """
     match = _ELI_PATH.search(uri or "")
     if not match:
         return None
     kind, number, year = match.groups()
     kind = _UNSAFE.sub("-", kind.upper()).strip("-")
     number = _UNSAFE.sub("-", number.upper()).strip("-")
-    return f"DRE-{kind}-{number}-{year}"
+    return f"{kind}/{number}/{year}"
 
 
 def main() -> int:
@@ -86,6 +96,12 @@ def main() -> int:
     summary_of: dict[str, str] = {}
     amended: dict[str, set[str]] = defaultdict(set)
 
+    # DRE's relation triples, held as ELI keys until every diploma's identity is
+    # known. They name diplomas by ELI, and an ELI cannot be turned into an
+    # identifier on its own — it has to be looked up in the cache.
+    ident_by_eli: dict[str, str] = {}
+    rdfa: list[tuple[str, str, str]] = []
+
     for path in raw_dir.glob("*.meta.json.gz"):
         try:
             with gzip.open(path, "rt", encoding="utf-8") as handle:
@@ -93,39 +109,47 @@ def main() -> int:
         except Exception:
             continue
         published = bundle.get("published") or {}
-        when = (published.get("DataPublicacao") or "")[:10]
-        try:
-            year = date.fromisoformat(when).year
-        except ValueError:
-            year = 1900
-        ident = build_identifier(
-            (published.get("ELI") or "").strip(),
-            (published.get("Numero") or "").strip(),
-            bundle.get("tipo", ""),
-            year,
-            (published.get("TipoDiplomaAcronimo") or "").strip(),
-            str(published.get("Id") or ""),
-        )
+        # Through published_date_of, not off DataPublicacao: DRE writes its
+        # 1900-01-01 sentinel there and keeps the real day in DataDistribuicao.
+        when = published_date_of(published)[:10]
         link = (published.get("LinkSitemap") or "").strip()
+        try:
+            ident = build_identifier(link, str(published.get("Id") or ""), when[:4])
+        except ValueError:
+            # No page URL and no usable id: the diploma has no name, so it can
+            # neither be indexed nor referred to.
+            continue
         if link:
             ident_of[
                 link.rstrip("/").rsplit("/", 2)[-2] + "/" + link.rstrip("/").rsplit("/", 1)[-1]
             ] = ident
+        eli_key = _eli_key(published.get("ELI") or "")
+        if eli_key:
+            ident_by_eli[eli_key] = ident
         surface = "cons" if path.name.startswith("cons-") else "pub"
         ident_of_norm[f"{surface}:{bundle.get('tipo', '')}:{bundle.get('key', '')}"] = ident
         published_on[ident] = when
         summary_of[ident] = (published.get("Sumario") or published.get("Resumo") or "").replace(
             "\x00", ""
         )
-        # DRE's own relations, both directions
-        for about, prop, resource in _RDFA.findall(published.get("ELIMetadataHTML") or ""):
-            source, target = _from_eli(about), _from_eli(resource)
-            if not source or not target:
-                continue
-            if prop == "amended_by":
-                amended[source].add(target)
-            else:
-                amended[target].add(source)
+        rdfa.extend(_RDFA.findall(published.get("ELIMetadataHTML") or ""))
+
+    # -- pass 1a: resolve the relation triples now that every ELI is known -----
+    outside = 0
+    for about, prop, resource in rdfa:
+        source = ident_by_eli.get(_eli_key(about) or "")
+        target = ident_by_eli.get(_eli_key(resource) or "")
+        if not source or not target:
+            outside += 1
+            continue
+        if prop == "amended_by":
+            amended[source].add(target)
+        else:
+            amended[target].add(source)
+    print(
+        f"DRE RDFa: {len(rdfa)} relations, {outside} naming a diploma outside the cache",
+        flush=True,
+    )
 
     dre_only = {k: set(v) for k, v in amended.items()}
     print(f"{len(published_on)} diplomas cached · DRE names an amender for {len(amended)}")
