@@ -15,7 +15,7 @@ import os
 import re
 import subprocess
 from datetime import date as date_type
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from legalize.models import CommitInfo
 from legalize.committer.message import format_commit_message
@@ -82,6 +82,10 @@ class GitRepo:
         # finalize_daily turns them into errors: a law that cannot be published
         # has to make the run red, not just leave a line in the log.
         self.refused: list[str] = []
+        # Directories already visible in a sparse checkout. ``None`` until the
+        # first write asks, because a normal clone must not pay for a git call.
+        self._cones: set[str] | None = None
+        self._sparse = False
 
     def _run(self, args: list[str], env: dict | None = None, check: bool = True) -> str:
         """Runs a git command and returns stdout.
@@ -128,6 +132,7 @@ class GitRepo:
         Returns:
             True if the file changed compared to the last commit.
         """
+        self._ensure_visible(rel_path)
         file_path = self._path / rel_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -152,6 +157,31 @@ class GitRepo:
         file_path.write_text(content, encoding="utf-8")
         self._run(["add", rel_path])
         return True
+
+    def _ensure_visible(self, rel_path: str) -> None:
+        """Make ``rel_path``'s directory visible when the checkout is sparse.
+
+        CI clones a country repo sparsely: writing the 171,722 files of Portugal
+        into the runner's working tree took 48 of the job's 55 allowed minutes,
+        while the daily touches a handful of them. Outside the cone the file is
+        invisible to ``git add`` and — worse — absent from disk, so the
+        unchanged-content check below would read nothing and re-commit an
+        identical law every morning.
+
+        A full checkout has no sparse-checkout file and pays one ``git config``
+        call per run.
+        """
+        if self._cones is None:
+            sparse = self._run(["config", "--get", "core.sparseCheckout"], check=False)
+            self._sparse = sparse.strip().lower() == "true"
+            self._cones = set()
+        if not self._sparse:
+            return
+        directory = str(PurePosixPath(rel_path).parent)
+        if directory in (".", "") or directory in self._cones:
+            return
+        self._run(["sparse-checkout", "add", directory])
+        self._cones.add(directory)
 
     def commit(self, info: CommitInfo) -> str | None:
         """Creates a commit with the CommitInfo data.

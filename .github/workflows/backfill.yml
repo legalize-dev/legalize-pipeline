@@ -44,7 +44,13 @@ jobs:
           repository: legalize-dev/legalize-${{ inputs.country }}
           path: repos/${{ inputs.country }}
           token: ${{ steps.app-token.outputs.token }}
+          # Same clone as daily-update.yml, for the same reason: this runs the very
+          # same `legalize daily`, and a full checkout of a large country spends the
+          # job on writing files it will not read. See the note there.
           fetch-depth: 0
+          filter: tree:0
+          sparse-checkout: .github
+          sparse-checkout-cone-mode: true
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:

@@ -55,15 +55,25 @@ jobs:
           repository: legalize-dev/legalize-${{ matrix.country }}
           path: repos/${{ matrix.country }}
           token: ${{ steps.app-token.outputs.token }}
-          # Blobless partial clone: full commit graph (needed by
-          # infer_last_date_from_git's `git log --grep=Source-Date`) but no
-          # historical blobs. On a large repo (nl ≈ 2 GB of per-reform history)
-          # a full fetch-depth:0 checkout downloaded every past version and ate
-          # most of the job's time budget; blobless fetches only the current
-          # tree's blobs (+ any it needs on demand) and cuts checkout to minutes,
-          # leaving the window for actual processing. Harmless for small repos.
+          # Treeless partial clone with a root-only working tree. Measured on
+          # legalize-pt (302,335 commits, 171,722 files) against the real remote:
+          #
+          #   blob:none + full checkout   52 min   ← what this used to do
+          #   blob:none, no checkout       3 min   ← the history and its trees
+          #   tree:0,   no checkout         39 s   ← the history alone
+          #
+          # So the working tree was 48 of those 52 minutes, against a job budget
+          # of 55 and a pipeline that runs in seconds. The daily touches a handful
+          # of files, so it does not need the other 171,721 on disk: the committer
+          # opens each directory it writes to (`git sparse-checkout add`, ~6 s for
+          # a year of Portugal). What stays local and instant is the commit graph,
+          # which is what the run actually reads — `git log --grep=Source-Date` to
+          # resume, and the Source-Id/Norm-Id trailers to skip what is already
+          # published: 3.1 s over the whole history of Portugal.
           fetch-depth: 0
-          filter: blob:none
+          filter: tree:0
+          sparse-checkout: .github
+          sparse-checkout-cone-mode: true
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
