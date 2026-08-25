@@ -20,7 +20,7 @@ import pytest
 import requests
 
 from legalize.fetcher.pt.dre_api import (
-    DOCUMENTS_BY_JOURNAL,
+    DOCUMENTS_BY_DATE,
     JOURNALS_BY_DATE,
     PUBLISHED_DETAIL,
     DREApi,
@@ -68,7 +68,7 @@ def _client() -> DREApi:
     client._module_version = "9DeZ4j9NYEpfCiXfe3gDLw"
     client._endpoints = {
         name: (f"https://diariodarepublica.pt/dr/screenservices/{name}", "hash", "View.view")
-        for name in (JOURNALS_BY_DATE, PUBLISHED_DETAIL, DOCUMENTS_BY_JOURNAL)
+        for name in (JOURNALS_BY_DATE, PUBLISHED_DETAIL, DOCUMENTS_BY_DATE)
     }
     return client
 
@@ -381,3 +381,56 @@ class TestOutOfScopeRecords:
         }
         with patch.object(type(client), "_bundle", lambda self, _id: bundle):
             assert client.get_text("pub:acordao-doutrinario:1932-559253") == b""
+
+
+# ─────────────────────────────────────────────
+# The day's documents, after DRE moved the screen
+# ─────────────────────────────────────────────
+
+
+class TestDocumentsByDate:
+    """DRE stopped answering on ``Legislacao_Conteudos.Conteudo_Det_Diario`` on
+    2026-08-25 and moved the day's Série I list to a block on the home screen.
+    The daily discovers every new law through this one call, so a shape change
+    here is a corpus that silently stops growing — the failure that cost the run
+    of 2026-08-25, which went green having published nothing."""
+
+    def test_documents_come_out_of_the_issues_they_are_nested_in(self):
+        client = _client()
+        payload = {
+            "data": {
+                "DiarioByDiaList": {
+                    "List": [
+                        {
+                            "Numero": "163",
+                            "DiplomaLegiList": {
+                                "List": [
+                                    {"LinkSitemap": "/dr/detalhe/lei/57-2026-1161149390"},
+                                    {"LinkSitemap": "/dr/detalhe/portaria/373-2026-1161149391"},
+                                ]
+                            },
+                        },
+                        {"Numero": "163-A", "DiplomaLegiList": {"List": []}},
+                    ]
+                }
+            }
+        }
+        with patch.object(DREApi, "_request", return_value=_json_response(payload)):
+            documents = client.documents_by_date("2026-08-24")
+        assert [d["LinkSitemap"] for d in documents] == [
+            "/dr/detalhe/lei/57-2026-1161149390",
+            "/dr/detalhe/portaria/373-2026-1161149391",
+        ]
+
+    def test_a_quiet_day_is_an_empty_list_not_an_error(self):
+        client = _client()
+        payload = {"data": {"DiarioByDiaList": {"List": []}}}
+        with patch.object(DREApi, "_request", return_value=_json_response(payload)):
+            assert client.documents_by_date("2026-08-23") == []
+
+    def test_a_missing_list_is_a_broken_contract(self):
+        """Not an empty day: a day that cannot be read must not look quiet."""
+        client = _client()
+        with patch.object(DREApi, "_request", return_value=_json_response({"data": {}})):
+            with pytest.raises(DREApiError, match="DiarioByDiaList"):
+                client.documents_by_date("2026-08-24")

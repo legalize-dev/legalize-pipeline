@@ -49,6 +49,7 @@ _CSRF_PATTERNS = (
 # known name prefixes rather than one exact name.
 _SCREEN_JS = (
     f"{BASE}/scripts/dr.Home.home.mvc.js",
+    f"{BASE}/scripts/dr.Home.WB_Serie1_List.mvc.js",
     f"{BASE}/scripts/dr.AnaliseJuridica.AnaliseJuridica.mvc.js",
     f"{BASE}/scripts/dr.AnaliseJuridica.WB_AnaliseJuridica_Associacoes.mvc.js",
     f"{BASE}/scripts/dr.Legislacao_Conteudos.Conteudo_Det_Diario.mvc.js",
@@ -61,7 +62,7 @@ AJ_ASSOCIATIONS = "aj_associations"
 AJ_ELEMENT_TYPE = "aj_element_type"
 AJ_DATA = "aj_data"
 JOURNALS_BY_DATE = "journals_by_date"
-DOCUMENTS_BY_JOURNAL = "documents_by_journal"
+DOCUMENTS_BY_DATE = "documents_by_date"
 PUBLISHED_DETAIL = "published_detail"
 CONS_HEADER = "cons_header"
 CONS_SNAPSHOT = "cons_snapshot"
@@ -69,7 +70,6 @@ CONS_TIMELINE = "cons_timeline"
 
 _VIEW_AJ = "AnaliseJuridica.AnaliseJuridica"
 _VIEW_HOME = "Home.home"
-_VIEW_DIARIO = "Legislacao_Conteudos.Conteudo_Det_Diario"
 _VIEW_PUBLISHED = "Legislacao_Conteudos.Conteudo_Detalhe"
 _VIEW_CONSOLIDATED = "LegislacaoConsolidada.LegCons_Detalhe"
 
@@ -79,7 +79,7 @@ _ACTIONS: dict[str, tuple[tuple[str, ...], str]] = {
     AJ_ELEMENT_TYPE: (("DataActionGetElementTypeAndApplicationSettings",), _VIEW_AJ),
     AJ_DATA: (("DataActionGetData",), _VIEW_AJ),
     AJ_ASSOCIATIONS: (("DataActionFetchAssociacoes",), _VIEW_AJ),
-    DOCUMENTS_BY_JOURNAL: (("DataActionGetDadosAndApplicationSettings",), _VIEW_DIARIO),
+    DOCUMENTS_BY_DATE: (("DataActionGetDataAndApplicationSettings",), _VIEW_HOME),
     PUBLISHED_DETAIL: (
         ("DataActionGetConteudoData", "DataActionGetAllConteudoDetalhe"),
         _VIEW_PUBLISHED,
@@ -91,6 +91,10 @@ _ACTIONS: dict[str, tuple[tuple[str, ...], str]] = {
 
 # Actions whose name is ambiguous across screens must be resolved against one file.
 _SCREEN_OF: dict[str, str] = {
+    # Every screen with a "get the data" action declares one under a name this
+    # generic; resolving against the union would hand this one another screen's
+    # apiVersion, which DRE answers with "No role validation found".
+    DOCUMENTS_BY_DATE: f"{BASE}/scripts/dr.Home.WB_Serie1_List.mvc.js",
     CONS_SNAPSHOT: f"{BASE}/scripts/dr.LegislacaoConsolidada.LegCons_Detalhe.mvc.js",
     AJ_DATA: f"{BASE}/scripts/dr.AnaliseJuridica.AnaliseJuridica.mvc.js",
     AJ_ASSOCIATIONS: f"{BASE}/scripts/dr.AnaliseJuridica.WB_AnaliseJuridica_Associacoes.mvc.js",
@@ -450,45 +454,31 @@ class DREApi(HttpClient):
             f"keys: {sorted(data)}. DRE changed the response shape."
         )
 
-    def documents_by_journal(self, journal_id: int | str) -> list[dict]:
-        """Every document in one Série I issue."""
-        data = self.call(
-            DOCUMENTS_BY_JOURNAL,
-            {
-                "DetalheConteudo2": {"List": [], "EmptyListItem": {}},
-                "ParteIdAux": "0",
-                "IsFinished": False,
-                "DiplomaIds": {"List": [], "EmptyListItem": "0"},
-                "NumeroDeResultadosPorPagina": 2500,
-                "DiarioIdAux": journal_id,
-                "DiarioId": journal_id,
-                "_diarioIdInDataFetchStatus": 1,
-                "ParteId": "0",
-                "_parteIdInDataFetchStatus": 1,
-                "IsSerieI": True,
-                "_isSerieIInDataFetchStatus": 1,
-                "Diario_DetalheConteudo": {"Id": "", "Titulo": "", "DataPublicacao": ""},
-                "_diario_DetalheConteudoInDataFetchStatus": 1,
-            },
-        )
-        for key in ("DetalheConteudo", "DetalheConteudo2"):
-            container = data.get(key)
-            if isinstance(container, dict) and container.get("List"):
-                return container["List"]
-            if isinstance(container, list) and container:
-                return container
-        raw = data.get("Json_Out")
-        if isinstance(raw, str) and raw:
-            hits = (json.loads(raw).get("hits") or {}).get("hits") or []
-            return [h.get("_source") or {} for h in hits]
-        raise DREApiError(
-            f"{DOCUMENTS_BY_JOURNAL} for issue {journal_id} returned no readable list "
-            f"— keys: {sorted(data)}. An issue always has documents."
-        )
+    def documents_by_date(self, iso_date: str) -> list[dict]:
+        """Every Série I document published on one date, across that day's issues.
 
-    # ----------------------------------------------------- análise jurídica
+        This used to be two calls — the day's issues, then each issue's contents
+        off ``Legislacao_Conteudos.Conteudo_Det_Diario``. On 2026-08-25 that screen
+        stopped answering (``No role validation found``, DRE's way of saying the
+        action no longer belongs to the view it is posted under) and the site began
+        reading the same list from a block on the home screen, which takes the date
+        and nests the documents inside each issue. One call, and the day's issues
+        no longer have to be enumerated first.
+        """
+        data = self.call(DOCUMENTS_BY_DATE, {"DataSelecionada": iso_date})
+        issues = (data.get("DiarioByDiaList") or {}).get("List")
+        if issues is None:
+            # An empty list is a legitimate answer (Sundays, holidays); a missing
+            # one means the shape moved again and the day would look quiet.
+            raise DREApiError(
+                f"{DOCUMENTS_BY_DATE} for {iso_date} returned no DiarioByDiaList — "
+                f"keys: {sorted(data)}. DRE changed the response shape."
+            )
+        documents: list[dict] = []
+        for issue in issues:
+            documents.extend(((issue.get("DiplomaLegiList") or {}).get("List")) or [])
+        return documents
 
-    @staticmethod
     def _aj_vars(tipo: str, key: str, associacao: str = "informacoes-gerais") -> dict:
         """The AnaliseJuridica screen state.
 

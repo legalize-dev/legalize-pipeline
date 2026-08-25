@@ -247,11 +247,10 @@ class DREDiscovery(NormDiscovery):
                 continue
             refs: list[list[str]] = []
             try:
-                for journal in client._api.journals_by_date(iso):
-                    for doc in client._api.documents_by_journal(journal["Id"]):
-                        match = _DETALHE.search(doc.get("LinkSitemap") or "")
-                        if match and match.group(1) in IN_SCOPE_TYPES:
-                            refs.append([match.group(1), match.group(2)])
+                for doc in client._api.documents_by_date(iso):
+                    match = _DETALHE.search(doc.get("LinkSitemap") or "")
+                    if match and match.group(1) in IN_SCOPE_TYPES:
+                        refs.append([match.group(1), match.group(2)])
             except Exception:
                 logger.warning("Journal walk failed for %s", iso, exc_info=True)
                 current += timedelta(days=1)
@@ -301,8 +300,7 @@ class DREDiscovery(NormDiscovery):
     ) -> Iterator[str]:
         """Yield the in-scope documents published on one date."""
         assert isinstance(client, DREClient)
-        for journal in client._api.journals_by_date(target_date.isoformat()):
-            for doc in client._api.documents_by_journal(journal["Id"]):
-                match = _DETALHE.search(doc.get("LinkSitemap") or "")
-                if match and match.group(1) in IN_SCOPE_TYPES:
-                    yield f"{PUBLISHED}:{match.group(1)}:{match.group(2)}"
+        for doc in client._api.documents_by_date(target_date.isoformat()):
+            match = _DETALHE.search(doc.get("LinkSitemap") or "")
+            if match and match.group(1) in IN_SCOPE_TYPES:
+                yield f"{PUBLISHED}:{match.group(1)}:{match.group(2)}"
