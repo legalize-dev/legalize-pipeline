@@ -339,6 +339,38 @@ def _start_fresh(cc, country: str) -> None:
         commits = subprocess.run(
             ["git", "rev-list", "--count", "HEAD"], cwd=repo, capture_output=True, text=True
         ).stdout.strip()
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True
+        ).stdout.strip()
+
+        # Ask the remote whether it holds what is about to be deleted. Denmark's
+        # 45,400 laws went in an rm -rf of a repo that had never been pushed, and
+        # the only thing standing between this command and that is whoever
+        # remembers to check by hand. A document cannot check; this can.
+        if head and remote:
+            listed = subprocess.run(
+                ["git", "ls-remote", remote], capture_output=True, text=True, timeout=120
+            )
+            if listed.returncode != 0:
+                raise click.ClickException(
+                    f"--fresh: cannot reach {remote} to confirm it holds this history "
+                    f"({commits} commits). Refusing to delete what may be the only copy."
+                )
+            if head not in listed.stdout:
+                raise click.ClickException(
+                    f"--fresh: {remote} does not have {head[:12]}, the local HEAD. "
+                    f"Deleting {repo} would lose {commits} commit(s) that exist nowhere "
+                    f"else. Push first, or move the directory aside."
+                )
+            console.print(f"  [dim]remote has this history ({head[:12]}), safe to discard[/dim]")
+        elif head:
+            # No remote to ask. Nothing is verifiable, so say the number out loud
+            # rather than refuse: a rehearsal repo has no remote by design.
+            console.print(
+                f"[yellow]--fresh: {repo} has no remote — {commits} commit(s) exist "
+                f"only here and are about to go[/yellow]"
+            )
+
         console.print(f"[yellow]--fresh: discarding {repo} ({commits or 0} commits)[/yellow]")
         shutil.rmtree(repo)
 

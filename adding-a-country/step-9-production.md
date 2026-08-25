@@ -81,13 +81,21 @@ repo somewhere disposable and leave the data directory alone:
 REHEARSAL=/tmp/xx-rehearsal
 rm -rf "$REHEARSAL"; git init -q "$REHEARSAL"
 git -C "$REHEARSAL" commit -q --allow-empty -m "[bootstrap] Init"
-git -C "$REHEARSAL" remote add origin git@github.com:legalize-dev/legalize-xx.git
 
 legalize -o countries.xx.repo_path=$REHEARSAL commit -c xx --all --limit 800
 legalize -o countries.xx.repo_path=$REHEARSAL health -c xx --deep
 ```
 
 Measured on Portugal: 800 laws, 1,342 commits, 22 seconds.
+
+**No remote on the rehearsal repo.** It used to be given the country's real one,
+so that `--fresh` would have something to carry over — and that put the production
+URL on a throwaway directory in `/tmp`, one mistyped `-o` away from publishing 800
+rehearsal laws over a live corpus. Nothing in the rehearsal needs it: `--fresh`
+copies the remote as a string, and 9.4's re-emission runs against the real repo.
+Leave it without a remote entirely: `--fresh` now asks the remote whether it holds
+the history it is about to delete, so an invented URL makes it refuse rather than
+carry anything over.
 
 There is deliberately no copy of the fetch cache here. An earlier version of this
 section built one out of symlinks, and it was both slower and dangerous: a run
@@ -263,8 +271,12 @@ legalize bootstrap -c xx --fresh
 not a git repo, so a mistyped `repo_path` cannot delete something else. `raw/` is
 never touched — it is the only copy, and refetching it is the whole corpus again.
 
-The old local history is gone at this point, so make sure the remote still has it
-(`git ls-remote origin`) before running this: that is the copy you fall back to.
+The old local history is gone at this point, and the remote is the copy you fall
+back to — so `--fresh` asks it first. It runs `git ls-remote` and refuses if the
+remote does not carry the local HEAD, or cannot be reached to say. A repo with no
+remote at all cannot be checked, so it prints the commit count and continues:
+Denmark's 45,400 laws went in an `rm -rf` of a repo that had never been pushed,
+and a number on screen is what there was instead of a question.
 
 **2. Replace the remote branch, before the long push.**
 

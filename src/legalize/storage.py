@@ -294,7 +294,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
     Inverse of save_structured_json(). Falls back to "parrafo" css_class
     when not present in JSON (most norms use only parrafo).
     """
-    logger.info("Loading norm from %s", json_path)
+    # debug, not info: this sits in the commit phase's hot loop, and at
+    # Portugal's 302,333 reforms it wrote a 42 MB log in 25 minutes.
+    logger.debug("Loading norm from %s", json_path)
     with open(json_path, encoding="utf-8") as f:
         data = json.load(f)
 

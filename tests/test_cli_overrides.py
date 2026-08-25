@@ -189,8 +189,74 @@ class TestFresh:
         assert "not a git repo" in result.output
         assert (victim / "keep.txt").read_text() == "important"
 
+    @staticmethod
+    def _repo_with_remote(tmp_path, *, pushed: bool):
+        """A repo and a bare remote beside it, optionally holding the history."""
+        import subprocess
+
+        bare = tmp_path / "remote.git"
+        subprocess.run(["git", "init", "-q", "--bare", str(bare)], check=True)
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        for args in (
+            ["git", "init", "-q"],
+            [
+                "git",
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "-qm",
+                "old",
+                "--allow-empty",
+            ],
+            ["git", "remote", "add", "origin", str(bare)],
+        ):
+            subprocess.run(args, cwd=repo, check=True)
+        if pushed:
+            subprocess.run(
+                ["git", "push", "-q", "origin", "HEAD:refs/heads/main"], cwd=repo, check=True
+            )
+        (repo / "stale.md").write_text("a law that no longer exists\n")
+        return repo, bare
+
+    def _run(self, tmp_path, repo, monkeypatch):
+        monkeypatch.setattr("legalize.pipeline.generic_bootstrap", lambda *a, **k: 0)
+        return CliRunner().invoke(
+            cli, ["--config", str(self._cfg(tmp_path, repo)), "bootstrap", "-c", "pt", "--fresh"]
+        )
+
     def test_empties_the_repo_and_keeps_the_remote(self, tmp_path, monkeypatch):
         """The point of rebuilding a history is to push it."""
+        import subprocess
+
+        repo, bare = self._repo_with_remote(tmp_path, pushed=True)
+
+        result = self._run(tmp_path, repo, monkeypatch)
+        assert result.exit_code == 0, result.output
+        assert not (repo / "stale.md").exists()
+        remote = subprocess.run(
+            ["git", "remote", "get-url", "origin"], cwd=repo, capture_output=True, text=True
+        )
+        assert str(bare) in remote.stdout
+
+    def test_refuses_when_the_remote_does_not_have_the_history(self, tmp_path, monkeypatch):
+        """The commits are about to be deleted, and nowhere else has them.
+
+        Denmark's 45,400 laws went this way: a local repo that had never been
+        pushed, removed in the belief it had been. The remote is the one witness
+        that can be asked, so ask it.
+        """
+        repo, _ = self._repo_with_remote(tmp_path, pushed=False)
+
+        result = self._run(tmp_path, repo, monkeypatch)
+        assert result.exit_code != 0
+        assert "does not have" in result.output
+        assert (repo / "stale.md").exists(), "refused, so nothing may have been deleted"
+
+    def test_says_the_number_out_loud_when_there_is_no_remote(self, tmp_path, monkeypatch):
+        """A rehearsal repo has no remote by design, so warn rather than refuse."""
         import subprocess
 
         repo = tmp_path / "repo"
@@ -208,21 +274,12 @@ class TestFresh:
                 "old",
                 "--allow-empty",
             ],
-            ["git", "remote", "add", "origin", "git@github.com:legalize-dev/legalize-pt.git"],
         ):
             subprocess.run(args, cwd=repo, check=True)
-        (repo / "stale.md").write_text("a law that no longer exists\n")
 
-        monkeypatch.setattr("legalize.pipeline.generic_bootstrap", lambda *a, **k: 0)
-        result = CliRunner().invoke(
-            cli, ["--config", str(self._cfg(tmp_path, repo)), "bootstrap", "-c", "pt", "--fresh"]
-        )
+        result = self._run(tmp_path, repo, monkeypatch)
         assert result.exit_code == 0, result.output
-        assert not (repo / "stale.md").exists()
-        remote = subprocess.run(
-            ["git", "remote", "get-url", "origin"], cwd=repo, capture_output=True, text=True
-        )
-        assert "legalize-pt" in remote.stdout
+        assert "no remote" in result.output
 
 
 class TestCrossReferences:
