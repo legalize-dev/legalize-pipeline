@@ -26,7 +26,7 @@ def _commit(repo, path, text, subject, law_id, source_id=None, state=""):
     (repo / path).write_text(BODY.format(id=law_id, state=state, text=text, amend=amend))
     trailers = f"\n\nNorm-Id: {law_id}"
     if source_id:
-        trailers += f"\nDisposition: {source_id}"
+        trailers += f"\nDisposition: {source_id}\nSource-Id: {source_id}"
     subprocess.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True)
     subprocess.run(
         ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-m", subject + trailers],
@@ -122,3 +122,35 @@ def test_an_unknown_law_fails_rather_than_reporting_an_empty_history(repo, run):
     result = run("NOPE-1")
     assert result.exit_code == 1
     assert "NOPE-1" in result.output
+
+
+# ── The other direction: what did this act change? ──
+
+
+def test_an_act_lists_the_laws_it_amended(repo, run):
+    _commit(repo, "pt/A-1.md", "v1", "[bootstrap] A", "A-1")
+    _commit(repo, "pt/B-2.md", "v1", "[bootstrap] B", "B-2")
+    _commit(repo, "pt/A-1.md", "v1", "[reform] A", "A-1", "ACT-7")
+    _commit(repo, "pt/B-2.md", "v1", "[reform] B", "B-2", "ACT-7")
+
+    out = run("ACT-7").output
+    assert "Amends 2 law(s)" in out
+    assert "A-1" in out and "B-2" in out
+
+
+def test_an_act_outside_the_corpus_still_answers_for_what_it_changed(repo, run):
+    # A type a country leaves out of scope amends laws that are in scope. The
+    # act has no history of its own here, which is not the same as unknown.
+    _commit(repo, "pt/A-1.md", "v1", "[bootstrap] A", "A-1")
+    _commit(repo, "pt/A-1.md", "v1", "[reform] A", "A-1", "OUTSIDE-1")
+
+    out = run("OUTSIDE-1").output
+    assert "not published here" in out
+    assert "Amends 1 law(s)" in out
+
+
+def test_a_law_that_is_only_amended_reports_no_second_section(repo, run):
+    _commit(repo, "pt/A-1.md", "v1", "[bootstrap] A", "A-1")
+    _commit(repo, "pt/A-1.md", "v1", "[reform] A", "A-1", "ACT-7")
+
+    assert "Amends" not in run("A-1").output

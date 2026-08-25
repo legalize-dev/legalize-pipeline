@@ -1159,6 +1159,9 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
 # REFORMS
 # ─────────────────────────────────────────────
 
+# Enough to see what kind of act it is without burying the law's own history.
+_AMENDED_SHOWN = 10
+
 
 @cli.command()
 @_country_option()
@@ -1199,34 +1202,72 @@ def reforms(ctx: click.Context, country: str, law_id: str, diff: bool) -> None:
 
     # A trailer is a whole line, so the grep is anchored: `Norm-Id: ES-1` must
     # not also answer for `ES-10`.
+    #
+    # Both trailers in one walk, because an identifier plays two roles and only
+    # one of them was answerable. `Norm-Id` is the law being changed; `Source-Id`
+    # is the act doing the changing, and asking what an act did meant knowing the
+    # git incantation. Portugal's DRE-DEC-LEI-32-2018 repealed 1,425 diplomas at
+    # once and this command reported it as a law with one commit.
+    #
+    # One alternated walk rather than two greps: measured over 300,733 commits,
+    # 4.0 s against the 2.0 s a single trailer cost, where two walks cost 5.4 s.
+    # The record separator is NUL because a commit body is many lines and
+    # splitting the output by line would tear it.
     log = _git(
         "log",
-        f"--grep=^Norm-Id: {law_id}$",
+        f"--grep=^(Norm-Id|Source-Id): {law_id}$",
         "--extended-regexp",
-        "--format=%H|%ad|%s",
+        "--format=%x00%H|%ad|%s%n%b",
         "--date=short",
     )
-    if not log:
+
+    own: list[list[str]] = []
+    amended: list[tuple[str, str, str]] = []
+    for record in log.split("\0"):
+        if not record.strip():
+            continue
+        head, _, body = record.partition("\n")
+        sha, when, subject = head.split("|", 2)
+        trailer = {}
+        for line in body.splitlines():
+            key, sep, value = line.partition(":")
+            if sep:
+                trailer.setdefault(key, value.strip())
+        # A commit that names this id as its Norm-Id is this law's own history,
+        # whatever else it carries. Everything else matched on Source-Id, and
+        # there the commit's Norm-Id is the law this act changed.
+        if trailer.get("Norm-Id") == law_id:
+            own.append([sha, when, subject])
+        else:
+            amended.append((when, trailer.get("Norm-Id", "?"), subject))
+
+    if not own and not amended:
         console.print(f"  [yellow]No commits carry Norm-Id: {law_id}[/yellow]")
         raise SystemExit(1)
 
-    entries = [line.split("|", 2) for line in log.splitlines()]
-    path = _git("log", "-1", "--name-only", "--format=", entries[0][0])
     state = "point_in_time"
-    if path:
-        front = _read_frontmatter(repo / path.splitlines()[0])
-        state = (front or {}).get("text_state") or "point_in_time"
-
-    console.print(
-        f"\n[bold]{escape(law_id)}[/bold]  ·  {len(entries)} commit(s)  ·  {escape(str(state))}\n"
-    )
+    if own:
+        path = _git("log", "-1", "--name-only", "--format=", own[0][0])
+        if path:
+            front = _read_frontmatter(repo / path.splitlines()[0])
+            state = (front or {}).get("text_state") or "point_in_time"
+        console.print(
+            f"\n[bold]{escape(law_id)}[/bold]  ·  {len(own)} commit(s)  ·  {escape(str(state))}\n"
+        )
+    else:
+        # An act can change laws in this repo without being in it: a type the
+        # country leaves out of scope still amends the ones inside.
+        console.print(
+            f"\n[bold]{escape(law_id)}[/bold]  ·  not published here, but named as an "
+            f"amending act\n"
+        )
     if state == "as_enacted":
         console.print(
             "  [dim]The body is the act as published and does not change. Each commit\n"
             "  records an amendment; the amending act is a file of its own.[/dim]\n"
         )
 
-    for sha, when, subject in entries:
+    for sha, when, subject in own:
         body = _git("log", "-1", "--format=%b", sha)
         source = next(
             (
@@ -1250,6 +1291,24 @@ def reforms(ctx: click.Context, country: str, law_id: str, diff: bool) -> None:
                 stat = _git("show", "--stat", "--format=", sha)
                 for line in stat.splitlines():
                     console.print(f"              [dim]{escape(line.strip())}[/dim]")
+
+    # The other direction. Listed rather than counted, because "amends 1,425
+    # laws" and "amends these 1,425 laws" are different answers, but capped
+    # because a screen of them is not readable and the whole list is one grep
+    # away — which is printed rather than described.
+    if amended:
+        # No date column: every row carries the amending act's own date, so it is
+        # the same value 1,425 times. No "[reform]" either — they all are one.
+        console.print(f"\n  [bold]Amends {len(amended)} law(s) in this repo[/bold]\n")
+        for _when, norm_id, subject in amended[:_AMENDED_SHOWN]:
+            title = subject.split("] ", 1)[-1]
+            console.print(f"  {escape(norm_id):<26}  {escape(title[:66])}")
+        if len(amended) > _AMENDED_SHOWN:
+            console.print(f"  [dim]… and {len(amended) - _AMENDED_SHOWN} more[/dim]")
+            console.print(
+                f'  [dim]git log --grep="^Source-Id: {escape(law_id)}$" -E --format=%b'
+                f" | grep ^Norm-Id:[/dim]"
+            )
 
     console.print()
 
