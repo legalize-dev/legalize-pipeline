@@ -68,9 +68,19 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
     if metadata.subjects:
         subj_yaml = ", ".join(f'"{_escape_yaml(s)}"' for s in metadata.subjects)
         lines.append(f"subjects: [{subj_yaml}]")
+    if metadata.summary:
+        lines.append(f'summary: "{_escape_yaml(metadata.summary)}"')
 
+    # A country field must not shadow one already written above: two lines with
+    # the same key is invalid YAML in strict parsers and last-one-wins in the
+    # lenient ones, so the file would either fail to load or load a value the
+    # pipeline never chose.
+    written = {line.split(":", 1)[0] for line in lines[1:]}
     for key, value in metadata.extra:
+        if key in written:
+            continue
         lines.append(f'{key}: "{_escape_yaml(value)}"')
+        written.add(key)
 
     lines.append("---")
     lines.append("")
@@ -79,8 +89,20 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
 
 
 def _escape_yaml(text: str) -> str:
-    """Escapes special characters for YAML double-quoted strings."""
-    return text.replace("\\", "\\\\").replace('"', '\\"')
+    """Escapes special characters for YAML double-quoted strings.
+
+    Line breaks and tabs are escaped rather than passed through: a raw newline
+    inside a double-quoted scalar ends the value and turns the rest of the
+    frontmatter into garbage. Sources put them in titles and summaries.
+    """
+    return (
+        text.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\r\n", "\\n")
+        .replace("\n", "\\n")
+        .replace("\r", "\\n")
+        .replace("\t", "\\t")
+    )
 
 
 def _clean_title(raw_title: str) -> str:

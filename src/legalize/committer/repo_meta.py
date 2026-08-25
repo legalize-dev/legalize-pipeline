@@ -1,8 +1,8 @@
 """Repo-level meta files committed to each country repo.
 
 These are NOT law files and are NOT part of the legislative record. They are
-project metadata (funding config, README, and LICENSE). They are committed as a
-standalone meta commit which the reform-history
+project metadata (the spec manifest, funding config, README, and LICENSE). They
+are committed as a standalone meta commit which the reform-history
 sync ignores, because they carry no ``Source-Date`` trailer (see
 ``state/store.py``).
 """
@@ -29,8 +29,11 @@ def repo_meta_files(country: str) -> dict[str, str]:
     from legalize.committer.license import render_license
     from legalize.committer.readme import render_readme
     from legalize.country_meta import COUNTRY_META
+    from legalize.layout import manifest
 
-    files = {".github/FUNDING.yml": FUNDING_YML}
+    # The manifest comes from the same LAYOUT the paths do, so it cannot
+    # describe a shape this repo was not written in (spec v0.4, §Conformance).
+    files = {".legalize.yml": manifest(country), ".github/FUNDING.yml": FUNDING_YML}
 
     meta = COUNTRY_META.get(country)
     if meta is not None:

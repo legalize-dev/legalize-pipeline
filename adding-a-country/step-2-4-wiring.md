@@ -103,10 +103,19 @@ This is the last cheap moment to choose. The layout is not in any public URL, so
 changing it breaks nothing a consumer has published — but it rewrites every path in the
 repo, which means a full rebuild rather than an edit. Decide before Step 9, not after.
 
-> **Not implemented yet.** `norm_to_filepath()` emits flat for every country today, and
-> nothing writes `.legalize.yml`. Until that lands, record the decision in
-> `RESEARCH-{CC}.md` and ship flat. Delete this note when the engine reads a per-country
-> layout.
+Declare it in one place — `layout.py::LAYOUT`, the same shape as `TEXT_STATE`:
+
+```python
+LAYOUT: dict[str, str] = {
+    "xx": SHARDED,   # absent means FLAT
+}
+```
+
+That entry is the whole switch. `norm_to_filepath()` builds every path from it and
+`.legalize.yml` is generated from the same dict, so the manifest cannot promise a shape
+the repo was not written in. Add the entry in the same PR that registers the fetcher, and
+never to a country whose repo has already been built flat — that is a rebuild, not an
+edit.
 
 
 ---
