@@ -266,12 +266,11 @@ def _commit_versions(config, repo, client, norm_id: str, fetch_one) -> int:
         return 0
     metadata = DREMetadataParser().parse(client.get_metadata(norm_id), norm_id)
     file_path = norm_to_filepath(metadata)
-    known = repo.load_existing_commits()
     created = 0
 
     for index, reform in enumerate(norm.reforms):
         # One reform can affect many norms, so the dedupe key is the pair.
-        if (reform.norm_id, metadata.identifier) in known:
+        if repo.has_commit_with_source_id(reform.norm_id, metadata.identifier):
             continue
         markdown = render_norm_at_date(metadata, norm.blocks, reform.date, include_all=index == 0)
         if not repo.write_and_add(file_path, markdown):

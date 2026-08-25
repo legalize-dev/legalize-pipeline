@@ -54,6 +54,49 @@ The client logged `Could not extract apiVersion`, kept POSTing to the old URLs,
 got HTML back, and the daily still exited 0. Verified live 2026-08-20: the
 first two endpoints work again with the renamed actions.
 
+## The August 2026 move: the day's Diário changed screens
+
+Between 2026-08-25 10:24 UTC (a green run) and that evening, this call started
+failing:
+
+```
+documents_by_journal raised System.InvalidOperationException: No role validation found
+```
+
+That message is OutSystems saying *this action does not belong to the view you
+posted it under* — not a rename, not a bad token, not an IP being blocked (the
+same error came from two networks and from the GitHub runner). The old screen,
+`Legislacao_Conteudos.Conteudo_Det_Diario`, still serves its JS and still
+declares `DataActionGetDadosAndApplicationSettings`, so endpoint discovery
+resolved it happily. Only the call fails.
+
+The site now reads the day's Série I from a block on the home screen:
+
+| | before | after |
+|---|---|---|
+| screen | `Legislacao_Conteudos.Conteudo_Det_Diario` | `Home.WB_Serie1_List` |
+| action | `DataActionGetDadosAndApplicationSettings` | `DataActionGetDataAndApplicationSettings` |
+| viewName | `Legislacao_Conteudos.Conteudo_Det_Diario` | `Home.home` |
+| input | `DiarioId` (one issue) | `DataSelecionada` (a date) |
+| output | `DetalheConteudo.List` | `DiarioByDiaList.List[].DiplomaLegiList.List` |
+
+It takes the date and nests each issue's documents inside it, so the two calls
+the fetcher used to make — the day's issues, then each issue's contents —
+collapse into one. `LinkSitemap` is still on every document, which is the only
+field discovery reads.
+
+### How it was found
+
+Loading the home page in a browser and reading the network panel: among the
+POSTs to `/dr/screenservices/…` there was `Home/WB_Serie1_List/DataActionGet…`,
+which no screen JS in `_SCREEN_JS` covered. The input name came from posting
+the action with an empty `variables` — it answers `200` with an empty
+`DiarioByDiaList` rather than an error — and then trying candidate names until
+one returned a non-empty list. `DataSelecionada` was the fifth guess.
+
+Verified live on 2026-08-24's issue (Série I nº 163): five documents, two leis
+and three portarias, each with the `LinkSitemap` the corpus is keyed on.
+
 ## The detail screen is URL-driven
 
 `DataActionGetAllConteudoDetalheData` does **not** take a document id. The old

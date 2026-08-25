@@ -227,11 +227,17 @@ class GitRepo:
 
         return sha
 
-    def load_existing_commits(self) -> None:
-        """Loads all existing Source-Id+Norm-Id pairs into memory.
+    def load_existing_commits(self) -> set[tuple[str, str]]:
+        """Loads all existing Source-Id+Norm-Id pairs into memory, and returns them.
 
         A single git log at startup, then lookups are O(1).
         Uses git's native trailer parsing for efficiency.
+
+        It returns the set as well as storing it because it read as a getter to
+        the one caller that did not use :meth:`has_commit_with_source_id`, which
+        got ``None`` and asked whether a pair was ``in`` it — a TypeError, caught
+        by a broad ``except`` and logged as "Error recording amendment on …" once
+        per law, on the path that records what an act changed.
         """
         self._existing_commits: set[tuple[str, str]] = set()
         try:
@@ -245,7 +251,7 @@ class GitRepo:
                 check=False,
             )
             if not output.strip():
-                return
+                return self._existing_commits
 
             for entry in output.split("\0"):
                 entry = entry.strip()
@@ -258,6 +264,7 @@ class GitRepo:
             logger.debug("Loaded %d existing commits", len(self._existing_commits))
         except subprocess.CalledProcessError:
             logger.warning("Could not load existing commits", exc_info=True)
+        return self._existing_commits
 
     def has_commit_with_source_id(self, source_id: str, norm_id: str | None = None) -> bool:
         """Checks whether a commit with this Source-Id + Norm-Id already exists."""

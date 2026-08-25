@@ -99,3 +99,38 @@ def test_a_clean_run_does_not_raise(tmp_path):
 
     state = StateStore(tmp_path / "state.json")
     assert finalize_daily(repo, state, [], 1, [], dry_run=True) == 1
+
+
+def test_the_commit_index_is_returned_not_just_stored(tmp_path):
+    """``load_existing_commits`` reads as a getter, so it has to behave like one.
+
+    It returned None while storing the pairs on the instance. The one caller that
+    asked ``if pair in repo.load_existing_commits()`` — the path that records what
+    an act changed — raised TypeError into a broad except and logged "Error
+    recording amendment on …" once per law. The daily stayed green: the laws of
+    the day were committed, the reforms of the laws they amended were not.
+    """
+    from datetime import date as _date
+
+    from legalize.models import CommitInfo, CommitType
+
+    repo = _repo(tmp_path)
+    assert repo.load_existing_commits() == set()
+
+    target = "pt/DRE-PORT-953-2008.md"
+    repo.write_and_add(target, FIRST)
+    repo.commit(
+        CommitInfo(
+            commit_type=CommitType.REFORM,
+            subject="[reform] Concessiona a zona de caça",
+            body="",
+            trailers={"Source-Id": "DRE-SRC-1", "Norm-Id": "DRE-PORT-953-2008"},
+            author_name="Legalize",
+            author_email="bot@legalize.dev",
+            author_date=_date(2008, 8, 25),
+            file_path=target,
+            content=FIRST,
+        )
+    )
+    assert ("DRE-SRC-1", "DRE-PORT-953-2008") in repo.load_existing_commits()
+    assert repo.has_commit_with_source_id("DRE-SRC-1", "DRE-PORT-953-2008")
