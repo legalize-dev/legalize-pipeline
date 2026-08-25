@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Build the map of which diploma amends which, for last_amendment (spec v0.3).
 
 Portugal needs this because DRE only consolidates 5,561 diplomas. For the other
@@ -16,26 +15,22 @@ Two sources, and neither is enough alone:
 
 The overlap is 713, so the union — 9,605 laws — is nearly three times either one.
 
-    python3 scripts/pt_amendments.py            # build it
-    python3 scripts/pt_amendments.py --report   # coverage only
+Built by ``bootstrap`` before the corpus is parsed, because the parse consumes
+it: an as-enacted file that cannot name the act that changed it is a silent 1994
+text presented as current law.
 """
 
 from __future__ import annotations
 
-import argparse
 import gzip
 import json
-import os
 import re
-import sys
 from collections import defaultdict
 from pathlib import Path
 
-sys.path.insert(0, "src")
-
-from legalize.config import load_config  # noqa: E402
-from legalize.fetcher.pt.client import published_date_of, unpack  # noqa: E402
-from legalize.fetcher.pt.identifier import build_identifier  # noqa: E402
+from legalize.config import Config
+from legalize.fetcher.pt.client import published_date_of, unpack
+from legalize.fetcher.pt.identifier import build_identifier
 
 _RDFA = re.compile(r'about="([^"]*)"\s+property="eli:(amended_by|amends)"\s+resource="([^"]*)"')
 _ELI_PATH = re.compile(r"/eli/([^/]+)/([^/]+)/(\d{4})")
@@ -80,12 +75,11 @@ def _eli_key(uri: str) -> str | None:
     return f"{kind}/{number}/{year}"
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--report", action="store_true")
-    args = ap.parse_args()
+def build_index(config: Config, report: bool = False) -> Path | None:
+    """Write ``{data_dir}/amendments.json``. ``report`` measures without writing.
 
-    config = load_config(os.environ.get("CONFIG", "config.yaml"))
+    Returns the file it wrote, or None in report mode.
+    """
     data_dir = Path(config.get_country("pt").data_dir)
     raw_dir = data_dir / "raw"
 
@@ -227,8 +221,8 @@ def main() -> int:
         f"laws with a known amender: {len(amended)} "
         f"(DRE {len(dre_only)}, only from the acts {inferred_only})"
     )
-    if args.report:
-        return 0
+    if report:
+        return None
 
     # -- write ------------------------------------------------------------------
     # Keyed by the amended law's *norm id*, because the text parser is what consumes
@@ -277,8 +271,4 @@ def main() -> int:
         f"wrote {target} — {len(out)} as-published laws, "
         f"{sum(len(v) for v in out.values())} amendments"
     )
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+    return target

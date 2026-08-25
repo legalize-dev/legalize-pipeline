@@ -308,6 +308,11 @@ def _commit_in_batches(
 @click.option("--legi-dir", default=None, help="France only: path to extracted LEGI dump.")
 @click.option("--xml", "xml_path", default=None, help="Path to local XML (pilot, ES only).")
 @click.option("--limit", default=None, type=int, help="Process only the first N norms.")
+@click.option(
+    "--fresh",
+    is_flag=True,
+    help="Delete data/json/ first. Needed when the identifier rule changed.",
+)
 @click.option("--dry-run", is_flag=True, help="Simulate without creating commits.")
 @click.pass_context
 def bootstrap(
@@ -318,6 +323,7 @@ def bootstrap(
     legi_dir: str | None,
     xml_path: str | None,
     limit: int | None,
+    fresh: bool,
     dry_run: bool,
 ) -> None:
     """Fetch + commit all norms for a country.
@@ -325,6 +331,7 @@ def bootstrap(
     Examples:
         legalize bootstrap -c ar                    # Argentina (32K norms)
         legalize bootstrap -c ar --limit 50         # Quick test
+        legalize bootstrap -c pt --fresh            # Identifier rule changed
         legalize bootstrap -c fr --legi-dir /path   # France
     """
     from legalize.pipeline import generic_bootstrap
@@ -339,6 +346,21 @@ def bootstrap(
     if legi_dir:
         cc = config.get_country(country)
         cc.source["legi_dir"] = legi_dir
+
+    if fresh:
+        # json/ is named by identifier and carries it inside. When the rule
+        # changes, a stale file is not overwritten by the new run — it is left
+        # behind, and the commit phase reads the directory rather than the id
+        # list, so every one of them ships as a law that no longer exists.
+        # raw/ is the source of truth and is never touched here.
+        import shutil
+        from pathlib import Path
+
+        json_dir = Path(config.get_country(country).data_dir) / "json"
+        stale = sum(1 for _ in json_dir.glob("*.json")) if json_dir.exists() else 0
+        console.print(f"[yellow]--fresh: removing {stale} file(s) from {json_dir}[/yellow]")
+        shutil.rmtree(json_dir, ignore_errors=True)
+        json_dir.mkdir(parents=True, exist_ok=True)
 
     # Special case: bootstrap from local XML (ES pilot/tests)
     if xml_path and country == "es":

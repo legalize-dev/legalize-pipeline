@@ -399,6 +399,43 @@ def generic_fetch_one(
             return None
 
 
+def discover_norm_ids(
+    config: Config,
+    country: str,
+    limit: int | None = None,
+    offset: int = 0,
+    rediscover: bool = False,
+) -> list[str]:
+    """Every norm id a country's discovery yields, cached to disk.
+
+    Separate from the fetching so that a country whose surfaces must be fetched
+    in a particular order can ask for the list and fetch it in phases, without
+    a second copy of the cache handling. Portugal does; see
+    ``fetcher/pt/bootstrap.py``.
+    """
+    from legalize.countries import get_client_class, get_discovery_class
+
+    cc = config.get_country(country)
+    cache = Path(cc.data_dir) / "discovery_ids.txt"
+
+    if cache.exists() and not rediscover:
+        norm_ids = [line.strip() for line in cache.read_text().splitlines() if line.strip()]
+        console.print(f"[dim]Loaded {len(norm_ids)} IDs from discovery cache[/dim]")
+    else:
+        with get_client_class(country).create(cc) as client:
+            discovery = get_discovery_class(country).create({**cc.source, "cache_dir": cc.data_dir})
+            norm_ids = list(discovery.discover_all(client))
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_text("\n".join(norm_ids) + "\n")
+        console.print(f"[dim]Saved {len(norm_ids)} IDs to discovery cache[/dim]")
+
+    if offset:
+        norm_ids = norm_ids[offset:]
+    if limit:
+        norm_ids = norm_ids[:limit]
+    return norm_ids
+
+
 def generic_fetch_all(
     config: Config,
     country: str,
@@ -414,33 +451,8 @@ def generic_fetch_all(
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    from legalize.countries import get_client_class, get_discovery_class
-
     cc = config.get_country(country)
-    client_cls = get_client_class(country)
-    discovery_cls = get_discovery_class(country)
-
-    # Discover all norm IDs — cache to disk so restarts skip rediscovery
-    source_with_cache = {**cc.source, "cache_dir": cc.data_dir}
-    discovery_cache = Path(cc.data_dir) / "discovery_ids.txt"
-
-    if discovery_cache.exists() and not force:
-        norm_ids = [
-            line.strip() for line in discovery_cache.read_text().splitlines() if line.strip()
-        ]
-        console.print(f"[dim]Loaded {len(norm_ids)} IDs from discovery cache[/dim]")
-    else:
-        with client_cls.create(cc) as client:
-            discovery = discovery_cls.create(source_with_cache)
-            norm_ids = list(discovery.discover_all(client))
-        discovery_cache.parent.mkdir(parents=True, exist_ok=True)
-        discovery_cache.write_text("\n".join(norm_ids) + "\n")
-        console.print(f"[dim]Saved {len(norm_ids)} IDs to discovery cache[/dim]")
-
-    if offset:
-        norm_ids = norm_ids[offset:]
-    if limit:
-        norm_ids = norm_ids[:limit]
+    norm_ids = discover_norm_ids(config, country, limit=limit, offset=offset, rediscover=force)
 
     console.print(f"[bold]Fetch — {len(norm_ids)} norms for {country.upper()}[/bold]")
     if offset:

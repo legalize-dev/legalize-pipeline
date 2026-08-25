@@ -268,16 +268,24 @@ class DREDiscovery(NormDiscovery):
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
         """Yield every norm id worth fetching, consolidated first.
 
-        A diploma DRE consolidates is yielded only as ``cons:`` — the consolidated
-        surface carries the same document plus its history, so emitting both would
-        write two files for one law.
+        Both surfaces are yielded, including for the 5,561 diplomas that appear
+        on both. They cannot be deduplicated here: the two surfaces give a
+        diploma two different DRE ids, so there is nothing in a norm id to match
+        on. Measured over the real lists — 5,561 consolidated keys against
+        198,270 as-published — the two sets do not intersect at all.
+
+        This used to collect ``cons_keys`` to filter with and never read it,
+        which read as a solved problem. What actually resolves the overlap is
+        the identifier both surfaces build from the document's own page URL, and
+        the order they are fetched in: ``fetcher/pt/bootstrap.py`` fetches the
+        as-published side first and the consolidated side last, so the version
+        history wins. Order is the mechanism; do not add a filter here without
+        reading that module first.
         """
         assert isinstance(client, DREClient)
 
-        cons_keys: set[str] = set()
         count = 0
         for norm_id in self.consolidated_ids(client):
-            cons_keys.add(norm_id.split(":", 2)[2])
             count += 1
             yield norm_id
         logger.info("Discovery: %d consolidated diplomas", count)
