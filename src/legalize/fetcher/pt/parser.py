@@ -695,10 +695,8 @@ class DREMetadataParser(MetadataParser):
             or ""
         ).strip()
         dre_id = str(published.get("Id") or legis.get("Id") or "").strip()
-        serie = serie_of(published, legis)
-        identifier = build_identifier(
-            eli, numero, tipo_slug, pub_date.year, acronimo, dre_id, serie
-        )
+        link = (published.get("LinkSitemap") or legis.get("LinkSitemap") or "").strip()
+        identifier = build_identifier(link, dre_id, pub_date.year)
         emissor = (published.get("Emissor") or legis.get("Emissor") or "").strip()
         jurisdiction = jurisdiction_from_eli(eli, numero, emissor)
 
@@ -710,7 +708,19 @@ class DREMetadataParser(MetadataParser):
         ).title()
         citation = f"{tipo_display} n.º {numero}" if numero else tipo_display
         designacao = " ".join((frag.get("Designacao") or "").split())
-        sumario = " ".join((published.get("Sumario") or legis.get("Sumario") or "").split())
+        # ``Resumo`` is the same thing under another name, and DRE fills one or the
+        # other: measured over 6,000 records, Sumario covers 80.1 % and Resumo
+        # 12.9 %, and they overlap on 70. Reading both takes summary coverage to
+        # 91.9 % — 11.8 % of the corpus has no other prose description at all.
+        sumario = " ".join(
+            (
+                published.get("Sumario")
+                or legis.get("Sumario")
+                or published.get("Resumo")
+                or legis.get("Resumo")
+                or ""
+            ).split()
+        )
         descriptive = designacao or sumario
         title = f"{citation} — {_cut(descriptive, 120)}" if descriptive else citation
         short_title = _cut(descriptive, 80) or citation
@@ -732,7 +742,13 @@ class DREMetadataParser(MetadataParser):
         add("eli", eli)
         add("eli_type", (eli_meta.get("type_document") or "").rsplit("/", 1)[-1])
         add("surface", bundle.get("surface"))
-        add("series", published.get("Serie"))
+        add("series", serie_of(published, legis))
+        # The repo shards by year, so the value the path is built from lives in
+        # the file. It is read off the identifier and not off publication_date:
+        # an identifier is stable within a major version of the spec, while a
+        # date can be corrected — and a corrected date would move the file and
+        # put a rename in the history that no legislature made.
+        add("year", identifier.split("-")[1])
         add("part", published.get("Parte"))
         # Suplemento is 0 % filled even for diplomas that are in one; the only
         # place it appears is the Publicacao string.

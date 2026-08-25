@@ -219,6 +219,7 @@ class TestAmendmentPropagation:
                         "Numero": "37/94",
                         "TipoDiplomaAcronimo": "lei",
                         "DataPublicacao": "1994-11-11",
+                        "LinkSitemap": "/dr/detalhe/lei/37-1994-533820",
                     },
                 },
                 fh,
@@ -249,11 +250,11 @@ class TestAmendmentPropagation:
             assert changed == {"pub:decreto-lei:16-1994-512030"}
             index = _json.loads((tmp_path / "amendments.json").read_text())
             assert index["pub:decreto-lei:16-1994-512030"] == [
-                ["1994-11-11", "DRE-LEI-37-1994", "Alterados os arts. 5.º, 9.º"]
+                ["1994-11-11", "DRE-1994-37-533820", "Alterados os arts. 5.º, 9.º"]
             ]
             # and it is live in the parser, not just on disk
             assert pt_parser._AMENDMENTS["pub:decreto-lei:16-1994-512030"][0][1] == (
-                "DRE-LEI-37-1994"
+                "DRE-1994-37-533820"
             )
         finally:
             pt_parser.set_amendments({})

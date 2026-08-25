@@ -106,28 +106,36 @@ def test_every_declared_layout_is_resolvable():
         assert placeholders_of(template)
 
 
-# Real identifiers, one per directory of the built repo, with the bucket their
-# own sha1 gives them. Portugal is the country the sharding rule was written for
-# and the only one declared, so this is what stops a rebuild from silently
-# emitting the flat shape the repo has today.
+# Real identifiers, one per directory of the repo, under the scheme Portugal is
+# rebuilt with: DRE's own name for the document, year first. Portugal is the
+# country the year layout was chosen for and the only one declared, so this is
+# what stops a rebuild from silently emitting a shape the manifest does not
+# promise.
 PT_LAWS = [
-    ("pt", "DRE-DEC-16-2026", "a1"),
-    ("pt-20", "DRE-DEC-1976-408958", "a2"),
-    ("pt-30", "DRE-DEC-1976-407159", "6a"),
+    ("pt", "DRE-2026-16-901234567", "2026"),
+    ("pt-20", "DRE-1976-408958", "1976"),
+    ("pt-30", "DRE-1983-31-297783", "1983"),
 ]
 
 
-@pytest.mark.parametrize("directory,identifier,bucket", PT_LAWS)
-def test_portugal_is_sharded(directory, identifier, bucket):
+@pytest.mark.parametrize("directory,identifier,year", PT_LAWS)
+def test_portugal_shards_by_year(directory, identifier, year):
     jurisdiction = None if directory == "pt" else directory
-    meta = _meta(identifier, "pt", jurisdiction)
-    assert norm_to_filepath(meta) == f"{directory}/{bucket}/{identifier}.md"
+    meta = _meta(identifier, "pt", jurisdiction, extra=(("year", year),))
+    assert norm_to_filepath(meta) == f"{directory}/{year}/{identifier}.md"
 
 
-def test_portugals_manifest_says_sharded():
+def test_portugals_manifest_declares_the_year_layout():
     """What a consumer reads to rebuild the path. If it and the paths above ever
     disagree, every law's metadata resolves and every body 404s."""
-    assert yaml.safe_load(manifest("pt"))["layout"][0]["path"] == SHARDED
+    assert yaml.safe_load(manifest("pt"))["layout"][0]["path"] == layout_for("pt")
+
+
+def test_a_portuguese_law_without_the_year_field_is_refused():
+    """The path is built from a field, so the field has to be there. Refusing is
+    the point: a guessed path 404s a law that exists."""
+    with pytest.raises(TemplateError, match="year"):
+        norm_to_filepath(_meta("DRE-2026-16-901234567", "pt"))
 
 
 def _meta(identifier: str, country: str, jurisdiction: str | None = None, **kw) -> NormMetadata:

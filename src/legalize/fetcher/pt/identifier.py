@@ -1,25 +1,37 @@
-"""ELI-derived identifiers and jurisdictions for Portuguese diplomas.
+"""Identifiers and jurisdictions for Portuguese diplomas.
 
-Portugal publishes an ELI (European Legislation Identifier) for essentially every
-diploma, and it is the only stable, official, machine-readable name each law has::
+DRE names every document it publishes, in the URL of that document's own page::
 
-    https://data.dre.pt/eli/dec-lei/47344/1966/p/cons/20260623/pt/html
-    https://data.dre.pt/eli/lei/29/2026/06/23/p/dre/pt/html
-    https://data.dre.pt/eli/declegreg/2/2025/07/02/m/dre/pt/html
-                          ^type   ^num ^year      ^jurisdiction
+    https://diariodarepublica.pt/dr/detalhe/resolucao/3-2001-1331261
+                                            ^type    ^number ^year ^DRE id
 
-The old scheme (``DRE-DL-47344``) was built from a hand-kept map of 19 type codes
-against DRE's 33 ELI types, wrote the year with two digits for 55,742 files and four
-for 32,650, collapsed Resolução do Conselho de Ministros and Resolução da Assembleia
-da República onto the same ``DRE-R-`` prefix, and funnelled every numberless diploma
-into two ``*-UNKNOWN`` files that each ended up holding a single document. See
-RESEARCH-PT-v2 §1.7 and §6.1.
+That name is read here, not rebuilt. The previous scheme reconstructed one from
+the ELI type, the ``Numero`` field and the série, and every part of that
+reconstruction went wrong on the real corpus: ``Numero`` spells the série inside
+itself (``"1/2000 (2.ª série)"``), which leaked into 11,161 identifiers in two
+different spellings and defeated the two-digit-year normalisation in three more;
+the type came from a hand-kept map against 40 ELI types; and the whole thing
+needed a série discriminant to stop 6,862 pairs of unrelated acts colliding.
+
+The DRE id makes all of that unnecessary. Measured over the whole catalogue:
+171,734 distinct identifiers out of 171,737 documents, the three duplicates
+being one act indexed twice rather than two acts sharing a name.
+
+The year comes first so that a consumer finds it at a fixed position — the
+second hyphen-separated component, always — which is what lets the repo shard
+by year with a rule short enough to state in the manifest. Searching for a
+component that looks like a year does not work: 2,931 diplomas are numbered
+like one.
+
+The type is not in the identifier. It is in the file, as ``rank``, which is
+where a reader who wants it should find it; number and year alone are ambiguous
+across types (32 % of them are), so this is a name for a machine to resolve and
+not a citation to read.
 """
 
 from __future__ import annotations
 
 import re
-import unicodedata
 
 # /eli/{type}/{number}/{year}[/{month}/{day}]/{jurisdiction}/{cons|dre}/...
 _ELI = re.compile(r"/eli/(?P<type>[^/]+)/(?P<number>[^/]+)/(?P<year>\d{4})/(?P<rest>.*)$")
@@ -27,75 +39,6 @@ _JURISDICTION_SEGMENT = re.compile(r"(?:^|/)(?P<code>[pam])(?:/|$)")
 
 # ELI jurisdiction segment -> legalize jurisdiction (ISO 3166-2, as ELI uses).
 JURISDICTIONS = {"p": None, "a": "pt-20", "m": "pt-30"}
-
-_UNSAFE = re.compile(r"[^A-Z0-9]+")
-
-# DRE URL slug -> the ELI type token, the official short form of the same type.
-#
-# The record's own ``TipoDiplomaAcronimo`` cannot carry this: it is empty on 559 of
-# 13,211 despachos normativos and disagrees with itself on the rest ("DN" on the
-# legacy catalogue rows, "despnorm" on the modern ones), which split one type across
-# three prefixes — DRE-DN-, DRE-DESPNORM- and DRE-DESPACHO-NORMATIVO-. Keyed on the
-# slug instead, every diploma of a type gets one prefix whatever the row looks like.
-#
-# Derived from every ELI in the corpus (40 types, no type ever maps to two tokens);
-# "regimento" is the one entry read off TipoDiplomaAcronimo, DRE publishing no ELI
-# for it, and it matches its own sub-types rgtassrep / rgtconsest.
-TYPE_TOKENS = {
-    "acordao-supremo-tribunal-justica": "acstj",
-    "acordao-tribunal-constitucional": "actconst",
-    "acordao-tribunal-contas": "actcont",
-    "assento": "asst",
-    "aviso": "av",
-    "aviso-banco-portugal": "avbdp",
-    "declaracao": "decl",
-    "declaracao-rectificacao": "declrectif",
-    "declaracao-retificacao": "declretif",
-    "decreto": "dec",
-    "decreto-governo": "decgov",
-    "decreto-legislativo-regional": "declegreg",
-    "decreto-lei": "dec-lei",
-    "decreto-ministro-republica": "decminrep",
-    "decreto-ministro-republica-para-regiao-autonoma-acores": "decminrepraa",
-    "decreto-ministro-republica-para-regiao-autonoma-madeira": "decminrepram",
-    "decreto-presidente-republica": "decpresrep",
-    "decreto-regional": "decreg",
-    "decreto-regulamentar": "decregul",
-    "decreto-regulamentar-regional": "decregulreg",
-    "decreto-representante-republica-para-regiao-autonoma-acores": "decrepraa",
-    "decreto-representante-republica-para-regiao-autonoma-madeira": "decrepram",
-    "despacho": "desp",
-    "despacho-normativo": "despnorm",
-    "lei": "lei",
-    "lei-constitucional": "leiconst",
-    "lei-organica": "leiorg",
-    "mapa-oficial": "mapofic",
-    "portaria": "port",
-    "regimento": "rgt",
-    "regimento-assembleia-republica": "rgtassrep",
-    "regimento-conselho-estado": "rgtconsest",
-    "regulamento": "regul",
-    "regulamento-cmvm": "regul-cmvm",
-    "resolucao": "resol",
-    "resolucao-assembleia-legislativa-regiao-autonoma-acores": "resolalraa",
-    "resolucao-assembleia-legislativa-regiao-autonoma-madeira": "resolalram",
-    "resolucao-assembleia-legislativa-regional": "resolalr",
-    "resolucao-assembleia-regional": "resolassreg",
-    "resolucao-assembleia-republica": "resolassrep",
-    "resolucao-conselho-ministros": "resolconsmin",
-}
-
-
-def _slug(value: str) -> str:
-    """Uppercase, de-accent and make filesystem-safe, without deleting characters.
-
-    The old parser ran ``re.sub(r"[^a-zA-Z0-9\\-]", "", …)``, which silently turned
-    ``43199(1ªparte)`` into ``431991parte`` — a citation a lawyer cannot resolve.
-    Here every unsafe run becomes a single hyphen instead of vanishing.
-    """
-    folded = unicodedata.normalize("NFKD", value)
-    ascii_only = "".join(c for c in folded if not unicodedata.combining(c))
-    return _UNSAFE.sub("-", ascii_only.upper()).strip("-")
 
 
 def parse_eli(eli: str) -> dict | None:
@@ -162,88 +105,38 @@ def serie_of(*sources: dict) -> str:
     return ""
 
 
-def build_identifier(
-    eli: str,
-    numero: str,
-    tipo_slug: str = "",
-    ano: str | int = "",
-    acronimo: str = "",
-    dre_id: str = "",
-    serie: str = "",
-) -> str:
-    """Build the filesystem-safe identifier for a diploma.
+# The document's own page URL: /dr/detalhe/{type}/{number}-{year}-{id}. The
+# type segment is skipped — it is in the file as ``rank`` — and the tail is read
+# right to left, because the number may itself contain hyphens ("790-B", "1033-BV")
+# while the id and the year never do.
+_DOC_URL = re.compile(r"/dr/detalhe/[^/]+/(?P<name>[^/?#]+)/?\s*$")
+_YEAR = re.compile(r"(?:1[6-9]|20)\d{2}")
 
-    Prefers the ELI type token (official, 33 distinct values, no hand-kept map) and
-    the diploma's own ``Numero`` (the authoritative citation, which may carry a third
-    component the ELI drops — ``Portaria n.º 216/2024/1``). The year is appended only
-    when ``Numero`` does not already contain it, so pre-1976 continuous numbering
-    (``Decreto-Lei n.º 47344``) still gets one.
 
-        dec-lei  + "47344"     + 1966 -> DRE-DEC-LEI-47344-1966
-        (no ELI, slug "portaria")     -> DRE-PORT-…  (pre-1990 diplomas)
-        lei      + "29/2026"          -> DRE-LEI-29-2026
-        lei      + "82-D/2014"        -> DRE-LEI-82-D-2014
-        port     + "216/2024/1"       -> DRE-PORT-216-2024-1
-        declegreg+ "2/2025/M"         -> DRE-DECLEGREG-2-2025-M
-        port     + "953/2008" + II    -> DRE-PORT-953-2008-II
+def build_identifier(link: str, source_id: str, year: str | int = "") -> str:
+    """``DRE-{YEAR}-{NUMBER}-{SOURCE_ID}`` — DRE's own name for the document.
 
-    The série is appended when it is not Série I. Portugal numbers the two séries
-    of the Diário da República independently, so 6,862 pairs of unrelated acts —
-    a portaria regulating animal health and a promotion to lieutenant colonel —
-    share a number and a year and resolved to one identifier, one file, one law.
-    Série I keeps the bare name because it is the legislation proper and 82 % of
-    the corpus; the I-A/I-B split of 1976-1999 is Série I and keeps it too.
+        /dr/detalhe/resolucao/3-2001-1331261        -> DRE-2001-3-1331261
+        /dr/detalhe/portaria/790-b-1992-447283      -> DRE-1992-790-B-447283
+        /dr/detalhe/decreto/1976-408205             -> DRE-1976-408205
+        (no page URL)                               -> DRE-{year}-{source_id}
+
+    Portugal published thousands of numberless ``Decreto de <data>`` acts; those
+    are the third form, and DRE's id is what separates them from each other.
     """
-    parsed = parse_eli(eli)
-    # The as-published ELI only exists from about 1990 (0/16 diplomas before, 42/42
-    # after), so it cannot be the primary key for the ~104,000 older ones. The type
-    # is therefore read off the DRE slug, which every diploma of a type shares by
-    # construction, and only then off the record's own fields — TipoDiplomaAcronimo
-    # is neither always filled nor self-consistent (see TYPE_TOKENS).
-    type_token = _slug(
-        TYPE_TOKENS.get(tipo_slug) or (parsed["type"] if parsed else "") or acronimo or tipo_slug
-    )
-    components = [c for c in (numero or "").split("/") if c.strip()]
+    match = _DOC_URL.search(link or "")
+    if match:
+        parts = [p for p in match.group("name").split("-") if p]
+        if len(parts) >= 2 and _YEAR.fullmatch(parts[-2]):
+            return "-".join(["DRE", parts[-2], *parts[:-2], parts[-1]]).upper()
 
-    if parsed:
-        # Take the number and the year from the ELI — it always writes the year with
-        # four digits, while Numero writes "4/85" as often as "39/2016". Then append
-        # any component Numero carries beyond those two: the "/1" of
-        # "Portaria n.º 216/2024/1" and the "/M" of "DLR n.º 2/2025/M".
-        parts = ["DRE", type_token or "X", _slug(parsed["number"]), str(parsed["year"])]
-        parts += [_slug(c) for c in components[2:]]
-        parts += _serie_suffix(serie)
-        return "-".join(p for p in parts if p)
-
-    # No ELI (everything before ~1990). Rebuild from Numero, normalising the
-    # two-digit year DRE writes there ("905/80") to four digits, so the corpus has
-    # one identifier shape instead of the 55,742-vs-32,650 split of the old repo.
-    year = _slug(str(ano))
-    if (
-        len(components) >= 2
-        and re.fullmatch(r"\d{2}", components[1])
-        and year.endswith(components[1])
-    ):
-        components[1] = year
-    number = "-".join(_slug(c) for c in components if _slug(c))
-    parts = ["DRE", type_token or "X"]
-    if number:
-        parts.append(number)
-        if year and year not in number.split("-"):
-            parts.append(year)
-    elif year:
-        # Portugal published thousands of numberless "Decreto de <data>" acts. The old
-        # scheme funnelled every one of them into DRE-D-UNKNOWN.md, which ended up
-        # holding a single document — the rest were overwritten with no trace in git.
-        # DRE's own content id makes each one unique.
-        parts.append(year)
-        if dre_id:
-            parts.append(_slug(dre_id))
-    parts += _serie_suffix(serie)
-    return "-".join(p for p in parts if p)
-
-
-def _serie_suffix(serie: str) -> list[str]:
-    """The série as an identifier component — empty for Série I and for no série."""
-    token = _slug((serie or "").split("-")[0])
-    return [token] if token and token != "I" else []
+    # A document with no usable page URL — one in 4,000 measured. Its id still
+    # names it uniquely, so it is published rather than dropped; only the
+    # citation number is missing from the name.
+    source_id = str(source_id or "").strip()
+    year = str(year or "").strip()
+    if not source_id or not _YEAR.fullmatch(year):
+        raise ValueError(
+            f"no identifier can be built: link={link!r} source_id={source_id!r} year={year!r}"
+        )
+    return f"DRE-{year}-{source_id}".upper()

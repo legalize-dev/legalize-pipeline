@@ -165,7 +165,7 @@ def _identifier_of(data_dir: Path, norm_id: str) -> str | None:
     """The official identifier of a diploma already in the raw cache."""
     from datetime import date as _date
 
-    from legalize.fetcher.pt.identifier import build_identifier, serie_of
+    from legalize.fetcher.pt.identifier import build_identifier
 
     path = data_dir / "raw" / f"{safe_name(norm_id)}.meta.json.gz"
     try:
@@ -179,15 +179,14 @@ def _identifier_of(data_dir: Path, norm_id: str) -> str | None:
         year = _date.fromisoformat(when).year
     except ValueError:
         year = 1900
-    return build_identifier(
-        (published.get("ELI") or "").strip(),
-        (published.get("Numero") or "").strip(),
-        bundle.get("tipo", ""),
-        year,
-        (published.get("TipoDiplomaAcronimo") or "").strip(),
-        str(published.get("Id") or ""),
-        serie_of(published),
-    )
+    try:
+        return build_identifier(
+            (published.get("LinkSitemap") or "").strip(),
+            str(published.get("Id") or ""),
+            year,
+        )
+    except ValueError:
+        return None
 
 
 def refresh_amendments(api: Any, data_dir: str | Path, targets: set[str]) -> set[str]:

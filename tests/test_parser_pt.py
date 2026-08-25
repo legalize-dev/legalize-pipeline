@@ -57,130 +57,108 @@ def _pack_published(when: str, html: str) -> bytes:
 
 
 class TestIdentifier:
-    """The old scheme wrote the year with two digits for 55,742 files and four for
-    32,650, funnelled every numberless diploma into two ``*-UNKNOWN`` files, and
-    silently deleted characters out of 13 official numbers."""
+    """DRE names every document it publishes, in that document's own page URL.
+    The old scheme rebuilt a name instead of reading it, and every part of the
+    rebuild went wrong on the real corpus: the série leaked out of ``Numero``
+    into 11,161 identifiers in two spellings, the two-digit-year normalisation
+    was defeated in three more, and 6,862 pairs of unrelated acts needed a
+    discriminant to stop them colliding."""
 
     @pytest.mark.parametrize(
-        ("eli", "numero", "expected"),
+        "link,expected",
         [
+            # The number keeps its own hyphens; the year and the id never have any.
+            ("/dr/detalhe/resolucao/3-2001-1331261", "DRE-2001-3-1331261"),
+            ("/dr/detalhe/portaria/790-b-1992-447283", "DRE-1992-790-B-447283"),
+            ("/dr/detalhe/portaria/1033-bv-2004-284102", "DRE-2004-1033-BV-284102"),
+            ("/dr/detalhe/decreto-lei/47344-1966-168776", "DRE-1966-47344-168776"),
+            ("/dr/detalhe/lei/82-d-2014-30348109", "DRE-2014-82-D-30348109"),
+            # Portugal published thousands of numberless "Decreto de <data>" acts.
+            # The old scheme funnelled every one into a single *-UNKNOWN file.
+            ("/dr/detalhe/decreto/1976-408205", "DRE-1976-408205"),
+            # Absolute URLs and trailing slashes are the same document.
             (
-                "https://data.dre.pt/eli/dec-lei/47344/1966/p/cons/20260623/pt/html",
-                "47344",
-                "DRE-DEC-LEI-47344-1966",
-            ),
-            (
-                "https://data.dre.pt/eli/lei/29/2026/06/23/p/dre/pt/html",
-                "29/2026",
-                "DRE-LEI-29-2026",
-            ),
-            (
-                "https://data.dre.pt/eli/lei/82-d/2014/p/cons/20231229/pt/html",
-                "82-D/2014",
-                "DRE-LEI-82-D-2014",
-            ),
-            # the ELI drops the third component; Numero keeps it and so must the id
-            (
-                "https://data.dre.pt/eli/port/216/2024/09/23/p/dre/pt/html",
-                "216/2024/1",
-                "DRE-PORT-216-2024-1",
-            ),
-            (
-                "https://data.dre.pt/eli/declegreg/2/2025/07/02/m/dre/pt/html",
-                "2/2025/M",
-                "DRE-DECLEGREG-2-2025-M",
-            ),
-            # DRE writes "4/85"; the ELI says 1985 and the ELI wins
-            (
-                "https://data.dre.pt/eli/lei/4/1985/p/cons/20190621/pt/html",
-                "4/85",
-                "DRE-LEI-4-1985",
+                "https://diariodarepublica.pt/dr/detalhe/lei/29-2026-901234567/",
+                "DRE-2026-29-901234567",
             ),
         ],
     )
-    def test_from_eli(self, eli, numero, expected):
-        assert build_identifier(eli, numero) == expected
+    def test_the_name_is_read_from_dre_not_rebuilt(self, link, expected):
+        assert build_identifier(link, "", "") == expected
 
-    def test_two_digit_year_normalised_without_eli(self):
-        """No ELI exists before ~1990, and that is most of the corpus."""
-        assert build_identifier("", "905/80", "portaria", 1980, "port") == "DRE-PORT-905-1980"
+    def test_the_year_is_always_the_second_component(self):
+        """What lets the repo shard by year with a one-line rule. Searching for a
+        component that looks like a year does not work: 2,931 diplomas are
+        numbered like one."""
+        for link in ("/dr/detalhe/lei/1999-2001-123456", "/dr/detalhe/decreto/1976-408205"):
+            assert build_identifier(link, "", "").split("-")[1] in {"2001", "1976"}
 
-    def test_numberless_diploma_is_unique(self):
-        """Two ``*-UNKNOWN`` files each held exactly one document; every other
-        numberless "Decreto de <data>" was silently overwritten."""
-        first = build_identifier("", "", "decreto", 1993, "dec", "159184")
-        second = build_identifier("", "", "decreto", 1993, "dec", "159185")
-        assert first != second
-        assert "UNKNOWN" not in first
-
-    def test_no_silent_character_deletion(self):
-        """``43199(1ªparte)`` used to become ``431991parte``."""
-        built = build_identifier("", "43199(1ªparte)", "decreto", 1960, "dec")
-        assert built == "DRE-DEC-43199-1APARTE-1960"
-
-    def test_rcm_and_rar_do_not_collide(self):
-        """Both used to map to ``DRE-R-``, which is why 98 % of Resoluções are
-        missing from the old repo."""
-        rcm = build_identifier(
-            "https://data.dre.pt/eli/resolconsmin/50/2020/p/dre/pt/html", "50/2020"
+    def test_a_number_that_looks_like_a_year_is_not_mistaken_for_one(self):
+        assert (
+            build_identifier("/dr/detalhe/lei/1999-2001-123456", "", "") == "DRE-2001-1999-123456"
         )
-        rar = build_identifier(
-            "https://data.dre.pt/eli/resolassrep/50/2020/p/dre/pt/html", "50/2020"
+
+    def test_the_serie_is_not_in_the_name_and_cannot_leak_into_it(self):
+        """``Numero`` spells the série inside itself — "1/2000 (2.ª série)" — and
+        that leaked into 11,161 identifiers as ``2-A-SERIE`` and ``2-ASERIE``."""
+        assert (
+            build_identifier("/dr/detalhe/portaria/1-2000-1652040", "", "") == "DRE-2000-1-1652040"
         )
-        assert rcm != rar
 
-    def test_the_serie_tells_two_acts_with_one_number_apart(self):
-        """Portugal numbers the séries of the Diário da República independently.
+    def test_two_acts_sharing_a_number_and_a_year_get_different_names(self):
+        """Resolução 3/2001-PG is two acts: DRE ids 1331261 and 2789653,
+        published a week apart. The DRE id is what separates them, so no
+        discriminant has to be invented."""
+        a = build_identifier("/dr/detalhe/resolucao/3-2001-1331261", "", "")
+        b = build_identifier("/dr/detalhe/resolucao/3-2001-2789653", "", "")
+        assert a != b
 
-        "Portaria n.º 953/2008" is a hunting concession in Série I and a table of
-        insurance fees in Série II. 6,862 pairs like it shared one identifier, one
-        file and one Markdown name, so one of the two left the corpus in silence.
-        """
-        serie_i = build_identifier("", "953/2008", "portaria", 2008, "port", "453567", "I")
-        serie_ii = build_identifier("", "953/2008", "portaria", 2008, "port", "2280971", "II")
-        assert serie_i == "DRE-PORT-953-2008"
-        assert serie_ii == "DRE-PORT-953-2008-II"
+    def test_the_type_is_not_in_the_name(self):
+        """Number and year alone are ambiguous across types in 32 % of cases, so
+        this is a name for a machine to resolve. The type is in the file as
+        ``rank``, which is where a reader should find it."""
+        assert "PORTARIA" not in build_identifier("/dr/detalhe/portaria/44-2025-911089434", "", "")
 
-    def test_serie_i_keeps_the_bare_name_including_the_1976_split(self):
-        """Between 1976 and 1999 Série I was published as I-A and I-B. Both are
-        Série I: suffixing them would rename 44,000 files for nothing."""
-        for serie in ("I", "I-A", "I-B", ""):
-            built = build_identifier("", "500/1994", "portaria", 1994, "port", "1", serie)
-            assert built == "DRE-PORT-500-1994", serie
+    def test_a_document_with_no_page_url_is_still_published(self):
+        """One in 4,000 measured. Its DRE id still names it uniquely."""
+        assert build_identifier("", "408205", 1976) == "DRE-1976-408205"
+        assert build_identifier("/dr/nonsense", "408205", "1976") == "DRE-1976-408205"
 
-    def test_serie_read_off_the_record(self):
+    def test_a_document_that_cannot_be_named_raises_rather_than_inventing(self):
+        with pytest.raises(ValueError):
+            build_identifier("", "", 1976)
+        with pytest.raises(ValueError):
+            build_identifier("", "408205", "")
+
+    def test_the_name_is_a_single_path_segment(self):
+        """It is also the file name, so anything else writes outside the tree."""
+        for link in ("/dr/detalhe/portaria/790-b-1992-447283", "/dr/detalhe/decreto/1976-408205"):
+            name = build_identifier(link, "", "")
+            assert "/" not in name and "\\" not in name and name == name.strip()
+
+
+class TestSerie:
+    """``series`` is a published field, and the série is what tells a Série I act
+    from a Série II one that shares its number — 6,862 such pairs exist."""
+
+    def test_declared_serie_wins(self):
         assert serie_of({"Serie": "II"}) == "II"
+
+    def test_the_1976_1999_split_is_still_serie_i(self):
+        """Série I was I-A and I-B for those years, and they are the same série."""
         assert serie_of({"Serie": "I-A"}) == "I"
-        # DRE leaves Serie empty on plenty of records; Publicacao always spells it.
+
+    def test_falls_back_to_the_publication_string(self):
+        """DRE fills ``Serie`` on some records and not others; ``Publicacao``
+        always spells it out."""
         assert (
             serie_of({"Publicacao": "Diário da República n.º 242/2008, Série II de 2008-12-16"})
             == "II"
         )
-        assert serie_of({}, {"Serie": "II"}) == "II"
-        assert serie_of({}) == ""
 
-    def test_filesystem_safe(self):
-        built = build_identifier("", "1/94-1ªsecção", "lei", 1994, "lei")
-        assert not set(built) & set(':/\\*?"<>| ')
-
-    def test_one_prefix_per_type_whatever_the_row_says(self):
-        """DRE files 13,211 despachos normativos under three different acronyms —
-        "DN" on its legacy catalogue rows, "despnorm" on the modern ones and empty
-        on 559 — which split one type across three identifier prefixes."""
-        modern = build_identifier(
-            "https://data.dre.pt/eli/despnorm/7/1980/p/dre/pt/html",
-            "7/80",
-            "despacho-normativo",
-            1980,
-            "despnorm",
-        )
-        legacy = build_identifier("", "7/80", "despacho-normativo", 1980, "DN", "30993000")
-        blank = build_identifier("", "7/80", "despacho-normativo", 1980, "", "30993001")
-        assert modern == legacy == blank == "DRE-DESPNORM-7-1980"
-
-    def test_unknown_type_still_falls_back(self):
-        """A type DRE has not published an ELI for must still get an identifier."""
-        assert build_identifier("", "3/2020", "tipo-novo", 2020, "tn") == "DRE-TN-3-2020"
+    def test_first_source_that_knows_wins_and_silence_is_empty(self):
+        assert serie_of({}, {"Serie": "I"}) == "I"
+        assert serie_of({}, {}) == ""
 
 
 class TestScopeYear:
@@ -672,6 +650,7 @@ class TestMetadata:
                 "URL_PDF": "https://files.diariodarepublica.pt/1s/2026/06/11900/0000200008.pdf",
                 "ELI": "https://data.dre.pt/eli/lei/29/2026/06/23/p/dre/pt/html",
                 "Id": "1135578391",
+                "LinkSitemap": "/dr/detalhe/lei/29-2026-1135578391",
                 "ELIMetadataHTML": (
                     '<span property="eli:is_about" resource="http://data.dre.pt/eli/authority/legal-subject/30211723"></span>'
                     '<span property="eli:cites" resource="http://data.europa.eu/eli/dir/2019/944/oj"></span>'
@@ -684,7 +663,7 @@ class TestMetadata:
 
     def test_core_fields(self):
         meta = DREMetadataParser().parse(self._bundle(), "pub:lei:29-2026-1135578391")
-        assert meta.identifier == "DRE-LEI-29-2026"
+        assert meta.identifier == "DRE-2026-29-1135578391"
         assert meta.country == "pt"
         assert meta.publication_date == date(2026, 6, 23)
         assert meta.status is NormStatus.IN_FORCE

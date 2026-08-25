@@ -151,7 +151,15 @@ LAYOUT: dict[str, str] = {
     # rewrites. Measured: 3 h 22 min of commit phase, 27 min of enumeration per
     # push, 74 min for the ``--name-only`` walk the DB seed needs, and a pack
     # GitHub rejects for exceeding 2.00 GiB.
-    "pt": SHARDED,
+    #
+    # By year rather than by hash, which is the default answer: Portugal's
+    # identifiers carry the year at a fixed position, so the key is immutable and
+    # a reader can see what a directory holds. Measured over 171,737 laws and 74
+    # years, a commit touches 3,260 tree entries against 928 for the hash and
+    # 171,737 flat — both are far below where the cost starts to matter, and only
+    # this one is legible. Sharding by type was measured too and rejected: one
+    # type holds 49 % of the corpus, which is the flat problem again.
+    "pt": "{directory}/{year}/{identifier}.md",
 }
 
 
