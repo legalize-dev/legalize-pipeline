@@ -359,6 +359,18 @@ def _start_fresh(cc, country: str) -> None:
     shutil.rmtree(json_dir, ignore_errors=True)
     json_dir.mkdir(parents=True, exist_ok=True)
 
+    # The discovery cache is derived too, and it is the one that goes stale
+    # invisibly: a scope rule is corrected in the code, the list on disk still
+    # holds what the old rule let through, and the run trusts the list. Portugal
+    # had 6,056 pre-1960 scan-only diplomas sitting in a cache written seven
+    # hours before `earliest_year` was fixed — enough to put every one of them
+    # back into the corpus. Rediscovery reads the cached sitemaps, so it costs
+    # no network.
+    ids = Path(cc.data_dir) / "discovery_ids.txt"
+    if ids.exists():
+        console.print(f"[yellow]--fresh: discarding the discovery cache {ids}[/yellow]")
+        ids.unlink()
+
 
 @cli.command()
 @_country_option()
