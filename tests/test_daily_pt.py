@@ -140,6 +140,30 @@ class TestDailyWiring:
             assert callable(daily)
         assert daily.__doc__ and "re-consolidated" in daily.__doc__
 
+    def test_the_days_norms_are_committed_inside_the_date_loop(self):
+        """The block that publishes the day's diplomas sat inside `if amended_today
+        and not dry_run`, and that flag is only set *inside* the block — so it was
+        never true on a fresh run and every daily discovered the day's norms and
+        committed none of them. `test_the_daily_propagates` passed the whole time:
+        it reads the source as text, and the text was all there, one level too deep.
+        """
+        import ast
+        import inspect
+        import textwrap
+
+        from legalize.fetcher.pt import daily as pt_daily
+
+        fn = ast.parse(textwrap.dedent(inspect.getsource(pt_daily.daily))).body[0]
+        date_loop = next(
+            node
+            for node in ast.walk(fn)
+            if isinstance(node, ast.For) and ast.unparse(node.iter) == "dates_to_process"
+        )
+        assert any(
+            isinstance(node, ast.For) and ast.unparse(node.iter) == "norm_ids"
+            for node in ast.walk(date_loop)
+        )
+
 
 class TestAnaliseJuridicaMaps:
     """The maps are corpus-wide, so nothing in the per-norm fetch path loads them.

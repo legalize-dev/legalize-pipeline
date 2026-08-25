@@ -180,28 +180,8 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
             if not norm_ids:
                 console.print("    No new norms found")
                 state.last_summary_date = current_date
-
-        # ---- 3. the laws today's acts amended: one commit each, body unchanged ----
-        if amended_today and not dry_run:
-            try:
-                changed_laws = analise_juridica.refresh_amendments(
-                    client._api, cc.data_dir, amended_today
-                )
-            except Exception as exc:
-                errors.append(f"Error refreshing amendments: {exc}")
-                logger.exception("Error refreshing amendments")
-                changed_laws = set()
-            if changed_laws:
-                console.print(f"\n[bold]{len(changed_laws)} law(s) amended today[/bold]")
-            for law_id in sorted(changed_laws):
-                try:
-                    commits_created += _commit_versions(
-                        config, repo, client, law_id, generic_fetch_one
-                    )
-                except Exception as exc:
-                    errors.append(f"Error recording amendment on {law_id}: {exc}")
-                    logger.exception("Error recording amendment on %s", law_id)
                 continue
+
             console.print(f"    {len(norm_ids)} norm(s) found")
 
             for norm_id in norm_ids:
@@ -239,6 +219,27 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                     logger.exception("Error processing %s", norm_id)
 
             state.last_summary_date = current_date
+
+        # ---- 3. the laws today's acts amended: one commit each, body unchanged ----
+        if amended_today and not dry_run:
+            try:
+                changed_laws = analise_juridica.refresh_amendments(
+                    client._api, cc.data_dir, amended_today
+                )
+            except Exception as exc:
+                errors.append(f"Error refreshing amendments: {exc}")
+                logger.exception("Error refreshing amendments")
+                changed_laws = set()
+            if changed_laws:
+                console.print(f"\n[bold]{len(changed_laws)} law(s) amended today[/bold]")
+            for law_id in sorted(changed_laws):
+                try:
+                    commits_created += _commit_versions(
+                        config, repo, client, law_id, generic_fetch_one
+                    )
+                except Exception as exc:
+                    errors.append(f"Error recording amendment on {law_id}: {exc}")
+                    logger.exception("Error recording amendment on %s", law_id)
 
         # Only record the sitemap baseline once the run got this far: crashing
         # mid-run must not make us forget the diplomas we had not refreshed yet.
