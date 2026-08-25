@@ -87,6 +87,10 @@ class ShadowedLaw(RuntimeError):
     """A law could not be published because another act holds its file name."""
 
 
+class UnwritableLaw(RuntimeError):
+    """A law had data and could not be written into the repo."""
+
+
 def finalize_daily(
     repo: GitRepo,
     state: StateStore,
@@ -541,11 +545,14 @@ def generic_bootstrap(
     # filename order, which for countries with mixed pre/post-1970 laws
     # leaves clamped 1970-01-02 commits at HEAD and breaks downstream
     # incremental sync (committer-date filter returns 0).
-    total_commits = commit_all_fast(config, country, dry_run=dry_run)
-
-    write_country_meta(config, country)
-    if not dry_run:
-        write_repo_meta(config, country)
+    try:
+        total_commits = commit_all_fast(config, country, dry_run=dry_run)
+    finally:
+        # A repo that is going red still declares its layout: without the
+        # manifest there is no way to see whether the paths were the problem.
+        write_country_meta(config, country)
+        if not dry_run:
+            write_repo_meta(config, country)
 
     console.print(f"\n[bold green]✓ Bootstrap {country.upper()} completed[/bold green]")
     console.print(f"  {len(fetched)} norms fetched, {total_commits} commits created")
@@ -872,8 +879,18 @@ def commit_all_fast(
                 norm_cache.pop(norm_id, None)
 
     console.print(f"\n[bold green]✓ {fi.commit_count} commits created (fast-import)[/bold green]")
+
+    # Every law that could be written is in the repo before this line, the same
+    # order finalize_daily uses for a shadowed act: the run's work is not thrown
+    # away because part of it failed. But a law that has data and no file is data
+    # loss, and a green run with a traceback somewhere in the scrollback is how it
+    # ships unnoticed. Measured on Portugal: a stale corpus missing the field the
+    # layout template needs produced 171,737 errors, zero laws, and success.
     if errors:
-        console.print(f"[yellow]⚠ {errors} errors[/yellow]")
+        raise UnwritableLaw(
+            f"{errors} law(s) had data and could not be written to the repo — "
+            f"{fi.commit_count} commit(s) were created. See the logged tracebacks."
+        )
 
     return fi.commit_count
 

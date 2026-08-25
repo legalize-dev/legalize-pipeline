@@ -57,13 +57,38 @@ def _country_option(default: str = "es"):
 
 @click.group()
 @click.option("--config", "config_path", default="config.yaml", help="Path to config file.")
+@click.option(
+    "--set",
+    "-o",
+    "overrides",
+    multiple=True,
+    metavar="KEY=VALUE",
+    help="Override a config value, dotted: -o countries.pt.data_dir=/tmp/slice. Repeatable.",
+)
 @click.option("--verbose", "-v", is_flag=True, help="Enable debug logs.")
 @click.pass_context
-def cli(ctx: click.Context, config_path: str, verbose: bool) -> None:
+def cli(ctx: click.Context, config_path: str, overrides: tuple[str, ...], verbose: bool) -> None:
     """Legalize — Version-controlled legislation in Git."""
     _setup_logging(verbose)
     ctx.ensure_object(dict)
-    ctx.obj["config"] = load_config(config_path)
+    ctx.obj["config"] = load_config(config_path, _parse_overrides(overrides))
+
+
+def _parse_overrides(pairs: tuple[str, ...]) -> dict[str, str]:
+    """``KEY=VALUE`` pairs for ``load_config``, which has taken them all along.
+
+    Pointing a run at a throwaway data directory and repo is what makes a
+    rehearsal on a slice of the cache possible without copying config.yaml and
+    editing it — a copy that then goes stale against the real one. The value is
+    left a string: everything worth overriding from a shell is a path.
+    """
+    out: dict[str, str] = {}
+    for pair in pairs:
+        key, sep, value = pair.partition("=")
+        if not sep or not key.strip():
+            raise click.BadParameter(f"{pair!r} is not KEY=VALUE")
+        out[key.strip()] = value
+    return out
 
 
 # ─────────────────────────────────────────────
@@ -172,7 +197,14 @@ def commit(
         legalize commit -c fr --all --limit 10         # Only first 10
         legalize commit -c fr --all --offset 10 --limit 10  # Norms 11-20
     """
-    from legalize.pipeline import commit_all, commit_all_fast, commit_one
+    from legalize.pipeline import (
+        UnwritableLaw,
+        commit_all,
+        commit_all_fast,
+        commit_one,
+        write_country_meta,
+        write_repo_meta,
+    )
 
     config = ctx.obj["config"]
     if repo_path or data_dir:
@@ -183,12 +215,31 @@ def commit(
             cc.data_dir = data_dir
 
     if commit_all_flag:
-        if batch:
-            _commit_in_batches(config, country, batch, offset, limit, dry_run)
-        elif fast:
-            commit_all_fast(config, country, limit=limit, offset=offset)
-        else:
-            commit_all(config, country, dry_run=dry_run, limit=limit, offset=offset)
+        # The manifest is not decoration: it is how a consumer knows where the
+        # bodies are, so a repo without one is not conformant. `bootstrap` has
+        # always written it, but §9.2 sends every country over ~20K laws down
+        # this path instead, and that repo went out with no .legalize.yml and no
+        # README unless somebody remembered to add them by hand.
+        #
+        # In a `finally` so that it still lands when the run ends red: a repo
+        # that lost laws is the one you most need to be able to inspect.
+        lost = None
+        try:
+            if batch:
+                _commit_in_batches(config, country, batch, offset, limit, dry_run)
+            elif fast:
+                commit_all_fast(config, country, limit=limit, offset=offset)
+            else:
+                commit_all(config, country, dry_run=dry_run, limit=limit, offset=offset)
+        except UnwritableLaw as exc:
+            lost = exc
+        finally:
+            if not dry_run:
+                write_country_meta(config, country)
+                write_repo_meta(config, country)
+        if lost:
+            console.print(f"\n[red]{lost}[/red]")
+            raise SystemExit(1)
     elif norm_ids:
         for norm_id in norm_ids:
             commit_one(config, country, norm_id, dry_run=dry_run)
@@ -731,8 +782,15 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
         return subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True)
 
     # ── 2. Basic stats ──
+    # The repo's own README is Markdown too, and it is not a law: it has no
+    # frontmatter, so every check below that reads one would report it as broken.
+    # Taken from the writer's own list rather than a second one here, which would
+    # go stale the day a meta file is added.
+    from legalize.committer.repo_meta import repo_meta_files
+
+    meta_paths = {repo / name for name in repo_meta_files(country)}
     md_files = list(repo.rglob("*.md"))
-    md_files = [f for f in md_files if ".git" not in f.parts]
+    md_files = [f for f in md_files if ".git" not in f.parts and f not in meta_paths]
     commit_count = _git("rev-list", "--count", "HEAD").stdout.strip()
     console.print(f"  Markdown files: {len(md_files)}")
     console.print(f"  Git commits:    {commit_count}")
