@@ -4,6 +4,14 @@ This directory is the **end-to-end playbook** for taking a country from "name on
 to a merged PR with the country repo live on legalize.dev. If you follow every step,
 an AI agent (or a human) can go from zero to pushed bootstrap without extra instructions.
 
+**The output format is not this playbook's to decide.** It is the
+[Legalize Format Spec](https://github.com/legalize-dev/legalize/blob/main/SPEC.md), and every country repo
+conforms to it. This playbook
+tells you how to build a fetcher; the spec tells you what the fetcher must produce —
+the frontmatter fields, what makes an identifier valid, where a file lives, what a
+commit means. Read it once before Step 0 and again before Step 4. Where the two
+disagree, the spec wins and this playbook has a bug.
+
 ## How to read this (agents: this part is not optional)
 
 The playbook is split into one file per step because a full country onboarding
@@ -162,6 +170,10 @@ text) unless you have tried and **documented in RESEARCH-{CC}.md** why
 historical versions are unreachable (robots.txt disallow, no archive API,
 paywalled, etc.). Single-snapshot ships are **temporary** and must have a
 follow-up task to add history.
+
+This is a conformance requirement, not a preference: see
+[§History](https://github.com/legalize-dev/legalize/blob/main/SPEC.md#history) in the spec.
+A repo whose history is a single import does not conform.
 
 Why: rebuilding commit history after a single-snapshot ship is extremely
 expensive. Every law needs `filter-branch` / fresh rewrite, and the web

@@ -73,11 +73,11 @@ For Step 7 (sample bootstrap) you will init a **local-only** sandbox repo under
 `../countries/{code}/` with no remote. That's fine — the pipeline only needs a
 git directory to commit to.
 
-The final output structure is flat — all laws in `{country_dir}/`, rank goes in
-YAML frontmatter:
+Rank goes in the YAML frontmatter, never in the directory structure:
 
 ```
 legalize-{code}/
+  .legalize.yml   # the manifest — declares the layout below
   {code}/
     ID-2024-123.md
     ID-2024-456.md
@@ -85,7 +85,28 @@ legalize-{code}/
   LICENSE         # MIT
 ```
 
-The `norm_to_filepath()` function generates `{country}/{identifier}.md` automatically.
+**Decide the layout here, and only here.** The spec defines two shapes
+([§Directory layout](https://github.com/legalize-dev/legalize/blob/main/SPEC.md#directory-layout)):
+
+```
+{directory}/{identifier}.md                 flat
+{directory}/{id_sha1_2}/{identifier}.md     sharded — 256 buckets by sha1 of the identifier
+```
+
+**Sharded is the default answer.** Measured across 100 to 157,504 files, sharding is
+never slower than flat and never produces a bigger pack; below ~250 files it simply
+stops gaining. Flat costs `commits × files` in rewritten trees, and one real corpus of
+171,735 files in a flat directory took 3 h 22 min just to commit and then could not be
+pushed at all — GitHub rejects a pack over 2 GiB.
+
+This is the last cheap moment to choose. The layout is not in any public URL, so
+changing it breaks nothing a consumer has published — but it rewrites every path in the
+repo, which means a full rebuild rather than an edit. Decide before Step 9, not after.
+
+> **Not implemented yet.** `norm_to_filepath()` emits flat for every country today, and
+> nothing writes `.legalize.yml`. Until that lands, record the decision in
+> `RESEARCH-{CC}.md` and ship flat. Delete this note when the engine reads a per-country
+> layout.
 
 
 ---
