@@ -17,7 +17,10 @@ gh repo create legalize-dev/legalize-{code} --public \
 gh api -X PUT repos/legalize-dev/legalize-{code}/topics \
   -f 'names[]=legalize-country'
 
-# Wipe the sandbox repo from Step 7 and re-init clean
+# Wipe the sandbox repo from Step 7 and re-init clean. This is the first
+# bootstrap, where there is nothing published to lose. To rebuild a country
+# that is already live, do NOT do this by hand — see "Re-emitting a country
+# that is already published" in 9.4, and use `legalize bootstrap --fresh`.
 rm -rf ../countries/xx
 git init ../countries/xx/
 mkdir -p ../countries/xx/xx
@@ -232,9 +235,65 @@ way:
   walk grows with how much the remote already holds, while the transfer per slice
   stays flat.
 
-If you are re-pushing a rebuilt history with no common ancestor, empty the remote
-first and pass `--force`. That rewrites a public repo — be sure that is what you
-mean.
+This is GitHub's own documented procedure for the 2 GiB limit — push every Nth
+commit to the branch ref with `+` (force) — with the step size, keepalives,
+timeout and retry filled in from what Portugal cost. See
+[Troubleshooting the 2 GB push limit](https://docs.github.com/en/get-started/using-git/troubleshooting-the-2-gb-push-limit).
+
+### Re-emitting a country that is already published
+
+A country gets re-emitted when its identifier rule, its layout or its frontmatter
+changes: every file is renamed or rewritten, so the new history shares no ancestor
+with the published one. Portugal was the first, on 2026-08-25.
+
+**The remote repository is never deleted.** Stars, forks, issues, pull requests,
+topics, the description and every setting live outside the git history and survive
+a force push untouched; deleting and recreating the repo is the only thing that
+loses them, and `legalize-pt` had 28 stars and 5 forks the day it was re-emitted.
+"Empty the remote" below means *replace the branch*, never the repository.
+
+**1. Rebuild locally.**
+
+```bash
+legalize bootstrap -c xx --fresh
+```
+
+`--fresh` discards the repo directory and re-inits it **keeping `origin`**, empties
+`data-xx/json/`, and drops the discovery cache. It refuses if the path exists and is
+not a git repo, so a mistyped `repo_path` cannot delete something else. `raw/` is
+never touched — it is the only copy, and refetching it is the whole corpus again.
+
+The old local history is gone at this point, so make sure the remote still has it
+(`git ls-remote origin`) before running this: that is the copy you fall back to.
+
+**2. Replace the remote branch, before the long push.**
+
+```bash
+git -C ../countries/xx push --force origin \
+  $(git -C ../countries/xx rev-list --max-parents=0 HEAD):refs/heads/main
+```
+
+That is the new history's root commit — one law, five objects — so it costs nothing
+to send. Order matters, and for a reason that is easy to miss:
+
+- **`legalize push` fetches `origin` before deciding what to skip** (the bullet
+  above about stale refs). Run against a remote that still holds the old history,
+  that fetch **downloads back everything `--fresh` just deleted** — for Portugal,
+  300,733 commits and gigabytes, straight into the repo we emptied on purpose.
+  With the branch already replaced, the fetch finds one commit and returns.
+- **Every slice afterwards is a fast-forward**, so `legalize push` needs no
+  `--force` at all. Passing it anyway is harmless; not needing it is the point.
+- **GitHub does not allow deleting the default branch**, and nothing here asks you
+  to. The branch is replaced in place, so no bridge branch is needed either.
+
+Prefer `--force-with-lease` over `--force` if anyone else can push to the repo: it
+refuses when the remote moved since your last fetch, instead of overwriting it.
+
+**3. Push the rest** exactly as above — `legalize push -c xx`.
+
+The old commits become unreachable rather than deleted. GitHub garbage-collects
+them on its own schedule, so the repository can report its old size for a while
+after the re-emission; nothing needs doing about that.
 
 ## 9.5 Open the engine PR
 
