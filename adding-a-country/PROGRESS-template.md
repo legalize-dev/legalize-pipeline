@@ -33,7 +33,7 @@ Steps are listed in execution order. Each section maps to its step number.
 - [ ] `countries.py` — `REGISTRY` entry added
 - [ ] `countries.py` — `TEXT_STATE` line added, or the source is `point_in_time` (the default) and correctly needs none
 - [ ] `config.yaml` — country section with `repo_path`, `data_dir`, `source`, `max_workers`
-- [ ] Output repo structure planned: flat `{code}/` directory, no subdirs by rank
+- [ ] `layout.py` — `LAYOUT` entry added, or the repo is flat (the default) and deliberately so. Sharded is the default answer; see Step 4
 
 ## Daily path (Step 5)
 - [ ] Decision made: `generic_daily` vs. custom `daily.py` (see criteria table in Step 5)
