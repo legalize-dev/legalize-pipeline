@@ -301,6 +301,65 @@ def _commit_in_batches(
 # ─────────────────────────────────────────────
 
 
+def _start_fresh(cc, country: str) -> None:
+    """Empty the repo and the derived JSON, for a history that is being rebuilt.
+
+    Two things, and both are required rather than tidy:
+
+    ``json/`` is named by identifier and carries it inside. When a country's
+    identifier rule changes, a stale file is not overwritten by the new run — it
+    is left behind, and the commit phase reads the directory rather than the id
+    list, so every one of them ships as a law that no longer exists.
+
+    The repo is re-initialised because ``commit_all_fast`` streams a whole
+    history through ``fast-import`` and does not skip what is already committed:
+    run it over an existing repo and the result is the old history with a second
+    one stacked on top. ``raw/`` is the source of truth and is never touched.
+
+    The remote is carried over, because the point of rebuilding a history is to
+    push it, and re-adding it by hand is the step someone forgets.
+    """
+    import shutil
+    import subprocess
+    from pathlib import Path
+
+    repo = Path(cc.repo_path)
+    if repo.exists() and not (repo / ".git").exists():
+        # A repo_path typo should not delete somebody's directory.
+        raise click.ClickException(f"--fresh: {repo} exists and is not a git repo, refusing")
+
+    remote = ""
+    if repo.exists():
+        remote = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        commits = subprocess.run(
+            ["git", "rev-list", "--count", "HEAD"], cwd=repo, capture_output=True, text=True
+        ).stdout.strip()
+        console.print(f"[yellow]--fresh: discarding {repo} ({commits or 0} commits)[/yellow]")
+        shutil.rmtree(repo)
+
+    repo.mkdir(parents=True)
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "commit", "-q", "--allow-empty", "-m", f"[bootstrap] Init legalize-{country}"],
+        cwd=repo,
+        check=True,
+    )
+    if remote:
+        subprocess.run(["git", "remote", "add", "origin", remote], cwd=repo, check=True)
+        console.print(f"  [dim]remote kept: {remote}[/dim]")
+
+    json_dir = Path(cc.data_dir) / "json"
+    stale = sum(1 for _ in json_dir.glob("*.json")) if json_dir.exists() else 0
+    console.print(f"[yellow]--fresh: removing {stale} derived file(s) from {json_dir}[/yellow]")
+    shutil.rmtree(json_dir, ignore_errors=True)
+    json_dir.mkdir(parents=True, exist_ok=True)
+
+
 @cli.command()
 @_country_option()
 @click.option("--repo-path", default=None, help="Override output repo directory.")
@@ -311,7 +370,7 @@ def _commit_in_batches(
 @click.option(
     "--fresh",
     is_flag=True,
-    help="Delete data/json/ first. Needed when the identifier rule changed.",
+    help="Re-init the repo and delete data/json/ first. For a rebuilt history.",
 )
 @click.option("--dry-run", is_flag=True, help="Simulate without creating commits.")
 @click.pass_context
@@ -348,19 +407,7 @@ def bootstrap(
         cc.source["legi_dir"] = legi_dir
 
     if fresh:
-        # json/ is named by identifier and carries it inside. When the rule
-        # changes, a stale file is not overwritten by the new run — it is left
-        # behind, and the commit phase reads the directory rather than the id
-        # list, so every one of them ships as a law that no longer exists.
-        # raw/ is the source of truth and is never touched here.
-        import shutil
-        from pathlib import Path
-
-        json_dir = Path(config.get_country(country).data_dir) / "json"
-        stale = sum(1 for _ in json_dir.glob("*.json")) if json_dir.exists() else 0
-        console.print(f"[yellow]--fresh: removing {stale} file(s) from {json_dir}[/yellow]")
-        shutil.rmtree(json_dir, ignore_errors=True)
-        json_dir.mkdir(parents=True, exist_ok=True)
+        _start_fresh(config.get_country(country), country)
 
     # Special case: bootstrap from local XML (ES pilot/tests)
     if xml_path and country == "es":

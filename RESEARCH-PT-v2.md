@@ -1544,9 +1544,34 @@ during the corpus fetch. Nothing else is running.
 
 The rebuild is **not** running. It was started twice and stopped twice on purpose:
 once because its output predated spec v0.3, once to wait for this harvest. Restart
-it with `scripts/pt_reparse_and_bootstrap.sh` — reparse, wipe, bootstrap, health,
-no push — once the harvest is done and `scripts/pt_amendments.py` has been re-run
-over the complete relation cache.
+it, once the harvest is done, with:
+
+```bash
+legalize bootstrap -c pt --fresh
+```
+
+`--fresh` empties `json/` first, which is required here and not optional: those
+files are named by identifier and carry it inside, the identifier rule has changed
+under them, and the commit phase reads the directory rather than the id list — so
+a stale file left behind ships as a law that no longer exists.
+
+The command builds the amendment index, installs the análise jurídica maps,
+fetches as-published first and consolidated last, commits, and writes the repo
+meta. It does not push. Health must be clean afterwards:
+
+```bash
+legalize health -c pt --deep
+```
+
+> This used to be `scripts/pt_reparse_and_bootstrap.sh` plus
+> `scripts/pt_amendments.py`, both removed on 2026-08-25. They were not a
+> convenience: the shell wrapped the amendment index in `|| echo "continuing
+> without last_amendment"`, and that index had been dead since the identifier
+> moved to v3 — so the run would have published 46,750 laws whose
+> `last_amendment` named a diploma the corpus no longer contained. The two-phase
+> ordering, which is what keeps a consolidated diploma from being flattened by
+> its as-published twin, lived only in the script where neither the daily nor a
+> test could reach it. Both now live in `fetcher/pt/`.
 
 ### 14.2b State of the corpus data
 
@@ -1556,7 +1581,7 @@ over the complete relation cache.
 | `relations/{162,165}/` | DRE's relation table, one response per norm | harvesting |
 | `thesaurus.json` | descriptor id -> Portuguese label | complete, 15,630 terms, 0 unresolved |
 | `subjects.json` | LinkSitemap -> subjects, for the 12 % of consolidated diplomas with no ELI RDFa | complete, 548 filled, 26 genuinely none, 5 errors |
-| `amendments.json` | norm id -> [(date, amending act, DRE's wording)] | rebuilt from the first tenth of the harvest; **re-run after it finishes** |
+| `amendments.json` | norm id -> [(date, amending act, DRE's wording)] | rebuilt by `bootstrap` as its first step, so it is never stale against the parse that consumes it |
 | `json/` | derived, wiped and rewritten by every reparse | empty |
 | `migration/old-paths.txt` | the old repo's 90,651 paths at head `495d62b` | for the redirect map, taken before any force-push |
 
@@ -1566,8 +1591,9 @@ as-published id. `scripts/pt_fetch_missing.py --report` recomputes it.
 
 ### 14.3 Remaining, in order
 
-1. **Finish the harvest** (§14.2), then `scripts/pt_amendments.py` over the complete
-   cache, then `scripts/pt_reparse_and_bootstrap.sh`. Health must be clean.
+1. **Finish the harvest** (§14.2), then `legalize bootstrap -c pt --fresh`, which
+   rebuilds the amendment index over the complete cache as its first step. Health
+   must be clean.
 2. **Push** to `legalize-dev/legalize-pt` (force; the history is rewritten) and tag
    the old head `pre-v2` first. Waiting on the user, deliberately.
 3. **Engine PR** from `feat/pt-v2`, CI green. `fix/text-state-round-trip` is already

@@ -157,3 +157,69 @@ def test_a_law_that_cannot_be_written_ends_red(tmp_path, config):
     )
     with pytest.raises(UnwritableLaw):
         commit_all_fast(cfg, "pt")
+
+
+class TestFresh:
+    """``--fresh`` throws away a history so a rebuilt one can take its place.
+
+    ``commit_all_fast`` streams a whole history through fast-import and skips
+    nothing already committed, so bootstrapping over a populated repo stacks a
+    second history on the first. The old shell script did the wipe by hand; it
+    is a flag now because the hand step is the one that gets forgotten.
+    """
+
+    @staticmethod
+    def _cfg(tmp_path, repo):
+        path = tmp_path / "config.yaml"
+        path.write_text(
+            f'countries:\n  pt:\n    repo_path: "{repo}"\n    data_dir: "{tmp_path / "data"}"\n'
+        )
+        return path
+
+    def test_refuses_a_directory_that_is_not_a_repo(self, tmp_path):
+        """A repo_path typo must not delete somebody's files."""
+        victim = tmp_path / "not-a-repo"
+        victim.mkdir()
+        (victim / "keep.txt").write_text("important")
+
+        result = CliRunner().invoke(
+            cli, ["--config", str(self._cfg(tmp_path, victim)), "bootstrap", "-c", "pt", "--fresh"]
+        )
+        assert result.exit_code != 0
+        assert "not a git repo" in result.output
+        assert (victim / "keep.txt").read_text() == "important"
+
+    def test_empties_the_repo_and_keeps_the_remote(self, tmp_path, monkeypatch):
+        """The point of rebuilding a history is to push it."""
+        import subprocess
+
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        for args in (
+            ["git", "init", "-q"],
+            [
+                "git",
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "-qm",
+                "old",
+                "--allow-empty",
+            ],
+            ["git", "remote", "add", "origin", "git@github.com:legalize-dev/legalize-pt.git"],
+        ):
+            subprocess.run(args, cwd=repo, check=True)
+        (repo / "stale.md").write_text("a law that no longer exists\n")
+
+        monkeypatch.setattr("legalize.pipeline.generic_bootstrap", lambda *a, **k: 0)
+        result = CliRunner().invoke(
+            cli, ["--config", str(self._cfg(tmp_path, repo)), "bootstrap", "-c", "pt", "--fresh"]
+        )
+        assert result.exit_code == 0, result.output
+        assert not (repo / "stale.md").exists()
+        remote = subprocess.run(
+            ["git", "remote", "get-url", "origin"], cwd=repo, capture_output=True, text=True
+        )
+        assert "legalize-pt" in remote.stdout
