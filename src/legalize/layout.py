@@ -44,15 +44,23 @@ PLACEHOLDERS = frozenset(_values("", ""))  # derived, so it cannot drift from _v
 
 # What shape each country's repo is in. A country absent from this map is FLAT,
 # which is what every repo built before spec v0.4 already is — so adding a
-# country here is a deliberate act and forgetting to is the safe failure. The
-# map is empty because no country has been rebuilt under v0.4 yet; declaring one
-# here before its repo is rebuilt would describe a shape the repo is not in.
+# country here is a deliberate act and forgetting to is the safe failure. An
+# entry here is a claim about a repo that already exists: it goes in with the
+# rebuild that makes it true, never before, or the manifest promises consumers a
+# shape the repo is not in and every body 404s.
 #
 # Changing a value rewrites every path in that repo. It breaks no public URL
 # (the layout appears in none of them) but it is a full rebuild rather than an
 # edit, so it is decided before the first bootstrap, together with the country.
 # See ``adding-a-country/step-2-4-wiring.md``, Step 4.
-LAYOUT: dict[str, str] = {}
+LAYOUT: dict[str, str] = {
+    # 164,278 files in one directory, an 8 MB tree that each of 300,732 commits
+    # rewrites. Measured: 3 h 22 min of commit phase, 27 min of enumeration per
+    # push, 74 min for the ``--name-only`` walk the DB seed needs, and a pack
+    # GitHub rejects for exceeding 2.00 GiB. Sharded, the diff touches 926 tree
+    # entries instead of 164,278.
+    "pt": SHARDED,
+}
 
 
 def layout_for(country_code: str) -> str:

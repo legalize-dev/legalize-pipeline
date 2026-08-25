@@ -56,11 +56,33 @@ def test_absent_country_is_flat():
 
 
 def test_every_declared_layout_is_resolvable():
-    """LAYOUT is empty until a country is rebuilt under v0.4. This is the guard
-    for when it is not: a typo there must fail here, not four hours into a
-    bootstrap."""
+    """A typo in LAYOUT must fail here, not four hours into a bootstrap."""
     for code, template in LAYOUT.items():
         assert law_path(code, "X", template).endswith("/X.md")
+
+
+# Real identifiers, one per directory of the built repo, with the bucket their
+# own sha1 gives them. Portugal is the country the sharding rule was written for
+# and the only one declared, so this is what stops a rebuild from silently
+# emitting the flat shape the repo has today.
+PT_LAWS = [
+    ("pt", "DRE-DEC-16-2026", "a1"),
+    ("pt-20", "DRE-DEC-1976-408958", "a2"),
+    ("pt-30", "DRE-DEC-1976-407159", "6a"),
+]
+
+
+@pytest.mark.parametrize("directory,identifier,bucket", PT_LAWS)
+def test_portugal_is_sharded(directory, identifier, bucket):
+    jurisdiction = None if directory == "pt" else directory
+    meta = _meta(identifier, "pt", jurisdiction)
+    assert norm_to_filepath(meta) == f"{directory}/{bucket}/{identifier}.md"
+
+
+def test_portugals_manifest_says_sharded():
+    """What a consumer reads to rebuild the path. If it and the paths above ever
+    disagree, every law's metadata resolves and every body 404s."""
+    assert yaml.safe_load(manifest("pt"))["layout"][0]["path"] == SHARDED
 
 
 def _meta(identifier: str, country: str, jurisdiction: str | None = None) -> NormMetadata:
