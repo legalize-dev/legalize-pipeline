@@ -31,6 +31,7 @@ Discovery strategy:
 from __future__ import annotations
 
 import logging
+import time
 import zipfile
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -54,6 +55,25 @@ _DEFAULT_BULK_URL = "https://www.riigiteataja.ee/avaandmed/ERT"
 # The earliest year with XML coverage. Anything before 2010 is bundled inside
 # xml.2010.zip as legacy content.
 _DEFAULT_START_YEAR = 2010
+
+# How often the bulk download reports where it is. The daily runs under a
+# 55-minute job timeout and this download is the only thing between the first
+# log line and the last, so silence here is silence for the whole run.
+_PROGRESS_EVERY_S = 30.0
+
+
+def _fmt_bytes(n: float) -> str:
+    for unit in ("B", "KB", "MB"):
+        if n < 1000:
+            return f"{n:.1f} {unit}"
+        n /= 1000
+    return f"{n:.1f} GB"
+
+
+def _fmt_duration(seconds: float) -> str:
+    """Minutes and seconds, never hours — the budget being blown is in minutes."""
+    seconds = max(0, int(seconds))
+    return f"{seconds // 60}m{seconds % 60:02d}s"
 
 
 @dataclass
@@ -206,13 +226,55 @@ class RTDiscovery(NormDiscovery):
                 logger.info("Downloading %s → %s", url, zip_path)
                 with requests.get(url, stream=True, timeout=600) as resp:
                     resp.raise_for_status()
-                    with zip_path.open("wb") as f:
-                        for chunk in resp.iter_content(chunk_size=1024 * 1024):
-                            if chunk:
-                                f.write(chunk)
+                    # Announce the size before spending the window on it. This
+                    # one line is the whole diagnosis of #100: xml.2026.zip is
+                    # 42.3 GB (measured 2026-08-26), and requests' timeout is
+                    # per-chunk, so a download that cannot finish inside the
+                    # job never raises — the runner kills it mid-stream and
+                    # nothing downstream ever logs a thing.
+                    total = int(resp.headers.get("content-length") or 0)
+                    logger.info("%s is %s", zip_name, _fmt_bytes(total))
+                    self._stream_to_file(resp, zip_path, zip_name, total)
 
             logger.info("Extracting %s", zip_path)
-            self._extract_zip(zip_path, self._legi_dir)
+            started = time.monotonic()
+            extracted = self._extract_zip(zip_path, self._legi_dir)
+            logger.info(
+                "Extracted %d XML file(s) from %s in %s",
+                extracted,
+                zip_name,
+                _fmt_duration(time.monotonic() - started),
+            )
+
+    @staticmethod
+    def _stream_to_file(resp, zip_path: Path, zip_name: str, total: int) -> None:
+        """Write a streaming response to disk, reporting progress as it goes."""
+        started = last_report = time.monotonic()
+        done = 0
+        with zip_path.open("wb") as f:
+            for chunk in resp.iter_content(chunk_size=1024 * 1024):
+                if not chunk:
+                    continue
+                f.write(chunk)
+                done += len(chunk)
+                now = time.monotonic()
+                if now - last_report < _PROGRESS_EVERY_S:
+                    continue
+                last_report = now
+                rate = done / (now - started)
+                logger.info(
+                    "%s: %s of %s (%.1f%%) at %s/s, %s elapsed, ETA %s",
+                    zip_name,
+                    _fmt_bytes(done),
+                    _fmt_bytes(total) if total else "unknown",
+                    (100 * done / total) if total else 0.0,
+                    _fmt_bytes(rate),
+                    _fmt_duration(now - started),
+                    _fmt_duration((total - done) / rate) if total and rate else "unknown",
+                )
+        logger.info(
+            "Downloaded %s in %s", _fmt_bytes(done), _fmt_duration(time.monotonic() - started)
+        )
 
     @staticmethod
     def _extract_zip(zip_path: Path, dest: Path) -> int:

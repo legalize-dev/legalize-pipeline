@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import date
 from pathlib import Path
 
 import pytest
 
+from legalize.fetcher.ee import discovery as ee_discovery
 from legalize.fetcher.ee.discovery import (
     RTDiscovery,
+    _fmt_bytes,
+    _fmt_duration,
     _parse_header,
 )
 
@@ -168,3 +172,45 @@ class TestHeaderMemoryFreeing:
         assert info is not None
         # Should be well under 100ms even on a slow machine
         assert elapsed < 0.5, f"Header parse took {elapsed:.3f}s"
+
+
+class _FakeResponse:
+    """Minimal stand-in for a streaming ``requests`` response."""
+
+    def __init__(self, chunks: list[bytes]) -> None:
+        self._chunks = chunks
+
+    def iter_content(self, chunk_size: int = 0):
+        return iter(self._chunks)
+
+
+class TestDownloadProgress:
+    """The bulk download used to run for 55 minutes without logging a line."""
+
+    def test_stream_to_file_writes_the_body_and_reports_progress(
+        self, tmp_path: Path, caplog, monkeypatch
+    ):
+        monkeypatch.setattr(ee_discovery, "_PROGRESS_EVERY_S", 0.0)
+        dest = tmp_path / "xml.2026.zip"
+
+        with caplog.at_level(logging.INFO, logger="legalize.fetcher.ee.discovery"):
+            RTDiscovery._stream_to_file(
+                _FakeResponse([b"a" * 10, b"b" * 10]), dest, "xml.2026.zip", 20
+            )
+
+        assert dest.read_bytes() == b"a" * 10 + b"b" * 10
+        messages = [r.getMessage() for r in caplog.records]
+        assert any("xml.2026.zip:" in m and "ETA" in m for m in messages), messages
+        assert any(m.startswith("Downloaded") for m in messages), messages
+
+    def test_fmt_bytes_names_the_scale_that_matters(self):
+        # The two sizes from #100: the Estonian zip and the English subset
+        # whose size the code used to quote.
+        assert _fmt_bytes(42_287_934_136) == "42.3 GB"
+        assert _fmt_bytes(1_057_875_472) == "1.1 GB"
+        assert _fmt_bytes(512) == "512.0 B"
+
+    def test_fmt_duration_stays_in_minutes(self):
+        # 42.3 GB at the 6.4 MB/s measured on 2026-08-26, against a 55m job.
+        assert _fmt_duration(42_287_934_136 / 6_415_251) == "109m51s"
+        assert _fmt_duration(-1) == "0m00s"

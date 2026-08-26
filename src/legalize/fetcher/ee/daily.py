@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
@@ -79,11 +80,19 @@ def daily(
     console.print(f"[bold]Daily EE — processing {len(dates_to_process)} day(s)[/bold]")
 
     # Refresh the current-year bulk zip so we pick up today's new XMLs.
-    # Skip download if the local copy is already fresh (mtime >= today),
-    # otherwise we'd waste ~1.1 GB of bandwidth on every daily run. If
-    # the download fails (slow server, network issue) we fall back to
+    # Skip download if the local copy is already fresh (mtime >= today).
+    #
+    # The zip is not small and it is not the 1.1 GB this comment used to
+    # claim: that was xml.2026.en.zip, the English subset. The Estonian
+    # xml.{year}.zip measured 42.3 GB on 2026-08-26 (344 MB for 2024,
+    # 2.8 GB for 2025 — it is growing by an order of magnitude a year),
+    # which is why the CI daily never finishes. See #100.
+    #
+    # If the download fails (slow server, network issue) we fall back to
     # whatever is already extracted in legi/ — the daily will still run
-    # against known data, just not the absolute freshest.
+    # against known data, just not the absolute freshest. That fallback
+    # does NOT cover a download that is merely too slow: requests' timeout
+    # is per-chunk, so the runner kills the job instead of raising here.
     discovery = RTDiscovery.create(cc)
     current_year = max(d.year for d in dates_to_process)
     zip_path = Path(cc.data_dir) / "bulk" / f"xml.{current_year}.zip"
@@ -139,6 +148,11 @@ def daily(
         for current_date in dates_to_process:
             console.print(f"\n  [bold]{current_date}[/bold]")
 
+            # discover_daily re-walks every XML in legi_dir once per day, so
+            # the scan time is per-day and grows with the corpus. Print it:
+            # without it, a run that goes quiet gives no way to tell a slow
+            # scan from a stuck fetch (see #100).
+            scan_started = time.monotonic()
             try:
                 norm_ids = list(discovery.discover_daily(client, current_date))
             except Exception as e:
@@ -146,13 +160,17 @@ def daily(
                 logger.error(msg, exc_info=True)
                 errors.append(msg)
                 continue
+            scan_secs = time.monotonic() - scan_started
 
             if not norm_ids:
-                console.print("    No changes")
+                console.print(f"    No changes (scanned in {scan_secs:.0f}s)")
                 state.last_summary_date = current_date
                 continue
 
-            console.print(f"    {len(norm_ids)} version(s) effective on {current_date}")
+            console.print(
+                f"    {len(norm_ids)} version(s) effective on {current_date} "
+                f"(scanned in {scan_secs:.0f}s)"
+            )
 
             for gid in norm_ids:
                 try:
@@ -174,6 +192,9 @@ def daily(
                     console.print(f"    [red]✗ {msg}[/red]")
 
             state.last_summary_date = current_date
+            console.print(
+                f"    [dim]{current_date} done in {time.monotonic() - scan_started:.0f}s[/dim]"
+            )
 
     return finalize_daily(
         repo,
