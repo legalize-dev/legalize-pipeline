@@ -223,6 +223,7 @@ def generic_daily(
     with client_cls.create(cc) as client:
         for current_date in dates_to_process:
             console.print(f"\n  [bold]{current_date}[/bold]")
+            client.set_as_of(current_date)
 
             try:
                 modified_ids = list(discovery.discover_daily(client, current_date))

@@ -314,10 +314,8 @@ countries:
     # preserves them all) and produces one git commit per real reform.
     # 2 workers × 4 req/s = 8 req/s effective — tuned for politeness against
     # zoekservice.overheid.nl + repository.officiele-overheidspublicaties.nl.
-    # The daily flow is single-threaded, so 4 req/s is also its effective rate
-    # (was 2): heavily-amended laws refetch their full expression history each
-    # run, and at 2 req/s the daily job overran the CI time budget. 8 req/s
-    # effective for bootstrap is unchanged (workers halved, rate doubled).
+    # The daily is single-threaded and now asks for one manifest plus the one
+    # expression in force that day, so it costs two requests per changed law.
     # Estimated 22K active laws × ~6 expressions avg → ~130K downloads → ~4-5 h.
     max_workers: 2
     source:

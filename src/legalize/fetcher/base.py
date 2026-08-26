@@ -46,6 +46,14 @@ class LegislativeClient(ABC):
     def get_metadata(self, norm_id: str) -> bytes:
         """Fetch metadata for a norm."""
 
+    def set_as_of(self, target: date) -> None:
+        """Narrow what ``get_text`` returns to the state at ``target``.
+
+        A no-op for the sources that only ever publish a current text. A
+        client that serves a versioned archive overrides it so the daily
+        downloads the one expression it renders instead of the whole history.
+        """
+
     @abstractmethod
     def close(self) -> None:
         """Clean up resources."""

@@ -16,7 +16,8 @@ every law, so ``get_text`` returns a **bundled multi-expression envelope** by
 default: every expression listed in the manifest is downloaded and wrapped in
 a ``<bwb-multi-expression>`` root so the parser can emit multi-``Version``
 blocks and the pipeline can generate one git commit per historical reform.
-Call ``get_latest_xml`` if you need only the current toestand.
+Call ``set_as_of`` first — the daily does — and ``get_text`` serves only the
+expression in force on that day instead.
 
 Both services are public, no auth, license CC0. Polite rate default: 2 req/s.
 
@@ -30,6 +31,7 @@ from __future__ import annotations
 
 import logging
 import threading
+from datetime import date
 from typing import TYPE_CHECKING
 from urllib.parse import quote
 from xml.etree import ElementTree as ET
@@ -100,6 +102,24 @@ class BWBClient(HttpClient):
         # single fetch populates both ``get_text`` and ``get_metadata``.
         self._bundle_cache: dict[str, bytes] = {}
         self._bundle_lock = threading.Lock()
+        # Set by the daily: the day being rendered. While it holds a date,
+        # ``get_text`` serves that single expression instead of the history.
+        self._as_of: date | None = None
+
+    def set_as_of(self, target: date) -> None:
+        """Serve the expression in force at ``target`` instead of the history.
+
+        The daily renders one point in time, so every other expression is
+        weight it downloads and throws away — *Regeling zorgverzekering*
+        alone carries 2.6 GB of them to produce one commit. Bootstrap never
+        calls this and keeps building the full envelope, which is where the
+        per-reform git history comes from.
+        """
+        with self._bundle_lock:
+            if self._as_of != target:
+                # What we cached answers a different day's question.
+                self._bundle_cache.clear()
+            self._as_of = target
 
     # ─────────────────────────────────────────
     # SRU search API
@@ -260,12 +280,20 @@ class BWBClient(HttpClient):
 
         When ``include_history`` is False (or when a law has only one
         expression) the returned bytes are the raw ``<toestand>`` XML of the
-        latest expression, so downstream code still works unchanged.
+        latest expression, so downstream code still works unchanged. Same
+        shape after ``set_as_of``, with the expression in force that day.
         """
         with self._bundle_lock:
             cached = self._bundle_cache.get(norm_id)
         if cached is not None:
             return cached
+
+        if self._as_of is not None:
+            data = self._expression_at(norm_id, self._as_of)
+            if data is not None:
+                with self._bundle_lock:
+                    self._bundle_cache[norm_id] = data
+                return data
 
         if not self._include_history:
             path = self.get_latest_xml_path(norm_id)
@@ -330,6 +358,27 @@ class BWBClient(HttpClient):
         with self._bundle_lock:
             self._bundle_cache[norm_id] = bundle
         return bundle
+
+    def _expression_at(self, bwb_id: str, target: date) -> bytes | None:
+        """Download the one expression in force at ``target``.
+
+        Returns None when the manifest is unreadable or lists no downloadable
+        expression, so the caller can fall back to the full envelope.
+        """
+        try:
+            expressions = self.list_expressions(bwb_id)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Manifest for %s unreadable (%s), falling back", bwb_id, exc)
+            return None
+        if not expressions:
+            return None
+
+        iso = target.isoformat()
+        in_force = [path for effective_date, path in expressions if effective_date <= iso]
+        # Nothing in force yet — a law whose first expression starts later.
+        # The oldest one is what the full envelope would have rendered too.
+        path = in_force[-1] if in_force else expressions[0][1]
+        return self._get(f"{self._repo_url}/{bwb_id}/{path}")
 
     def get_metadata(self, norm_id: str) -> bytes:
         """Return the same envelope as get_text — metadata is embedded."""
