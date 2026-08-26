@@ -14,6 +14,7 @@ import click
 from rich.console import Console
 from rich.logging import RichHandler
 
+from legalize.committer.author import resolve_author
 from legalize.config import load_config
 from legalize.countries import supported_countries
 from legalize.models import NormMetadata, NormStatus, Rank
@@ -382,8 +383,26 @@ def _start_fresh(cc, country: str) -> None:
     # orphaned on a second branch with the init commit stranded on the first.
     # The shape of the repo depended on a global git config.
     subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, check=True)
+    # And the identity for the same reason as the branch name: a machine without
+    # a global user.email cannot commit at all, and this one is the very first
+    # commit of the repo. It failed exactly there in CI — "Author identity
+    # unknown" — while passing on every laptop, which is what a dependency on
+    # ambient git config looks like. `resolve_author` is the same source the
+    # committer uses, so a configured machine still signs with its own name.
+    author_name, author_email = resolve_author()
     subprocess.run(
-        ["git", "commit", "-q", "--allow-empty", "-m", f"[bootstrap] Init legalize-{country}"],
+        [
+            "git",
+            "-c",
+            f"user.name={author_name}",
+            "-c",
+            f"user.email={author_email}",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            f"[bootstrap] Init legalize-{country}",
+        ],
         cwd=repo,
         check=True,
     )

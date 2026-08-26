@@ -88,3 +88,24 @@ def sample_laws(tmp_path):
         (json_dir / f"{lid}.json").write_text(json.dumps(data), encoding="utf-8")
 
     return json_dir
+
+
+@pytest.fixture
+def no_git_identity(tmp_path, monkeypatch):
+    """A machine with no git identity anywhere — which is every CI runner.
+
+    `--fresh` makes the first commit of a rebuilt repo, and it used to inherit
+    the author from ambient git config. That passes on any laptop and fails on
+    every runner with "Author identity unknown", so the test has to take the
+    identity away to be worth anything.
+    """
+    empty = tmp_path / "no-gitconfig"
+    # `useConfigOnly` is what makes this faithful. Without it git invents
+    # user@hostname from the OS and commits with a hint, so a laptop passes a
+    # test the runner fails — which is exactly how this bug survived.
+    empty.write_text("[user]\n\tuseConfigOnly = true\n")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
+    monkeypatch.setenv("GIT_CONFIG_SYSTEM", str(empty))
+    monkeypatch.setenv("HOME", str(tmp_path / "nohome"))
+    for var in ("GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL"):
+        monkeypatch.delenv(var, raising=False)

@@ -227,7 +227,7 @@ class TestFresh:
             cli, ["--config", str(self._cfg(tmp_path, repo)), "bootstrap", "-c", "pt", "--fresh"]
         )
 
-    def test_empties_the_repo_and_keeps_the_remote(self, tmp_path, monkeypatch):
+    def test_empties_the_repo_and_keeps_the_remote(self, tmp_path, monkeypatch, no_git_identity):
         """The point of rebuilding a history is to push it."""
         import subprocess
 
@@ -255,7 +255,9 @@ class TestFresh:
         assert "does not have" in result.output
         assert (repo / "stale.md").exists(), "refused, so nothing may have been deleted"
 
-    def test_says_the_number_out_loud_when_there_is_no_remote(self, tmp_path, monkeypatch):
+    def test_says_the_number_out_loud_when_there_is_no_remote(
+        self, tmp_path, monkeypatch, no_git_identity
+    ):
         """A rehearsal repo has no remote by design, so warn rather than refuse."""
         import subprocess
 
