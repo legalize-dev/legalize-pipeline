@@ -152,17 +152,6 @@ def _parse_list(list_el: ET.Element) -> str:
     return "\n".join(items)
 
 
-def _extract_paragraphs(body: ET.Element) -> list[Paragraph]:
-    """Recursively extract paragraphs from a body/chapter/section/article tree.
-
-    Walks the Akoma Ntoso body structure and emits flat Paragraph objects with
-    css_class hints for the transformer.
-    """
-    paragraphs: list[Paragraph] = []
-    _walk_body(body, paragraphs, depth=0)
-    return paragraphs
-
-
 def _walk_body(el: ET.Element, paragraphs: list[Paragraph], depth: int) -> None:
     """Walk an element tree, emitting Paragraphs for content elements."""
     tag = _tag(el)

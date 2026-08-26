@@ -304,12 +304,6 @@ def _identifier_from_lgbl(lgbl: str) -> str:
     return f"LGBl-{year}-{int(num):03d}"
 
 
-def _select_meta_html(data: bytes) -> str:
-    """Return the meta-page HTML, whether `data` is raw HTML or a JSON envelope."""
-    meta, _ = _select_meta_and_current_html(data)
-    return meta
-
-
 def _select_meta_and_current_html(data: bytes) -> tuple[str, str]:
     """Return (meta_html, current_html) from raw HTML, get_metadata envelope,
     or get_text envelope. Either side may be empty."""
@@ -487,10 +481,6 @@ def _inline_text(el) -> str:
         if child.tail:
             parts.append(child.tail)
     return "".join(parts)
-
-
-def _children_with_class(el, classes: frozenset[str]) -> list:
-    return [c for c in el if _node_classes(c) & classes]
 
 
 def _list_marker_for_paragraph(para_class: str, raw_text: str) -> str:

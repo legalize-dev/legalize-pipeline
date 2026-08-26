@@ -26,7 +26,6 @@ from typing import TYPE_CHECKING, Optional
 
 from legalize.fetcher.ar.catalog import (
     InfoLEGCatalog,
-    InfoLEGRow,
     load_catalog,
     url_for,
 )
@@ -314,7 +313,3 @@ class InfoLEGClient(HttpClient):
         return -1
 
     # ── Helpers exposed to discovery / parser ──
-
-    def get_row(self, norm_id: str) -> Optional[InfoLEGRow]:
-        """Return the catalog row for a norm, loading the catalog if needed."""
-        return self.catalog.get(norm_id)

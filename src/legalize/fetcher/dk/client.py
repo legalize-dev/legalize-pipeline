@@ -83,18 +83,6 @@ class RetsinformationClient(HttpClient):
 
     # ── Version chain helpers ──
 
-    def get_schema_org(self, accession_number: str) -> dict:
-        """Fetch schema.org JSON-LD metadata for version chain discovery.
-
-        Returns the parsed ``legislationConsolidates`` list and other
-        structured metadata from the SPA metadata endpoint.
-        """
-        url = f"{self._base_url}/api/document/metadata/{accession_number}"
-        data = self._get(url)
-        wrapper = json.loads(data)
-        schema_str = wrapper.get("schemaOrgMetadata", "{}")
-        return json.loads(schema_str)
-
     # ── Daily change feed ──
 
     def get_daily_changes(self, date_str: str | None = None) -> list[dict]:

@@ -142,16 +142,3 @@ class TARClient(HttpClient):
         if cursor:
             url += f'&page("{cursor}")'
         return self._get(url)
-
-    def get_page_by_date(
-        self, target_date: str, page_size: int = 100, cursor: str | None = None
-    ) -> bytes:
-        """Fetch documents adopted on a specific date (server-side filter)."""
-        url = (
-            f"{self._base_url}/{self._dataset}"
-            f'?priimtas="{target_date}"'
-            f"&select({_DISCOVERY_FIELDS})&sort(dokumento_id)&limit({page_size})"
-        )
-        if cursor:
-            url += f'&page("{cursor}")'
-        return self._get(url)

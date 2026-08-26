@@ -191,10 +191,6 @@ class LegislationGovUkClient(HttpClient):
                 break
         return pages
 
-    def get_year_feed(self, type_code: str, year: int, page: int = 1) -> bytes:
-        """Fetch a per-year Atom feed (discovery)."""
-        return self._get(self.year_feed_url(type_code, year, page))
-
     def get_type_feed(self, type_code: str, page: int = 1) -> bytes:
         """Fetch the aggregate Atom feed for a type code."""
         return self._get(self.type_feed_url(type_code, page))

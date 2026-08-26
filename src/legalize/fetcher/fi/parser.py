@@ -71,21 +71,8 @@ def _ln(el: etree._Element) -> str:
     return etree.QName(el.tag).localname
 
 
-def _find(el: etree._Element, xpath: str) -> etree._Element | None:
-    """Find first match using namespace-aware xpath."""
-    return el.find(xpath, _NS)
-
-
 def _findall(el: etree._Element, xpath: str) -> list[etree._Element]:
     return el.findall(xpath, _NS)
-
-
-def _attr(el: etree._Element, name: str) -> str:
-    """Get attribute, trying plain name first, then finlex-namespaced."""
-    val = el.get(name)
-    if val is None:
-        val = el.get(f"{{{_FINLEX_NS}}}{name}")
-    return val or ""
 
 
 def _text_content(el: etree._Element) -> str:

@@ -255,22 +255,6 @@ ORDER BY ?dateApplicability"""
                 consolidations.append(consol)
         return consolidations
 
-    def get_complex_work_uri(self, act_uri: str) -> str | None:
-        """Get the Complex Work URI for an Act via its graph."""
-        graph_uri = f"{act_uri}/graph"
-        query = f"""PREFIX jolux: <http://data.legilux.public.lu/resource/ontology/jolux#>
-SELECT ?complexWork WHERE {{
-  GRAPH <{graph_uri}> {{
-    <{act_uri}> jolux:isMemberOf ?complexWork .
-  }}
-}}
-LIMIT 1"""
-        result = self.sparql_query(query)
-        bindings = result.get("results", {}).get("bindings", [])
-        if bindings:
-            return bindings[0]["complexWork"]["value"]
-        return None
-
     # ─────────────────────────────────────────
     # Filestore downloads
     # ─────────────────────────────────────────

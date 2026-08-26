@@ -285,10 +285,6 @@ class BCNDiscovery(NormDiscovery):
                 break
             page += 1
 
-    def _in_scope(self, tipo_norma: str) -> bool:
-        """Check if a norm type is in the configured scope."""
-        return tipo_norma in self._scope
-
 
 def _parse_csv(data: bytes) -> list[dict[str, str]]:
     """Parse CSV bytes from exportarBSimpleMetas into list of dicts.

@@ -62,18 +62,6 @@ _UNSAFE = re.compile(r"[^A-Z0-9]+")
 _DETALHE = re.compile(r"/dr/detalhe/([^/)\"'\s]+)/([^/)\"'\s?#]+)")
 
 
-def _from_eli(uri: str) -> str | None:
-    """``…/eli/dec-lei/16/1994/…`` -> ``DRE-DEC-LEI-16-1994``."""
-    match = _ELI_PATH.search(uri or "")
-    if not match:
-        return None
-    kind, number, year = match.groups()
-    return (
-        f"DRE-{_UNSAFE.sub('-', kind.upper()).strip('-')}"
-        f"-{_UNSAFE.sub('-', number.upper()).strip('-')}-{year}"
-    )
-
-
 def targets_named_by(markdown: str) -> set[str]:
     """The norm ids an act links to, which are its candidate amendment targets.
 
@@ -138,27 +126,6 @@ def _read_json(path: Path) -> dict:
     except (OSError, ValueError):
         logger.warning("unreadable análise jurídica map, ignoring: %s", path, exc_info=True)
         return {}
-
-
-def read_relations(data_dir: str | Path) -> dict[str, list[dict[str, Any]]]:
-    """``{norm id: [inversa row, …]}`` from the harvested cache, all types merged."""
-    root = Path(data_dir) / RELATIONS_DIR
-    out: dict[str, list[dict[str, Any]]] = {}
-    if not root.exists():
-        return out
-    for type_dir in sorted(root.glob("*")):
-        if not type_dir.is_dir():
-            continue
-        for path in type_dir.glob("*.json.gz"):
-            try:
-                with gzip.open(path, "rt", encoding="utf-8") as handle:
-                    payload = json.load(handle)
-            except (OSError, ValueError):
-                continue
-            rows = relation_rows(payload)
-            if rows:
-                out.setdefault(path.name[: -len(".json.gz")], []).extend(rows)
-    return out
 
 
 def _identifier_of(data_dir: Path, norm_id: str) -> str | None:

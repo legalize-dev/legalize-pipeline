@@ -66,9 +66,6 @@ class _HeaderInfo:
     text_type: str  # tekstiliik
     effective_from: date | None
 
-    def is_consolidated(self) -> bool:
-        return self.text_type == "terviktekst"
-
 
 class RTDiscovery(NormDiscovery):
     """Discovery via the Riigi Teataja bulk XML dump.

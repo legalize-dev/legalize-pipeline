@@ -111,11 +111,6 @@ class EliClient(HttpClient):
         marker = f"<!--LEGALIZE norm_id={norm_id} pub_date={pub_date}-->\n".encode()
         return marker + data
 
-    def get_struct(self, norm_id: str) -> bytes:
-        """Fetch the hierarchical structure JSON for an act (optional)."""
-        eli = norm_id_to_eli(norm_id)
-        return self._get(f"{self._base_url}/acts/{eli}/struct")
-
     # ─── Discovery / daily fetches ───
 
     def search_year(self, year: int, offset: int = 0, limit: int = SEARCH_LIMIT_MAX) -> bytes:

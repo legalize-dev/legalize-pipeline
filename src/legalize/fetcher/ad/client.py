@@ -148,22 +148,6 @@ class BOPAClient(HttpClient):
         self._butlleti_cache[key] = docs
         return docs
 
-    def get_filters_by_bopa(
-        self,
-        *,
-        num: str,
-        year: str,
-    ) -> dict[str, Any]:
-        """Fetch the organisme/tema filters present in a specific butlletí.
-
-        Used as ground truth to detect whether the 132-cap dropped any of our
-        target organismes. Not capped — returns the full list.
-        """
-        url = f"{self._api_base}/GetFiltersByBOPA"
-        params = {"numBOPA": str(num), "year": str(year)}
-        resp = self._request("GET", url, params=params)
-        return json.loads(resp.content)
-
     def get_blob(self, doc_path_or_url: str) -> tuple[bytes, dict[str, str]]:
         """Fetch a document blob (HTML file) and return ``(bytes, headers)``.
 

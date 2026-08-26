@@ -95,14 +95,6 @@ class FinlexClient(HttpClient):
 
     # ── Version-specific fetches ──
 
-    def get_version(self, year: str, number: str, lang_version: str) -> bytes:
-        """Fetch a specific consolidated version by its langAndVersion slug.
-
-        *lang_version* is e.g. ``fin@20180817``.
-        """
-        url = f"{self._api_base}/akn/fi/act/statute-consolidated/{year}/{number}/{lang_version}"
-        return self._get(url)
-
     # ── Discovery helpers ──
 
     def list_statutes(
@@ -138,17 +130,6 @@ class FinlexClient(HttpClient):
         url = f"{self._api_base}/akn/fi/act/statute-consolidated/list"
         data = self._get(url, params=params)
         return json.loads(data)
-
-    def list_versions(self, year: str, number: str, page: int = 1) -> bytes:
-        """List all consolidated versions (expressions) for a statute.
-
-        The API allows max 4 items per page for this endpoint.
-        Returns raw XML containing FRBRExpression elements.
-        """
-        url = (
-            f"{self._api_base}/akn/fi/act/statute-consolidated/{year}/{number}?page={page}&limit=4"
-        )
-        return self._get(url)
 
 
 def _split_norm_id(norm_id: str) -> tuple[str, str]:

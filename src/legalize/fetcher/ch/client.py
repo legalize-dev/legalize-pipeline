@@ -245,52 +245,6 @@ ORDER BY ?dateAppl"""
             )
         return out
 
-    def get_cca_metadata(self, cca_uri: str) -> dict:
-        """Fetch all JOLux predicates on the ConsolidationAbstract level.
-
-        Also includes the DE Expression's ``title`` / ``titleShort`` and the
-        ``basicAct``'s publication info. Returns a dict of
-        ``predicate_local_name → [values]`` (values are strings).
-        """
-        # 1. Predicates on the CCA itself
-        cca_q = f"""SELECT ?p ?o WHERE {{
-  GRAPH ?g {{
-    <{cca_uri}> ?p ?o .
-  }}
-}}"""
-        cca_rows = self.sparql_query(cca_q).get("results", {}).get("bindings", [])
-
-        # 2. Predicates on the language expression of the CCA (title, titleShort)
-        expr_uri = f"{cca_uri}/{self._language}"
-        expr_q = f"""SELECT ?p ?o WHERE {{
-  GRAPH ?g {{
-    <{expr_uri}> ?p ?o .
-  }}
-}}"""
-        expr_rows = self.sparql_query(expr_q).get("results", {}).get("bindings", [])
-
-        out: dict[str, list[str]] = {}
-        for row in cca_rows + expr_rows:
-            pred = row["p"]["value"]
-            key = pred.rsplit("#", 1)[-1].rsplit("/", 1)[-1]
-            out.setdefault(key, []).append(row["o"]["value"])
-
-        # 3. Follow basicAct one hop to get the original publication metadata
-        basic_acts = out.get("basicAct", [])
-        if basic_acts:
-            ba_uri = basic_acts[0]
-            ba_q = f"""SELECT ?p ?o WHERE {{
-  GRAPH ?g {{
-    <{ba_uri}> ?p ?o .
-  }}
-}}"""
-            for row in self.sparql_query(ba_q).get("results", {}).get("bindings", []):
-                pred = row["p"]["value"]
-                key = "basicAct_" + pred.rsplit("#", 1)[-1].rsplit("/", 1)[-1]
-                out.setdefault(key, []).append(row["o"]["value"])
-
-        return out
-
     # ─────────────────────────────────────────
     # Vocabulary label caches (lazy, thread-safe)
     # ─────────────────────────────────────────
@@ -309,25 +263,6 @@ SELECT ?s ?label WHERE {{
             uri = row["s"]["value"]
             out[uri] = row["label"]["value"]
         return out
-
-    def rank_label(self, type_uri: str) -> str:
-        """Human-readable label for a ``jolux:typeDocument`` URI.
-
-        Returns the DE prefLabel (e.g. ``Bundesgesetz``, ``Verordnung des
-        Bundesrates``). Falls back to the URI's trailing segment if the
-        label cache doesn't know it.
-        """
-        with self._vocab_lock:
-            if self._rank_labels is None:
-                self._rank_labels = self._load_labels("resource-type")
-        return self._rank_labels.get(type_uri, type_uri.rsplit("/", 1)[-1])
-
-    def institution_label(self, inst_uri: str) -> str:
-        """Human-readable label for a ``jolux:responsibilityOf`` URI."""
-        with self._vocab_lock:
-            if self._institution_labels is None:
-                self._institution_labels = self._load_labels("legal-institution")
-        return self._institution_labels.get(inst_uri, inst_uri.rsplit("/", 1)[-1])
 
     # ─────────────────────────────────────────
     # Filestore

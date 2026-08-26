@@ -73,16 +73,6 @@ class ESbirkaClient(HttpClient):
         url = f"{self._base_url}/dokumenty-sbirky/{self._encode_url(norm_id)}"
         return self._get(url)
 
-    def get_metadata_at_date(self, norm_id: str, version_date: str) -> bytes:
-        """Fetch metadata for a specific version of a law.
-
-        version_date is ISO format, e.g. "2026-01-01".
-        The versioned staleUrl is e.g. "/sb/1993/1/2026-01-01".
-        """
-        versioned = f"{norm_id}/{version_date}"
-        url = f"{self._base_url}/dokumenty-sbirky/{self._encode_url(versioned)}"
-        return self._get(url)
-
     def get_text(self, norm_id: str) -> bytes:
         """Fetch ALL text fragments for a law (auto-paginates).
 
@@ -96,21 +86,6 @@ class ESbirkaClient(HttpClient):
         """Fetch a specific page of text fragments."""
         url = f"{self._base_url}/dokumenty-sbirky/{self._encode_url(norm_id)}/fragmenty"
         return self._get(url, params={"cisloStranky": str(page)})
-
-    def get_text_at_date(self, norm_id: str, version_date: str, page: int = 0) -> bytes:
-        """Fetch text fragments for a specific version of a law."""
-        versioned = f"{norm_id}/{version_date}"
-        url = f"{self._base_url}/dokumenty-sbirky/{self._encode_url(versioned)}/fragmenty"
-        return self._get(url, params={"cisloStranky": str(page)})
-
-    def get_all_fragments(self, norm_id: str) -> list[dict]:
-        """Fetch ALL text fragments across all pages for a law."""
-        return self._fetch_all_pages(norm_id)
-
-    def get_all_fragments_at_date(self, norm_id: str, version_date: str) -> list[dict]:
-        """Fetch ALL text fragments for a specific version."""
-        versioned = f"{norm_id}/{version_date}"
-        return self._fetch_all_pages(versioned)
 
     def _fetch_all_pages(self, stale_url: str) -> list[dict]:
         """Paginate through all fragment pages and collect into a single list."""

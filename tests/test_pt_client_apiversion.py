@@ -21,7 +21,6 @@ import requests
 
 from legalize.fetcher.pt.dre_api import (
     DOCUMENTS_BY_DATE,
-    JOURNALS_BY_DATE,
     PUBLISHED_DETAIL,
     DREApi,
     DREApiError,
@@ -68,7 +67,7 @@ def _client() -> DREApi:
     client._module_version = "9DeZ4j9NYEpfCiXfe3gDLw"
     client._endpoints = {
         name: (f"https://diariodarepublica.pt/dr/screenservices/{name}", "hash", "View.view")
-        for name in (JOURNALS_BY_DATE, PUBLISHED_DETAIL, DOCUMENTS_BY_DATE)
+        for name in (PUBLISHED_DETAIL, DOCUMENTS_BY_DATE)
     }
     return client
 
@@ -84,7 +83,7 @@ class TestResolveEndpoint:
         client = _client()
 
         url, api_version = client._resolve_endpoint(
-            JOURNALS_BY_DATE, _HOME_JS_RENAMED, "home.mvc.js", ("DataActionGetDRByDataCalendario",)
+            DOCUMENTS_BY_DATE, _HOME_JS_RENAMED, "home.mvc.js", ("DataActionGetDRByDataCalendario",)
         )
 
         assert url.endswith(
@@ -98,7 +97,7 @@ class TestResolveEndpoint:
 
         with pytest.raises(DREApiError) as exc:
             client._resolve_endpoint(
-                JOURNALS_BY_DATE, _HOME_JS_RENAMED, "home.mvc.js", ("DataActionGetSomethingElse",)
+                DOCUMENTS_BY_DATE, _HOME_JS_RENAMED, "home.mvc.js", ("DataActionGetSomethingElse",)
             )
 
         message = str(exc.value)
@@ -111,7 +110,7 @@ class TestResolveEndpoint:
 
         with pytest.raises(DREApiError):
             client._resolve_endpoint(
-                JOURNALS_BY_DATE, "", "home.mvc.js", ("DataActionGetDRByDataCalendario",)
+                DOCUMENTS_BY_DATE, "", "home.mvc.js", ("DataActionGetDRByDataCalendario",)
             )
 
 
@@ -129,7 +128,7 @@ class TestPostFailsLoudly:
             patch.object(client, "_request", return_value=_html_response()),
             pytest.raises(DREApiError) as exc,
         ):
-            client.call(JOURNALS_BY_DATE, {})
+            client.call(DOCUMENTS_BY_DATE, {})
 
         message = str(exc.value)
         assert "instead of JSON" in message
@@ -151,15 +150,15 @@ class TestPostFailsLoudly:
             patch.object(client, "_request", return_value=_json_response(payload)),
             pytest.raises(DREApiError, match="No role validation found"),
         ):
-            client.call(JOURNALS_BY_DATE, {})
+            client.call(DOCUMENTS_BY_DATE, {})
 
     def test_apiversion_and_module_version_are_sent(self):
         client = _client()
-        client._endpoints[JOURNALS_BY_DATE] = ("https://dre.test/action", "the-hash", "Home.home")
+        client._endpoints[DOCUMENTS_BY_DATE] = ("https://dre.test/action", "the-hash", "Home.home")
         request = MagicMock(return_value=_json_response({"data": {}}))
 
         with patch.object(client, "_request", request):
-            client.call(JOURNALS_BY_DATE, {})
+            client.call(DOCUMENTS_BY_DATE, {})
 
         sent = request.call_args.kwargs["json"]
         assert sent["versionInfo"]["apiVersion"] == "the-hash"
@@ -168,51 +167,6 @@ class TestPostFailsLoudly:
         # A Block's action must post under the *screen* viewName, or DRE answers
         # "No role validation found" — see docs/pt-dre-api.md.
         assert sent["viewName"] == "Home.home"
-
-
-# ─────────────────────────────────────────────
-# journals_by_date: empty day vs broken API
-# ─────────────────────────────────────────────
-
-
-class TestJournalsByDate:
-    def test_empty_hits_is_a_legitimate_empty_day(self):
-        """Sundays and holidays really do publish nothing — no false alarm."""
-        client = _client()
-        payload = {"data": {"Json_Out": '{"hits": {"hits": []}}'}}
-
-        with patch.object(client, "_request", return_value=_json_response(payload)):
-            assert client.journals_by_date("2026-08-16") == []
-
-    def test_hits_are_mapped(self):
-        client = _client()
-        payload = {
-            "data": {
-                "Json_Out": (
-                    '{"hits": {"hits": [{"_source": {"dbId": 1159106555, "numero": "159",'
-                    ' "dataPublicacao": "2026-08-18",'
-                    ' "conteudoTitle": "Di\\u00e1rio da Rep\\u00fablica n.\\u00ba 159/2026, S\\u00e9rie I de 2026-08-18"}}]}}'
-                )
-            }
-        }
-
-        with patch.object(client, "_request", return_value=_json_response(payload)):
-            journals = client.journals_by_date("2026-08-18")
-
-        assert len(journals) == 1
-        assert journals[0]["Id"] == 1159106555
-        assert "Série I" in journals[0]["conteudoTitle"]
-
-    def test_unreadable_shape_raises(self):
-        """Neither Json_Out nor SerieI means DRE changed the contract."""
-        client = _client()
-        payload = {"data": {"SomethingNew": {"List": []}}}
-
-        with (
-            patch.object(client, "_request", return_value=_json_response(payload)),
-            pytest.raises(DREApiError, match="response shape"),
-        ):
-            client.journals_by_date("2026-08-18")
 
 
 # ─────────────────────────────────────────────

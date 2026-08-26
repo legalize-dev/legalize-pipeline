@@ -52,12 +52,6 @@ _WS_RUNS_RE = re.compile(r"[ \t]+")
 _HTML_PARSER = lxml_html.HTMLParser(encoding=INFOLEG_ENCODING)
 
 
-def _decode(data: bytes) -> str:
-    """Decode raw InfoLEG bytes as cp1252 with control-char stripping."""
-    text = data.decode(INFOLEG_ENCODING, errors="replace")
-    return _CONTROL_CHAR_RE.sub("", text)
-
-
 def _parse_html(data: bytes):
     """Parse InfoLEG HTML bytes into an lxml tree (cp1252 forced)."""
     if not data:

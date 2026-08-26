@@ -141,15 +141,6 @@ class OLRCClient(HttpClient):
 
     # -- Release-point-aware methods ------------------------------------------
 
-    def get_release_point_text(self, norm_id: str, release_tag: str) -> bytes:
-        """Return section XML for a *specific* release point."""
-        title_num, section_id = parse_norm_id(norm_id)
-        return self._extract_section_xml(release_tag, title_num, section_id)
-
-    def available_release_points(self) -> list[dict[str, str]]:
-        """Return the list of known release points."""
-        return list(RELEASE_POINTS)
-
     def cached_release_tags(self) -> list[str]:
         """Return release tags whose title XMLs are already on disk."""
         rp_dir = self._data_dir / "release-points"

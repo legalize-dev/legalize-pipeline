@@ -136,10 +136,6 @@ class SlovLexClient(HttpClient):
         year, number = norm_id.split("/", 1)
         return self.search_catalog(rows=1, cislo=f"{number}/{year}")
 
-    def get_catalog_entry(self, norm_id: str) -> bytes:
-        """Fetch a single catalog entry for a law (convenience wrapper)."""
-        return self.get_metadata(norm_id)
-
     # ── PDF (for source URL) ──
 
     @staticmethod

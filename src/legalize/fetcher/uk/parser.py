@@ -1406,21 +1406,6 @@ def _first_pseudo_para_child(element: etree._Element) -> etree._Element | None:
     return None
 
 
-def _render_schedule(sched: etree._Element, builder: _BlockBuilder) -> None:
-    """Render an entire Schedule as a block."""
-    num_el = sched.find("leg:Number", NS)
-    title_el = sched.find("leg:Title", NS)
-    num = _clean_text(_inline_text(num_el)) if num_el is not None else ""
-    title = _clean_text(_inline_text(title_el)) if title_el is not None else ""
-    heading = " — ".join(piece for piece in (num, title) if piece) or "SCHEDULE"
-    builder.add("h2", heading)
-
-    body = sched.find("leg:ScheduleBody", NS)
-    if body is None:
-        return
-    _render_p_body(body, builder, depth=0)
-
-
 # ─── MetadataParser ────────────────────────────────────────────
 
 

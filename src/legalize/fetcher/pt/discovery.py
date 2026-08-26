@@ -18,11 +18,10 @@ Série is filtered at fetch time, from the detail record — the only place it e
 from __future__ import annotations
 
 import gzip
-import json
 import logging
 import re
 from collections.abc import Iterator
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 from legalize.fetcher.base import LegislativeClient, NormDiscovery
@@ -223,44 +222,6 @@ class DREDiscovery(NormDiscovery):
                 yield tipo, key
 
     # ------------------------------------------------------------ journal walk
-
-    def journal_ids(self, client: DREClient, start: date, end: date) -> Iterator[tuple[str, str]]:
-        """Walk the Diário da República day by day. Authoritative but slow.
-
-        Appends one line per date to ``{cache}/journal_walk.jsonl`` so a crash does
-        not lose the enumeration done so far.
-        """
-        log = (self._cache / "journal_walk.jsonl") if self._cache else None
-        done: set[str] = set()
-        if log and log.exists():
-            for line in log.read_text(encoding="utf-8").splitlines():
-                try:
-                    done.add(json.loads(line)["date"])
-                except Exception:
-                    continue
-
-        current = start
-        while current <= end:
-            iso = current.isoformat()
-            if iso in done:
-                current += timedelta(days=1)
-                continue
-            refs: list[list[str]] = []
-            try:
-                for doc in client._api.documents_by_date(iso):
-                    match = _DETALHE.search(doc.get("LinkSitemap") or "")
-                    if match and match.group(1) in IN_SCOPE_TYPES:
-                        refs.append([match.group(1), match.group(2)])
-            except Exception:
-                logger.warning("Journal walk failed for %s", iso, exc_info=True)
-                current += timedelta(days=1)
-                continue
-            if log:
-                with log.open("a", encoding="utf-8") as handle:
-                    handle.write(json.dumps({"date": iso, "refs": refs}) + "\n")
-            for tipo, key in refs:
-                yield tipo, key
-            current += timedelta(days=1)
 
     # ------------------------------------------------------- NormDiscovery API
 

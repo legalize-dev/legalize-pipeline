@@ -22,7 +22,6 @@ has broken in the past. Two facts cost an hour each to find and are enforced her
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 import threading
@@ -61,7 +60,6 @@ _SCREEN_JS = (
 AJ_ASSOCIATIONS = "aj_associations"
 AJ_ELEMENT_TYPE = "aj_element_type"
 AJ_DATA = "aj_data"
-JOURNALS_BY_DATE = "journals_by_date"
 DOCUMENTS_BY_DATE = "documents_by_date"
 PUBLISHED_DETAIL = "published_detail"
 CONS_HEADER = "cons_header"
@@ -75,7 +73,6 @@ _VIEW_CONSOLIDATED = "LegislacaoConsolidada.LegCons_Detalhe"
 
 # logical name -> (action-name prefixes, viewName to post under)
 _ACTIONS: dict[str, tuple[tuple[str, ...], str]] = {
-    JOURNALS_BY_DATE: (("DataActionGetDRByDataCalendario",), _VIEW_HOME),
     AJ_ELEMENT_TYPE: (("DataActionGetElementTypeAndApplicationSettings",), _VIEW_AJ),
     AJ_DATA: (("DataActionGetData",), _VIEW_AJ),
     AJ_ASSOCIATIONS: (("DataActionFetchAssociacoes",), _VIEW_AJ),
@@ -415,45 +412,6 @@ class DREApi(HttpClient):
 
     # ------------------------------------------------------------ journal walk
 
-    def journals_by_date(self, iso_date: str) -> list[dict]:
-        """The Diário da República issues published on one date."""
-        data = self.call(
-            JOURNALS_BY_DATE,
-            {
-                "DataCalendario": iso_date,
-                "_dataCalendarioInDataFetchStatus": 1,
-                # Sentinel required by DRE's Elasticsearch date filter.
-                "DataUltimaPublicacao": "2099-11-26",
-                "HasSerie1": True,
-                "HasSerie2": False,
-                "IsRendered": True,
-            },
-        )
-        raw = data.get("Json_Out")
-        if isinstance(raw, str) and raw:
-            hits = (json.loads(raw).get("hits") or {}).get("hits") or []
-            return [
-                {
-                    "Id": (h.get("_source") or {}).get("dbId"),
-                    "Numero": (h.get("_source") or {}).get("numero", ""),
-                    "DataPublicacao": (h.get("_source") or {}).get("dataPublicacao", ""),
-                    # Names the série; the sitemap never does.
-                    "conteudoTitle": (h.get("_source") or {}).get("conteudoTitle", ""),
-                }
-                for h in hits
-            ]
-        serie1 = data.get("SerieI")
-        if isinstance(serie1, dict):
-            return serie1.get("List") or []
-        if isinstance(serie1, list):
-            return serie1
-        # An empty list is a legitimate answer (Sundays, holidays); an unreadable
-        # response is not.
-        raise DREApiError(
-            f"{JOURNALS_BY_DATE} for {iso_date} returned neither Json_Out nor SerieI — "
-            f"keys: {sorted(data)}. DRE changed the response shape."
-        )
-
     def documents_by_date(self, iso_date: str) -> list[dict]:
         """Every Série I document published on one date, across that day's issues.
 
@@ -647,9 +605,6 @@ class DREApi(HttpClient):
         }
 
     # ---------------------------------------------------------------- helpers
-
-    def get_json(self, url: str) -> Any:
-        return json.loads(self._request("GET", url).text)
 
     def get_text_body(self, url: str) -> str:
         return self._request("GET", url).text

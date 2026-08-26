@@ -239,10 +239,6 @@ class BWBClient(HttpClient):
         expressions.sort(key=lambda x: x[0])
         return expressions
 
-    def get_expression_xml(self, bwb_id: str, xml_path: str) -> bytes:
-        """Download one specific expression's XML by its manifest path."""
-        return self._get(f"{self._repo_url}/{bwb_id}/{xml_path}")
-
     def get_text(self, norm_id: str) -> bytes:
         """Fetch the full history of a law as a bundled multi-expression envelope.
 
@@ -333,7 +329,3 @@ class BWBClient(HttpClient):
     # ─────────────────────────────────────────
     # Portal URL for citations
     # ─────────────────────────────────────────
-
-    def portal_url_for(self, bwb_id: str) -> str:
-        """Build the canonical wetten.overheid.nl URL for a BWB ID."""
-        return f"{self._portal_url}/{quote(bwb_id)}"
