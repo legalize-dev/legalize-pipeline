@@ -228,11 +228,20 @@ class BWBClient(HttpClient):
             # Check if the xml manifestation is actually present — some old
             # expressions only have the "gedrukte tekst" (printed text)
             # variant without XML. Skip those.
+            #
+            # ``<item _deleted="true">`` means KOOP withdrew that XML: the URL
+            # answers 301 to itself forever, so asking for it costs the whole
+            # retry budget and never returns a body. On a heavily-reissued
+            # regeling that is a quarter of the manifest.
             has_xml = False
             for manifestation in exp.findall("manifestation"):
-                if manifestation.get("label") == "xml":
-                    has_xml = True
-                    break
+                if manifestation.get("label") != "xml":
+                    continue
+                item = manifestation.find("item")
+                if item is not None and item.get("_deleted") == "true":
+                    continue
+                has_xml = True
+                break
             if has_xml:
                 expressions.append((effective_date, xml_path))
 

@@ -90,6 +90,9 @@ class HttpClient(LegislativeClient):
         self._max_retries = max_retries
 
         self._session = requests.Session()
+        # requests defaults to 30 hops. No source needs more than a couple, and
+        # a server looping a URL onto itself makes every hop pure latency.
+        self._session.max_redirects = 5
         self._session.headers["User-Agent"] = user_agent
         if extra_headers:
             self._session.headers.update(extra_headers)
@@ -152,6 +155,8 @@ class HttpClient(LegislativeClient):
                 return resp
             except requests.HTTPError:
                 raise  # Non-retryable HTTP errors (404, 400, etc.)
+            except requests.TooManyRedirects:
+                raise  # A URL that redirects to itself never resolves
             except requests.RequestException as exc:
                 last_exc = exc
                 if attempt < self._max_retries - 1:
