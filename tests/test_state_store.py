@@ -12,8 +12,11 @@ import os
 import subprocess
 from datetime import date, timedelta
 
+import pytest
+
 from legalize.state.store import (
     MAX_LOOKBACK_DAYS,
+    RunRecord,
     StateStore,
     infer_last_date_from_git,
     latest_source_date,
@@ -155,3 +158,26 @@ class TestResolveDatesUnblocksFrozenCountries:
         assert dates, "the fallback must produce work, not an empty range"
         assert dates[0] == TODAY - timedelta(days=MAX_LOOKBACK_DAYS) + timedelta(days=1)
         assert dates[-1] == TODAY
+
+
+def test_a_failed_save_leaves_the_previous_state_readable(tmp_path):
+    """state.json is written by rename, never truncated in place.
+
+    A Ctrl-C during a commit run — which saves every 50 laws — used to leave a
+    half-written file, and every later daily for that country then died in
+    ``json.load`` before it could do anything about it.
+    """
+    import json
+
+    path = tmp_path / "state.json"
+    state = StateStore(path)
+    state.last_summary_date = date(2024, 1, 1)
+    state.save()
+
+    # A value json.dump chokes on, so the write dies part-way through.
+    state._runs.append(RunRecord(timestamp="2024-01-02T00:00:00", errors=[object()]))
+    with pytest.raises(TypeError):
+        state.save()
+
+    assert json.loads(path.read_text(encoding="utf-8"))["last_summary"] == "2024-01-01"
+    assert not list(tmp_path.glob(".state.json.*")), "the temp file was left behind"

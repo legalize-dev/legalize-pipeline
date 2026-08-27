@@ -17,23 +17,9 @@ from rich.logging import RichHandler
 from legalize.committer.author import resolve_author
 from legalize.config import load_config
 from legalize.countries import supported_countries
-from legalize.models import NormMetadata, NormStatus, Rank
 
 console = Console(soft_wrap=True)
 console.file.reconfigure(line_buffering=True)
-
-
-def _get_jurisdiction_codes(country: str) -> list[str]:
-    """Return the list of subnational jurisdiction codes for a country.
-
-    Derived from the country's metadata mappings (e.g., _DEPT_TO_JURISDICTION
-    for Spain). Returns an empty list if no subnational jurisdictions exist.
-    """
-    if country == "es":
-        from legalize.fetcher.es.metadata import _DEPT_TO_JURISDICTION
-
-        return sorted(set(_DEPT_TO_JURISDICTION.values()))
-    return []
 
 
 def _setup_logging(verbose: bool) -> None:
@@ -434,7 +420,6 @@ def _start_fresh(cc, country: str) -> None:
 @click.option("--repo-path", default=None, help="Override output repo directory.")
 @click.option("--data-dir", default=None, help="Override data directory.")
 @click.option("--legi-dir", default=None, help="France only: path to extracted LEGI dump.")
-@click.option("--xml", "xml_path", default=None, help="Path to local XML (pilot, ES only).")
 @click.option("--limit", default=None, type=int, help="Process only the first N norms.")
 @click.option(
     "--fresh",
@@ -449,7 +434,6 @@ def bootstrap(
     repo_path: str | None,
     data_dir: str | None,
     legi_dir: str | None,
-    xml_path: str | None,
     limit: int | None,
     fresh: bool,
     dry_run: bool,
@@ -478,24 +462,7 @@ def bootstrap(
     if fresh:
         _start_fresh(config.get_country(country), country)
 
-    # Special case: bootstrap from local XML (ES pilot/tests)
-    if xml_path and country == "es":
-        from legalize.pipeline import bootstrap_from_local_xml
-
-        metadata = NormMetadata(
-            title="Constitución Española",
-            short_title="Constitución Española",
-            identifier="BOE-A-1978-31229",
-            country="es",
-            rank=Rank.CONSTITUCION,
-            publication_date=date(1978, 12, 29),
-            status=NormStatus.IN_FORCE,
-            department="Cortes Generales",
-            source="https://www.boe.es/eli/es/c/1978/12/27/(1)",
-        )
-        bootstrap_from_local_xml(config, metadata, xml_path, dry_run=dry_run)
-    else:
-        generic_bootstrap(config, country, dry_run=dry_run, limit=limit)
+    generic_bootstrap(config, country, dry_run=dry_run, limit=limit)
 
 
 # ─────────────────────────────────────────────
@@ -546,11 +513,20 @@ def daily(
 
     # Country-specific daily.py takes priority (ES, FR have custom flows).
     # Falls back to generic_daily for countries using the standard interfaces.
+    #
+    # Only the lookup is guarded. With the call inside the try, any
+    # AttributeError raised anywhere inside a country's own daily sent that same
+    # country down generic_daily instead — which commits, stamping a synthetic
+    # Source-Id and a fixed [reform] type on laws whose real flow had just
+    # crashed, and pushing them. Same shape as the bootstrap hook in pipeline.py.
     try:
         module = __import__(f"legalize.fetcher.{country}.daily", fromlist=["daily"])
-        run_daily = module.daily
-        run_daily(config, target_date=parsed_date, dry_run=dry_run)
-    except (ImportError, AttributeError):
+    except ImportError:
+        module = None
+
+    if module is not None and hasattr(module, "daily"):
+        module.daily(config, target_date=parsed_date, dry_run=dry_run)
+    else:
         from legalize.pipeline import generic_daily
 
         generic_daily(config, country, target_date=parsed_date, dry_run=dry_run)
@@ -582,158 +558,27 @@ def reprocess(
 
 
 # ─────────────────────────────────────────────
-# CCAA (Spain subnational — kept separate)
+# META
 # ─────────────────────────────────────────────
 
 
-@cli.command("fetch-jurisdiction")
-@click.argument("jurisdiction", required=False)
-@click.option("--all", "all_flag", is_flag=True, help="Fetch all subnational jurisdictions.")
-@click.option("--force", is_flag=True, help="Re-download even if already exists.")
+@cli.command()
 @_country_option()
 @click.pass_context
-def fetch_jurisdiction(
-    ctx: click.Context, jurisdiction: str | None, all_flag: bool, force: bool, country: str
-) -> None:
-    """Download subnational jurisdiction legislation.
+def meta(ctx: click.Context, country: str) -> None:
+    """Write and commit this repo's meta files (.legalize.yml, README, LICENSE).
+
+    Spec §Conformance: a conforming repo declares itself in ``.legalize.yml``.
+    Only bootstrap and ``commit --all`` wrote one, so every repo built before
+    that — 33 of the 34 published — has none, and the only other way to add one
+    was a full rebuild. Touches no law file and creates at most one commit.
 
     Examples:
-        legalize fetch-jurisdiction es-pv          # País Vasco only
-        legalize fetch-jurisdiction --all           # All jurisdictions
-        legalize fetch-jurisdiction --all -c es     # Explicit country
+        legalize meta -c lv
     """
-    from legalize.fetcher.es.fetch import fetch_catalog_ccaa
+    from legalize.pipeline import write_repo_meta
 
-    config = ctx.obj["config"]
-    codes = _get_jurisdiction_codes(country)
-
-    if not codes:
-        console.print(f"[red]No subnational jurisdictions defined for {country}[/red]")
-        return
-
-    if all_flag:
-        for jur in codes:
-            fetch_catalog_ccaa(config, jur, force=force)
-    elif jurisdiction:
-        if jurisdiction not in codes:
-            console.print(f"[red]Unknown: {jurisdiction}. Valid: {', '.join(codes)}[/red]")
-            return
-        fetch_catalog_ccaa(config, jurisdiction, force=force)
-    else:
-        console.print("Use --all or pass a jurisdiction code.")
-        console.print(f"  Available: {', '.join(codes)}")
-
-
-@cli.command("bootstrap-jurisdiction")
-@click.argument("jurisdiction", required=False)
-@click.option("--all", "all_flag", is_flag=True, help="Bootstrap all subnational jurisdictions.")
-@click.option("--force", is_flag=True, help="Re-download even if already exists.")
-@click.option("--dry-run", is_flag=True, help="Simulate without creating commits.")
-@_country_option()
-@click.pass_context
-def bootstrap_jurisdiction(
-    ctx: click.Context,
-    jurisdiction: str | None,
-    all_flag: bool,
-    force: bool,
-    dry_run: bool,
-    country: str,
-) -> None:
-    """Full subnational bootstrap: fetch + commit.
-
-    Examples:
-        legalize bootstrap-jurisdiction es-pv          # País Vasco only
-        legalize bootstrap-jurisdiction --all           # All jurisdictions
-        legalize bootstrap-jurisdiction --all -c es     # Explicit country
-    """
-    import json
-    from pathlib import Path
-
-    from legalize.fetcher.es.fetch import fetch_catalog_ccaa
-    from legalize.pipeline import commit_one
-
-    config = ctx.obj["config"]
-    codes = _get_jurisdiction_codes(country)
-
-    if not codes:
-        console.print(f"[red]No subnational jurisdictions defined for {country}[/red]")
-        return
-
-    targets = codes if all_flag else ([jurisdiction] if jurisdiction else [])
-    if not targets:
-        console.print("Use --all or pass a jurisdiction code.")
-        console.print(f"  Available: {', '.join(codes)}")
-        return
-
-    if jurisdiction and jurisdiction not in codes:
-        console.print(f"[red]Unknown: {jurisdiction}. Valid: {', '.join(codes)}[/red]")
-        return
-
-    _JUR_TO_NAME = {
-        "es-an": "Andalucía",
-        "es-ar": "Aragón",
-        "es-as": "Asturias",
-        "es-cb": "Cantabria",
-        "es-cl": "Castilla y León",
-        "es-cm": "Castilla-La Mancha",
-        "es-cn": "Canarias",
-        "es-ct": "Cataluña",
-        "es-ex": "Extremadura",
-        "es-ga": "Galicia",
-        "es-ib": "Balears",
-        "es-mc": "Murcia",
-        "es-md": "Madrid",
-        "es-nc": "Navarra",
-        "es-pv": "País Vasco",
-        "es-ri": "Rioja",
-        "es-vc": "Valenciana",
-    }
-
-    grand_total = 0
-    for jur in targets:
-        name = _JUR_TO_NAME.get(jur, jur)
-        console.print(f"\n[bold]{'=' * 50}[/bold]")
-        console.print(f"[bold]  {jur.upper()} ({name})[/bold]")
-        console.print(f"[bold]{'=' * 50}[/bold]")
-
-        fetch_catalog_ccaa(config, jur, force=force)
-
-        cc = config.get_country(country)
-        json_dir = Path(cc.data_dir) / "json"
-        jur_files = []
-        for jf in sorted(json_dir.glob("*.json")):
-            with open(jf) as f:
-                data = json.load(f)
-            jur_code = data.get("metadata", {}).get("jurisdiccion")
-            dept = data.get("metadata", {}).get("departamento", "")
-            if jur_code == jur or (not jur_code and name in dept):
-                jur_files.append(jf)
-        jur_files = list(dict.fromkeys(jur_files))
-
-        console.print(f"  {len(jur_files)} norms to commit")
-
-        commits = 0
-        errors = 0
-        for i, jf in enumerate(jur_files, 1):
-            try:
-                c = commit_one(config, country, jf.stem, dry_run=dry_run)
-                commits += c
-            except (OSError, ValueError):
-                errors += 1
-            if i % 100 == 0:
-                console.print(f"  [{i}/{len(jur_files)}] {commits} commits")
-
-        grand_total += commits
-        repo_dir = Path(cc.repo_path) / jur
-        actual = len(list(repo_dir.glob("*.md"))) if repo_dir.exists() else 0
-        console.print(f"  [green]=> {actual} files, {commits} new commits, {errors} errors[/green]")
-
-    console.print(f"\n[bold green]Total: {grand_total} new commits[/bold green]")
-
-
-# ─────────────────────────────────────────────
-# HEALTH
-# ─────────────────────────────────────────────
+    write_repo_meta(ctx.obj["config"], country)
 
 
 # ─────────────────────────────────────────────

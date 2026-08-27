@@ -63,9 +63,11 @@ logger = logging.getLogger(__name__)
 # ─────────────────────────────────────────────
 
 # Weekday schedule per country (skip these weekdays).
-# Defined here so config.yaml stays declarative. Override in country daily.py
-# only if the country needs a fully custom flow (ES, FR).
-_SKIP_WEEKDAYS: dict[str, set[int]] = {
+# Defined here so config.yaml stays declarative. The one copy: a country with
+# its own daily.py reads this table too, because four of them used to hold a
+# hand-rolled duplicate — which made the rows below unreachable for exactly the
+# countries that had one, and left ee out of the table altogether.
+SKIP_WEEKDAYS: dict[str, set[int]] = {
     "es": {6},  # Mon-Sat (BOE)
     "fr": {6},  # Mon-Sat (DILA)
     "se": {5, 6},  # Mon-Fri (Riksdagen)
@@ -80,6 +82,7 @@ _SKIP_WEEKDAYS: dict[str, set[int]] = {
     "fi": {5, 6},  # Mon-Fri (Finlex updates on business days)
     "ua": {6},  # Mon-Sat (Rada publishes on business days)
     "dk": {5, 6},  # Mon-Fri (Retsinformation harvest API, business days)
+    "ee": {5, 6},  # Mon-Fri (Riigi Teataja)
 }
 
 
@@ -93,6 +96,10 @@ class UnwritableLaw(RuntimeError):
 
 class HistoryMismatch(RuntimeError):
     """The branch holds commits this run cannot continue from."""
+
+
+class NothingPublished(RuntimeError):
+    """The run had errors and published nothing, so it must not exit green."""
 
 
 # One fast-import session per chunk. The session is the unit of durability: the
@@ -148,6 +155,15 @@ def finalize_daily(
             f"{' …' if len(refused) > 5 else ''}"
         )
 
+    # Same principle, applied to the error list. A source that changes its HTML
+    # gives "12 errors, 0 commits" every morning and the leg still goes green,
+    # so nobody looks. Errors alongside published laws stay a warning — the day's
+    # work landed — but a day that produced only errors has to end red.
+    if errors and commits_created == 0:
+        raise NothingPublished(
+            f"{len(errors)} error(s) and no commits: nothing was published. First: {errors[0]}"
+        )
+
     return commits_created
 
 
@@ -191,7 +207,7 @@ def generic_daily(
     state = StateStore(cc.state_path)
     state.load()
 
-    skip = _SKIP_WEEKDAYS.get(country, set())
+    skip = SKIP_WEEKDAYS.get(country, set())
     dates_to_process = resolve_dates_to_process(
         state,
         cc.repo_path,
@@ -532,6 +548,16 @@ def generic_fetch_all(
             f"{' …' if len(clashes) > 5 else ''}[/yellow]"
         )
 
+    # A discovery that yields nothing, or a source that fails on every norm, used
+    # to be a green run with an empty cache behind it — and the bootstrap that
+    # follows then reports "No norms found" and exits 0 too. Switzerland goes
+    # exactly down this path.
+    if not fetched:
+        raise NothingPublished(
+            f"{country}: {len(norm_ids)} norm(s) discovered and none fetched — "
+            f"{errors} error(s). Nothing was written to {cc.data_dir}."
+        )
+
     return fetched
 
 
@@ -566,10 +592,9 @@ def generic_bootstrap(
     console.print(f"  Data dir: {cc.data_dir}")
     console.print(f"  Repo output: {cc.repo_path}\n")
 
+    # generic_fetch_all raises NothingPublished when it fetched nothing, which is
+    # what "No norms found." used to print before returning 0.
     fetched = generic_fetch_all(config, country, force=False, limit=limit)
-    if not fetched:
-        console.print("[yellow]No norms found.[/yellow]")
-        return 0
 
     console.print("\n[bold]Commit — generating git history[/bold]\n")
     # Use fast-import for bootstrap: 10-50x faster than commit_all() and,
@@ -629,8 +654,16 @@ def _extract_reforms_generic(text_parser, client, norm_id, blocks, text_data=Non
                 norm_id,
             )
 
-    # Try parser-level reform extraction from raw text (e.g. UA annotations)
-    if text_data is not None and hasattr(text_parser, "extract_reforms"):
+    # Try parser-level reform extraction from raw text (e.g. UA annotations).
+    # `hasattr` was always true — TextParser defines it — and the base
+    # implementation parses the text a second time to get the blocks this
+    # function was already handed. The 12 countries that do not override it paid
+    # for two full parses of every norm, Portugal's 171,740 included.
+    from legalize.fetcher.base import TextParser
+
+    own_extract = getattr(type(text_parser), "extract_reforms", None)
+    overrides_it = own_extract is not None and own_extract is not TextParser.extract_reforms
+    if text_data is not None and overrides_it:
         parser_reforms = text_parser.extract_reforms(text_data)
         if parser_reforms:
             return parser_reforms
@@ -784,6 +817,15 @@ def commit_all(
         if len(lines) > 10:
             console.print(f"  ... ({len(lines) - 10} more)")
 
+    # Same rule as commit_all_fast: a law with data and no file is data loss, and
+    # this is the path the playbook prescribes for every country over ~20K laws
+    # (--no-fast and --batch). It counted the failures and printed a green line.
+    if errors:
+        raise UnwritableLaw(
+            f"{errors} law(s) had data and could not be committed — "
+            f"{total} commit(s) were created. See the logged tracebacks."
+        )
+
     return total
 
 
@@ -796,15 +838,29 @@ def _resume_index(repo_path: str | Path, all_reforms: list) -> int:
     """How many of ``all_reforms`` the branch already holds.
 
     The stream is deterministic — every reform, sorted by date — so the commits
-    on ``refs/heads/main`` are always a prefix of it, and the tip names which
-    one. Read back from the tip's own trailers rather than counting commits: a
-    reform that failed to render produced no commit, and a count would then
-    resume one law early for every one of them.
+    on ``refs/heads/main`` are always a prefix of it, and the newest law commit
+    names which one. Read back from that commit's own trailers rather than
+    counting commits: a reform that failed to render produced no commit, and a
+    count would then resume one law early for every one of them.
+
+    ``--grep``, because the tip is not always a law: the pipeline's own
+    ``[fix-pipeline]`` meta commit carries no trailers at all, and reading it
+    made every single resume fail with HistoryMismatch — a message telling the
+    operator to throw away the whole history and start over.
     """
     import subprocess
 
     tip = subprocess.run(
-        ["git", "-C", str(repo_path), "log", "-1", "--format=%b", "refs/heads/main"],
+        [
+            "git",
+            "-C",
+            str(repo_path),
+            "log",
+            "-1",
+            "--format=%b",
+            "--grep=^Norm-Id: ",
+            "refs/heads/main",
+        ],
         capture_output=True,
         text=True,
     )
@@ -1020,7 +1076,15 @@ def reprocess(
     console.print(f"[bold]Reprocess — {reason}[/bold]\n")
     commits = 0
     for norm_id in norm_ids:
-        generic_fetch_one(config, country, norm_id, force=True)
+        # The re-download decides what gets committed. When it fails it returns
+        # None and leaves the old JSON in place, so commit_one re-renders exactly
+        # the text that is being repaired, produces 0 commits and says nothing —
+        # on the only repair path the commit-integrity rule allows.
+        if generic_fetch_one(config, country, norm_id, force=True) is None:
+            raise NothingPublished(
+                f"{norm_id}: re-download failed, so there is nothing new to commit. "
+                f"The law in the repo is unchanged."
+            )
         commits += commit_one(config, country, norm_id, dry_run=dry_run)
     return commits
 
@@ -1118,6 +1182,12 @@ def write_repo_meta(config: Config, country: str) -> None:
 
     repo = GitRepo(cc.repo_path, config.git.committer_name, config.git.committer_email)
     repo.init()
+    # The commit below is a plain `git commit`, and its tree comes from the
+    # index. fast-import never touches the index, and it only resets the working
+    # tree on the last chunk — so on the failure path, where this runs from a
+    # `finally`, the meta commit was built from an index that predates the whole
+    # import and deleted the corpus from the tip.
+    repo.sync_index()
 
     changed = [
         rel_path

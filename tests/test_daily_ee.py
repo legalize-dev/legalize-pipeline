@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
+from unittest.mock import MagicMock
 
 from legalize.fetcher.ee.daily import _build_group_map
 
@@ -68,3 +70,47 @@ class TestBuildGroupMap:
         (ee / "b.md").write_text("---\ngroup_id: 222\n---\n")
         result = _build_group_map(ee)
         assert result == {"111": "a", "222": "b"}
+
+
+def test_an_empty_group_map_stops_the_run(tmp_path, monkeypatch):
+    """The map is read off the working tree, and CI clones it sparsely.
+
+    Empty, every version falls through to the "brand new law" branch of
+    _process_version: a duplicate file named after the version id, committed as
+    [bootstrap] instead of [reform] — one new wrong law per reform, in green.
+    """
+    import pytest
+
+    from legalize.config import Config, CountryConfig, GitConfig
+    from legalize.fetcher.ee import daily as ee_daily
+
+    repo, data = tmp_path / "repo", tmp_path / "data"
+    (repo / "ee").mkdir(parents=True)  # bootstrapped, but nothing visible in the cone
+    legi = data / "legi"
+    legi.mkdir(parents=True)
+    (legi / "one.xml").write_bytes(b"<x/>")
+
+    config = Config(
+        git=GitConfig(),
+        countries={
+            "ee": CountryConfig(
+                repo_path=str(repo),
+                data_dir=str(data),
+                state_path=str(tmp_path / "state.json"),
+            )
+        },
+    )
+
+    discovery = MagicMock()
+    discovery.ensure_bulk_dump.side_effect = RuntimeError("no network in tests")
+    monkeypatch.setattr(ee_daily.RTDiscovery, "create", lambda cc: discovery)
+
+    widened: list[str] = []
+    monkeypatch.setattr(ee_daily.GitRepo, "ensure_visible", lambda self, d: widened.append(d))
+
+    with pytest.raises(RuntimeError, match="published as a new law"):
+        ee_daily.daily(config, target_date=date(2026, 4, 1))
+
+    # And the cone is widened before the directory is read, or the map is empty
+    # on every CI run by construction.
+    assert widened == ["ee"]

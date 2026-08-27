@@ -132,7 +132,7 @@ class GitRepo:
         Returns:
             True if the file changed compared to the last commit.
         """
-        self._ensure_visible(rel_path)
+        self.ensure_visible(str(PurePosixPath(rel_path).parent))
         file_path = self._path / rel_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -158,15 +158,30 @@ class GitRepo:
         self._run(["add", rel_path])
         return True
 
-    def _ensure_visible(self, rel_path: str) -> None:
-        """Make ``rel_path``'s directory visible when the checkout is sparse.
+    def sync_index(self) -> None:
+        """Rebuild the index from HEAD, so the next commit's tree comes from it.
+
+        ``git fast-import`` moves the ref and never touches the index, and
+        ``FastImporter`` only resets the working tree on its last chunk. Any
+        plain ``git commit`` afterwards — the repo-meta commit is the one that
+        runs in a ``finally`` — builds its tree from an index that predates the
+        import, so the commit deletes every law fast-import just wrote.
+
+        ``check=False``: a repo whose HEAD is still unborn has nothing to reset
+        to, which is the normal state on the first commit of a bootstrap.
+        """
+        self._run(["reset", "--mixed", "-q", "HEAD"], check=False)
+
+    def ensure_visible(self, directory: str) -> None:
+        """Make ``directory`` visible when the checkout is sparse.
 
         CI clones a country repo sparsely: writing the 171,722 files of Portugal
         into the runner's working tree took 48 of the job's 55 allowed minutes,
         while the daily touches a handful of them. Outside the cone the file is
-        invisible to ``git add`` and — worse — absent from disk, so the
-        unchanged-content check below would read nothing and re-commit an
-        identical law every morning.
+        invisible to ``git add`` and — worse — absent from disk, so
+        ``write_and_add``'s unchanged-content check would read nothing and
+        re-commit an identical law every morning. Public because a daily that
+        *reads* the repo needs the same guarantee before it globs a directory.
 
         A full checkout has no sparse-checkout file and pays one ``git config``
         call per run.
@@ -177,7 +192,6 @@ class GitRepo:
             self._cones = set()
         if not self._sparse:
             return
-        directory = str(PurePosixPath(rel_path).parent)
         if directory in (".", "") or directory in self._cones:
             return
         self._run(["sparse-checkout", "add", directory])
@@ -402,12 +416,20 @@ class FastImporter:
         self._proc.wait()
         if exc_type is None and self._commit_count > 0:
             if self._proc.returncode != 0:
-                stderr = self._proc.stderr.read().decode() if self._proc.stderr else ""
-                logger.error("git fast-import failed: %s", stderr)
-            else:
-                logger.info("git fast-import: %d commits imported", self._commit_count)
-                if self._checkout_on_exit:
-                    self._checkout()
+                # The ref did not move, so this chunk is not in the repo — and
+                # the next chunk would anchor on the previous tip and carry on,
+                # leaving a hole in the middle of the history that a rerun does
+                # not backfill (_resume_index reads the tip and skips past it).
+                # Logging it was worse than useless: stderr is not captured, so
+                # the message was always empty and the run reported success.
+                raise FastImportDied(
+                    f"git fast-import exited {self._proc.returncode} after "
+                    f"{self._commit_count} queued commits; refs/heads/main did not "
+                    "move (its own error is on stderr, above)"
+                )
+            logger.info("git fast-import: %d commits imported", self._commit_count)
+            if self._checkout_on_exit:
+                self._checkout()
 
     @property
     def commit_count(self) -> int:

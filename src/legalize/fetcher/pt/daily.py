@@ -29,7 +29,7 @@ from legalize.committer.git_ops import GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
 from legalize.models import CommitType, Reform
-from legalize.pipeline import finalize_daily
+from legalize.pipeline import SKIP_WEEKDAYS, finalize_daily
 from legalize.state.store import StateStore, resolve_dates_to_process
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
@@ -41,10 +41,6 @@ _URL_ENTRY = re.compile(
     r"<url>\s*<loc>([^<]+)</loc>\s*(?:<lastmod>([^<]*)</lastmod>)?", re.IGNORECASE | re.DOTALL
 )
 _CONS_URL = re.compile(r"/dr/legislacao-consolidada/([^/]+)/(\d{4})-(\d+)")
-
-# The Diário da República publishes Monday to Friday. The daily has run on 121 of
-# 125 weekdays; the four misses were Portuguese public holidays.
-_SKIP_WEEKDAYS = {5, 6}
 
 
 def _lastmod_state_path(data_dir: str | Path) -> Path:
@@ -122,7 +118,12 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     console.print(f"  [dim]análise jurídica: {loaded or 'no maps found'}[/dim]")
 
     dates_to_process = resolve_dates_to_process(
-        state, cc.repo_path, target_date, skip_weekdays=_SKIP_WEEKDAYS
+        # Monday to Friday: the daily has run on 121 of 125 weekdays, and the
+        # four misses were Portuguese public holidays.
+        state,
+        cc.repo_path,
+        target_date,
+        skip_weekdays=SKIP_WEEKDAYS["pt"],
     )
     if dates_to_process is None:
         console.print("[yellow]No last date found. Use --date or run bootstrap.[/yellow]")

@@ -411,3 +411,45 @@ class TestGenericPipeline:
         # Should not raise, falls back to extract_reforms
         result = _extract_reforms_generic(mock_parser, mock_client, "SFS-2024:1", blocks)
         assert isinstance(result, list)
+
+    def test_a_parser_that_does_not_override_extract_reforms_parses_once(self):
+        """``hasattr(parser, "extract_reforms")`` is always true — it is on the base.
+
+        The base implementation parses the text a second time to rebuild the
+        blocks this function was already handed, so the 12 countries that do not
+        override it paid for two full parses of every norm — Portugal's 171,740
+        included.
+        """
+        from legalize.fetcher.base import TextParser
+
+        calls = []
+
+        class PlainParser(TextParser):
+            def parse_text(self, data: bytes):
+                calls.append(data)
+                return []
+
+        result = _extract_reforms_generic(
+            PlainParser(), MagicMock(spec=[]), "TEST-001", [], b"<x/>"
+        )
+
+        assert calls == [], "the norm was parsed a second time"
+        assert result == []
+
+    def test_a_parser_that_does_override_it_is_still_used(self):
+        from legalize.fetcher.base import TextParser
+
+        expected = [Reform(date=date(2024, 3, 1), norm_id="UA-1", affected_blocks=())]
+
+        class AnnotationParser(TextParser):
+            def parse_text(self, data: bytes):
+                return []
+
+            def extract_reforms(self, data: bytes):
+                return expected
+
+        result = _extract_reforms_generic(
+            AnnotationParser(), MagicMock(spec=[]), "TEST-001", [], b"<x/>"
+        )
+
+        assert result == expected

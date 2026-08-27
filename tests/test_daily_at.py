@@ -13,8 +13,10 @@ from datetime import date, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from legalize.fetcher.at.client import RISClient
-from legalize.pipeline import generic_daily
+from legalize.pipeline import NothingPublished, generic_daily
 from legalize.state.store import MAX_LOOKBACK_DAYS, infer_last_date_from_git
 from legalize.fetcher.at.discovery import _RIS_WINDOWS, RISDiscovery, _ris_window
 
@@ -325,7 +327,13 @@ class TestDailyATOrchestration:
 
         assert result == 0
 
-    def test_discovery_error_continues(self, tmp_path):
+    def test_discovery_error_ends_the_run_red(self, tmp_path):
+        """Errors and nothing published is a failure, not a quiet zero.
+
+        A source that changes its HTML gives "N errors, 0 commits" every morning
+        and the leg still went green, so nobody looked. The run record still
+        lands first — the failure is reported, not swallowed.
+        """
         config = self._make_config(tmp_path)
         mock_client, mock_client_cls, mock_discovery, mock_disc_cls = self._mock_countries()
         mock_discovery.discover_daily.side_effect = RuntimeError("API down")
@@ -333,10 +341,10 @@ class TestDailyATOrchestration:
         with (
             patch("legalize.countries.get_client_class", return_value=mock_client_cls),
             patch("legalize.countries.get_discovery_class", return_value=mock_disc_cls),
+            pytest.raises(NothingPublished, match="nothing was published"),
         ):
-            result = generic_daily(config, "at", target_date=date(2026, 4, 1))
+            generic_daily(config, "at", target_date=date(2026, 4, 1))
 
-        assert result == 0
         state_path = Path(config.get_country("at").state_path)
         assert state_path.exists()
 

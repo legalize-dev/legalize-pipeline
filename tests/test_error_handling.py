@@ -28,7 +28,15 @@ from legalize.models import (
     Reform,
     Version,
 )
-from legalize.pipeline import commit_all, commit_one, generic_fetch_all, generic_fetch_one
+from legalize.pipeline import (
+    NothingPublished,
+    UnwritableLaw,
+    commit_all,
+    commit_one,
+    generic_fetch_all,
+    generic_fetch_one,
+    reprocess,
+)
 from legalize.state.store import StateStore
 from legalize.storage import load_norma_from_json, save_structured_json
 
@@ -234,6 +242,62 @@ class TestGenericFetchErrorHandling:
 
 
 # ─────────────────────────────────────────────
+# TestRunsThatPublishedNothing
+# ─────────────────────────────────────────────
+
+
+class TestRunsThatPublishedNothing:
+    """A run with nothing to show for its errors must not exit 0.
+
+    The precedent is `legalize health`, which raises SystemExit(1) rather than
+    printing the problem: three Portuguese laws vanished from the corpus behind
+    an on-screen warning nobody read.
+    """
+
+    def test_fetch_all_raises_when_it_fetched_nothing(self, test_config):
+        """Discovery yields ids and every fetch fails — Switzerland's exact path."""
+        mock_discovery = MagicMock()
+        mock_discovery.discover_all.return_value = iter(["NORM-001", "NORM-002"])
+        mock_discovery_cls = MagicMock()
+        mock_discovery_cls.create.return_value = mock_discovery
+
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client_cls = MagicMock()
+        mock_client_cls.create.return_value = mock_client
+
+        with (
+            patch("legalize.countries.get_client_class", return_value=mock_client_cls),
+            patch("legalize.countries.get_discovery_class", return_value=mock_discovery_cls),
+            patch("legalize.pipeline.generic_fetch_one", return_value=None),
+            pytest.raises(NothingPublished, match="none fetched"),
+        ):
+            generic_fetch_all(test_config, "es")
+
+    def test_reprocess_raises_when_the_re_download_failed(self, test_config, monkeypatch):
+        """The only repair path the commit-integrity rule allows.
+
+        The return value was discarded: a failed re-download left the old JSON
+        on disk, commit_one re-rendered exactly the text being repaired, and the
+        command reported 0 commits and exited 0.
+        """
+        norm = _make_simple_norm("TEST-RP-001", "Ley a reparar")
+        save_structured_json(test_config.get_country("es").data_dir, norm)
+
+        committed = []
+        monkeypatch.setattr("legalize.pipeline.generic_fetch_one", lambda *a, **k: None)
+        monkeypatch.setattr(
+            "legalize.pipeline.commit_one", lambda *a, **k: committed.append(a) or 0
+        )
+
+        with pytest.raises(NothingPublished, match="re-download failed"):
+            reprocess(test_config, "es", ["TEST-RP-001"], "a parser bug")
+
+        assert committed == [], "it re-rendered the very text it was asked to repair"
+
+
+# ─────────────────────────────────────────────
 # TestCommitErrorHandling
 # ─────────────────────────────────────────────
 
@@ -248,9 +312,13 @@ class TestCommitErrorHandling:
         result = commit_one(test_config, "es", "NONEXISTENT-NORM-ID")
         assert result == 0
 
-    def test_commit_all_continues_after_failure(self, test_config):
+    def test_commit_all_publishes_what_it_can_and_ends_red(self, test_config):
         """Create 3 JSON files where one has corrupt data.
-        Verify commit_all processes the other 2 and reports the error.
+
+        The two good laws are still committed — a run does not throw away its
+        work because part of it failed — but the run must not report success:
+        this is the path the playbook prescribes for every country over ~20K
+        laws (--no-fast, --batch), and it printed a green line and returned.
         """
         # Save 2 valid norms
         norm1 = _make_simple_norm("TEST-ERR-001", "Ley Uno")
@@ -263,10 +331,12 @@ class TestCommitErrorHandling:
         corrupt_file = json_dir / "TEST-ERR-002.json"
         corrupt_file.write_text("{invalid json content", encoding="utf-8")
 
-        total = commit_all(test_config, "es")
+        with pytest.raises(UnwritableLaw, match="1 law"):
+            commit_all(test_config, "es")
 
-        # The 2 valid norms should each produce 1 commit (bootstrap)
-        assert total == 2
+        # The 2 valid norms are in the repo all the same.
+        repo = Path(test_config.get_country("es").repo_path)
+        assert len(list(repo.rglob("*.md"))) == 2
 
     def test_commit_all_returns_zero_for_empty_dir(self, test_config):
         """Call commit_all with an empty data/json/ directory.
