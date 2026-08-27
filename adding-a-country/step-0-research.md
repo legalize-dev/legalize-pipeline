@@ -5,7 +5,7 @@
 
 **Do not skip this step.** Every quality problem we have ever shipped (mojibake,
 missing metadata, lost tables, wrong dates) was caused by skipping it. Produce a
-`RESEARCH-{CC}.md` file at the workspace root (`~/autonomo/legalize/RESEARCH-XX.md`)
+`RESEARCH-{CC}.md` file at the root of this repo (`engine/RESEARCH-XX.md`)
 before writing any code.
 
 ## 0.1 Identify the source(s)

@@ -123,7 +123,7 @@ None of these execute without an explicit OK from you.
 ```bash
 cd ~/projects/legalize/engine-es
 git log --oneline main..HEAD   # 5 commits on refactor/es-deep
-cat RESEARCH-ES-v2.md           # full plan
+cat research/RESEARCH-ES-v2.md  # full plan
 less /tmp/es-audit/fidelity-log.csv
 uv run pytest tests/test_parser_es_refactor.py
 uv run python -m scripts.es_fidelity.sample --n 20 --seed 2026 > /tmp/es-audit/sample-2026.txt
