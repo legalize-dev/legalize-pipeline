@@ -479,6 +479,23 @@ def _parse_version_sidebar(archive_html: bytes, newest_version: int) -> list[dic
     #   amendments share an amending law — in both cases we fall back to
     #   the amending-law publication date, which is always present and
     #   almost always the right effective-date proxy.
+    #
+    # `_valid` is defined once, above the loop, and told the running date
+    # explicitly. As a closure inside the loop it read `last_good_effective`
+    # late, which was correct only because every call sat in the iteration
+    # that defined it — one kept for later would have used the last version's
+    # date without saying so.
+    max_plausible = f"{date.today().year + 10}-12-31"
+
+    def _valid(candidate: str | None, last_good: str | None) -> str | None:
+        if not candidate:
+            return None
+        if candidate > max_plausible:
+            return None  # sentinel like 2201-01-01
+        if last_good is not None and candidate < last_good:
+            return None
+        return candidate
+
     entries: list[dict] = []
     last_good_effective: str | None = None
     for v in range(1, newest_version + 1):
@@ -495,20 +512,9 @@ def _parse_version_sidebar(archive_html: bytes, newest_version: int) -> list[dic
             # to the last known-good date. At each step, reject values that
             # would move the timeline backwards OR are sentinel dates that
             # Justel uses for "far future / indeterminate" (e.g. 01-01-2201).
-            _max_plausible = f"{date.today().year + 10}-12-31"
-
-            def _valid(candidate: str | None) -> str | None:
-                if not candidate:
-                    return None
-                if candidate > _max_plausible:
-                    return None  # sentinel like 2201-01-01
-                if last_good_effective is not None and candidate < last_good_effective:
-                    return None
-                return candidate
-
             effective = (
-                _valid(prior.get("end_date"))
-                or _valid(prior.get("amending_law_pub_date"))
+                _valid(prior.get("end_date"), last_good_effective)
+                or _valid(prior.get("amending_law_pub_date"), last_good_effective)
                 or last_good_effective
             )
 

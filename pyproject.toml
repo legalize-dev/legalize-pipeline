@@ -48,29 +48,14 @@ line-length = 100
 [tool.ruff.lint]
 # Explicit rather than "whatever this version's default is" (see the ruff==
 # pin above). E4/E7/E9/F is ruff's own default select; B (flake8-bugbear) is
-# added on top — it catches real bugs (see per-file-ignores below for the
-# pre-existing debt it found on first run).
+# added on top — it catches real bugs, two of which it did catch here.
 select = ["E4", "E7", "E9", "F", "B"]
 
-# Pre-existing B violations as of enabling the rule, fenced off per file so
-# new code (and new files) are held to it while this backlog gets cleared.
-# TODO(fetcher owner): fix in src/legalize/fetcher/** and drop the ignore —
-# not engine CI's scope, see the CI/alerting review, finding 7.
-[tool.ruff.lint.per-file-ignores]
-"src/legalize/cli.py" = ["B007"]
-"src/legalize/fetcher/_tables.py" = ["B007"]
-"src/legalize/fetcher/base.py" = ["B027"]
-"src/legalize/fetcher/be/client.py" = ["B023"]
-"src/legalize/fetcher/be/parser.py" = ["B905"]
-"src/legalize/fetcher/ee/discovery.py" = ["B007"]
-"src/legalize/fetcher/gr/pdf_extractor.py" = ["B007"]
-"src/legalize/fetcher/ie/parser.py" = ["B007"]
-"src/legalize/fetcher/lu/client.py" = ["B904"]
-"src/legalize/fetcher/ro/parser.py" = ["B007"]
-# Same backlog, in tests/ — out of this task's file scope (only
-# tests/test_repo_meta_license.py), left for whoever owns those tests.
-"tests/test_integration_multicountry.py" = ["B905"]
-"tests/test_layout.py" = ["B007"]
+# The per-file-ignores that used to sit here (18 B violations across 12 files)
+# are gone: the backlog was cleared, not re-fenced. Two of them were real —
+# a `_valid` closure in be/client.py that read the loop variable late, and a
+# `raise` in lu/client.py that dropped the download error, which is what turns
+# a failed fetch into "this law has no XML". Keep this file free of ignores.
 
 [dependency-groups]
 dev = [

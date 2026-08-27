@@ -877,7 +877,9 @@ class JustelTextParser(TextParser):
             versions_list: list[Version] = []
             chosen_title = ""
             chosen_type = "article"
-            for (v_num, eff_date, _, _, _), snap_map in zip(snapshots, per_snapshot_block_map):
+            for (v_num, eff_date, _, _, _), snap_map in zip(
+                snapshots, per_snapshot_block_map, strict=True
+            ):
                 block = snap_map.get(block_id)
                 if block is None:
                     continue

@@ -122,7 +122,7 @@ def test_absent_country_is_flat():
 
 def test_every_declared_layout_is_resolvable():
     """A typo in LAYOUT must fail at import, not four hours into a bootstrap."""
-    for code, template in LAYOUT.items():
+    for template in LAYOUT.values():
         assert "{identifier}" in template
         assert placeholders_of(template)
 

@@ -300,11 +300,13 @@ ORDER BY ?dateApplicability"""
         xml_url = _eli_to_xml_url(act_uri)
         try:
             original_xml = self.download_xml(xml_url)
-        except Exception:
-            # Fallback: ask SPARQL for the real URL
+        except Exception as exc:
+            # Fallback: ask SPARQL for the real URL. Chained, because without
+            # `from exc` a timeout or a 500 on the filestore surfaces as "this
+            # law has no XML" and the fetch failure reads as a data gap.
             sparql_url = self.get_xml_url(act_uri)
             if not sparql_url:
-                raise ValueError(f"No XML available for {norm_id} ({act_uri})")
+                raise ValueError(f"No XML available for {norm_id} ({act_uri})") from exc
             original_xml = self.download_xml(sparql_url)
 
         # 2. Look for consolidation versions (Complex Work derived from ELI)

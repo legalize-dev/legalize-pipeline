@@ -62,7 +62,7 @@ def render_table(
     # Detect <thead> for header row — fall back to first row otherwise
     head_row_idx = -1
     raw_rows: list[list[tuple[str, int, int]]] = []
-    for i, tr in enumerate(table_el.iter()):
+    for tr in table_el.iter():
         tag = (tr.tag or "").lower() if isinstance(tr.tag, str) else ""
         if tag != "tr":
             continue
