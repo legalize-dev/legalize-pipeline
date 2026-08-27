@@ -57,9 +57,6 @@ _INCLUDED_ACT_TYPES = {
     "STATUT",
 }
 
-# Years to skip for daily discover (no gazette on Sundays).
-_SKIP_WEEKDAYS: set[int] = set()  # Romania publishes Mon-Sat typically
-
 
 class RoDiscovery(NormDiscovery):
     """Discover Romanian norms via the SOAP API."""

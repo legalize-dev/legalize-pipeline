@@ -48,6 +48,8 @@ from legalize.models import (
     Reform,
     Version,
 )
+from legalize.fetcher._tables import render_table
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -65,16 +67,13 @@ def _parse_html(data: bytes):
 # Text hygiene
 # ─────────────────────────────────────────────
 
-# C0 control chars (except \t, \n, \r) and C1 control chars (0x80-0x9F).
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
-
 
 def _clean_text(text: str) -> str:
     """Normalize whitespace, strip non-breaking spaces and invalid control chars."""
     if not text:
         return ""
     text = text.replace("\xa0", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
@@ -350,74 +349,16 @@ def _table_cell_text(td) -> str:
     raw = "".join(parts)
     # Normalize whitespace around <br> but keep the tag intact.
     raw = re.sub(r"\s*<br>\s*", "<br>", raw)
-    raw = _CONTROL_CHAR_RE.sub("", raw)
+    raw = strip_control(raw)
     raw = raw.replace("\xa0", " ")
     raw = re.sub(r"[ \t]+", " ", raw)
-    raw = raw.replace("|", "\\|")
+    # No pipe escaping here — render_table escapes cell text itself.
     return raw.strip()
 
 
 def _table_to_markdown(table_el) -> str:
-    """Convert a Justel <table> to a Markdown pipe table.
-
-    Handles rowspan/colspan by repeating values. First row becomes the header.
-    """
-    raw_rows: list[list[tuple[str, int, int]]] = []
-    for tr in table_el.iter("tr"):
-        cells: list[tuple[str, int, int]] = []
-        for cell in tr:
-            tag = (cell.tag or "").lower()
-            if tag not in ("td", "th"):
-                continue
-            text = _table_cell_text(cell)
-            colspan = int(cell.get("colspan") or cell.get("COLSPAN") or 1)
-            rowspan = int(cell.get("rowspan") or cell.get("ROWSPAN") or 1)
-            cells.append((text, colspan, rowspan))
-        if cells:
-            raw_rows.append(cells)
-
-    if not raw_rows:
-        return ""
-
-    expanded: list[list[str]] = []
-    pending: dict[int, tuple[str, int]] = {}
-    for row in raw_rows:
-        out_row: list[str] = []
-        col = 0
-        cell_idx = 0
-        while cell_idx < len(row) or col in pending:
-            if col in pending:
-                text, remaining = pending[col]
-                out_row.append(text)
-                if remaining > 1:
-                    pending[col] = (text, remaining - 1)
-                else:
-                    del pending[col]
-                col += 1
-                continue
-            text, colspan, rowspan = row[cell_idx]
-            for _ in range(colspan):
-                out_row.append(text)
-                if rowspan > 1:
-                    pending[col] = (text, rowspan - 1)
-                col += 1
-            cell_idx += 1
-        expanded.append(out_row)
-
-    if not expanded:
-        return ""
-
-    max_cols = max(len(r) for r in expanded)
-    for r in expanded:
-        while len(r) < max_cols:
-            r.append("")
-
-    lines: list[str] = []
-    lines.append("| " + " | ".join(expanded[0]) + " |")
-    lines.append("| " + " | ".join("---" for _ in range(max_cols)) + " |")
-    for row in expanded[1:]:
-        lines.append("| " + " | ".join(row) + " |")
-    return "\n".join(lines)
+    """Convert a Justel <table> to a Markdown pipe table."""
+    return render_table(table_el, _table_cell_text)
 
 
 def _serialise_children_to_segments(el) -> list[tuple[str, Any]]:

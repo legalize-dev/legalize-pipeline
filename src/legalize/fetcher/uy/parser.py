@@ -47,6 +47,7 @@ from legalize.models import (
     Reform,
     Version,
 )
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -89,9 +90,6 @@ TIPO_TO_RANK: dict[str, str] = {
     "reglamento": "reglamento",
     "ordenanza departamental": "ordenanza_departamental",
 }
-
-# Match any C0/C1 control character except tab, LF and CR.
-_CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # Match a whole <TABLE>…</TABLE> block. Case-insensitive, dot matches newline.
 _TABLE_RE = re.compile(r"<table\b[^>]*>.*?</table>", re.IGNORECASE | re.DOTALL)
@@ -162,7 +160,7 @@ def _format_date(d: date | None) -> str:
 
 
 def _strip_control_chars(text: str) -> str:
-    return _CTRL_RE.sub("", text)
+    return strip_control(text)
 
 
 def _normalize_whitespace(text: str) -> str:

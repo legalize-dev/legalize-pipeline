@@ -48,6 +48,8 @@ from legalize.models import (
     Rank,
     Version,
 )
+from legalize.fetcher._tables import render_table
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +60,6 @@ _HTML_PARSER = lxml_html.HTMLParser(encoding="utf-8")
 # Helpers: text, dates, classes
 # ─────────────────────────────────────────────
 
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 _WS_RE = re.compile(r"\s+")
 
 
@@ -67,7 +68,7 @@ def _clean_text(text: str) -> str:
     if not text:
         return ""
     text = text.replace("\xa0", " ").replace("\u2003", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = _WS_RE.sub(" ", text)
     return text.strip()
 
@@ -289,12 +290,6 @@ def _element_text(el) -> str:
 # ─────────────────────────────────────────────
 
 
-def _cell_text(td) -> str:
-    """Cleaned text of a table cell, with pipe escaping."""
-    txt = _element_text(td)
-    return txt.replace("|", "\\|") if txt else ""
-
-
 def _find_real_table(wrapper) -> Any | None:
     """The Sejm wraps real tables in an outer 1-cell layout <TABLE>.
 
@@ -336,68 +331,9 @@ def _find_real_table(wrapper) -> Any | None:
 def _table_to_markdown(table_el) -> str:
     """Convert a real <TABLE> element to a Markdown pipe table.
 
-    Handles COLSPAN/ROWSPAN by repeating values across expanded cells. Returns
-    an empty string if the table has no parseable rows.
+    Returns an empty string if the table has no parseable rows.
     """
-    raw_rows: list[list[tuple[str, int, int]]] = []
-    for tr in table_el.iter():
-        if (tr.tag or "").lower() != "tr":
-            continue
-        cells: list[tuple[str, int, int]] = []
-        for cell in tr:
-            ctag = (cell.tag or "").lower()
-            if ctag not in ("td", "th"):
-                continue
-            text = _cell_text(cell)
-            colspan = int(cell.get("COLSPAN") or cell.get("colspan") or 1)
-            rowspan = int(cell.get("ROWSPAN") or cell.get("rowspan") or 1)
-            cells.append((text, colspan, rowspan))
-        if cells:
-            raw_rows.append(cells)
-
-    if not raw_rows:
-        return ""
-
-    # Expand colspan/rowspan into a rectangular grid
-    expanded: list[list[str]] = []
-    pending: dict[int, tuple[str, int]] = {}  # col_index → (text, remaining)
-    for row in raw_rows:
-        out_row: list[str] = []
-        col = 0
-        cell_idx = 0
-        while cell_idx < len(row) or col in pending:
-            if col in pending:
-                text, remaining = pending[col]
-                out_row.append(text)
-                if remaining > 1:
-                    pending[col] = (text, remaining - 1)
-                else:
-                    del pending[col]
-                col += 1
-                continue
-            text, colspan, rowspan = row[cell_idx]
-            for _ in range(colspan):
-                out_row.append(text)
-                if rowspan > 1:
-                    pending[col] = (text, rowspan - 1)
-                col += 1
-            cell_idx += 1
-        expanded.append(out_row)
-
-    if not expanded:
-        return ""
-
-    max_cols = max(len(r) for r in expanded)
-    for r in expanded:
-        while len(r) < max_cols:
-            r.append("")
-
-    lines: list[str] = []
-    lines.append("| " + " | ".join(expanded[0]) + " |")
-    lines.append("| " + " | ".join("---" for _ in range(max_cols)) + " |")
-    for row in expanded[1:]:
-        lines.append("| " + " | ".join(row) + " |")
-    return "\n".join(lines)
+    return render_table(table_el, lambda cell: _element_text(cell) or "")
 
 
 # ─────────────────────────────────────────────

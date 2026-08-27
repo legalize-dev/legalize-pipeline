@@ -16,11 +16,9 @@ from lxml import etree
 
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
-
-# C0/C1 control characters to strip (keep \n, \r, \t).
-_CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # ISB special entity elements → Unicode replacements.
 _ENTITY_MAP: dict[str, str] = {
@@ -158,7 +156,7 @@ def _inline_text(elem: etree._Element) -> str:
             parts.append(child.tail)
 
     text = "".join(parts)
-    text = _CTRL.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
@@ -763,7 +761,7 @@ def _revised_inline_text(elem) -> str:
             parts.append(child.tail)
 
     text = "".join(parts)
-    text = _CTRL.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
@@ -784,7 +782,7 @@ def _html_text(elem) -> str:
         text = elem.text_content()
     except (ValueError, AttributeError):
         return ""
-    text = _CTRL.sub("", text)
+    text = strip_control(text)
     return re.sub(r"\s+", " ", text).strip()
 
 
@@ -831,7 +829,7 @@ def _html_inline_text(elem) -> str:
             parts.append(child.tail)
 
     text = "".join(parts)
-    text = _CTRL.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
 

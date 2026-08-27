@@ -47,13 +47,12 @@ from legalize.models import (
     Reform,
     Version,
 )
+from legalize.fetcher._tables import render_table
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
 _HTML_PARSER = lxml_html.HTMLParser(encoding="utf-8")
-
-# Control characters to strip (C0/C1 except tab, newline, carriage return).
-_CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # UI elements to skip.
 _SKIP_CLASSES = {"TAG_COLLAPSED"}
@@ -93,7 +92,7 @@ def _parse_html(data: bytes):
 
 def _clean_text(text: str) -> str:
     """Clean text: strip control chars, normalize whitespace."""
-    text = _CTRL_RE.sub("", text)
+    text = strip_control(text)
     text = text.replace("\xa0", " ")  # non-breaking space
     text = re.sub(r"\s+", " ", text).strip()
     return text
@@ -148,7 +147,7 @@ def _inline_text(el) -> str:
             parts.append("*")
 
         if node.text:
-            text = _CTRL_RE.sub("", node.text).replace("\xa0", " ")
+            text = strip_control(node.text).replace("\xa0", " ")
             if is_link:
                 href = _normalize_href(node.get("href", ""))
                 parts.append(f"[{text}]({href})")
@@ -165,7 +164,7 @@ def _inline_text(el) -> str:
             if isinstance(child.tag, str):
                 _walk(child, depth + 1)
             if child.tail:
-                tail = _CTRL_RE.sub("", child.tail).replace("\xa0", " ")
+                tail = strip_control(child.tail).replace("\xa0", " ")
                 parts.append(tail)
 
         if is_bold:
@@ -179,75 +178,8 @@ def _inline_text(el) -> str:
 
 
 def _table_to_markdown(table_el) -> str:
-    """Convert a <table> element to a Markdown pipe table.
-
-    Handles rowspan and colspan by expanding to a 2D grid.
-    Cell content is extracted with inline formatting preserved.
-    """
-    raw_rows: list[list[tuple[str, int, int]]] = []
-    for tr in table_el.iter():
-        tag = tr.tag if isinstance(tr.tag, str) else ""
-        if tag.lower() != "tr":
-            continue
-        cells: list[tuple[str, int, int]] = []
-        for cell in tr:
-            cell_tag = cell.tag if isinstance(cell.tag, str) else ""
-            if cell_tag.lower() not in ("td", "th"):
-                continue
-            text = _clean_text(cell.text_content()).replace("|", "\\|")
-            colspan = int(cell.get("colspan") or cell.get("COLSPAN") or 1)
-            rowspan = int(cell.get("rowspan") or cell.get("ROWSPAN") or 1)
-            cells.append((text, colspan, rowspan))
-        if cells:
-            raw_rows.append(cells)
-
-    if not raw_rows:
-        return ""
-
-    # Expand rowspan/colspan into a 2D grid.
-    expanded: list[list[str]] = []
-    pending: dict[int, tuple[str, int]] = {}
-
-    for row in raw_rows:
-        out_row: list[str] = []
-        col = 0
-        cell_idx = 0
-        while cell_idx < len(row) or col in pending:
-            if col in pending:
-                text, remaining = pending[col]
-                out_row.append(text)
-                if remaining > 1:
-                    pending[col] = (text, remaining - 1)
-                else:
-                    del pending[col]
-                col += 1
-                continue
-            if cell_idx >= len(row):
-                break
-            text, colspan, rowspan = row[cell_idx]
-            for _ in range(colspan):
-                out_row.append(text)
-                if rowspan > 1:
-                    pending[col] = (text, rowspan - 1)
-                col += 1
-            cell_idx += 1
-        expanded.append(out_row)
-
-    if not expanded:
-        return ""
-
-    max_cols = max(len(r) for r in expanded)
-    for r in expanded:
-        while len(r) < max_cols:
-            r.append("")
-
-    lines = []
-    lines.append("| " + " | ".join(expanded[0]) + " |")
-    lines.append("| " + " | ".join("---" for _ in range(max_cols)) + " |")
-    for row in expanded[1:]:
-        lines.append("| " + " | ".join(row) + " |")
-
-    return "\n".join(lines)
+    """Convert a <table> element to a Markdown pipe table."""
+    return render_table(table_el, lambda cell: _clean_text(cell.text_content()))
 
 
 def _parse_ro_date(text: str) -> date | None:

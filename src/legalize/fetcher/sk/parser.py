@@ -18,11 +18,9 @@ from lxml import etree
 
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
-
-# C0/C1 control characters to strip (keep \n, \r, \t).
-_CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # Non-breaking space → regular space
 _NBSP = re.compile(r"\xa0|&nbsp;")
@@ -89,7 +87,7 @@ def _clean_text(text: str) -> str:
         return ""
 
     text = _NBSP.sub(" ", text)
-    text = _CTRL.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
@@ -184,7 +182,7 @@ def _html_table_to_markdown(table_el: etree._Element) -> str:
                 row_is_header = True
             content = etree.tostring(cell, method="text", encoding="unicode") or ""
             content = _NBSP.sub(" ", content)
-            content = _CTRL.sub("", content)
+            content = strip_control(content)
             content = re.sub(r"\s+", " ", content).strip()
             content = content.replace("|", "\\|")
             cells.append(content)

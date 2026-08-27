@@ -55,7 +55,10 @@ def bootstrap(
     if workers is None:
         workers = getattr(cc, "max_workers", 4) or 4
 
-    json_dir = Path(cc.data_dir) / "json"
+    # Not data_dir/json/ — that is the generic pipeline's own store, and these
+    # per-version records have a different shape. `legalize commit` reads it and
+    # would abort on the first file.
+    json_dir = Path(cc.data_dir) / "versions"
     json_dir.mkdir(parents=True, exist_ok=True)
 
     console.print("[bold]Bootstrap SK — Slov-Lex with version history[/bold]\n")

@@ -38,14 +38,12 @@ from legalize.models import (
     Rank,
     Version,
 )
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
 # Force UTF-8 — Lovdata serves UTF-8 but lxml auto-detection can misfire.
 _HTML_PARSER = lxml_html.HTMLParser(encoding="utf-8")
-
-# C0 control chars (except \t, \n, \r) and C1 control chars (0x80-0x9F).
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # Heading tag → CSS class for the transformer's markdown renderer.
 _HEADING_CSS = {
@@ -71,7 +69,7 @@ def _clean_text(text: str) -> str:
     if not text:
         return ""
     text = text.replace("\xa0", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 

@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import subprocess
+import tempfile
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -242,7 +244,15 @@ class StateStore:
             )
 
     def save(self) -> None:
-        """Persist state to disk."""
+        """Persist state to disk, atomically.
+
+        Truncate-and-write leaves a half-written state.json behind whenever the
+        process goes away mid-save — a Ctrl-C during a long commit run, which
+        saves every 50 laws — and every later run for that country then dies in
+        ``json.load`` before it can do anything about it. Same private-write-then
+        -rename as ``storage.save_structured_json``: the rename is atomic, so a
+        reader sees either the old file or the new one.
+        """
         self._path.parent.mkdir(parents=True, exist_ok=True)
 
         data = {
@@ -250,8 +260,16 @@ class StateStore:
             "runs": [asdict(r) for r in self._runs],
         }
 
-        with open(self._path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+        fd, tmp = tempfile.mkstemp(
+            dir=self._path.parent, prefix=f".{self._path.name}.", suffix=".tmp"
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            os.replace(tmp, self._path)
+        except BaseException:
+            Path(tmp).unlink(missing_ok=True)
+            raise
 
         logger.debug("State saved to %s", self._path)
 

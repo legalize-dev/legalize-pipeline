@@ -25,15 +25,13 @@ from xml.etree import ElementTree as ET
 
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
 # ─── Namespaces ───
 _AKN_NS = "http://docs.oasis-open.org/legaldocml/ns/akn/3.0/CSD13"
 _SCL_NS = "http://www.scl.lu"
-
-# C0/C1 control characters to strip (keeps \n, \r, \t)
-_CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # ─── Rank mapping ───
 _RANK_MAP: dict[str, str] = {
@@ -119,7 +117,7 @@ def _extract_text(el: ET.Element) -> str:
             parts.append(child.tail)
 
     text = "".join(parts)
-    return _CONTROL_RE.sub("", text)
+    return strip_control(text)
 
 
 def _parse_list(list_el: ET.Element) -> str:
@@ -360,7 +358,7 @@ class LegiluxTextParser(TextParser):
         Akoma Ntoso document and handles accordingly.
         """
         text = data.decode("utf-8", errors="replace")
-        text = _CONTROL_RE.sub("", text)
+        text = strip_control(text)
 
         root = ET.fromstring(text)
         root_tag = _tag(root)
@@ -564,7 +562,7 @@ class LegiluxMetadataParser(MetadataParser):
         (original) Act's scl:JOLUXLegalResource block.
         """
         text = data.decode("utf-8", errors="replace")
-        text = _CONTROL_RE.sub("", text)
+        text = strip_control(text)
 
         root = ET.fromstring(text)
 

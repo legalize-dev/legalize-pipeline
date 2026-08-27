@@ -14,11 +14,9 @@ from typing import Any
 
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
-
-# C0/C1 control characters to strip (keep \n, \r, \t).
-_CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # Regex for extracting amendment numbers from full citation text.
 _AMENDMENT_RE = re.compile(r"č\.\s*(\d+)/(\d+)\s*Sb\.")
@@ -94,7 +92,7 @@ def _html_table_to_markdown(html: str) -> str:
             content = re.sub(r"<[^>]+>", "", content)
             content = content.replace("&amp;", "&")
             content = content.replace("&nbsp;", " ")
-            content = _CTRL.sub("", content)
+            content = strip_control(content)
             content = re.sub(r"\s+", " ", content).strip()
             # Escape pipe chars inside cells
             content = content.replace("|", "\\|")
@@ -188,7 +186,7 @@ def _clean_text(text: str) -> str:
     text = text.replace("&nbsp;", " ")
 
     # Remove control characters
-    text = _CTRL.sub("", text)
+    text = strip_control(text)
 
     # Normalize whitespace
     text = re.sub(r"\s+", " ", text).strip()

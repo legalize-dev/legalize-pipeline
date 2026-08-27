@@ -58,6 +58,7 @@ from legalize.models import (
     Reform,
     Version,
 )
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -107,11 +108,6 @@ TYPE_CODE_TO_JURISDICTION_RANK: dict[str, tuple[str | None, str]] = {
     "nisro": ("uk-nir", "ni-statutory-rule-or-order"),
 }
 
-# Strip C0 and C1 control characters. We do this at paragraph boundaries
-# because CLML itself is clean, but non-breaking-space noise from copy-paste
-# in tribunal transcripts has slipped in before.
-_CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
-
 # Collapses any whitespace run (including NBSPs and newlines) to a single
 # space, used after pre-wrapping inline bold/italic.
 _WS_RE = re.compile(r"\s+")
@@ -127,7 +123,7 @@ def _clean_text(text: str | None) -> str:
     # In UK legal text NBSPs appear between "s." and the section number;
     # collapsing them is fine for the Markdown output.
     text = text.replace("\u00a0", " ")
-    text = _CTRL_RE.sub("", text)
+    text = strip_control(text)
     return _WS_RE.sub(" ", text).strip()
 
 

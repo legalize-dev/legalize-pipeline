@@ -70,6 +70,7 @@ from legalize.models import (
     Rank,
     Version,
 )
+from legalize.fetcher._text import strip_control
 
 NS = "http://www.leychile.cl/esquemas"
 AEM_NS = "http://valida.aem.gob.cl"
@@ -83,9 +84,6 @@ def _t(name: str) -> str:
 def _aem(name: str) -> str:
     return f"{{{AEM_NS}}}{name}"
 
-
-# Strip C0 + C1 control characters (keep \t, \n, \r)
-_CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # Collapses any whitespace run (including newlines) to a single space — used
 # for YAML-safe title strings.
@@ -162,7 +160,7 @@ def _normalize_text(text: str) -> str:
 
     Called on every text fragment before it is handed back to the caller.
     """
-    text = _CTRL_RE.sub("", text)
+    text = strip_control(text)
     text = text.replace("\u00a0", " ")
     return text
 

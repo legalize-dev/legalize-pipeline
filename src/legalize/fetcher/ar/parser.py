@@ -40,6 +40,7 @@ from lxml import html as lxml_html
 from legalize.fetcher.ar.reforms import INFOLEG_ENCODING
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,6 @@ logger = logging.getLogger(__name__)
 # ── Text cleaning ──
 
 # C0 control chars (except \t \n \r) and C1 control chars (0x80–0x9F)
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 _WS_RUNS_RE = re.compile(r"[ \t]+")
 _HTML_PARSER = lxml_html.HTMLParser(encoding=INFOLEG_ENCODING)
 
@@ -65,7 +65,7 @@ def _clean(text: str) -> str:
         return ""
     text = unescape(text)
     text = text.replace("\xa0", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = _WS_RUNS_RE.sub(" ", text)
     text = text.replace("\r", "")
     return text.strip()
