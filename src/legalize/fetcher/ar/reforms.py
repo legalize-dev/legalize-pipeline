@@ -20,7 +20,19 @@ POC validated 2026-04-11 against Ley 19.550 (Sociedades) using Ley 27.444
 (2018) as the modificatoria — 4 article substitutions extracted and matched
 literally against the consolidated texact.htm.
 
-See RESEARCH-AR.md §6 for the complete reconstruction algorithm.
+What the extractor assumes, and where it stops:
+
+- **The instruction names its target law in the same breath.** A match is kept
+  only if the text between the article number and the new body refers to the
+  norm we are reconstructing ("de la Ley 19.550"), so a modificatoria that
+  touches five laws contributes only the articles that name ours.
+- **Article bodies run until the next ``Art. N.-`` header.** A modificatoria
+  that does not number its articles that way yields nothing at all.
+- **Nothing outside the four templates is guessed at.** A plural substitution
+  we can detect but cannot split into quoted articles is emitted as
+  :attr:`ModificationKind.UNKNOWN` with an empty body, so the caller downgrades
+  the norm to bootstrap-only instead of publishing a version we invented. The
+  same is true of Resoluciones that only update monetary amounts.
 """
 
 from __future__ import annotations
@@ -34,8 +46,11 @@ from legalize.fetcher._text import strip_control
 logger = logging.getLogger(__name__)
 
 
-# Decode all InfoLEG HTML as cp1252 regardless of declared charset.
-# Mixed ISO-8859-1 / windows-1252 declarations in the wild — see RESEARCH-AR.md §5.
+# Decode all InfoLEG HTML as cp1252 regardless of the declared charset. The host
+# mixes ISO-8859-1 and windows-1252 declarations and is wrong either way; the two
+# differ only over 0x80-0x9F, which is where the em dashes and smart quotes of
+# Argentine legal prose live. Read as ISO-8859-1 they decode to C1 control chars
+# and strip_control() below deletes them, eating the punctuation silently.
 INFOLEG_ENCODING = "cp1252"
 
 

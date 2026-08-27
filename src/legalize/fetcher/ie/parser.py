@@ -255,11 +255,6 @@ class ISBTextParser(TextParser):
         """Parse ISB XML format (acts with XML available, ~1995+)."""
         root = etree.fromstring(data)
         paragraphs: list[Paragraph] = []
-        images_dropped = 0
-
-        # Count images dropped
-        for graphic in root.iter("graphic"):
-            images_dropped += 1
 
         # Extract metadata for the Version
         meta_el = root.find("metadata")

@@ -7,7 +7,7 @@ This parser is Spain-specific (it walks BOE's <bloque>/<version>/<p> schema)
 but the module path is kept here so pre-existing callers keep working.
 Peer countries use their own fetcher/<cc>/parser.py.
 
-Refactored 2026-04-22 (RESEARCH-ES-v2.md):
+Refactored 2026-04-22 (research/RESEARCH-ES-v2.md):
 - Per-tag dispatch (no more findall("p") that dropped tables/lists/images)
 - Rich inline extractor (sup/sub/a-href/br preserved)
 - Images linked to BOE CDN as Markdown image references (policy §11)
@@ -402,7 +402,7 @@ def parse_diario_xml(xml_data: bytes | str) -> list[Block]:
     <fecha_publicacion>, so the same renderer/markdown pipeline works.
 
     Used for Stage B (non-consolidated norms — Circulares, Resoluciones,
-    Órdenes no consolidadas, RDs puntuales). See RESEARCH-ES-v2.md §3.
+    Órdenes no consolidadas, RDs puntuales). See research/RESEARCH-ES-v2.md §3.
     """
     if isinstance(xml_data, str):
         xml_bytes = xml_data.encode("utf-8")

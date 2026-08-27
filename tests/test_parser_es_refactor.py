@@ -1,4 +1,4 @@
-"""Pin tests for the 2026-04-22 Spain parser refactor (RESEARCH-ES-v2.md).
+"""Pin tests for the 2026-04-22 Spain parser refactor (research/RESEARCH-ES-v2.md).
 
 These cover the constructs that the pre-refactor parser silently dropped
 or degraded: tables, nota_pie footnotes, cita blockquotes, libro/anexo

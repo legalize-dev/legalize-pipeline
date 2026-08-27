@@ -46,7 +46,7 @@ class LegislativeClient(ABC):
     def get_metadata(self, norm_id: str) -> bytes:
         """Fetch metadata for a norm."""
 
-    def set_as_of(self, target: date) -> None:
+    def set_as_of(self, target: date) -> None:  # noqa: B027 (optional hook, see docstring)
         """Narrow what ``get_text`` returns to the state at ``target``.
 
         A no-op for the sources that only ever publish a current text. A

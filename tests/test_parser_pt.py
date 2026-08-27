@@ -2,7 +2,7 @@
 
 Every case here is a defect the old tretas.org-based pipeline actually shipped —
 the counts in the docstrings come from the audit of `legalize-pt` at 109,929 files
-(RESEARCH-PT-v2 §1).
+(research/RESEARCH-PT-v2.md §1).
 """
 
 from __future__ import annotations

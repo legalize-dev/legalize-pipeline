@@ -168,7 +168,7 @@ class BCNDiscovery(NormDiscovery):
             consecutive_failures = 0
             max_consecutive_failures = 3
             # BCN's exportarBSimpleMetas silently ignores `npagina` and returns
-            # the same first page on every request — see RESEARCH-CHILE.md §7.5.
+            # the same first page on every request.
             # Detect "no new IDs on this page" and move on to the next type
             # after one stale page (allowing for one flaky duplicate page).
             stale_pages = 0

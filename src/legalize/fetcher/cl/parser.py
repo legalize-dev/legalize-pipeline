@@ -855,8 +855,8 @@ def _collect_extra(root: ET.Element, norm_id: str) -> list[tuple[str, str]]:
     """Build the ordered list of extra (key, value) pairs for frontmatter.
 
     Every XML-available field the playbook asks us to capture is included
-    here with an English snake_case key. Rationale for choices is in
-    ``RESEARCH-CHILE.md §7.3``.
+    here with an English snake_case key. Where a value is not passed through
+    verbatim the reason is commented at the point it is built.
     """
     extra: list[tuple[str, str]] = []
 

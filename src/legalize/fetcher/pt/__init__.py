@@ -2,7 +2,7 @@
 
 One client over two DRE surfaces: the consolidated corpus (5,528 diplomas with
 article-level version history) and the diploma as published (everything else).
-See docs/pt-dre-api.md and RESEARCH-PT-v2.md.
+See docs/pt-dre-api.md and research/RESEARCH-PT-v2.md.
 """
 
 from legalize.fetcher.pt.client import DREClient

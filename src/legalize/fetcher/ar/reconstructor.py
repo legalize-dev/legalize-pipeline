@@ -16,7 +16,15 @@ this module reconstructs every per-date snapshot by:
    ``[consolidacion]`` snapshot is appended so the user always lands on
    the authoritative current text.
 
-See RESEARCH-AR.md §6 for the strategy and the POC validation data.
+The strategy assumes two things that are not always true: that a
+modificatoria's own text is complete and templated enough to replay (see
+:mod:`legalize.fetcher.ar.reforms` for the four patterns and their limits), and
+that the catalog's modifications graph is the whole truth about what touched a
+norm. Step 3 is what makes that safe — the convergence check against
+``texact.htm`` decides whether a reconstructed timeline is published as history
+or collapsed back to ``v0 + [consolidacion]``, so a bad replay costs us versions,
+never a wrong current text. Validated in a POC on 2026-04-11 against Ley 19.550
+(Sociedades) with Ley 27.444 as the modificatoria.
 """
 
 from __future__ import annotations

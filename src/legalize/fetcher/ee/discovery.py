@@ -150,7 +150,7 @@ class RTDiscovery(NormDiscovery):
             groups.setdefault(info.group_id, []).append(info)
 
         # Sort each group by effective_from desc, pick the first
-        for group_id, versions in groups.items():
+        for versions in groups.values():
             versions.sort(key=lambda h: h.effective_from or date(1900, 1, 1), reverse=True)
             yield versions[0].global_id
 
@@ -281,7 +281,7 @@ def _parse_header(path: Path) -> _HeaderInfo | None:
     # Stream until we close </metaandmed>
     context = etree.iterparse(str(path), events=("end",), huge_tree=True)
     try:
-        for event, elem in context:
+        for _, elem in context:
             local = etree.QName(elem.tag).localname
             if local == "dokumentLiik" and not doc_type:
                 doc_type = (elem.text or "").strip()

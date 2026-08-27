@@ -105,11 +105,6 @@ def _cache_put(key: str, value: tuple[str, str, str]) -> None:
 # Constants
 # ─────────────────────────────────────────────
 
-# Standard A4 portrait dimensions in PDF points (72 dpi)
-_A4_WIDTH = 595
-_A4_HEIGHT = 842
-_A4_TOLERANCE = 2  # points
-
 # Hyphenation characters used by Greek typesetters at line breaks
 _HYPHENS = ("-", "\u2212")  # ASCII hyphen + U+2212 MINUS SIGN
 
@@ -374,10 +369,6 @@ def _read_pages(pdf_path: Path) -> list[tuple[str, float, float]]:
     return out
 
 
-def _is_a4(width: float, height: float) -> bool:
-    return abs(width - _A4_WIDTH) <= _A4_TOLERANCE and abs(height - _A4_HEIGHT) <= _A4_TOLERANCE
-
-
 def _strip_first_page_header(lines: list[str]) -> tuple[list[str], list[str]]:
     """Drop the gazette masthead from the first page.
 
@@ -525,14 +516,6 @@ def _extract_text_uncached(path: Path) -> tuple[str, str, str]:
     pages = _read_pages(path)
     if not pages:
         return "", "", ""
-
-    # Sanity check page geometry — non-A4 pages signal a non-standard issue
-    # (e.g. landscape annexes, certain old scanned documents). We don't
-    # raise; we just collect the warning so the caller can decide.
-    for i, (_, w, h) in enumerate(pages):
-        if not _is_a4(w, h):
-            # Quietly noted; the caller can re-run with logging on if needed.
-            pass
 
     repeated_headers = _collect_repeated_headers(pages)
     page_tables = _extract_page_tables(path)

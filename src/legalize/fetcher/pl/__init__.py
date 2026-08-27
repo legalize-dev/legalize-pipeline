@@ -4,8 +4,9 @@ Source: ELI API of the Polish Sejm (https://api.sejm.gov.pl/eli).
 
 Scope v1: publisher DU (Dziennik Ustaw) only, acts with HTML text only.
 Acts that only have PDF (Konstytucja 1997, Obwieszczenia with consolidated
-codes, pre-2012 historical acts) are skipped client-side. See
-RESEARCH-POLAND.md for the full rationale.
+codes, pre-2012 historical acts) are skipped client-side on the listing's own
+``textHTML`` flag: the pipeline publishes Markdown derived from that HTML, so a
+PDF-only act would ship as a law with no text in it at all.
 """
 
 from legalize.fetcher.pl.client import EliClient

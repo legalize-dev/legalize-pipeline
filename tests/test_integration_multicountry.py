@@ -529,13 +529,13 @@ class TestStorageGenericRoundTrip:
         loaded = load_norma_from_json(json_path)
 
         assert len(loaded.blocks) == len(norm.blocks)
-        for orig, loaded_b in zip(norm.blocks, loaded.blocks):
+        for orig, loaded_b in zip(norm.blocks, loaded.blocks, strict=True):
             assert loaded_b.id == orig.id
             assert loaded_b.block_type == orig.block_type
             assert loaded_b.title == orig.title
             assert len(loaded_b.versions) == len(orig.versions)
 
-            for orig_v, loaded_v in zip(orig.versions, loaded_b.versions):
+            for orig_v, loaded_v in zip(orig.versions, loaded_b.versions, strict=True):
                 assert loaded_v.norm_id == orig_v.norm_id
                 assert loaded_v.publication_date == orig_v.publication_date
                 # Paragraph text should match
@@ -554,7 +554,7 @@ class TestStorageGenericRoundTrip:
         loaded = load_norma_from_json(json_path)
 
         assert len(loaded.reforms) == len(norm.reforms)
-        for orig, loaded_r in zip(norm.reforms, loaded.reforms):
+        for orig, loaded_r in zip(norm.reforms, loaded.reforms, strict=True):
             assert loaded_r.date == orig.date
             assert loaded_r.norm_id == orig.norm_id
 

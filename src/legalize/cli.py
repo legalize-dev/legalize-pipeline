@@ -985,7 +985,8 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
                     issues.append(
                         (
                             "WARN",
-                            f"  {key} — stated on {100 * total / len(envelopes):.1f}% of records, none published",
+                            f"  {key} — stated on {100 * total / len(envelopes):.1f}% of records, "
+                            f"unpublished on {100 * n / total:.1f}% of those",
                         )
                     )
 

@@ -4,8 +4,8 @@ Two parsers:
 - EliTextParser: walks the semantic HTML returned by /acts/{eli}/text.html.
 - EliMetadataParser: parses the JSON returned by /acts/{eli}.
 
-The HTML uses a stable ``unit unit_XXXX`` class taxonomy (see RESEARCH-POLAND.md
-§6.1 for the full mapping). Top-level content sits inside ``<div class="parts">``.
+The HTML uses a stable ``unit unit_XXXX`` class taxonomy, mapped in full below.
+Top-level content sits inside ``<div class="parts">``.
 
 Structural hierarchy (Polish name → internal block_type):
     part (część), ksga (księga), tytu (tytuł), dzia (dział),
@@ -885,7 +885,12 @@ class EliTextParser(TextParser):
         return blocks
 
     def extract_reforms(self, data: bytes) -> list[Any]:
-        """Poland v1 does not track per-law reforms (see RESEARCH-POLAND.md §2.4).
+        """Poland v1 does not track per-law reforms.
+
+        The ELI API serves one HTML text per act — the act as announced. Later
+        consolidations exist only as PDF and ``references`` names related acts
+        without dating them, so there is no dated series of texts to turn into
+        commits.
 
         Falls back to the generic extractor which groups by (pub_date, norm_id).
         All blocks emitted by parse_text share the same pub_date + norm_id, so

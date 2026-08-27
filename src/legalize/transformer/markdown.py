@@ -3,7 +3,7 @@
 Converts the Block/Version/Paragraph structure from BOE XML
 into Markdown that mirrors the legal hierarchy.
 
-Refactored 2026-04-22 (RESEARCH-ES-v2.md):
+Refactored 2026-04-22 (research/RESEARCH-ES-v2.md):
 - Full CSS-class map covering libro/parte/titulo/cap/seccion/subseccion/
   articulo/anexo/apendice/disposiciones/firmas
 - Blockquote rendering for cita/cita_con_pleca family

@@ -731,7 +731,7 @@ class RoTextParser(TextParser):
 
         # Also add blocks that only exist in older versions (deleted articles).
         latest_ids = {b.id for b in latest_blocks}
-        for v_date, v_id, blocks in all_version_blocks:
+        for _, _, blocks in all_version_blocks:
             for block in blocks:
                 if block.id not in latest_ids:
                     latest_ids.add(block.id)
