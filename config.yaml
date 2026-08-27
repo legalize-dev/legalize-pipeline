@@ -46,6 +46,11 @@ countries:
       requests_per_second: 4.0
       user_agent: "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
 
+  # fr is deliberately OUT of the daily-update matrix: it has no incremental
+  # source. legi_dir below is a local extraction of the LEGI dump that exists
+  # on one laptop and nowhere in CI, so a daily run would find nothing.
+  # Putting fr back in the matrix needs a fetcher that reads DILA's feed, not
+  # a matrix edit.
   fr:
     repo_path: "../countries/fr"
     data_dir: "../countries/data-fr"
