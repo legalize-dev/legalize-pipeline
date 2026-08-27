@@ -10,8 +10,18 @@ Writing a fetcher for your country's legislation is the highest-impact contribut
 git clone https://github.com/legalize-dev/legalize-pipeline.git
 cd legalize-pipeline
 pip install -e ".[dev]"
-pytest tests/ -v        # 459 tests
-ruff check src/ tests/  # lint
+pytest tests/ -v              # ~2000 tests as of this writing (check with `pytest --collect-only -q`), grows with every country
+ruff check src/ tests/        # lint
+ruff format --check src/ tests/  # formatting (CI gate, matches `ruff format`)
+```
+
+Install the pre-commit hooks too — they run the same lint/format checks (plus secret
+scanning and Actions linting) before each commit, and the full test suite before each
+push:
+
+```bash
+pip install pre-commit
+pre-commit install --hook-type pre-commit --hook-type pre-push
 ```
 
 ## Code conventions

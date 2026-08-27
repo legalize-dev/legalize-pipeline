@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       country:
-        description: "Country code (es, fr, at, de, se, pt, lv, ad, lt, ee, pl, gr, nl, be, cz, fi, it, lu, eu, uk)"
+        description: "Country code (es, at, de, se, pt, lv, ad, lt, ee, pl, gr, nl, be, cz, fi, it, lu, eu, uk) — not fr, see the matrix comment below"
         required: false
         type: string
         default: ""
@@ -38,7 +38,15 @@ jobs:
         #       fetcher, so the daily always clamps to the last 10 days and
         #       finds nothing. Re-enable once a modern reform source lands.
         #   ro: bootstrap only, not yet wired for daily updates.
-        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","fr","at","de","se","pt","lv","ad","lt","ee","pl","gr","nl","be","cz","fi","it","lu","eu","uk"]') }}
+        #   fr: cannot run in CI — two stacked blocks, do not re-add without
+        #       fixing both. (1) config.yaml's `fr.source.legi_dir` points at a
+        #       local LEGI dump path and no workflow here downloads or publishes
+        #       that dump (config.yaml:56 needs a comment saying so). (2) since
+        #       the sparse-checkout change (8546e8b) the run now dies earlier
+        #       still, inside `_repo_scope`, before it would even reach the LEGI
+        #       read. While fr stays out, its known-broken state can't hide a
+        #       real regression in the other 20 countries under `fail-fast: false`.
+        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","at","de","se","pt","lv","ad","lt","ee","pl","gr","nl","be","cz","fi","it","lu","eu","uk"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
@@ -92,3 +100,15 @@ jobs:
             DATE_FLAG="--date $INPUT_DATE"
           fi
           legalize daily -c "$INPUT_COUNTRY" --repo-path "repos/$INPUT_COUNTRY" $DATE_FLAG --push
+
+      # `cancelled` (e.g. a slow country hitting the 55m timeout) is a state
+      # `if: failure()` never catches, so a cancelled leg reads as neither
+      # pass nor fail anywhere that checks job status. This step runs
+      # specifically on cancellation and fails the job outright so it shows
+      # up as a real failure — including to engine-alert.yml, which alerts
+      # per matrix country on workflow_run failure/cancellation.
+      - name: Fail explicitly on cancellation
+        if: cancelled()
+        run: |
+          echo "::error::Job was cancelled (e.g. hit the 55m timeout) — failing explicitly so it can't hide as a soft grey status."
+          exit 1

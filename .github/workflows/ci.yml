@@ -34,115 +34,14 @@ jobs:
       - run: ruff check src/ tests/
       - run: ruff format --check src/ tests/
 
-  # ─── Per-country smoke tests (dynamic, only when that country changed) ───
-  detect-countries:
-    runs-on: ubuntu-latest
-    outputs:
-      countries: ${{ steps.detect.outputs.countries }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-        with:
-          fetch-depth: 0
-
-      - name: Detect changed country folders
-        id: detect
-        run: |
-          # Get changed files vs base (PR) or previous commit (push)
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE=${{ github.event.pull_request.base.sha }}
-          else
-            BASE=${{ github.event.before }}
-          fi
-
-          # Fallback for initial push
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            BASE=HEAD~1
-          fi
-
-          CHANGED=$(git diff --name-only "$BASE" HEAD 2>/dev/null || echo "")
-
-          # Find all country folders that exist in fetcher/
-          ALL_COUNTRIES=""
-          for dir in src/legalize/fetcher/*/; do
-            code=$(basename "$dir")
-            # Skip __pycache__ and non-country dirs
-            if [ -f "$dir/__init__.py" ]; then
-              ALL_COUNTRIES="$ALL_COUNTRIES $code"
-            fi
-          done
-
-          # Filter to only countries whose files changed
-          CHANGED_COUNTRIES="[]"
-          ITEMS=""
-          for code in $ALL_COUNTRIES; do
-            if echo "$CHANGED" | grep -q "src/legalize/fetcher/$code/"; then
-              ITEMS="$ITEMS\"$code\","
-            fi
-          done
-
-          # Also include all countries if core pipeline files changed
-          if echo "$CHANGED" | grep -qE "src/legalize/(pipeline|storage|config|countries|models)\.py|src/legalize/(committer|transformer|state)/"; then
-            ITEMS=""
-            for code in $ALL_COUNTRIES; do
-              ITEMS="$ITEMS\"$code\","
-            done
-          fi
-
-          # Build JSON array
-          if [ -n "$ITEMS" ]; then
-            CHANGED_COUNTRIES="[${ITEMS%,}]"
-          fi
-
-          echo "countries=$CHANGED_COUNTRIES" >> "$GITHUB_OUTPUT"
-          echo "Changed countries: $CHANGED_COUNTRIES"
-
-  country-smoke:
-    needs: [detect-countries, test]
-    if: needs.detect-countries.outputs.countries != '[]'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        country: ${{ fromJSON(needs.detect-countries.outputs.countries) }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
-        with:
-          python-version: "3.12"
-      - run: pip install -e ".[dev]"
-
-      - name: Verify ${{ matrix.country }} dispatch
-        run: |
-          python -c "
-          from legalize.countries import get_client_class, get_discovery_class, get_text_parser, get_metadata_parser
-          code = '${{ matrix.country }}'
-          print(f'Verifying {code.upper()} dispatch...')
-          c = get_client_class(code)
-          d = get_discovery_class(code)
-          t = get_text_parser(code)
-          m = get_metadata_parser(code)
-          assert hasattr(c, 'create'), f'{c.__name__} missing create()'
-          assert hasattr(c, 'get_text'), f'{c.__name__} missing get_text()'
-          assert hasattr(c, 'get_metadata'), f'{c.__name__} missing get_metadata()'
-          assert hasattr(d, 'discover_all'), f'{d.__name__} missing discover_all()'
-          assert hasattr(t, 'parse_text'), f'{type(t).__name__} missing parse_text()'
-          assert hasattr(m, 'parse'), f'{type(m).__name__} missing parse()'
-          print(f'  Client:    {c.__name__} ✓')
-          print(f'  Discovery: {d.__name__} ✓')
-          print(f'  Parser:    {type(t).__name__} ✓')
-          print(f'  Metadata:  {type(m).__name__} ✓')
-          print(f'{code.upper()} dispatch OK ✓')
-          "
-
-      - name: Run ${{ matrix.country }} tests
-        run: |
-          # Run country-specific tests if they exist
-          if ls tests/test_*${{ matrix.country }}* 2>/dev/null; then
-            pytest tests/test_*${{ matrix.country }}* -v --tb=short
-          elif [ "${{ matrix.country }}" = "es" ]; then
-            pytest tests/test_metadata.py tests/test_xml_parser.py tests/test_sumario.py tests/test_pipeline_bootstrap.py -v --tb=short
-          elif [ "${{ matrix.country }}" = "fr" ]; then
-            pytest tests/test_parser_legi.py -v --tb=short
-          else
-            echo "No specific tests for ${{ matrix.country }}, dispatch verification passed"
-          fi
+  # Per-country smoke testing used to live here as two more jobs
+  # (detect-countries + country-smoke): a substring glob (`test_*$country*`)
+  # that matched the wrong files for fr/ar/se, two unreachable elif branches,
+  # and an `else` that let a brand-new fetcher with zero tests read as
+  # passing. It was also redundant with `test` above: test_pipeline_generic.py
+  # already iterates all 33 countries' dispatch on every push (the same
+  # assertion "Verify dispatch" ran per-country here), and pytest already
+  # collects every tests/test_*.py file — including country-specific ones —
+  # without a glob to get subtly wrong. Removed rather than fixed; per-country
+  # test discoverability is a file-naming convention (tests/test_*_{cc}*.py),
+  # not a CI job.
