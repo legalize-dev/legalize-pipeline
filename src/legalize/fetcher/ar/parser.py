@@ -7,7 +7,11 @@ InfoLEG serves two flavors per norm:
 
 Both are HTML 4.01 with no semantic structure: articles are bold spans
 followed by ``<br>`` and free-form paragraphs. The encoding is **windows-1252**
-even when the meta tag declares ``ISO-8859-1`` (see RESEARCH-AR.md §5).
+even when the meta tag declares ``ISO-8859-1``. The two encodings only disagree
+over 0x80-0x9F, and that is exactly where Argentine legal prose lives: em dashes,
+smart quotes, ellipsis. Read as ISO-8859-1 those bytes become C1 control
+characters, which ``strip_control`` then deletes — punctuation vanishing without
+a single decode error to notice it by.
 
 The parser handles:
 

@@ -284,9 +284,9 @@ class DREClient(LegislativeClient):
             # Where the Jornal Oficial dos Açores leaves the corpus. 21 % of the
             # as-published ids are DRE's legacy regional catalogue — every row with
             # a FonteRegional names the Azorean gazette — and legalize-pt is the
-            # Diário da República (RESEARCH-PT-v2 §11). Keyed on the marker, not on
-            # emptiness: 188 of those rows do carry their text, and they are out of
-            # scope for being another gazette, not for being blank.
+            # Diário da República (research/RESEARCH-PT-v2.md §11). Keyed on the
+            # marker, not on emptiness: 188 of those rows do carry their text, and
+            # they are out of scope for being another gazette, not for being blank.
             if (detail.get("TipoConteudo") or "") == "DiplomaLegacor":
                 raise ValueError(f"Jornal Oficial dos Açores, out of scope: {norm_id}")
             # clean() first: DRE writes a lone NUL into Texto on the rows it has

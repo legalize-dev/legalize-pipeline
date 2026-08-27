@@ -18,8 +18,11 @@ Argentina's bootstrap:
 
 Parallelism: network-bound stage runs in a ThreadPoolExecutor (each worker
 owns its own :class:`InfoLEGClient`). Commits run sequentially on the main
-thread because :class:`GitRepo` is not thread-safe. 8 workers is the
-benchmarked sweet spot (see config.yaml and RESEARCH-AR.md §9).
+thread because :class:`GitRepo` is not thread-safe. 8 workers (``max_workers``
+in config.yaml) is the benchmarked sweet spot: servicios.infoleg.gob.ar
+advertises no rate limits to negotiate with, so the ceiling had to be measured
+rather than read, and the only signal that it has been crossed is fetches that
+start failing.
 
 This module is discovered automatically by
 :func:`legalize.pipeline.generic_bootstrap` via the optional
@@ -87,8 +90,8 @@ def bootstrap(
         config: loaded :class:`Config`.
         dry_run: if True, print actions without committing.
         limit: only process the first N Tier 1 norms (useful for testing).
-        workers: parallel HTTP workers. 8 was benchmarked safe on
-            servicios.infoleg.gob.ar — see RESEARCH-AR.md §9.
+        workers: parallel HTTP workers. Defaults to ``max_workers`` in
+            config.yaml; 8 was benchmarked safe on servicios.infoleg.gob.ar.
 
     Returns the total number of commits created.
     """

@@ -10,7 +10,9 @@ Two responsibilities:
    (original) from the legacy host ``servicios.infoleg.gob.ar``. The host
    is Apache 2.2.22 (no robots.txt, no rate-limit headers, mixed
    ISO-8859-1/windows-1252 declarations). We always decode as **cp1252**
-   regardless of the declared charset — see RESEARCH-AR.md §5.
+   regardless of the declared charset: the declarations are wrong either way and
+   the two encodings differ only over 0x80-0x9F, which is where InfoLEG's em
+   dashes and smart quotes sit. See :mod:`legalize.fetcher.ar.reforms`.
 
 There is no per-norm metadata API: metadata comes from the catalog row
 (``InfoLEGRow`` from :mod:`legalize.fetcher.ar.catalog`). The metadata

@@ -40,7 +40,7 @@ class TestParseTextoXml:
 
         Refactor 2026-04-22: we no longer drop them; the note body is the
         legislative audit trail for each block and the markdown renderer
-        emits it as a quoted small-text line. See RESEARCH-ES-v2.md §1.1.
+        emits it as a quoted small-text line. See research/RESEARCH-ES-v2.md §1.1.
         """
         blocks = parse_text_xml(constitucion_xml)
         note_classes: set[str] = set()

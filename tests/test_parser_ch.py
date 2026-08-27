@@ -2,7 +2,7 @@
 
 Covers the five research fixtures (Constitution, ZGB, DBG tax law, an
 ordinary Bundesgesetz, and a recent Verordnung) and exercises the key
-formatting constructs flagged in RESEARCH-CH.md §0.4:
+formatting constructs the Fedlex Akoma Ntoso payloads use:
 
 - Akoma Ntoso structural hierarchy (book → level → article)
 - Inline formatting (``<b>`` / ``<i>`` / ``<sup>`` / ``<br>``)

@@ -4,8 +4,8 @@ IMPO returns `application/json; charset=ISO-8859-1` — responses must be
 decoded as Latin-1, never via `requests` auto-detection.
 
 Schema (validated 2026-04-07 against 5 live fixtures in
-engine/tests/fixtures/uy/ — see RESEARCH-URUGUAY.md §4.8 for the full
-metadata and formatting inventory):
+engine/tests/fixtures/uy/ — the full metadata and formatting inventory is
+the one below):
 
 Top-level fields (union across the 5 fixtures):
     tipoNorma, nroNorma, anioNorma, nombreNorma, leyenda,

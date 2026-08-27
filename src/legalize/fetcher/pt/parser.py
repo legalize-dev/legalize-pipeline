@@ -729,7 +729,7 @@ class DREMetadataParser(MetadataParser):
 
         # Portuguese diplomas are cited by number; the descriptive text lives in
         # Designacao and Sumario, and the search index only reads title and
-        # short_title. See RESEARCH-PT-v2 §12b.
+        # short_title. See research/RESEARCH-PT-v2.md §12b.
         tipo_display = (published.get("TipoDiploma") or "").strip() or tipo_slug.replace(
             "-", " "
         ).title()

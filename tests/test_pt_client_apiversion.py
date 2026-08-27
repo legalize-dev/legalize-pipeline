@@ -262,7 +262,7 @@ class TestDocumentDetail:
 class TestOutOfScopeRecords:
     """DRE indexes the Jornal Oficial dos Açores but never digitised it: 6,597 of
     the first 31,000 as-published ids are catalogue rows with no text, no PDF and
-    no ELI. They are out of scope (RESEARCH-PT-v2 §11) and must not reach the
+    no ELI. They are out of scope (research/RESEARCH-PT-v2.md §11) and must not reach the
     corpus as text-less cards."""
 
     @staticmethod
