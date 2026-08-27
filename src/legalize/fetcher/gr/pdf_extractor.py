@@ -69,6 +69,7 @@ from typing import Union
 
 import pdfplumber
 import pypdfium2 as pdfium
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -134,10 +135,6 @@ GR_TABLE_CLOSE = "\n<<</GR_TABLE>>>\n"
 _MIN_TABLE_ROWS = 2
 _MIN_TABLE_COLS = 2
 
-# C0/C1 control characters that must never appear in legislative text.
-# Mirrors fetcher/lv/parser.py to keep encoding hygiene consistent.
-_CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
-
 # Soft hyphen (U+00AD) and PDFium's stand-in (U+FFFE) appear mid-word when
 # the original PDF used a soft-hyphen as a hyphenation hint. They are not
 # hyphenation markers we should preserve — they should disappear so the
@@ -171,7 +168,7 @@ def _normalize_unicode(text: str) -> str:
     pipeline operates on clean codepoints.
     """
     text = _INVISIBLE_RE.sub("", text)
-    text = _CTRL_RE.sub("", text)
+    text = strip_control(text)
     return text
 
 

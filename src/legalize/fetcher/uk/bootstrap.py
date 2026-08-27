@@ -367,6 +367,30 @@ def _commit_si_norms(
     first commit emitted by ``FastImporter`` has no explicit ``from``,
     which makes git fast-import use the current branch tip as parent.
     """
+    # TODO(A1): delete this whole function and call
+    #     pipeline.commit_all_fast(config, "uk", norm_ids=si_norm_ids)
+    # once commit_all_fast grows that parameter. Needed signature change in
+    # src/legalize/pipeline.py:891 — one new keyword-only argument:
+    #
+    #     def commit_all_fast(config, country, limit=None, offset=0,
+    #                         dry_run=False, *, norm_ids: list[str] | None = None)
+    #
+    # and, at line 915, select the files from it instead of globbing:
+    #
+    #     json_files = ([json_dir / f"{n}.json" for n in sorted(norm_ids)]
+    #                   if norm_ids is not None else sorted(json_dir.glob("*.json")))
+    #     json_files = [p for p in json_files if p.exists()]
+    #
+    # Everything else in commit_all_fast already works unchanged. This copy
+    # predates two fixes that live only in pipeline.py and are the reason the
+    # duplication is expensive:
+    #   * no _resume_index (pipeline.py:836) — a death restarts from zero and
+    #     then raises HistoryMismatch on the pre-existing branch;
+    #   * no _IMPORT_CHUNK (pipeline.py:106) chunking — one all-or-nothing
+    #     fast-import session, so a kill loses every queued commit. That is
+    #     exactly what killed the Portugal import three times in one night.
+    # It also rescans all_reforms per iteration (`remaining = sum(...)` below),
+    # the quadratic cache eviction pipeline.py replaced with last_reform_index.
     json_dir = Path(cc.data_dir) / "json"
 
     all_reforms: list[tuple[date_type, str, int, Path]] = []

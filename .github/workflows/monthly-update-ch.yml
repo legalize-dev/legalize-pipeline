@@ -27,7 +27,18 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 240  # 4h ceiling — actual run is ~1.5-2h
+    # The GitHub App installation token minted below is only valid for ~1h —
+    # a GitHub-enforced ceiling, not something create-github-app-token can
+    # extend (same rule documented in daily-update.yml). This job's own
+    # timeout used to be 240 (4h), and it was hitting that ceiling exactly,
+    # every month, for 4 months straight — with a dead token and a "Push
+    # updates" step that (lacking if: always()) never ran once the run got
+    # cancelled. Capping well under the token's 1h lifetime, combined with
+    # the idempotency layer (existing commits are skipped fast) and the
+    # if: always() + freshly-minted token on Push below, makes each run
+    # salvage its partial progress instead of losing it — same pattern as
+    # the daily matrix's 55m cap.
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
@@ -65,11 +76,28 @@ jobs:
         run: |
           legalize bootstrap -c ch --repo-path repos/ch --data-dir data-ch
 
+      # Minted right before the push instead of reused from job start: by now
+      # up to ~50 minutes have elapsed and the original token may be close to
+      # (or past) its 1h expiry. if: always() so a cancelled bootstrap above
+      # (job timeout) still gets whatever it managed to commit locally pushed.
+      - name: Refresh GitHub App token before push
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
+        id: app-token-push
+        if: always()
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-ch
+
       - name: Push updates
+        if: always()
         working-directory: repos/ch
+        env:
+          PUSH_TOKEN: ${{ steps.app-token-push.outputs.token }}
         run: |
-          if git diff --quiet HEAD origin/main; then
+          if git diff --quiet HEAD origin/main 2>/dev/null; then
             echo "No new commits to push."
           else
-            git push origin HEAD:main
+            git push "https://x-access-token:${PUSH_TOKEN}@github.com/legalize-dev/legalize-ch.git" HEAD:main
           fi

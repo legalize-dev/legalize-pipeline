@@ -62,13 +62,15 @@ You do not own:
   `fetcher/cache.py`, `pipeline.py`, `countries.py`, `config.py`,
   `cli.py`, CI workflows. PRs are welcome, they just go through the
   project lead.
-- **The output format.** Filenames (= official ID), commit author
-  (`Legalize <legalize@legalize.dev>`), commit trailers (`Source-Id`,
+- **The output format.** Filenames (= official ID), commit committer
+  (`Legalize <legalize@legalize.dev>` — the project bot; the author is
+  whoever ran the pipeline), commit trailers (`Source-Id`,
   `Source-Date`, `Norm-Id`), commit types (`[bootstrap]`, `[reform]`,
-  `[new]`, `[repeal]`, `[correction]`, `[fix-pipeline]`), and the
-  FLAT directory layout are locked. Changing any of this requires
-  regenerating every country's history. Don't touch them without
-  explicit approval.
+  `[new]`, `[repeal]`, `[correction]`, `[fix-pipeline]`), and each
+  country's declared directory layout (`src/legalize/layout.py`;
+  flat unless the country has a `LAYOUT` entry) are locked. Changing
+  any of this requires regenerating every country's history. Don't
+  touch them without explicit approval.
 - **Other countries.** Stay in your lane unless a country maintainer
   invites you in or the country has no assigned maintainer.
 

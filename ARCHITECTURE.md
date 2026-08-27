@@ -12,7 +12,7 @@ fetch → transform → commit
 2. **Transform** — generic XML/HTML → Markdown rendering, frontmatter generation, slug computation. Country-agnostic.
 3. **Commit** — generic git operations: write files, stage, commit with historical `GIT_AUTHOR_DATE`, push. Idempotent via `git log --grep` on the `Source-Id` trailer.
 
-The CLI (`legalize fetch | commit | bootstrap | daily | reprocess | status | health`) dispatches these phases per country.
+The CLI (`legalize bootstrap | commit | daily | fetch | fetch-jurisdiction | health | push | reforms | reprocess | status`) dispatches these phases per country.
 
 ## Modules
 
@@ -47,8 +47,16 @@ Country-agnostic. Anything country-specific belongs in the parser, not here.
 ### `committer/` — generic git operations
 
 - `git_ops.py` — `GitRepo`: init, write_and_add, commit (with historical `GIT_AUTHOR_DATE`), push, idempotency via `git log --grep` on the `Source-Id` trailer.
-- `message.py` — `build_commit_info()`, `format_commit_message()`. Six commit types: `[bootstrap]`, `[reforma]`, `[nueva]`, `[derogacion]`, `[correccion]`, `[fix-pipeline]`. Trailers: `Source-Id`, `Source-Date`, `Norm-Id`.
+- `message.py` — `build_commit_info()`, `format_commit_message()`. Six commit types: `[bootstrap]`, `[reform]`, `[new]`, `[repeal]`, `[correction]`, `[fix-pipeline]` (the values of `CommitType` in `models.py`). Trailers: `Source-Id`, `Source-Date`, `Norm-Id`.
 - `author.py` — author resolved from `git config user.name/user.email` (whoever runs the pipeline). Committer is fixed to the project bot via `config.yaml::git.committer_name/email`.
+
+### `storage.py` — local data cache
+
+Saves each fetched norm to `data-{code}/json/{id}.json`, the intermediate form `commit` reads from so a bootstrap never re-downloads to regenerate output. Tracks which identifier each write claims (`_claim()`) so two norms that resolve to the same filename — a real occurrence, not a bug — overwrite deliberately instead of silently.
+
+### `layout.py` — directory layout resolution (Legalize Format Spec v0.4)
+
+Where a law file lives in its repo. `LAYOUT` maps a country code to a path template (`FLAT` — `{directory}/{identifier}.md` — is the default for every country not in the dict); `law_path()` builds the path when the pipeline writes a norm, `path_from_frontmatter()` rebuilds it from a file's own frontmatter (the consumer's side of the same rule), and `manifest()` renders the `.legalize.yml` published at each country repo's root. A placeholder is either a value this module derives (`directory`, `identifier`, `id_sha1_2`) or any key of the law's own frontmatter, used verbatim — which is how Portugal shards by `{year}` without the spec anticipating it. See the hub's `SPEC.md`, §Directory layout, for the full rule and `CLAUDE.md`'s "Output format" section for why a shape change requires a full rebuild.
 
 ### `state/` — pipeline state
 

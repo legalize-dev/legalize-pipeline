@@ -20,9 +20,9 @@ source has them). Fetch them explicitly by ID so you get the **same** set every
 time you iterate:
 
 ```bash
-# Option A: fetch by explicit IDs
-legalize fetch -c xx --id LAW-2024-1 --id LAW-2024-42 --id LAW-1998-100 \
-                     --id LAW-2012-5 --id LAW-2023-TARIFF
+# Option A: fetch by explicit IDs (positional, not a flag)
+legalize fetch -c xx LAW-2024-1 LAW-2024-42 LAW-1998-100 \
+                     LAW-2012-5 LAW-2023-TARIFF
 
 # Option B: limit-based (less reproducible, OK for first smoke test)
 legalize fetch -c xx --all --limit 5

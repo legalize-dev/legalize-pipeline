@@ -328,7 +328,10 @@ def _commit_prepared_law(
 
     commits_created = 0
 
-    for idx, (snap, markdown) in enumerate(zip(law.result.snapshots, law.rendered)):
+    # strict: a short `rendered` used to truncate silently, which drops a
+    # version from a law's history and can only be repaired by reprocess.
+    pairs = zip(law.result.snapshots, law.rendered, strict=True)
+    for idx, (snap, markdown) in enumerate(pairs):
         if not markdown:
             continue
 

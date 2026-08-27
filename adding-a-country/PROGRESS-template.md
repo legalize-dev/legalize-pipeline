@@ -10,7 +10,7 @@ Currently on: **Step _ ** — <one line on what you were doing>
 Steps are listed in execution order. Each section maps to its step number.
 
 ## Research (Step 0)
-- [ ] `RESEARCH-{CC}.md` exists at workspace root with source + licensing + API details
+- [ ] `RESEARCH-{CC}.md` exists at the root of this repo (`engine/`) with source + licensing + API details
 - [ ] 5 representative fixtures saved under `engine/tests/fixtures/{code}/` (different ranks, at least one with tables)
 - [ ] Metadata inventory table in research doc lists **every** field the source exposes
 - [ ] Formatting inventory in research doc covers tables, bold, italic, lists, footnotes, links, formulas, quotations, annexes, signatories (images skipped)
@@ -63,5 +63,6 @@ Steps are listed in execution order. Each section maps to its step number.
 - [ ] Web PR merged on `legalize-web` (`_COUNTRIES_RAW` entry + language YAML if new)
 - [ ] DB seeded once via `legalize-enrichment` → `sync.yml` in **full-local** mode
 - [ ] `https://legalize.dev/{code}` live and renders a table-containing law correctly
-- [ ] Memory updated and `RESEARCH-{CC}.md` deleted
+- [ ] Memory updated and `RESEARCH-{CC}.md` moved to `engine/research/{CC}.md`
+      (`git mv`, not deleted — code under `fetcher/{code}/` cites it by name)
 

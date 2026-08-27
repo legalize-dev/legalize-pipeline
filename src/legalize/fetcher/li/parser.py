@@ -61,12 +61,12 @@ from legalize.models import (
     Rank,
     Version,
 )
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
 _HTML_PARSER = lxml_html.HTMLParser(encoding="utf-8")
 
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 _WHITESPACE_RE = re.compile(r"\s+")
 
 # German month names → numeric month
@@ -95,7 +95,7 @@ def _clean_text(text: str) -> str:
     if not text:
         return ""
     text = text.replace("\xa0", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = _WHITESPACE_RE.sub(" ", text)
     return text.strip()
 

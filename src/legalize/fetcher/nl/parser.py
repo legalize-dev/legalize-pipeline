@@ -49,12 +49,9 @@ from legalize.models import (
     Rank,
     Version,
 )
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
-
-# Source file is always UTF-8 (XML prolog declares it). Even so, we decode
-# explicitly and strip C0/C1 controls — defensive against rare editorial leaks.
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 
 def _clean(text: str | None) -> str:
@@ -62,7 +59,7 @@ def _clean(text: str | None) -> str:
     if not text:
         return ""
     text = text.replace("\xa0", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 

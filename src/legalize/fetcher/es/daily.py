@@ -18,7 +18,7 @@ from legalize.committer.git_ops import GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
 from legalize.models import CommitType, Disposition, Reform
-from legalize.pipeline import finalize_daily
+from legalize.pipeline import SKIP_WEEKDAYS, finalize_daily
 from legalize.state.store import StateStore, resolve_dates_to_process
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
@@ -85,7 +85,7 @@ def daily(
         state,
         cc.repo_path,
         target_date,
-        skip_weekdays={6},
+        skip_weekdays=SKIP_WEEKDAYS["es"],
     )
     if dates_to_process is None:
         console.print("[yellow]No last summary found. Use --date or run bootstrap.[/yellow]")

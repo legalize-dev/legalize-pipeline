@@ -1993,6 +1993,57 @@
       ],
       "attribution": "> Fuente: IMPO — Centro de Información Oficial (https://www.impo.com.uy). Datos reutilizados bajo la Licencia de Datos Abiertos – Uruguay (Decreto 54/017).",
       "notes": "## Detalles de la fuente\n\n- Codificación de origen: ISO-8859-1 (Latin-1), normalizada a UTF-8 en el repositorio.\n- Las imágenes (escaneos del Diario Oficial, etc.) no se incluyen; se conserva el enlace al escaneo en `extra.gazette_scan_url`.\n- Las notas editoriales de IMPO (referencias cruzadas e historial de modificaciones que añade el organismo, no texto legal aprobado) no se vuelcan al cuerpo; solo se registra su número en `extra.editorial_notes_count`."
+    },
+    "dk": {
+      "code": "dk",
+      "name": "Danmark",
+      "language": "da",
+      "source_name": "Retsinformation, Danmarks officielle portal for lovgivning (Civilstyrelsen)",
+      "source_urls": [
+        "Portal: https://www.retsinformation.dk",
+        "ELI XML: https://www.retsinformation.dk/eli/{path}/xml",
+        "Harvest API: https://api.retsinformation.dk/v1/Documents"
+      ],
+      "data_license": "offentlig ejendom (Lov om ophavsret § 9)",
+      "scope": "Dette repositorium indeholder dansk lovgivning fra Lovtidende A, hentet som LexDania XML via Retsinformations ELI-adresser. Hver retsakt er én Markdown-fil; da kilden ikke udstiller en konsolideret version-for-version historik, afspejler git-historikken retsaktens offentliggørelser som selvstændige dokumenter (as enacted), ikke en sammenskrevet nuværende tekst.",
+      "norm_types": [
+        {
+          "label": "Lov (Lovtidende A)",
+          "pattern": "A{år}{løbenummer}.md",
+          "note": "Retsakt identificeret ved sit ELI-accessionsnummer, f.eks. A20240043429.",
+          "examples": [
+            "dk/A20240043429.md"
+          ]
+        }
+      ],
+      "attribution": "> Indeholder data fra Retsinformation (retsinformation.dk), Danmarks officielle portal for lovgivning.",
+      "notes": "## Begrænsninger\n\n- Retsakter er hentet *som offentliggjort* (as enacted); der er ikke sammenskrevne (konsoliderede) versioner, da Retsinformations åbne kanaler ikke udstiller dem.\n- Underliggende bekendtgørelser og cirkulærer, der ikke er ELI-nummererede i Lovtidende A, er ikke omfattet.\n- Billeder og andre binære bilag medtages ikke."
+    },
+    "ua": {
+      "code": "ua",
+      "name": "Україна",
+      "language": "uk",
+      "source_name": "Законодавство України, Верховна Рада України (zakon.rada.gov.ua / data.rada.gov.ua)",
+      "source_urls": [
+        "Портал: https://zakon.rada.gov.ua",
+        "Картка акта (JSON): https://data.rada.gov.ua/laws/card/{nreg}.json",
+        "Текст редакції: https://zakon.rada.gov.ua/laws/show/{nreg}/ed{YYYYMMDD}.txt"
+      ],
+      "data_license": "суспільне надбання (офіційні документи не є об'єктом авторського права, ст. 8 Закону України \"Про авторське право і суміжні права\")",
+      "scope": "Цей репозиторій містить законодавство України, отримане з офіційного порталу Верховної Ради (zakon.rada.gov.ua та data.rada.gov.ua). Кожен акт — окремий файл Markdown, а кожна редакція (зміна) — окремий git-комміт, датований днем набрання чинності відповідної редакції.",
+      "norm_types": [
+        {
+          "label": "Закон, кодекс, постанова тощо",
+          "pattern": "{nreg}.md",
+          "note": "Ідентифікатор файлу — офіційний номер акта (nreg), приведений до нижнього регістру, зі зворотною похилою рискою заміненою на дефіс, напр. 254к/96-ВР → 254к-96-вр.",
+          "examples": [
+            "ua/254к-96-вр.md",
+            "ua/2341-14.md"
+          ]
+        }
+      ],
+      "attribution": "> Містить дані з офіційного порталу Верховної Ради України (zakon.rada.gov.ua).",
+      "notes": "## Обмеження\n\n- Історія редакцій обмежена тим, що надає картка акта (`/laws/card/{nreg}.json`); акти без переліку редакцій публікуються лише чинним текстом.\n- Зображення та інші бінарні додатки не включаються."
     }
   }
 }

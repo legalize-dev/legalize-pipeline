@@ -29,6 +29,7 @@ import logging
 import re
 from dataclasses import dataclass
 from enum import Enum
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -38,15 +39,10 @@ logger = logging.getLogger(__name__)
 INFOLEG_ENCODING = "cp1252"
 
 
-# C0 control chars (except \t \n \r) and C1 control chars (0x80–0x9F).
-# These leak from cp1252 decoding and break YAML/MD downstream.
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
-
-
 def decode_infoleg(data: bytes) -> str:
     """Decode raw InfoLEG bytes as cp1252 with control-char stripping."""
     text = data.decode(INFOLEG_ENCODING, errors="replace")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     return text
 
 

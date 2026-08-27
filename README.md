@@ -12,37 +12,6 @@ Each law is a file. Each reform is a commit. Every country is a repo.
 
 ![Pipeline diagram](docs/pipeline-diagram.svg)
 
-## Public repos (output)
-
-| Country | Repo | Source |
-|---------|------|--------|
-| Andorra | [legalize-ad](https://github.com/legalize-dev/legalize-ad) | BOPA |
-| Argentina | [legalize-ar](https://github.com/legalize-dev/legalize-ar) | InfoLEG |
-| Austria | [legalize-at](https://github.com/legalize-dev/legalize-at) | RIS (Bundeskanzleramt) |
-| Belgium | [legalize-be](https://github.com/legalize-dev/legalize-be) | Justel (Belgisch Staatsblad) |
-| Chile | [legalize-cl](https://github.com/legalize-dev/legalize-cl) | BCN (LeyChile) |
-| Czech Republic | [legalize-cz](https://github.com/legalize-dev/legalize-cz) | e-Sbírka |
-| Denmark | [legalize-dk](https://github.com/legalize-dev/legalize-dk) | Retsinformation |
-| Estonia | [legalize-ee](https://github.com/legalize-dev/legalize-ee) | Riigi Teataja |
-| Finland | [legalize-fi](https://github.com/legalize-dev/legalize-fi) | Finlex |
-| France | [legalize-fr](https://github.com/legalize-dev/legalize-fr) | LEGI (Legifrance) |
-| Germany | [legalize-de](https://github.com/legalize-dev/legalize-de) | gesetze-im-internet.de |
-| Greece | [legalize-gr](https://github.com/legalize-dev/legalize-gr) | ET (Ethniko Typografeio) |
-| Ireland | [legalize-ie](https://github.com/legalize-dev/legalize-ie) | Irish Statute Book |
-| Italy | [legalize-it](https://github.com/legalize-dev/legalize-it) | Normattiva |
-| Latvia | [legalize-lv](https://github.com/legalize-dev/legalize-lv) | likumi.lv (Latvijas Vēstnesis) |
-| Lithuania | [legalize-lt](https://github.com/legalize-dev/legalize-lt) | TAR (data.gov.lt) |
-| Luxembourg | [legalize-lu](https://github.com/legalize-dev/legalize-lu) | Legilux |
-| Netherlands | [legalize-nl](https://github.com/legalize-dev/legalize-nl) | BWB (wetten.overheid.nl) |
-| Norway | [legalize-no](https://github.com/legalize-dev/legalize-no) | Lovdata |
-| Poland | [legalize-pl](https://github.com/legalize-dev/legalize-pl) | Dziennik Ustaw (Sejm ELI) |
-| Portugal | [legalize-pt](https://github.com/legalize-dev/legalize-pt) | DRE (Diário da República) |
-| Slovakia | [legalize-sk](https://github.com/legalize-dev/legalize-sk) | Slov-Lex |
-| Spain | [legalize-es](https://github.com/legalize-dev/legalize-es) | BOE |
-| Sweden | [legalize-se](https://github.com/legalize-dev/legalize-se) | SFSR (Riksdag) |
-| Ukraine | [legalize-ua](https://github.com/legalize-dev/legalize-ua) | Rada (data.rada.gov.ua) |
-| Uruguay | [legalize-uy](https://github.com/legalize-dev/legalize-uy) | IMPO |
-
 ## Architecture
 
 ```
@@ -102,8 +71,11 @@ src/legalize/
   config.py             # Config + CountryConfig from config.yaml
   models.py             # Domain models (generic, multi-country)
   storage.py            # Save XML + JSON to data/ (intermediate cache)
+  layout.py             # Directory layout per country (Format Spec v0.4)
   pipeline.py           # Generic orchestration (fetch, commit, bootstrap, daily, reprocess)
 ```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the module-by-module reference.
 
 ## Prerequisites
 
@@ -170,37 +142,57 @@ See [adding-a-country/](adding-a-country/README.md) for the full walkthrough.
 
 ## Countries
 
-| Country | Status | Source | Maintainer | Repo |
-|---------|--------|--------|------------|------|
-| Andorra | Live | [BOPA](https://www.bopa.ad/) | — | [legalize-ad](https://github.com/legalize-dev/legalize-ad) |
-| Argentina | Live | [InfoLEG](http://www.infoleg.gob.ar/) | — | [legalize-ar](https://github.com/legalize-dev/legalize-ar) |
-| Austria | Live | [RIS](https://www.ris.bka.gv.at/) | — | [legalize-at](https://github.com/legalize-dev/legalize-at) |
-| Belgium | Live | [Justel](https://www.ejustice.just.fgov.be/) | — | [legalize-be](https://github.com/legalize-dev/legalize-be) |
-| Chile | Live | [BCN](https://www.leychile.cl/) | — | [legalize-cl](https://github.com/legalize-dev/legalize-cl) |
-| Czech Republic | Live | [e-Sbírka](https://www.e-sbirka.cz/) | — | [legalize-cz](https://github.com/legalize-dev/legalize-cz) |
-| Denmark | Fetcher ready | [Retsinformation](https://www.retsinformation.dk/) | — | [legalize-dk](https://github.com/legalize-dev/legalize-dk) |
-| Estonia | Live | [Riigi Teataja](https://www.riigiteataja.ee/) | — | [legalize-ee](https://github.com/legalize-dev/legalize-ee) |
-| Finland | Live | [Finlex](https://www.finlex.fi/) | — | [legalize-fi](https://github.com/legalize-dev/legalize-fi) |
-| France | Live | [Legifrance](https://www.legifrance.gouv.fr/) | — | [legalize-fr](https://github.com/legalize-dev/legalize-fr) |
-| Germany | Live | [gesetze-im-internet.de](https://www.gesetze-im-internet.de/) | — | [legalize-de](https://github.com/legalize-dev/legalize-de) |
-| Greece | Live | [ET](https://www.et.gr/) | — | [legalize-gr](https://github.com/legalize-dev/legalize-gr) |
-| Ireland | Fetcher ready | [Irish Statute Book](https://www.irishstatutebook.ie/) | — | [legalize-ie](https://github.com/legalize-dev/legalize-ie) |
-| Italy | Fetcher ready | [Normattiva](https://www.normattiva.it/) | — | [legalize-it](https://github.com/legalize-dev/legalize-it) |
-| Latvia | Live | [likumi.lv](https://likumi.lv/) | — | [legalize-lv](https://github.com/legalize-dev/legalize-lv) |
-| Lithuania | Live | [TAR](https://www.e-tar.lt/) | — | [legalize-lt](https://github.com/legalize-dev/legalize-lt) |
-| Luxembourg | Live | [Legilux](https://legilux.public.lu/) | — | [legalize-lu](https://github.com/legalize-dev/legalize-lu) |
-| Netherlands | Live | [BWB](https://wetten.overheid.nl/) | — | [legalize-nl](https://github.com/legalize-dev/legalize-nl) |
-| Norway | Live | [Lovdata](https://lovdata.no/) | — | [legalize-no](https://github.com/legalize-dev/legalize-no) |
-| Poland | Live | [Dziennik Ustaw](https://isap.sejm.gov.pl/) | — | [legalize-pl](https://github.com/legalize-dev/legalize-pl) |
-| Portugal | Live | [DRE](https://dre.pt/) | — | [legalize-pt](https://github.com/legalize-dev/legalize-pt) |
-| Slovakia | Fetcher ready | [Slov-Lex](https://www.slov-lex.sk/) | — | [legalize-sk](https://github.com/legalize-dev/legalize-sk) |
-| South Korea | Planned | [law.go.kr](https://www.law.go.kr/) | [@9bow](https://github.com/9bow) | — |
-| Spain | Live | [BOE](https://www.boe.es/) | [@EnriqueLop](https://github.com/EnriqueLop) | [legalize-es](https://github.com/legalize-dev/legalize-es) |
-| Sweden | Live | [Riksdag](https://www.riksdagen.se/) | — | [legalize-se](https://github.com/legalize-dev/legalize-se) |
-| Ukraine | Live | [Rada](https://data.rada.gov.ua/) | — | [legalize-ua](https://github.com/legalize-dev/legalize-ua) |
-| United Kingdom | Live | [legislation.gov.uk](https://www.legislation.gov.uk/) | [@florinungur](https://github.com/florinungur) | [legalize-uk](https://github.com/legalize-dev/legalize-uk) |
-| United States | Live | [OLRC](https://uscode.house.gov/) | — | [legalize-us](https://github.com/legalize-dev/legalize-us) |
-| Uruguay | Live | [IMPO](https://www.impo.com.uy/) | — | [legalize-uy](https://github.com/legalize-dev/legalize-uy) |
+Source of truth for this table: `REGISTRY` in
+[`src/legalize/countries.py`](src/legalize/countries.py) (which countries have
+a fetcher) and the `daily-update.yml` / `monthly-update-*.yml` workflow
+matrices (which of those run on a schedule). **Status** is derived from the
+latter, not hand-maintained — see
+[OPERATIONS.md](OPERATIONS.md#publication-calendar) for what each value means
+operationally and why a handful of countries are unscheduled on purpose.
+
+| Country | Status | Source | Repo | Maintainer |
+|---------|--------|--------|------|------------|
+| Andorra | Daily | [BOPA](https://www.bopa.ad/) | [legalize-ad](https://github.com/legalize-dev/legalize-ad) | — |
+| Argentina | Monthly | [InfoLEG](http://www.infoleg.gob.ar/) | [legalize-ar](https://github.com/legalize-dev/legalize-ar) | — |
+| Austria | Daily | [RIS](https://www.ris.bka.gv.at/) | [legalize-at](https://github.com/legalize-dev/legalize-at) | — |
+| Belgium | Daily | [Justel](https://www.ejustice.just.fgov.be/) | [legalize-be](https://github.com/legalize-dev/legalize-be) | — |
+| Chile | Unscheduled | [BCN](https://www.leychile.cl/) | [legalize-cl](https://github.com/legalize-dev/legalize-cl) | — |
+| Colombia | Monthly | [SUIN-Juriscol](https://www.suin-juriscol.gov.co) | [legalize-co](https://github.com/legalize-dev/legalize-co) | — |
+| Czech Republic | Daily | [e-Sbírka](https://www.e-sbirka.cz/) | [legalize-cz](https://github.com/legalize-dev/legalize-cz) | — |
+| Denmark | Unscheduled | [Retsinformation](https://www.retsinformation.dk/) | [legalize-dk](https://github.com/legalize-dev/legalize-dk) | — |
+| Estonia | Daily | [Riigi Teataja](https://www.riigiteataja.ee/) | [legalize-ee](https://github.com/legalize-dev/legalize-ee) | — |
+| European Union | Daily | [EUR-Lex](https://eur-lex.europa.eu) | [legalize-eu](https://github.com/legalize-dev/legalize-eu) | — |
+| Finland | Daily | [Finlex](https://www.finlex.fi/) | [legalize-fi](https://github.com/legalize-dev/legalize-fi) | — |
+| France | Unscheduled | [Legifrance](https://www.legifrance.gouv.fr/) | [legalize-fr](https://github.com/legalize-dev/legalize-fr) | — |
+| Germany | Daily | [gesetze-im-internet.de](https://www.gesetze-im-internet.de/) | [legalize-de](https://github.com/legalize-dev/legalize-de) | — |
+| Greece | Daily | [ET](https://www.et.gr/) | [legalize-gr](https://github.com/legalize-dev/legalize-gr) | — |
+| Ireland | Unscheduled | [Irish Statute Book](https://www.irishstatutebook.ie/) | [legalize-ie](https://github.com/legalize-dev/legalize-ie) | — |
+| Italy | Daily | [Normattiva](https://www.normattiva.it/) | [legalize-it](https://github.com/legalize-dev/legalize-it) | — |
+| Latvia | Daily | [likumi.lv](https://likumi.lv/) | [legalize-lv](https://github.com/legalize-dev/legalize-lv) | — |
+| Liechtenstein | Unscheduled | [Lilex](https://www.gesetze.li) | [legalize-li](https://github.com/legalize-dev/legalize-li) | — |
+| Lithuania | Daily | [TAR](https://www.e-tar.lt/) | [legalize-lt](https://github.com/legalize-dev/legalize-lt) | — |
+| Luxembourg | Daily | [Legilux](https://legilux.public.lu/) | [legalize-lu](https://github.com/legalize-dev/legalize-lu) | — |
+| Netherlands | Daily | [BWB](https://wetten.overheid.nl/) | [legalize-nl](https://github.com/legalize-dev/legalize-nl) | — |
+| Norway | Unscheduled | [Lovdata](https://lovdata.no/) | [legalize-no](https://github.com/legalize-dev/legalize-no) | — |
+| Poland | Daily | [Dziennik Ustaw](https://isap.sejm.gov.pl/) | [legalize-pl](https://github.com/legalize-dev/legalize-pl) | — |
+| Portugal | Daily | [DRE](https://dre.pt/) | [legalize-pt](https://github.com/legalize-dev/legalize-pt) | — |
+| Romania | Unscheduled | [Portalul Legislativ](https://legislatie.just.ro) | [legalize-ro](https://github.com/legalize-dev/legalize-ro) | — |
+| Slovakia | Unscheduled | [Slov-Lex](https://www.slov-lex.sk/) | [legalize-sk](https://github.com/legalize-dev/legalize-sk) | — |
+| Spain | Daily | [BOE](https://www.boe.es/) | [legalize-es](https://github.com/legalize-dev/legalize-es) | [@EnriqueLop](https://github.com/EnriqueLop) |
+| Sweden | Daily | [Riksdag](https://www.riksdagen.se/) | [legalize-se](https://github.com/legalize-dev/legalize-se) | — |
+| Switzerland | Monthly | [Fedlex](https://www.fedlex.admin.ch/) | [legalize-ch](https://github.com/legalize-dev/legalize-ch) | — |
+| Ukraine | Unscheduled | [Rada](https://data.rada.gov.ua/) | [legalize-ua](https://github.com/legalize-dev/legalize-ua) | — |
+| United Kingdom | Daily | [legislation.gov.uk](https://www.legislation.gov.uk/) | [legalize-uk](https://github.com/legalize-dev/legalize-uk) | [@florinungur](https://github.com/florinungur) |
+| United States | Unscheduled | [OLRC](https://uscode.house.gov/) | [legalize-us](https://github.com/legalize-dev/legalize-us) | — |
+| Uruguay | Unscheduled | [IMPO](https://www.impo.com.uy/) | [legalize-uy](https://github.com/legalize-dev/legalize-uy) | — |
+
+South Korea ([legalize-kr](https://github.com/legalize-dev/legalize-kr),
+maintained by [@9bow](https://github.com/9bow)) is live but, unlike every
+country above, is **not** built by this pipeline — it has no entry in
+`REGISTRY` and isn't part of this table for that reason. It's the deliberate
+exception, not a second pattern to follow: a new country goes into the
+pipeline as `fetcher/{cc}/` unless the source genuinely can't be brought in
+that way.
 
 Want to add your country? See [adding-a-country/](adding-a-country/README.md).
 
@@ -210,6 +202,12 @@ We welcome contributions, especially new country parsers. See
 [CONTRIBUTING.md](CONTRIBUTING.md) and [adding-a-country/](adding-a-country/README.md).
 If you want to look after a country long-term, [MAINTAINERS.md](MAINTAINERS.md)
 explains the federated model.
+
+## Operations
+
+Keeping the published repos current — the publication calendar, what to do
+when a scheduled run fails, and the slow-source mitigation — is documented in
+[OPERATIONS.md](OPERATIONS.md).
 
 ## License
 

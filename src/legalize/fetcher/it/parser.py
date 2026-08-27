@@ -18,12 +18,12 @@ from lxml import html as lxml_html
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.fetcher.it.client import TIPO_TO_CODE, URN_TYPE_MAP
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
 # ── Text cleaning ──
 
-_CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 _WS_RE = re.compile(r"\s+")
 _HTML_PARSER = lxml_html.HTMLParser(encoding="utf-8")
 
@@ -32,7 +32,7 @@ def _clean(text: str) -> str:
     """Normalize whitespace, strip control chars, decode HTML entities."""
     text = unescape(text)
     text = text.replace("\xa0", " ")
-    text = _CTRL_RE.sub("", text)
+    text = strip_control(text)
     text = _WS_RE.sub(" ", text)
     return text.strip()
 
@@ -360,7 +360,7 @@ def _extract_ascii_table(el: lxml_html.HtmlElement) -> str:
     cleaned: list[str] = []
     for line in lines:
         line = unescape(line).replace("\xa0", " ")
-        line = _CTRL_RE.sub("", line)
+        line = strip_control(line)
         # Don't collapse whitespace for table lines — preserve alignment
         cleaned.append(line.rstrip())
 

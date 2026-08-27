@@ -5,6 +5,16 @@
 
 This is the last step. By now the 5-law review has passed and parallelism is tuned.
 
+**If you are an external contributor without write access to the `legalize-dev`
+GitHub org, stop after §9.1's `gh repo create` fails (or before running it).**
+Everything from here on — creating `legalize-dev/legalize-{code}`, pushing to it,
+merging the engine PR's CI workflows, and §9.7/§9.8 (which touch the private
+`legalize-web` and `legalize-enrichment` repos) — requires maintainer access.
+Open your engine PR with Steps 0–8 done (fetcher, tests, and the §7 quality-gate
+evidence) and say in the PR body that you'd like to see the country through to
+production; a maintainer takes it from there. See
+[MAINTAINERS.md](../MAINTAINERS.md) for how that handoff works.
+
 ## 9.1 Create the GitHub repo
 
 ```bash
@@ -197,7 +207,7 @@ the wrong problem. Portugal cost an afternoon and four failed attempts this way
 bootstrap`.** Split fetch from commit and let the CLI push as it goes:
 
 ```bash
-legalize fetch -c xx                          # fetch everything into data-xx/
+legalize fetch -c xx --all                    # fetch everything into data-xx/
 legalize commit -c xx --all --batch 2000      # commit 2000 norms, push, repeat
 ```
 
@@ -219,7 +229,7 @@ slices, one push and one short-lived connection each:
 
 ```bash
 legalize push -c xx --dry-run     # list the slices first
-legalize push -c xx               # 25000 commits per slice
+legalize push -c xx               # 5000 commits per slice (the default)
 legalize push -c xx --start 7     # resume at slice 7
 ```
 
@@ -408,8 +418,11 @@ full-local seed lands, the daily `api` run picks the country up on its own.
 ## 9.10 Update the memory and MEMORY.md
 
 Save a one-line memory recording the country as shipped (date, law count, any
-quirks discovered during bootstrap). Delete `RESEARCH-{CC}.md` from the workspace
-root only after all the above is verified green.
+quirks discovered during bootstrap). Only after all the above is verified green,
+move `RESEARCH-{CC}.md` into `engine/research/{CC}.md` (`git mv`) — do not
+delete it. Code under `src/legalize/fetcher/{code}/` cites it by name (e.g.
+`See RESEARCH-{CC}.md §5`) and those comments stay meaningful only if the file
+still exists somewhere in the repo.
 
 
 ---
@@ -418,4 +431,5 @@ root only after all the above is verified green.
 the first push. A repo pushed dirty is a repo you rewrite in public.
 
 **Last step.** When every box in `PROGRESS.md` is ticked, delete `PROGRESS.md`
-and `RESEARCH-{CC}.md`. The country is shipped.
+and move `RESEARCH-{CC}.md` to `engine/research/{CC}.md` (§9.10). The country
+is shipped.

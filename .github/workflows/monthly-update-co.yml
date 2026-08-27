@@ -27,7 +27,18 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    # The GitHub App installation token minted below is only valid for ~1h —
+    # a GitHub-enforced ceiling, not something create-github-app-token can
+    # extend (same rule documented in daily-update.yml). This job's own
+    # timeout used to be 360 (6h), and it was hitting that ceiling exactly,
+    # every month, for 4 months straight — with a dead token and a "Push
+    # updates" step that (lacking if: always()) never ran once the run got
+    # cancelled. Capping well under the token's 1h lifetime, combined with
+    # the idempotency layer (existing commits are skipped fast) and
+    # if: always() + a freshly-minted token on Commit and Push below, makes
+    # each run salvage its partial progress instead of losing it — same
+    # pattern as the daily matrix's 55m cap.
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
@@ -66,18 +77,41 @@ jobs:
           mkdir -p data-co
           legalize fetch -c co --all --force --data-dir data-co
 
+      # if: always() — the ~3h fetch above almost never finishes inside the
+      # 50m job budget, but `legalize fetch` writes each ID's JSON to
+      # data-co/ as it goes, so a cancelled fetch still leaves committable
+      # data on disk. Without always() here, a cancelled fetch skips this
+      # step too and every fetched-but-uncommitted ID is wasted work.
       - name: Commit only new reforms (idempotent)
+        if: always()
         env:
           PYTHONUNBUFFERED: "1"
         run: |
           legalize commit -c co --all --no-fast \
             --repo-path repos/co --data-dir data-co
 
+      # Minted right before the push instead of reused from job start: by now
+      # up to ~50 minutes have elapsed and the original token may be close to
+      # (or past) its 1h expiry. if: always() so whatever got committed above
+      # (even from a cancelled fetch) still gets pushed.
+      - name: Refresh GitHub App token before push
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        id: app-token-push
+        if: always()
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-co
+
       - name: Push updates
+        if: always()
         working-directory: repos/co
+        env:
+          PUSH_TOKEN: ${{ steps.app-token-push.outputs.token }}
         run: |
-          if git diff --quiet HEAD origin/main; then
+          if git diff --quiet HEAD origin/main 2>/dev/null; then
             echo "No new reforms this month."
           else
-            git push origin HEAD:main
+            git push "https://x-access-token:${PUSH_TOKEN}@github.com/legalize-dev/legalize-co.git" HEAD:main
           fi

@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from legalize.committer.license import PIPELINE_URL, render_license
 from legalize.committer.repo_meta import repo_meta_files
+from legalize.countries import REGISTRY
 from legalize.country_meta import COUNTRY_META
+
+
+def test_every_registered_country_has_meta():
+    # Publishing without an entry means a corpus with no README and no
+    # LICENSE — the source's own data licence. Every country wired into the
+    # pipeline (REGISTRY) must have a COUNTRY_META entry before it ships.
+    assert set(REGISTRY) - set(COUNTRY_META) == set()
 
 
 def test_repo_meta_includes_license_for_known_country():

@@ -41,6 +41,8 @@ from legalize.models import (
     Rank,
     Version,
 )
+from legalize.fetcher._tables import render_table
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -154,19 +156,12 @@ def _parse_dotted_date(s: str) -> date | None:
         return None
 
 
-# C0 control chars (except \t, \n, \r) and C1 control chars (0x80-0x9F).
-# These are never legitimately in text but occasionally leak from likumi.lv
-# source data (e.g. U+009A between "pa" and "švaldības" in id=305766 breaks
-# YAML parsing downstream).
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
-
-
 def _clean_text(text: str) -> str:
     """Normalize whitespace, strip non-breaking spaces and invalid control chars."""
     if not text:
         return ""
     text = text.replace("\xa0", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
@@ -223,88 +218,13 @@ def _strip_descendants_with_classes(el, classes: frozenset[str]) -> None:
 # ─────────────────────────────────────────────
 
 
-def _table_cell_text(td) -> str:
-    """Extract clean text from a <TD> cell, escaping pipes for Markdown."""
-    text = _element_text(td)
-    return text.replace("|", "\\|").strip()
-
-
 def _table_to_markdown(table_el) -> str:
     """Convert a <TABLE> lxml element to a Markdown pipe table.
 
     likumi.lv uses uppercase HTML tags (<TABLE>, <TBODY>, <TR>, <TD>).
     Cells may contain <P>, <B>, <center>, <SUP>, etc.
-    Handles ROWSPAN and COLSPAN by repeating values.
     """
-    # Collect rows: each row is a list of (text, colspan, rowspan)
-    raw_rows: list[list[tuple[str, int, int]]] = []
-    for tr in table_el.iter():
-        tag = (tr.tag or "").lower()
-        if tag != "tr":
-            continue
-        cells: list[tuple[str, int, int]] = []
-        for cell in tr:
-            cell_tag = (cell.tag or "").lower()
-            if cell_tag not in ("td", "th"):
-                continue
-            text = _table_cell_text(cell)
-            colspan = int(cell.get("COLSPAN") or cell.get("colspan") or 1)
-            rowspan = int(cell.get("ROWSPAN") or cell.get("rowspan") or 1)
-            cells.append((text, colspan, rowspan))
-        if cells:
-            raw_rows.append(cells)
-
-    if not raw_rows:
-        return ""
-
-    # Expand rowspan/colspan into a 2D grid
-    # Track pending rowspans: column → (text, remaining_rows)
-    expanded: list[list[str]] = []
-    pending: dict[int, tuple[str, int]] = {}  # col_index → (text, remaining)
-
-    for row in raw_rows:
-        out_row: list[str] = []
-        col = 0
-        cell_idx = 0
-        while cell_idx < len(row) or col in pending:
-            if col in pending:
-                text, remaining = pending[col]
-                out_row.append(text)
-                if remaining > 1:
-                    pending[col] = (text, remaining - 1)
-                else:
-                    del pending[col]
-                col += 1
-                continue
-            text, colspan, rowspan = row[cell_idx]
-            for _ in range(colspan):
-                out_row.append(text)
-                if rowspan > 1:
-                    pending[col] = (text, rowspan - 1)
-                col += 1
-            cell_idx += 1
-        # Drain any pending columns at end of row
-        while pending:
-            col = max(pending) + 1
-            break
-        expanded.append(out_row)
-
-    if not expanded:
-        return ""
-
-    # Normalize to max column count
-    max_cols = max(len(r) for r in expanded)
-    for r in expanded:
-        while len(r) < max_cols:
-            r.append("")
-
-    lines = []
-    lines.append("| " + " | ".join(expanded[0]) + " |")
-    lines.append("| " + " | ".join("---" for _ in range(max_cols)) + " |")
-    for row in expanded[1:]:
-        lines.append("| " + " | ".join(row) + " |")
-
-    return "\n".join(lines)
+    return render_table(table_el, _element_text)
 
 
 # ─────────────────────────────────────────────

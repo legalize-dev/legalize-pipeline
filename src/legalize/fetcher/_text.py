@@ -32,11 +32,16 @@ def decode_utf8(data: bytes) -> str:
     return data.decode("utf-8", errors="replace")
 
 
+def strip_control(text: str) -> str:
+    """Strip C0/C1 control chars (keeping tab, LF, CR). No other rewriting."""
+    return _CONTROL_RE.sub("", text)
+
+
 def scrub_control(text: str) -> str:
     """Strip C0/C1 control chars and normalize NBSP family to regular space."""
     for src, dst in _NBSP_MAP.items():
         text = text.replace(src, dst)
-    return _CONTROL_RE.sub("", text)
+    return strip_control(text)
 
 
 def clean(data: bytes | str) -> str:

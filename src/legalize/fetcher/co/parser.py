@@ -20,11 +20,12 @@ from lxml import html as lxml_html
 
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._tables import render_table
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
 _CHARSET_RE = re.compile(rb"<meta[^>]+charset=[\"']?([A-Za-z0-9._-]+)", re.I)
-_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 _ARTICLE_RE = re.compile(
     r"^\s*(?:ART[IÍ]CULO|Art\.?)\s+([0-9]+|[a-záéíóúñ]+|[úu]nico)[°ºo.]?",
     re.I,
@@ -140,7 +141,7 @@ def _clean_text(text: str) -> str:
     if not text:
         return ""
     text = text.replace("\xa0", " ")
-    text = _CONTROL_CHAR_RE.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
@@ -280,67 +281,9 @@ def _strip_descendants_with_classes(el, classes: frozenset[str]) -> None:
         parent.remove(descendant)
 
 
-def _table_cell_text(td) -> str:
-    """Extract clean text from a table cell, escaping pipes for Markdown."""
-    text = _inline_text(td)
-    return text.replace("|", "\\|").strip()
-
-
 def _table_to_markdown(table_el) -> str:
     """Convert an HTML table to a Markdown pipe table."""
-    raw_rows: list[list[tuple[str, int, int]]] = []
-    for tr in table_el.iter():
-        if (tr.tag or "").lower() != "tr":
-            continue
-        cells: list[tuple[str, int, int]] = []
-        for cell in tr:
-            if (cell.tag or "").lower() not in ("td", "th"):
-                continue
-            text = _table_cell_text(cell)
-            colspan = int(cell.get("COLSPAN") or cell.get("colspan") or 1)
-            rowspan = int(cell.get("ROWSPAN") or cell.get("rowspan") or 1)
-            cells.append((text, colspan, rowspan))
-        if cells:
-            raw_rows.append(cells)
-
-    if not raw_rows:
-        return ""
-
-    expanded: list[list[str]] = []
-    pending: dict[int, tuple[str, int]] = {}
-    for row in raw_rows:
-        out_row: list[str] = []
-        col = 0
-        cell_idx = 0
-        while cell_idx < len(row) or col in pending:
-            if col in pending:
-                text, remaining = pending[col]
-                out_row.append(text)
-                if remaining > 1:
-                    pending[col] = (text, remaining - 1)
-                else:
-                    del pending[col]
-                col += 1
-                continue
-            text, colspan, rowspan = row[cell_idx]
-            for _ in range(colspan):
-                out_row.append(text)
-                if rowspan > 1:
-                    pending[col] = (text, rowspan - 1)
-                col += 1
-            cell_idx += 1
-        expanded.append(out_row)
-
-    max_cols = max(len(row) for row in expanded)
-    for row in expanded:
-        while len(row) < max_cols:
-            row.append("")
-
-    lines = ["| " + " | ".join(expanded[0]) + " |"]
-    lines.append("| " + " | ".join("---" for _ in range(max_cols)) + " |")
-    for row in expanded[1:]:
-        lines.append("| " + " | ".join(row) + " |")
-    return "\n".join(lines)
+    return render_table(table_el, _inline_text)
 
 
 def _make_block(

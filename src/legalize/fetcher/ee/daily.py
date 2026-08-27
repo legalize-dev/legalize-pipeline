@@ -36,7 +36,7 @@ from legalize.fetcher.ee.client import RTClient
 from legalize.fetcher.ee.discovery import RTDiscovery
 from legalize.fetcher.ee.parser import RTMetadataParser, RTTextParser
 from legalize.models import CommitType, Reform
-from legalize.pipeline import finalize_daily
+from legalize.pipeline import SKIP_WEEKDAYS, finalize_daily
 from legalize.state.store import StateStore, resolve_dates_to_process
 from legalize.transformer.markdown import render_norm_at_date
 
@@ -61,13 +61,11 @@ def daily(
     state = StateStore(cc.state_path)
     state.load()
 
-    # Skip weekdays: Riigi Teataja publishes Mon-Fri, but we process all
-    # days to be safe (the bulk zip is regenerated daily anyway).
     dates_to_process = resolve_dates_to_process(
         state,
         cc.repo_path,
         target_date,
-        skip_weekdays={5, 6},  # skip Sat+Sun
+        skip_weekdays=SKIP_WEEKDAYS["ee"],
     )
     if dates_to_process is None:
         console.print("[yellow]No last date found. Use --date or run bootstrap.[/yellow]")
@@ -119,15 +117,27 @@ def daily(
             console.print("  [red]No XMLs available. Aborting.[/red]")
             return 0
 
-    # Build group_id → canonical filename map from the existing repo
-    repo_ee_dir = Path(cc.repo_path) / "ee"
-    group_to_filename = _build_group_map(repo_ee_dir)
-    console.print(f"  Loaded {len(group_to_filename)} existing law groups from repo")
-
     repo = GitRepo(cc.repo_path, config.git.committer_name, config.git.committer_email)
     if not dry_run:
         repo.init()
         repo.load_existing_commits()
+
+    # Build group_id → canonical filename map from the existing repo. The map is
+    # read off the working tree, so the directory has to be in the cone first:
+    # CI clones sparsely, and an empty map does not fail — every version falls
+    # through to the `else` in _process_version and publishes a duplicate law
+    # under the version id with [bootstrap] instead of [reform].
+    repo.ensure_visible("ee")
+    repo_ee_dir = Path(cc.repo_path) / "ee"
+    group_to_filename = _build_group_map(repo_ee_dir)
+    console.print(f"  Loaded {len(group_to_filename)} existing law groups from repo")
+    if not group_to_filename and not dry_run:
+        raise RuntimeError(
+            f"No group_id found in any .md under {repo_ee_dir} — the map that resolves "
+            "a version to the law it belongs to is empty. Every version would be "
+            "published as a new law. Wrong --repo-path, an incomplete checkout, or the "
+            "country was never bootstrapped."
+        )
 
     text_parser = RTTextParser()
     meta_parser = RTMetadataParser()

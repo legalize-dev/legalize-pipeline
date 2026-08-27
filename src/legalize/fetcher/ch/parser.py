@@ -56,6 +56,7 @@ from xml.etree import ElementTree as ET
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.fetcher.ch.client import eli_url_to_norm_id
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +65,6 @@ _AKN_NS = "http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
 _XML_NS = "http://www.w3.org/XML/1998/namespace"
 
 # ─── Cleanup regexes ───
-_CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 _WS_RE = re.compile(r"[ \t]+")
 
 # ─── Rank mapping ───
@@ -151,7 +151,7 @@ def _clean_ws(text: str) -> str:
     """
     if not text:
         return ""
-    text = _CONTROL_RE.sub("", text)
+    text = strip_control(text)
     text = text.replace("\xa0", " ")
     text = _WS_RE.sub(" ", text)
     text = re.sub(r" +\n", "\n", text)
@@ -648,7 +648,7 @@ class FedlexTextParser(TextParser):
 
     def parse_text(self, data: bytes) -> list[Any]:
         xml = data.decode("utf-8", errors="replace")
-        xml = _CONTROL_RE.sub("", xml)
+        xml = strip_control(xml)
         try:
             root = ET.fromstring(xml)
         except ET.ParseError as exc:
@@ -907,7 +907,7 @@ class FedlexMetadataParser(MetadataParser):
 
     def parse(self, data: bytes, norm_id: str) -> NormMetadata:
         xml = data.decode("utf-8", errors="replace")
-        xml = _CONTROL_RE.sub("", xml)
+        xml = strip_control(xml)
         root = ET.fromstring(xml)
 
         # Track history_from (earliest version date) and images across all versions

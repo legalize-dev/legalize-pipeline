@@ -22,6 +22,7 @@ from legalize.models import (
     Rank,
     Version,
 )
+from legalize.fetcher._text import strip_control
 
 # Namespace constants.
 USLM_NS = "http://xml.house.gov/schemas/uslm/1.0"
@@ -33,9 +34,6 @@ _NS = f"{{{USLM_NS}}}"
 _DC = f"{{{DC_NS}}}"
 _DCTERMS = f"{{{DCTERMS_NS}}}"
 _XHTML = f"{{{XHTML_NS}}}"
-
-# Control characters to strip (C0/C1 minus tab, LF, CR).
-_CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 # Elements whose text is rendered inline (not as separate paragraphs).
 _INLINE_TAGS = frozenset(
@@ -78,7 +76,7 @@ def _clean(text: str) -> str:
     if not text:
         return ""
     text = text.replace("\xa0", " ")
-    text = _CTRL_RE.sub("", text)
+    text = strip_control(text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
