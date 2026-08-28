@@ -175,3 +175,56 @@ def test_it_refuses_a_branch_it_cannot_continue_from(corpus):
 
     with pytest.raises(HistoryMismatch):
         commit_all_fast(config, "pt")
+
+
+def test_a_repo_the_daily_has_extended_is_not_rebuilt_on_top_of_itself(corpus):
+    """The failure this cost us on legalize-es, in miniature.
+
+    A country repo is not only ever written by the bootstrap: the daily adds
+    `[new]` and `[reform]` commits to it for months afterwards. Resuming by
+    *position* assumed the branch was a prefix of the bootstrap stream, so a tip
+    the daily had put there — whose (Source-Date, Norm-Id) pair still appears in
+    the stream, at a low index — made the run resume from that index and re-emit
+    everything after it onto laws that already had their commits. It produced
+    18 `[bootstrap]` commits for already-published laws, 10 more with an empty
+    diff, ~95 duplicate versions, and 9 laws whose commits stopped being in
+    Source-Date order. Skipping by version instead of by position cannot do it.
+    """
+    config, repo = corpus
+    assert commit_all_fast(config, "pt") == 12
+
+    # What the daily leaves on the tip: a commit for a law the stream also
+    # builds, carrying a pair the stream already used at index 0.
+    first = _git(repo, "log", "--reverse", "--format=%b", "main").splitlines()
+    trailers = {
+        k.strip(): v.strip() for k, _, v in (ln.partition(":") for ln in first if ":" in ln)
+    }
+    (repo / "pt" / "1990" / "extra.md").write_text("daily\n")
+    subprocess.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-qm",
+            f"[reform] something the daily found\n\n"
+            f"Source-Id: {trailers['Source-Id']}\n"
+            f"Source-Date: {trailers['Source-Date']}\n"
+            f"Norm-Id: {trailers['Norm-Id']}",
+        ],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+    )
+    before = _git(repo, "rev-list", "--count", "main")
+
+    assert commit_all_fast(config, "pt") == 12, "it re-emitted a history the repo already had"
+    assert _git(repo, "rev-list", "--count", "main") == before, "the second run added commits"
+    body = _git(repo, "log", "--format=%b", "main")
+    for identifier, expected in (("DRE-1990-1-100", 4), ("DRE-2003-4-400", 3)):
+        named = [ln for ln in body.splitlines() if ln.strip() == f"Norm-Id: {identifier}"]
+        # The daily's own commit names one of them a second time; nothing else may.
+        assert len(named) <= expected + 1, f"{identifier} committed {len(named)} times"

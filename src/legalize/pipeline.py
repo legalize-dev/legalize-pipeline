@@ -16,10 +16,12 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import threading
 import time
+from collections import Counter
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
@@ -834,59 +836,72 @@ def commit_all(
 # ─────────────────────────────────────────────
 
 
-def _resume_index(repo_path: str | Path, all_reforms: list) -> int:
-    """How many of ``all_reforms`` the branch already holds.
+def _published(repo_path: str | Path) -> tuple[Counter, set[str]]:
+    """What the repo already carries, keyed by version, and the laws it names.
 
-    The stream is deterministic — every reform, sorted by date — so the commits
-    on ``refs/heads/main`` are always a prefix of it, and the newest law commit
-    names which one. Read back from that commit's own trailers rather than
-    counting commits: a reform that failed to render produced no commit, and a
-    count would then resume one law early for every one of them.
+    The key is ``(Source-Id, Norm-Id, Source-Date)`` and it is *counted*, not a
+    set. Both halves of that matter and both were learned by getting it wrong:
 
-    ``--grep``, because the tip is not always a law: the pipeline's own
-    ``[fix-pipeline]`` meta commit carries no trailers at all, and reading it
-    made every single resume fail with HistoryMismatch — a message telling the
-    operator to throw away the whole history and start over.
+    * The date has to be in the key. Not every country gives a reform its own
+      ``Source-Id`` — where the source publishes no amending act, ``norm_id``
+      is the law's own identifier and every version of one law shares the pair.
+      Keying on the pair alone then treats a law's second version as already
+      published and drops it, which loses history silently. Spain's acts do
+      carry their own ids (44,116 distinct pairs over 44,295 commits), so the
+      defect is invisible exactly where it is cheapest to miss.
+    * Counted, because one law can legitimately carry two reforms on one date,
+      and skipping "the key is present" would drop the second forever. Skipping
+      *as many as are published* emits the rest.
+
+    The bare ``Norm-Id`` set is the second answer, and it is not redundant: it
+    tells a run pointed at the wrong repository from a run continuing its own,
+    and it survives a commit that names the law without naming the act.
+
+    One act's change to one law is one commit, and that pair names it — which
+    makes it the key for "has this already been published?". Read in a single
+    pass and never per reform: walking commits is cheap, and this must not turn
+    a bootstrap into one subprocess per law.
+
+    No trees are opened. ``--name-only`` would say which file each commit
+    touched and costs a tree diff per commit — 74 minutes on a real corpus
+    where the log alone takes seconds — and it is not needed, because the
+    trailer names the law.
+
+    Empty sets are the honest answer for a repo that does not exist yet, has no
+    branch, or holds nothing: all three mean nothing has been published, and a
+    first run then behaves exactly as it always did.
     """
     import subprocess
 
-    tip = subprocess.run(
-        [
-            "git",
-            "-C",
-            str(repo_path),
-            "log",
-            "-1",
-            "--format=%b",
-            "--grep=^Norm-Id: ",
-            "refs/heads/main",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    if tip.returncode != 0 or not tip.stdout.strip():
-        return 0  # no branch, or nothing on it: this is a first run
-
-    trailer = {}
-    for line in tip.stdout.splitlines():
-        key, sep, value = line.partition(":")
-        if sep:
-            trailer.setdefault(key.strip(), value.strip())
-    key = (trailer.get("Source-Date", ""), trailer.get("Norm-Id", ""))
-
-    # Last occurrence, not first: one law can carry two reforms on one date, and
-    # resuming from the earlier of them would commit the later one twice.
-    seen = {}
-    for idx, (when, identifier, _reform_idx, _path) in enumerate(all_reforms):
-        seen[(when.isoformat(), identifier)] = idx
-    if key not in seen:
-        raise HistoryMismatch(
-            f"refs/heads/main ends at {key[1] or '?'} ({key[0] or 'no date'}), which is "
-            f"not part of the history this run would build. Committing on top would "
-            f"stack a second history on the first. Start from an empty repo "
-            f"(`bootstrap --fresh`) or point --repo-path somewhere else."
+    try:
+        out = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo_path),
+                "log",
+                "--format=%x1e%B",
+                "--grep=^Norm-Id: ",
+                "refs/heads/main",
+            ],
+            capture_output=True,
+            text=True,
         )
-    return seen[key] + 1
+    except OSError:
+        return Counter(), set()
+    if out.returncode != 0:
+        return Counter(), set()
+
+    versions: Counter = Counter()
+    norms: set[str] = set()
+    for body in out.stdout.split("\x1e"):
+        trailers = dict(re.findall(r"^([A-Z][\w-]*): *(.+?)\s*$", body, re.M))
+        source, norm = trailers.get("Source-Id"), trailers.get("Norm-Id")
+        if norm:
+            norms.add(norm)
+        if source and norm:
+            versions[(source, norm, trailers.get("Source-Date", ""))] += 1
+    return versions, norms
 
 
 def commit_all_fast(
@@ -928,6 +943,29 @@ def commit_all_fast(
     # so the git history is chronological across all laws.
     all_reforms: list[tuple[date, str, int, Path]] = []
 
+    # What the repo already publishes, by (Source-Id, Norm-Id) — the pair that
+    # identifies one act's change to one law, which is what a commit records.
+    #
+    # ``_resume_index`` below also skips work, but on a different premise: that
+    # the branch is a *prefix* of this stream. That holds for a run resuming
+    # itself and not for a repo the daily has been extending, where the tip is a
+    # ``[new]``/``[reform]`` commit whose (date, Norm-Id) pair still appears in
+    # the stream at a low index. It then resumed there and re-emitted everything
+    # after it on top of laws that already had their commits. Measured on
+    # legalize-es before this guard: 18 ``[bootstrap]`` commits for laws already
+    # published, 10 more with an empty diff, ~95 duplicate (Source-Id, Norm-Id)
+    # pairs, and 9 laws whose commits stopped being in Source-Date order —
+    # spec v0.4 §History, on a repo whose published history was correct.
+    #
+    # Matching by pair rather than by position makes the run idempotent whatever
+    # produced the existing history. It is the check the daily already does per
+    # reform (``fetcher/es/daily.py``, ``has_commit_with_source_id``); the
+    # bootstrap path simply never had it. ``bootstrap --fresh`` empties the repo
+    # first, so a deliberate rebuild sees nothing here and re-emits everything.
+    already, published_norms = _published(cc.repo_path)
+    skipped = 0
+    seen_identifiers: set[str] = set()
+
     for json_file in json_files:
         try:
             norm = load_norma_from_json(json_file)
@@ -946,11 +984,41 @@ def commit_all_fast(
                 ),
             )
 
+        seen_identifiers.add(norm.metadata.identifier)
         for i, reform in enumerate(reforms):
+            key = (reform.norm_id, norm.metadata.identifier, reform.date.isoformat())
+            if already[key] > 0:
+                already[key] -= 1
+                skipped += 1
+                continue
             all_reforms.append((reform.date, json_file.stem, i, json_file))
 
     all_reforms.sort(key=lambda x: x[0])
 
+    # Stacking a second history on an unrelated first is the failure this
+    # guards, and it is the one thing the pair filter cannot see: a repo full of
+    # someone else's laws shares no pair with this stream, which looks exactly
+    # like an empty repo. Overlap of laws is the signal, checked only on a full
+    # scan — with --limit or --offset the run deliberately sees a slice, and a
+    # slice that happens to miss every published law is not a wrong repository.
+    if (
+        limit is None
+        and offset == 0
+        and published_norms
+        and not (published_norms & seen_identifiers)
+    ):
+        raise HistoryMismatch(
+            f"refs/heads/main holds {len(published_norms)} law(s), none of which this run "
+            f"would build (e.g. {sorted(published_norms)[0]}). Committing on top would "
+            f"stack a second history on the first. Start from an empty repo "
+            f"(`bootstrap --fresh`) or point --repo-path somewhere else."
+        )
+
+    if skipped:
+        console.print(
+            f"  [dim]{skipped} reform(s) already committed in this repo — skipped. "
+            f"Use `bootstrap --fresh` to rebuild them.[/dim]"
+        )
     console.print(f"  {len(all_reforms)} total commits to generate (sorted by date)\n")
 
     if dry_run:
@@ -964,22 +1032,19 @@ def commit_all_fast(
     norm_cache: dict[str, ParsedNorm] = {}
     last_reform_index = {norm_id: idx for idx, (_, norm_id, _, _) in enumerate(all_reforms)}
     errors = 0
-    imported = 0
+    # The commits this run skipped are part of the history it produced, so the
+    # count it returns is the whole thing and not the increment — a resumed run
+    # and a fresh one report the same corpus.
+    imported = skipped
 
     # One import is one all-or-nothing session: fast-import moves the ref when its
     # stdin closes, so a run killed before that leaves an empty branch however far
-    # it got. Chunking makes the ref advance every _IMPORT_CHUNK commits, and
-    # _resume_index reads it back, so a death costs the current chunk instead of
-    # the whole history. The stream stays chronological because the chunks are
-    # slices of the already-sorted list, not of the laws.
-    start = _resume_index(cc.repo_path, all_reforms)
-    if start:
-        console.print(
-            f"  [green]resuming: {start} of {len(all_reforms)} already on the branch[/green]\n"
-        )
-        imported = start
-
-    for chunk_start in range(start, len(all_reforms), _IMPORT_CHUNK):
+    # it got. Chunking makes the ref advance every _IMPORT_CHUNK commits, so a
+    # death costs the current chunk instead of the whole history — and the next
+    # run picks up from there because the pair filter above has already dropped
+    # everything the finished chunks wrote. The stream stays chronological
+    # because the chunks are slices of the already-sorted list, not of the laws.
+    for chunk_start in range(0, len(all_reforms), _IMPORT_CHUNK):
         chunk_end = min(chunk_start + _IMPORT_CHUNK, len(all_reforms))
         with FastImporter(
             cc.repo_path,

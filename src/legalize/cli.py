@@ -14,8 +14,7 @@ import click
 from rich.console import Console
 from rich.logging import RichHandler
 
-from legalize.committer.author import resolve_author
-from legalize.config import load_config
+from legalize.config import GitConfig, load_config
 from legalize.countries import supported_countries
 
 console = Console(soft_wrap=True)
@@ -373,9 +372,9 @@ def _start_fresh(cc, country: str) -> None:
     # a global user.email cannot commit at all, and this one is the very first
     # commit of the repo. It failed exactly there in CI — "Author identity
     # unknown" — while passing on every laptop, which is what a dependency on
-    # ambient git config looks like. `resolve_author` is the same source the
-    # committer uses, so a configured machine still signs with its own name.
-    author_name, author_email = resolve_author()
+    # ambient git config looks like. The pipeline's own identity is the same
+    # source the committer uses, and it is what §Git identity requires.
+    author_name, author_email = GitConfig.committer_name, GitConfig.committer_email
     subprocess.run(
         [
             "git",

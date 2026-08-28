@@ -216,7 +216,13 @@ class GitRepo:
         git_date = info.author_date
         if git_date < date_type(1970, 1, 2):
             git_date = date_type(1970, 1, 2)
-        author_date = f"{git_date.isoformat()}T00:00:00"
+        # Spelled with the offset, because git applies the machine's zone to a
+        # naive timestamp and the day then depends on where the run happened.
+        # Five commits in legalize-es carry +01:00/+02:00 from exactly this,
+        # and two of them fall on the previous day in UTC — a Source-Date the
+        # commit no longer agrees with (spec v0.4, §Dates). The bootstrap path
+        # never had the bug: it pins "+0000" in _fast_import_commit below.
+        author_date = f"{git_date.isoformat()}T00:00:00+00:00"
 
         env = {
             "GIT_AUTHOR_DATE": author_date,

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import re
 
-from legalize.committer.author import resolve_author
+from legalize.config import GitConfig
 from legalize.models import (
     Block,
     CommitInfo,
@@ -49,7 +49,16 @@ def build_commit_info(
         "Norm-Id": norm_metadata.identifier,
     }
 
-    author_name, author_email = resolve_author()
+    # The pipeline's own identity, never the ambient git config. These commits
+    # get regenerated, and an author taken from whoever ran it makes every
+    # commit hash depend on which machine did the run — spec v0.4, §Git
+    # identity. It had already happened: one commit in legalize-pt and one in
+    # legalize-uy are signed with a person's name and address.
+    # ponytail: the class defaults, not the loaded config — honouring a fork's
+    # own configured identity here needs `config` threaded through this
+    # function's five call sites (es, sk, ee). Tracked in [es] #106.
+    author_name = GitConfig.committer_name
+    author_email = GitConfig.committer_email
 
     return CommitInfo(
         commit_type=commit_type,

@@ -82,7 +82,7 @@ Country-specific extras go in an `extra` sub-mapping (or as additional frontmatt
 
 **Committer:** `Legalize <legalize@legalize.dev>` — set in `config.yaml::git.committer_name/email`. This is the project bot identity that signs every output commit regardless of who runs the pipeline.
 
-**Author:** taken from the runner's `git config user.name/email`. When the pipeline runs from CI it is the GitHub App; when it runs locally it is whoever invoked it.
+**Author:** the same identity as the committer, and never the person or machine that ran the pipeline. Spec v0.4 §Git identity: these commits get regenerated, and an author taken from whoever ran it makes every commit hash depend on which machine did the run. It used to read the ambient `git config` — one commit in `legalize-pt` and one in `legalize-uy` are signed with a person's name because of it.
 
 ### Commit integrity rule
 

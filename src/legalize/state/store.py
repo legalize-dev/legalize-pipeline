@@ -137,17 +137,24 @@ def latest_source_date(repo_path: str) -> date | None:
     if result.returncode != 0:
         return None
 
+    # The maximum, not the first hit walking back from the tip. Repo-wide commit
+    # order carries no chronology — spec v0.4, §History: "A consumer MUST NOT
+    # read repo-wide commit order as chronological" — so the newest date is not
+    # necessarily the newest commit. A backfill of an old range lands its commits
+    # at the tip and would otherwise answer for the whole repo. The log is
+    # already capped at MAX_COMMITS_SCANNED, so reading all of it costs nothing
+    # over stopping early.
+    dates = []
     for body in result.stdout.split("\x1e"):
         for line in body.splitlines():
             if not line.startswith("Source-Date: "):
                 continue
             found = _parse_iso_date(line[len("Source-Date: ") :].strip())
             if found is not None and found <= today:
-                return found
-            # Future-dated (or malformed) trailer: keep walking back.
+                dates.append(found)
             break
 
-    return None
+    return max(dates) if dates else None
 
 
 def has_pipeline_commits(repo_path: str) -> bool:
