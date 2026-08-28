@@ -31,6 +31,8 @@ from datetime import date
 
 from lxml import etree
 
+from legalize.fetcher._text import decode_utf8, strip_control
+
 from legalize.models import NormMetadata, NormStatus, Rank
 from legalize.fetcher.es.titulos import get_short_title
 
@@ -260,7 +262,10 @@ def parse_metadata(
     Raises:
         ValueError: If minimum information cannot be extracted.
     """
-    root = etree.fromstring(xml_data)
+    # Through the scrubber, like every other XML entry point. BOE serves bytes
+    # that declare one encoding and carry another, and a C1 character reaching
+    # the frontmatter takes the whole YAML block down — not just its own field.
+    root = etree.fromstring(strip_control(decode_utf8(xml_data)).encode("utf-8"))
 
     meta = root.find(".//metadatos")
     if meta is None:

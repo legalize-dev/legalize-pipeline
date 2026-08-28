@@ -27,6 +27,7 @@ from __future__ import annotations
 from datetime import date
 
 from legalize.countries import text_state_for
+from legalize.fetcher._text import strip_control
 from legalize.models import NormMetadata, NormStatus, TextState
 
 
@@ -38,17 +39,30 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
     """
     clean_title = _clean_title(metadata.title)
     status = metadata.status.value if isinstance(metadata.status, NormStatus) else metadata.status
+    # The spec closes this field's domain, and it is the only one of the eight
+    # it closes. A value outside it is a defect in the file rather than in the
+    # reader, so it stops here instead of being published: the run loses one
+    # law and says which, where publishing it loses the guarantee for everyone.
+    if status not in {s.value for s in NormStatus}:
+        raise ValueError(
+            f"{metadata.identifier}: status {status!r} is not one the spec defines "
+            f"({', '.join(sorted(s.value for s in NormStatus))})"
+        )
 
+    # Every value is escaped, not just the prose ones. A control character or a
+    # quote in any of them ends the scalar and takes the whole block down with
+    # it — all eight mandatory fields at once, from one bad byte in one field.
+    # Well-formed values pass through unchanged, so no existing output moves.
     lines = [
         "---",
         f'title: "{_escape_yaml(clean_title)}"',
-        f'identifier: "{metadata.identifier}"',
-        f'country: "{metadata.country}"',
-        f'rank: "{metadata.rank}"',
+        f'identifier: "{_escape_yaml(metadata.identifier)}"',
+        f'country: "{_escape_yaml(metadata.country)}"',
+        f'rank: "{_escape_yaml(str(metadata.rank))}"',
         f'publication_date: "{metadata.publication_date.isoformat()}"',
         f'last_updated: "{version_date.isoformat()}"',
-        f'status: "{status}"',
-        f'source: "{metadata.source}"',
+        f'status: "{_escape_yaml(status)}"',
+        f'source: "{_escape_yaml(metadata.source)}"',
     ]
 
     # Spec v0.3: emitted only when the body is not the law in force at
@@ -62,9 +76,9 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
     if metadata.department:
         lines.append(f'department: "{_escape_yaml(metadata.department)}"')
     if metadata.jurisdiction:
-        lines.append(f'jurisdiction: "{metadata.jurisdiction}"')
+        lines.append(f'jurisdiction: "{_escape_yaml(metadata.jurisdiction)}"')
     if metadata.pdf_url:
-        lines.append(f'pdf_url: "{metadata.pdf_url}"')
+        lines.append(f'pdf_url: "{_escape_yaml(metadata.pdf_url)}"')
     if metadata.subjects:
         subj_yaml = ", ".join(f'"{_escape_yaml(s)}"' for s in metadata.subjects)
         lines.append(f"subjects: [{subj_yaml}]")
@@ -79,7 +93,7 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
     for key, value in metadata.extra:
         if key in written:
             continue
-        lines.append(f'{key}: "{_escape_yaml(value)}"')
+        lines.append(f'{_escape_yaml(key)}: "{_escape_yaml(value)}"')
         written.add(key)
 
     lines.append("---")
@@ -94,7 +108,17 @@ def _escape_yaml(text: str) -> str:
     Line breaks and tabs are escaped rather than passed through: a raw newline
     inside a double-quoted scalar ends the value and turns the rest of the
     frontmatter into garbage. Sources put them in titles and summaries.
+
+    Other control characters are removed first — only those, and not the
+    NBSP normalisation its neighbour ``scrub_control`` also does: NBSP is
+    content, and rewriting it here would move output in a format that is
+    final. A YAML parser rejects control characters
+    outright — "unacceptable character #x0096: special characters are not
+    allowed" — and it rejects the *document*, so one stray byte anywhere in one
+    field costs every field in the file. They arrive from sources that declare
+    one encoding and serve another, which is not a rare event.
     """
+    text = strip_control(text)
     return (
         text.replace("\\", "\\\\")
         .replace('"', '\\"')

@@ -178,7 +178,7 @@ def test_it_refuses_a_branch_it_cannot_continue_from(corpus):
 
 
 def test_a_repo_the_daily_has_extended_is_not_rebuilt_on_top_of_itself(corpus):
-    """The failure this cost us on legalize-es, in miniature.
+    """The failure this cost a published corpus, in miniature.
 
     A country repo is not only ever written by the bootstrap: the daily adds
     `[new]` and `[reform]` commits to it for months afterwards. Resuming by

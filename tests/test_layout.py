@@ -266,3 +266,41 @@ def test_frontmatter_survives_whatever_the_source_puts_in_a_string(raw):
     parsed = yaml.safe_load(_fm(title=raw, summary=raw).strip().strip("-"))
     assert parsed["title"] == raw.replace("\r\n", "\n").replace("\r", "\n")
     assert parsed["summary"] == parsed["title"]
+
+
+def test_a_control_character_does_not_take_the_whole_block_down():
+    """A YAML parser rejects the *document*, not the field: one stray byte in
+    one value loses all eight mandatory fields at once. Sources that declare one
+    encoding and serve another produce them, and a corpus has already shipped a
+    file nothing can read because of it."""
+    out = _fm(title="Ley\x96 de prueba", department="Minist\x0berio")
+    parsed = yaml.safe_load(out.strip().strip("-"))
+    assert parsed["title"] == "Ley de prueba"
+    assert parsed["identifier"] == "X-1"
+    assert parsed["status"] == "in_force"
+
+
+def test_a_quote_in_a_field_that_used_to_go_unescaped():
+    """`title` was escaped and the other seven were not. A quote in any of them
+    ends the scalar the same way."""
+    parsed = yaml.safe_load(_fm(jurisdiction='xx"broken').strip().strip("-"))
+    assert parsed["jurisdiction"] == 'xx"broken'
+
+
+def test_a_status_outside_the_spec_is_refused_not_published():
+    """The spec closes this field's domain. Losing one law loudly beats
+    publishing a value that voids the guarantee for every reader."""
+    with pytest.raises(ValueError, match="not one the spec defines"):
+        _fm(status="vigente")
+
+
+def test_a_well_formed_norm_still_renders_byte_for_byte():
+    """The escaping is new; the output must not be. Nothing here needs escaping,
+    so nothing may change — the format is final."""
+    out = _fm()
+    for line in (
+        'identifier: "X-1"',
+        'country: "xx"',
+        'status: "in_force"',
+    ):
+        assert line in out

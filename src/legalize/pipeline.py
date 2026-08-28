@@ -846,9 +846,10 @@ def _published(repo_path: str | Path) -> tuple[Counter, set[str]]:
       ``Source-Id`` — where the source publishes no amending act, ``norm_id``
       is the law's own identifier and every version of one law shares the pair.
       Keying on the pair alone then treats a law's second version as already
-      published and drops it, which loses history silently. Spain's acts do
-      carry their own ids (44,116 distinct pairs over 44,295 commits), so the
-      defect is invisible exactly where it is cheapest to miss.
+      published and drops it, which loses history silently. Where the source
+      does give each act an id the pairs are almost all distinct — 44,116 over
+      44,295 commits in one corpus — so the defect is invisible exactly where
+      it is cheapest to miss.
     * Counted, because one law can legitimately carry two reforms on one date,
       and skipping "the key is present" would drop the second forever. Skipping
       *as many as are published* emits the rest.
@@ -951,16 +952,17 @@ def commit_all_fast(
     # itself and not for a repo the daily has been extending, where the tip is a
     # ``[new]``/``[reform]`` commit whose (date, Norm-Id) pair still appears in
     # the stream at a low index. It then resumed there and re-emitted everything
-    # after it on top of laws that already had their commits. Measured on
-    # legalize-es before this guard: 18 ``[bootstrap]`` commits for laws already
-    # published, 10 more with an empty diff, ~95 duplicate (Source-Id, Norm-Id)
-    # pairs, and 9 laws whose commits stopped being in Source-Date order —
-    # spec v0.4 §History, on a repo whose published history was correct.
+    # after it on top of laws that already had their commits. Measured on a
+    # corpus of 44,295 commits before this guard: 18 ``[bootstrap]`` commits for
+    # laws already published, 10 more with an empty diff, ~95 duplicate
+    # (Source-Id, Norm-Id) pairs, and 9 laws whose commits stopped being in
+    # Source-Date order — spec v0.4 §History, on a repo whose published history
+    # was correct.
     #
     # Matching by pair rather than by position makes the run idempotent whatever
-    # produced the existing history. It is the check the daily already does per
-    # reform (``fetcher/es/daily.py``, ``has_commit_with_source_id``); the
-    # bootstrap path simply never had it. ``bootstrap --fresh`` empties the repo
+    # produced the existing history. It is the check a country's own daily
+    # already does per reform (``has_commit_with_source_id``); the bootstrap
+    # path simply never had it. ``bootstrap --fresh`` empties the repo
     # first, so a deliberate rebuild sees nothing here and re-emits everything.
     already, published_norms = _published(cc.repo_path)
     skipped = 0

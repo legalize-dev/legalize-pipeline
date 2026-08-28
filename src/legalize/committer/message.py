@@ -52,11 +52,11 @@ def build_commit_info(
     # The pipeline's own identity, never the ambient git config. These commits
     # get regenerated, and an author taken from whoever ran it makes every
     # commit hash depend on which machine did the run — spec v0.4, §Git
-    # identity. It had already happened: one commit in legalize-pt and one in
-    # legalize-uy are signed with a person's name and address.
+    # identity. It had already happened: two of the published corpora carry a
+    # commit signed with a person's name and address.
     # ponytail: the class defaults, not the loaded config — honouring a fork's
     # own configured identity here needs `config` threaded through this
-    # function's five call sites (es, sk, ee). Tracked in [es] #106.
+    # function's five call sites.
     author_name = GitConfig.committer_name
     author_email = GitConfig.committer_email
 
