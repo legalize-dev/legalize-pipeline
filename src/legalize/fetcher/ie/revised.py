@@ -44,8 +44,9 @@ def apply_revised_acts(
     pipeline (render_norm_at_date) and creates a REFORM commit via
     GitRepo + build_commit_info.
 
-    Idempotency: checks has_commit_with_source_id before creating each
-    commit.  Safe to re-run.
+    Safe to re-run: a norm whose consolidated text has not moved renders
+    byte-identical markdown, write_and_add reports no change, and no commit
+    is made.
 
     Returns the number of commits created.
     """
@@ -60,13 +61,12 @@ def apply_revised_acts(
 
     # Standard committer infrastructure
     repo = GitRepo(repo_path, config.git.committer_name, config.git.committer_email)
-    repo.load_existing_commits()
 
     metadata_parser = ISBMetadataParser()
 
     commits_created = 0
     revised_found = 0
-    skipped_idempotent = 0
+    skipped_unchanged = 0
     errors = 0
 
     with ISBClient.create(cc) as client:
@@ -77,14 +77,11 @@ def apply_revised_acts(
             if limit and revised_found >= limit:
                 break
 
-            # Build the source ID for idempotency. Use a distinct prefix
-            # so Source-Id != Norm-Id (the report flags same-value as a bug).
+            # A distinct prefix so Source-Id != Norm-Id. It carries no date:
+            # the DB's reform key is (law_id, source_id, date), so successive
+            # consolidations of one act are already distinct rows, and a
+            # stable Source-Id is what the history-fix script can reproduce.
             source_id = f"revised-{norm_id}"
-
-            # Idempotency: skip if already committed
-            if repo.has_commit_with_source_id(source_id, norm_id):
-                skipped_idempotent += 1
-                continue
 
             # Try to fetch revised text
             try:
@@ -134,21 +131,21 @@ def apply_revised_acts(
 
             # Render to full markdown with frontmatter via standard pipeline
             file_path = norm_to_filepath(metadata)
-            markdown = render_norm_at_date(
-                metadata, blocks, updated_to, include_all=True
-            )
+            markdown = render_norm_at_date(metadata, blocks, updated_to, include_all=True)
 
             if dry_run:
-                console.print(
-                    f"  [yellow]DRY-RUN[/yellow] {norm_id} → revised {updated_to}"
-                )
+                console.print(f"  [yellow]DRY-RUN[/yellow] {norm_id} → revised {updated_to}")
                 commits_created += 1
                 continue
 
-            # Write and stage
+            # Write and stage. This is the idempotency check: write_and_add
+            # returns False when the rendered markdown is byte-identical to
+            # what is already committed, which is what makes the pass
+            # re-runnable — a skip keyed on Source-Id alone would apply the
+            # first consolidation and then never see a later one.
             changed = repo.write_and_add(file_path, markdown)
             if not changed:
-                logger.debug("No change for %s", norm_id)
+                skipped_unchanged += 1
                 continue
 
             # Create reform and commit via standard infrastructure
@@ -180,7 +177,7 @@ def apply_revised_acts(
         f"\n[bold green]✓ Revised Acts complete[/bold green]\n"
         f"  {revised_found} revised versions found\n"
         f"  {commits_created} commits created\n"
-        f"  {skipped_idempotent} skipped (already committed)\n"
+        f"  {skipped_unchanged} skipped (text unchanged)\n"
         f"  {errors} errors"
     )
     return commits_created
