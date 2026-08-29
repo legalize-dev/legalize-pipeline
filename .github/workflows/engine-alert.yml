@@ -13,9 +13,27 @@ name: engine-alert
 # author already sees the red X in the same UI they're working in; backfill
 # and bootstrap are workflow_dispatch-only, watched live by whoever ran them.
 #
+# That covers a country that stops publishing loudly. It does not cover the
+# expensive way, which is a country that stops publishing quietly: `it` and
+# `pl` ran green every day from April to the end of August, reported
+# `Found 0 updated acts` for every date, and committed nothing. A green run
+# with zero commits is indistinguishable from a healthy one in every view we
+# have. So the `silence` job below asks the one question that separates them —
+# when did the repo last receive anything — reading the repos rather than the
+# runs. It would have caught `it`/`pl` (#115) in mid-July and `co`/`ch`/`ar`
+# (#114) a month before that.
+#
 # Pattern copied from ../../../sdk/.github/workflows/integration-alert.yml.
 
 on:
+  # Two questions, one file, because both end in the same place: an issue
+  # deduped by title. The workflow_run half catches a run that ended red. The
+  # schedule half catches the other way a country stops publishing — a run that
+  # ends green having committed nothing, which no dashboard we have can tell
+  # apart from a healthy one.
+  schedule:
+    - cron: "0 13 * * 1"  # Mondays, after the weekend's daily runs
+  workflow_dispatch: {}
   workflow_run:
     workflows:
       - "Daily update"
@@ -31,6 +49,7 @@ permissions:
 jobs:
   alert:
     if: |
+      github.event_name == 'workflow_run' &&
       github.event.workflow_run.head_branch == github.event.repository.default_branch &&
       (github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'cancelled')
     runs-on: ubuntu-latest
@@ -76,3 +95,56 @@ jobs:
 
           Close this issue once that job is green again; it will reopen on the next failure."
           done < /tmp/failed_jobs.txt
+
+  # A country that has published nothing for longer than its cadence allows.
+  # `it` and `pl` ran green every day from April to the end of August, finding
+  # zero acts each time and committing nothing (#115); `co`, `ch` and `ar` did
+  # the same from the cancelled side (#114). Neither shape reaches the job
+  # above: one ends green, and the other predates it. Between them that is
+  # 108,189 laws in `co`/`ar`/`ch` alone, silently frozen for four months.
+  silence:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Open an issue per silent country, deduped
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh label create country-silent --repo "$REPO" \
+            --color fbca04 --description "A country repo has stopped receiving pushes" \
+            2>/dev/null || true
+
+          python3 .github/scripts/country_silence.py > /tmp/silent.tsv
+
+          open_issues=$(gh issue list --repo "$REPO" --state open \
+            --label country-silent --limit 100 --json number,title)
+
+          while IFS=$'\t' read -r CODE CADENCE DAYS LIMIT; do
+            [ -z "$CODE" ] && continue
+            TITLE="Country silent: $CODE"
+            # ponytail: same rule as the job above — one open issue is the whole
+            # signal. The day count lives in the body of the first one and is not
+            # refreshed; a country that is still quiet next week is not news.
+            open=$(echo "$open_issues" | jq -r --arg t "$TITLE" \
+              '.[] | select(.title == $t) | .number' | head -1)
+            if [ -n "$open" ]; then
+              echo "Issue #$open already open for '$TITLE', saying nothing."
+              continue
+            fi
+            gh issue create --repo "$REPO" --label country-silent \
+              --title "$TITLE" \
+              --body "\`legalize-$CODE\` is scheduled **$CADENCE** and has received no push in **$DAYS days** (the limit for $CADENCE is $LIMIT).
+
+          Its scheduled runs may well be green: a run that finds nothing and commits nothing looks identical to a healthy one, which is why this check reads the repo instead of the run.
+
+          Worth separating two things before reaching for the fetcher:
+
+          - **Did the runs fail?** Check the workflow's recent runs. If they are red or cancelled, the cause is there and this issue is a symptom.
+          - **Did they succeed and publish nothing?** Then the discovery path is returning an empty list without raising, and the log will say so for every date in the window.
+
+          Close this once the country publishes again; it will reopen on the next check if it goes quiet."
+          done < /tmp/silent.tsv
