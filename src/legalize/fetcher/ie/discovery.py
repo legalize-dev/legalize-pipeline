@@ -80,16 +80,29 @@ class ISBDiscovery(NormDiscovery):
         """Yield norm IDs for Acts updated on or after target_date.
 
         Uses the last_updated parameter of the Oireachtas API.
+        Paginates through results to avoid truncation at page size.
         """
         isb: ISBClient = client  # type: ignore[assignment]
-        page = isb.get_updated_since(target_date.isoformat())
+        skip = 0
 
-        for item in page.get("results", []):
-            bill = item.get("bill", {})
-            act = bill.get("act", {})
-            if not act:
-                continue
+        while True:
+            page = isb.get_updated_since(target_date.isoformat(), skip=skip, limit=_PAGE_SIZE)
 
-            norm_id = _act_to_norm_id(act)
-            if norm_id:
-                yield norm_id
+            results = page.get("results", [])
+            if not results:
+                break
+
+            for item in results:
+                bill = item.get("bill", {})
+                act = bill.get("act", {})
+                if not act:
+                    continue
+
+                norm_id = _act_to_norm_id(act)
+                if norm_id:
+                    yield norm_id
+
+            if len(results) < _PAGE_SIZE:
+                break
+
+            skip += _PAGE_SIZE
