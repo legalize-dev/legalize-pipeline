@@ -467,6 +467,10 @@ class ISBTextParser(TextParser):
         doc = lxml_html.fromstring(data)
         act_div = doc.find('.//div[@id="act"]')
         if act_div is None:
+            # Constitution HTML has no div#act — dispatch if we see
+            # a Constitution heading (ARTICLE 1, h3 parts, etc.)
+            if doc.find('.//a[@id="article1"]') is not None:
+                return self._parse_constitution_html(data)
             return []
 
         pub_date = date(1970, 1, 1)
@@ -598,6 +602,120 @@ class ISBTextParser(TextParser):
             paragraphs.append(
                 Paragraph(css_class=_pending_css or "titulo_tit", text=_pending_heading)
             )
+
+        if not paragraphs:
+            return []
+
+        block = Block(
+            id="full-text",
+            block_type="document",
+            title="",
+            versions=(
+                Version(
+                    norm_id="",
+                    publication_date=pub_date,
+                    effective_date=pub_date,
+                    paragraphs=tuple(paragraphs),
+                ),
+            ),
+        )
+        return [block]
+
+    # ── Constitution parser ──────────────────────────────────────────
+
+    def _parse_constitution_html(self, data: bytes) -> list[Any]:
+        """Parse the Constitution of Ireland HTML.
+
+        The Constitution page (/eli/cons/en/html) has a different structure
+        from normal ISB act pages:
+        - No div#act — content is in div.col-md-8.col-md-offset-2
+        - Parts use <h3> with <a name="partN">
+        - Articles use <h4> or <h5> with <a name="articleN">
+        - Preamble is in a table after the main heading
+        - English-only body (Irish edition is at /eli/cons/ga/html)
+        """
+        from lxml import html as lxml_html
+
+        doc = lxml_html.fromstring(data)
+
+        # publication_date: enacted by plebiscite 1 July 1937.
+        # The Constitution came into operation on 29 December 1937.
+        # We use the plebiscite date as publication_date because that
+        # is when the text was adopted by the people — the operation
+        # date is an administrative start, not a publication event.
+        pub_date = date(1937, 7, 1)
+
+        paragraphs: list[Paragraph] = []
+
+        # Find the content wrapper
+        content = doc.find('.//div[@class="col-md-8 col-md-offset-2 col-sm-12"]')
+        if content is None:
+            # Fallback: try to find any element with article anchors
+            content = doc.body if doc.body is not None else doc
+
+        # Track which <p> elements have been consumed as headings,
+        # so the body-paragraph pass doesn't duplicate them.
+        _consumed: set[int] = set()
+
+        # Walk all elements in document order.
+        #
+        # lxml's HTML parser restructures invalid nesting: the source
+        # has <h3><a name="part1"></a><p><b>THE NATION</b></p></h3>
+        # but <p> inside <h3> is invalid, so lxml hoists the <p> to
+        # be the *next sibling* of the <h3>. We therefore use
+        # getnext() to find Part titles and Article heading text.
+
+        for elem in content.iter():
+            if not isinstance(elem.tag, str):
+                continue
+
+            # Part headings: <h3><a name="partN"></a></h3> <p>...THE NATION...</p>
+            if elem.tag == "h3":
+                anchor = elem.find(".//a[@name]")
+                if anchor is not None and anchor.get("name", "").startswith("part"):
+                    nxt = elem.getnext()
+                    if nxt is not None and nxt.tag == "p":
+                        text = _html_text(nxt)
+                        if text:
+                            paragraphs.append(Paragraph(css_class="titulo_tit", text=text))
+                            _consumed.add(id(nxt))
+                continue
+
+            # Article headings: <h4>/<h5><a name="articleN"></a></h4> <p>ARTICLE N</p>
+            if elem.tag in ("h4", "h5"):
+                anchor = elem.find(".//a[@name]")
+                if anchor is not None:
+                    name = anchor.get("name", "")
+                    if name.startswith("article"):
+                        nxt = elem.getnext()
+                        if nxt is not None and nxt.tag == "p":
+                            text = _html_text(nxt)
+                            if text:
+                                paragraphs.append(
+                                    Paragraph(css_class="articulo", text=f"**{text}**")
+                                )
+                                _consumed.add(id(nxt))
+                    else:
+                        # Sub-heading (e.g. "The National Parliament")
+                        nxt = elem.getnext()
+                        if nxt is not None and nxt.tag == "p":
+                            text = _html_text(nxt)
+                            if text:
+                                paragraphs.append(Paragraph(css_class="capitulo_tit", text=text))
+                                _consumed.add(id(nxt))
+                continue
+
+            # Body paragraphs: <p style="display: block; text-align: justify; ...">
+            if elem.tag == "p":
+                if id(elem) in _consumed:
+                    continue
+                style = elem.get("style", "")
+                # Only process body paragraphs (justified text), skip
+                # centered headings and navigation elements
+                if "justify" in style:
+                    text = _html_inline_text(elem)
+                    if text:
+                        paragraphs.append(Paragraph(css_class="parrafo", text=text))
 
         if not paragraphs:
             return []
@@ -862,8 +980,28 @@ class ISBMetadataParser(MetadataParser):
         """Parse metadata JSON from Oireachtas API.
 
         The data is the raw response from /v1/legislation.
-        norm_id is 'IE-{year}-act-{number}'.
+        norm_id is 'IE-{year}-act-{number}' or 'IE-1937-constitution'.
         """
+        # Constitution: not in the Oireachtas API. Return hardcoded
+        # metadata to avoid a wasted round-trip.
+        if norm_id == "IE-1937-constitution":
+            # publication_date: enacted by plebiscite 1 July 1937.
+            # The Constitution came into operation on 29 December 1937.
+            # We use the plebiscite date because that is when the text
+            # was adopted. The operation date is administrative.
+            return NormMetadata(
+                title="Bunreacht na hÉireann / Constitution of Ireland",
+                short_title="Constitution of Ireland",
+                identifier="IE-1937-constitution",
+                country="ie",
+                rank=Rank("constitution"),
+                publication_date=date(1937, 7, 1),
+                status=NormStatus.IN_FORCE,
+                department="",
+                source="https://www.irishstatutebook.ie/eli/cons/en/html",
+                extra=(("title_ga", "Bunreacht na hÉireann"),),
+            )
+
         response = json.loads(data)
 
         results = response.get("results", [])

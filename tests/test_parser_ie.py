@@ -197,6 +197,60 @@ class TestISBTextParser:
                 assert char not in unsafe, f"Unsafe char '{char}' in {norm_id}"
 
 
+class TestConstitutionParser:
+    """Test Constitution HTML parser against fixture."""
+
+    @pytest.fixture
+    def parser(self):
+        return ISBTextParser()
+
+    def test_parse_constitution_produces_blocks(self, parser):
+        """Constitution fixture must produce non-empty blocks."""
+        data = (FIXTURES / "sample-constitution.html").read_bytes()
+        blocks = parser.parse_text(data)
+
+        assert len(blocks) == 1, f"Expected 1 block, got {len(blocks)}"
+        paras = blocks[0].versions[0].paragraphs
+        assert len(paras) > 0, "Constitution produced 0 paragraphs"
+
+    def test_article_1_present(self, parser):
+        """Article 1 text must appear in the output."""
+        data = (FIXTURES / "sample-constitution.html").read_bytes()
+        blocks = parser.parse_text(data)
+        all_text = " ".join(p.text for p in blocks[0].versions[0].paragraphs)
+
+        assert "ARTICLE 1" in all_text or "Article 1" in all_text
+        assert "Irish nation" in all_text
+
+    def test_part_headings(self, parser):
+        """Part headings (THE NATION, THE STATE, etc.) must appear."""
+        data = (FIXTURES / "sample-constitution.html").read_bytes()
+        blocks = parser.parse_text(data)
+        paras = blocks[0].versions[0].paragraphs
+
+        part_headings = [p for p in paras if p.css_class == "titulo_tit"]
+        assert len(part_headings) >= 5, f"Expected >=5 part headings, got {len(part_headings)}"
+
+    def test_article_headings(self, parser):
+        """All 50 articles should produce articulo headings."""
+        data = (FIXTURES / "sample-constitution.html").read_bytes()
+        blocks = parser.parse_text(data)
+        paras = blocks[0].versions[0].paragraphs
+
+        articles = [p for p in paras if p.css_class == "articulo"]
+        assert len(articles) >= 40, f"Expected >=40 article headings, got {len(articles)}"
+
+    def test_publication_date(self, parser):
+        """Publication date should be 1 July 1937 (plebiscite date)."""
+        data = (FIXTURES / "sample-constitution.html").read_bytes()
+        blocks = parser.parse_text(data)
+        version = blocks[0].versions[0]
+
+        assert version.publication_date.year == 1937
+        assert version.publication_date.month == 7
+        assert version.publication_date.day == 1
+
+
 class TestHTMLParser:
     """Test HTML print view parser."""
 
