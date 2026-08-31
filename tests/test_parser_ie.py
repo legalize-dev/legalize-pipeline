@@ -1,10 +1,18 @@
 """Tests for the Ireland (IE) ISB parser."""
 
+import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
 
-from legalize.fetcher.ie.parser import ISBTextParser, ISBMetadataParser, _inline_text
+from legalize.fetcher.ie.parser import (
+    ISBTextParser,
+    ISBMetadataParser,
+    _ParseContext,
+    _anchor,
+    _inline_text,
+)
 from legalize.countries import get_text_parser, get_metadata_parser
 from lxml import etree
 
@@ -373,3 +381,103 @@ class TestInlineText:
         elem = etree.fromstring(xml)
         result = _inline_text(elem)
         assert result == "\u20ac100 or \u00a350"
+
+
+class TestFootnotes:
+    """Footnote definitions, and the isolation between documents.
+
+    The definitions used to accumulate in a module-level list. `ie` bootstraps
+    with max_workers: 8, so acts published one another's footnotes — the
+    sequential tests below all passed while that was true, which is why the
+    concurrency one exists.
+    """
+
+    def test_definitions_emitted_for_every_marker(self):
+        data = (FIXTURES / "sample-finance-2024.xml").read_bytes()
+        paragraphs = ISBTextParser().parse_text(data)[0].versions[0].paragraphs
+        text = "\n".join(p.text for p in paragraphs)
+
+        markers = {m for m in re.findall(r"\[\^(\w+)\](?!:)", text)}
+        definitions = {m for m in re.findall(r"^\[\^(\w+)\]:", text, re.MULTILINE)}
+
+        assert markers, "fixture has no footnote markers"
+        assert markers <= definitions, f"markers with no definition: {markers - definitions}"
+
+    def test_definition_does_not_repeat_the_marker(self):
+        """ISB prints the number twice: in <marker> and again opening the body."""
+        data = (FIXTURES / "sample-finance-2024.xml").read_bytes()
+        paragraphs = ISBTextParser().parse_text(data)[0].versions[0].paragraphs
+
+        definitions = [p.text for p in paragraphs if re.match(r"^\[\^\w+\]:", p.text)]
+        assert definitions
+        for definition in definitions:
+            num = re.match(r"^\[\^(\w+)\]:", definition).group(1)
+            assert not definition.startswith(f"[^{num}]: ^{num}"), definition
+
+    def test_footnotes_do_not_leak_between_concurrent_documents(self):
+        """Two acts parsed at once keep their own footnotes.
+
+        This is the whole point of the per-document context. Run sequentially it
+        passes against a module-level accumulator too, so it has to be threaded.
+        """
+        finance = (FIXTURES / "sample-finance-2024.xml").read_bytes()
+        policing = (FIXTURES / "sample-policing-2024.xml").read_bytes()
+
+        def count(which):
+            data = finance if which % 2 == 0 else policing
+            paragraphs = ISBTextParser().parse_text(data)[0].versions[0].paragraphs
+            return len([p for p in paragraphs if re.match(r"^\[\^\w+\]:", p.text)])
+
+        expected = [count(0), count(1)]
+        assert expected[0] != expected[1], "fixtures must differ for this to prove anything"
+
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            got = list(pool.map(count, range(8)))
+
+        assert got == [expected[i % 2] for i in range(8)]
+
+
+class TestCrossReferences:
+    """<xref> targets. ISB hrefs are fragments into the act ("#SEC4")."""
+
+    def test_links_resolve_to_a_heading_that_exists(self):
+        data = (FIXTURES / "sample-environment-2015.xml").read_bytes()
+        paragraphs = ISBTextParser().parse_text(data)[0].versions[0].paragraphs
+
+        anchors = {_anchor(p.text) for p in paragraphs if p.css_class in ("articulo", "titulo_tit")}
+        links = re.findall(r"\]\(#([^)]+)\)", "\n".join(p.text for p in paragraphs))
+
+        assert links, "fixture has no internal cross-references"
+        assert not [t for t in links if t not in anchors], "dead links"
+
+    def test_unknown_target_falls_back_to_plain_text(self):
+        """A reference into another act must not become a link to nowhere."""
+        xml = b"""<sect id="SEC1"><number>1.</number><title>Only section</title>
+        <p>see <xref href="#SEC99">section 99</xref> and
+        <xref href="#SEC1">section 1</xref></p></sect>"""
+        root = etree.fromstring(xml)
+        ctx = _ParseContext(anchors={"SEC1": _anchor("1. Only section")})
+
+        out = _inline_text(root.find("p"), ctx)
+
+        assert "[section 99]" not in out, "unknown target was linked"
+        assert "section 99" in out
+        assert "[section 1](#1-only-section)" in out
+
+    def test_ambiguous_anchor_is_dropped_rather_than_guessed(self):
+        """Two sections rendering one heading would collide — link neither."""
+        xml = b"""<act><body>
+        <sect id="SEC1"><number>1.</number><title>Same</title>
+          <p>see <xref href="#SEC2">that one</xref></p></sect>
+        <sect id="SEC2"><number>1.</number><title>Same</title><p>body</p></sect>
+        </body></act>"""
+        paragraphs = ISBTextParser().parse_text(xml)[0].versions[0].paragraphs
+
+        assert "](#" not in "\n".join(p.text for p in paragraphs)
+
+    def test_anchor_keeps_accents_and_matches_the_heading(self):
+        """Irish headings carry fadas; the anchor has to keep them."""
+        assert (
+            _anchor("8. **Continuation of An Garda Síochána**")
+            == "8-continuation-of-an-garda-síochána"
+        )

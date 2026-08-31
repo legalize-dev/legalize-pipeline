@@ -10,19 +10,79 @@ from __future__ import annotations
 import json
 import logging
 import re
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 from lxml import etree
 
+from legalize.fetcher._tables import render_table
 from legalize.fetcher.base import MetadataParser, TextParser
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
 from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
 
-# Module-level accumulator for footnote definitions collected during
-# _inline_text() calls.  Cleared by the parser after each act.
-_footnote_defs: list[tuple[str, str]] = []
+
+@dataclass
+class _ParseContext:
+    """What one document accumulates while it is being parsed.
+
+    This lives on the call stack, deliberately. Footnote definitions started out
+    in a module-level list, and ``ie`` bootstraps with ``max_workers: 8``
+    (``config.yaml``), so all eight workers appended into the same one: an act
+    published another act's footnotes, and one act collected three acts' worth.
+    Measured on two fixtures across eight threads, seven of the eight results
+    were wrong. State that belongs to a document has to be reachable only from
+    the call that parses it.
+    """
+
+    footnotes: list[tuple[str, str]] = field(default_factory=list)
+    anchors: dict[str, str] = field(default_factory=dict)
+
+
+# The punctuation a Markdown renderer drops when it derives a heading's anchor.
+# Mirrors github-slugger: accented letters and existing hyphens survive, which
+# matters here because Irish headings carry them —
+# "8. **Continuation of An Garda Síochána**" has to anchor at
+# "8-continuation-of-an-garda-síochána" both on GitHub and on the site.
+_ANCHOR_STRIP = re.compile(r"""[\u2000-\u206f\u2e00-\u2e7f'!"#$%&()*+,./:;<=>?@\[\]^`{|}~\\]""")
+
+
+def _anchor(heading: str) -> str:
+    """The anchor a Markdown renderer derives from a heading we emit.
+
+    The heading is rendered verbatim after the ``#`` marks, so the anchor for a
+    section is a pure function of the text ``_section_heading_text`` produced.
+    """
+    return _ANCHOR_STRIP.sub("", heading.lower().strip()).replace(" ", "-")
+
+
+def _strip_repeated_marker(body: str, num: str) -> str:
+    """Drop the marker ISB repeats at the head of a footnote's own body.
+
+    The number sits twice in the source — once in <marker>, once as a <su> that
+    opens the body — so the definition came out as "[^1]: ^1 OJ L2023/2831".
+    """
+    return body.removeprefix(f"^{num}").lstrip(" ,").strip() or body
+
+
+def _section_heading_text(sect: etree._Element) -> str:
+    """The heading line a <sect> will render as.
+
+    Used both to emit the heading and, in a pre-pass, to work out the anchor a
+    cross-reference to that section has to point at. One function so the two
+    cannot drift: an anchor computed from a heading we do not actually emit is
+    a dead link that no test would notice.
+    """
+    parts = []
+    for tag in ("number", "title"):
+        el = sect.find(tag)
+        if el is not None:
+            text = _inline_text(el)
+            if text:
+                parts.append(text)
+    return " ".join(parts)
+
 
 # ISB special entity elements → Unicode replacements.
 _ENTITY_MAP: dict[str, str] = {
@@ -53,7 +113,7 @@ _SKIP_TAGS = frozenset({"graphic", "hr1"})
 # ── Inline text extraction ──────────────────────────────────────────
 
 
-def _inline_text(elem: etree._Element) -> str:
+def _inline_text(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
     """Extract text from an element, resolving ISB entities and inline formatting.
 
     Walks child nodes recursively:
@@ -91,7 +151,7 @@ def _inline_text(elem: etree._Element) -> str:
 
         # Bold
         if tag in ("b", "strong"):
-            inner = _inline_text(child).strip()
+            inner = _inline_text(child, ctx).strip()
             if inner:
                 parts.append(f"**{inner}**")
             if child.tail:
@@ -100,7 +160,7 @@ def _inline_text(elem: etree._Element) -> str:
 
         # Italic
         if tag in ("i", "em"):
-            inner = _inline_text(child).strip()
+            inner = _inline_text(child, ctx).strip()
             if inner:
                 parts.append(f"*{inner}*")
             if child.tail:
@@ -109,7 +169,7 @@ def _inline_text(elem: etree._Element) -> str:
 
         # Superscript
         if tag == "su":
-            inner = _inline_text(child).strip()
+            inner = _inline_text(child, ctx).strip()
             if inner:
                 parts.append(f"^{inner}")
             if child.tail:
@@ -118,52 +178,54 @@ def _inline_text(elem: etree._Element) -> str:
 
         # Subscript (no MD equivalent, keep as-is)
         if tag == "sb":
-            parts.append(_inline_text(child))
+            parts.append(_inline_text(child, ctx))
             if child.tail:
                 parts.append(child.tail)
             continue
 
-        # Cross-references — preserve href as markdown link
+        # Cross-references. ISB hrefs are fragments into the act itself
+        # ("#SEC4", sometimes a bare "SEC9"), never URLs, so the href cannot be
+        # used as a link target directly: nothing in the Markdown answers to
+        # "SEC4". It is resolved against the anchors of the headings this
+        # document actually emits, and anything unresolvable — a reference into
+        # another act, an id we never emitted a heading for — stays plain text.
+        # A link that goes nowhere is worse than no link.
         if tag == "xref":
-            inner = _inline_text(child).strip()
-            href = child.get("href", "")
-            if inner and href:
-                parts.append(f"[{inner}]({href})")
-            else:
-                parts.append(inner)
+            inner = _inline_text(child, ctx).strip()
+            target = None
+            if ctx is not None:
+                target = ctx.anchors.get(child.get("href", "").lstrip("#"))
+            parts.append(f"[{inner}](#{target})" if inner and target else inner)
             if child.tail:
                 parts.append(child.tail)
             continue
 
-        # Footnotes: extract marker number and collect body text
+        # Footnotes: emit the marker inline, collect the definition for the
+        # block at the end of the document.
         if tag == "fn":
             marker = child.find(".//marker")
             if marker is not None:
                 num = _inline_text(marker).strip().lstrip("^")
                 parts.append(f"[^{num}]")
-                # Collect footnote body text for definitions block
-                body_parts = []
-                for fn_child in child:
-                    fn_tag = fn_child.tag if isinstance(fn_child.tag, str) else ""
-                    if fn_tag == "marker":
-                        continue  # Already handled above
-                    if fn_tag == "p":
-                        fn_text = _inline_text(fn_child).strip()
-                        if fn_text:
-                            body_parts.append(fn_text)
-                    elif fn_tag:
-                        fn_text = _inline_text(fn_child).strip()
-                        if fn_text:
-                            body_parts.append(fn_text)
-                if body_parts:
-                    _footnote_defs.append((num, " ".join(body_parts)))
+                if ctx is not None:
+                    body_parts = [
+                        text
+                        for fn_child in child
+                        if (fn_child.tag if isinstance(fn_child.tag, str) else "")
+                        not in ("", "marker")
+                        and (text := _inline_text(fn_child, ctx).strip())
+                    ]
+                    if body_parts:
+                        ctx.footnotes.append(
+                            (num, _strip_repeated_marker(" ".join(body_parts), num))
+                        )
             if child.tail:
                 parts.append(child.tail)
             continue
 
         # Font tags: recurse
         if tag == "font":
-            parts.append(_inline_text(child))
+            parts.append(_inline_text(child, ctx))
             if child.tail:
                 parts.append(child.tail)
             continue
@@ -175,7 +237,7 @@ def _inline_text(elem: etree._Element) -> str:
             continue
 
         # Fallback: recurse into unknown tags
-        parts.append(_inline_text(child))
+        parts.append(_inline_text(child, ctx))
         if child.tail:
             parts.append(child.tail)
 
@@ -188,95 +250,25 @@ def _inline_text(elem: etree._Element) -> str:
 # ── Table conversion ────────────────────────────────────────────────
 
 
-def _table_to_markdown(table_elem: etree._Element) -> str:
+def _table_to_markdown(table_elem: etree._Element, ctx: _ParseContext | None = None) -> str:
     """Convert an ISB <table> element to a Markdown pipe table.
 
-    Handles:
-    - Multi-paragraph cells (joined with space)
-    - colspan (cell text repeated across spanned columns)
-    - rowspan (cell text propagated to subsequent rows)
-    - Bold headers
-
-    Uses a pending-cell dict for rowspan, following the LV parser pattern.
+    The grid itself — colspan, rowspan, ragged rows, unquoted span attributes —
+    is resolved by the shared renderer that seven other countries already use.
+    Only the part that is actually ISB-specific stays here: a cell is one or
+    more <p> children, and the inline formatting inside them is ours.
     """
-    # First pass: collect raw cell data with colspan/rowspan info
-    raw_rows: list[list[tuple[str, int, int]]] = []  # [(text, colspan, rowspan), ...]
+    return render_table(table_elem, lambda cell: _cell_text(cell, ctx))
 
-    for tr in table_elem.findall(".//tr"):
-        row_cells: list[tuple[str, int, int]] = []
-        for td in tr.findall("td"):
-            # Cell may contain multiple <p> elements
-            cell_parts = []
-            for p in td.findall("p"):
-                text = _inline_text(p)
-                if text:
-                    cell_parts.append(text)
 
-            # If no <p> children, try direct text
-            if not cell_parts:
-                text = _inline_text(td)
-                if text:
-                    cell_parts.append(text)
-
-            cell_text = " ".join(cell_parts)
-            # Escape pipes in cell content
-            cell_text = cell_text.replace("|", "\\|")
-
-            colspan = int(td.get("colspan", "1"))
-            rowspan = int(td.get("rowspan", "1"))
-            row_cells.append((cell_text, colspan, rowspan))
-
-        if row_cells:
-            raw_rows.append(row_cells)
-
-    if not raw_rows:
-        return ""
-
-    # Second pass: resolve colspan and rowspan into a regular grid
-    rows: list[list[str]] = []
-    pending: dict[int, tuple[str, int]] = {}  # col -> (text, rows_remaining)
-
-    for raw_row in raw_rows:
-        out_row: list[str] = []
-        col = 0
-        cell_idx = 0
-
-        while cell_idx < len(raw_row) or col in pending:
-            if col in pending:
-                text, remaining = pending[col]
-                out_row.append(text)
-                if remaining > 1:
-                    pending[col] = (text, remaining - 1)
-                else:
-                    del pending[col]
-                col += 1
-            elif cell_idx < len(raw_row):
-                text, colspan, rowspan = raw_row[cell_idx]
-                for _ in range(colspan):
-                    out_row.append(text)
-                    if rowspan > 1:
-                        pending[col] = (text, rowspan - 1)
-                    col += 1
-                cell_idx += 1
-            else:
-                break
-
-        rows.append(out_row)
-
-    # Normalize column count
-    max_cols = max(len(r) for r in rows)
-    for row in rows:
-        while len(row) < max_cols:
-            row.append("")
-
-    lines = []
-    for i, row in enumerate(rows):
-        lines.append("| " + " | ".join(row) + " |")
-        # Add separator after first row (header)
-        if i == 0:
-            lines.append("| " + " | ".join("---" for _ in row) + " |")
-
-    return "\n".join(lines)
+def _cell_text(td: etree._Element, ctx: _ParseContext | None = None) -> str:
+    """Flatten one ISB <td> into the string that goes inside the pipe cell."""
+    cell_parts = [text for p in td.findall("p") if (text := _inline_text(p, ctx))]
+    if not cell_parts:
+        text = _inline_text(td, ctx)
+        if text:
+            cell_parts.append(text)
+    return " ".join(cell_parts).replace("|", "\\|")
 
 
 # ── Paragraph class → css_class mapping ─────────────────────────────
@@ -329,19 +321,48 @@ class ISBTextParser(TextParser):
         if body is None:
             return []
 
-        self._parse_body(body, paragraphs)
+        ctx = _ParseContext()
+
+        # A cross-reference can point at a section the walk has not reached yet,
+        # so the anchors are collected before anything is emitted. <sect id> is
+        # exactly the target ISB's hrefs use.
+        #
+        # Two sections that render the same heading would share an anchor, and a
+        # renderer disambiguates those by appending a suffix — so the link would
+        # quietly land on the wrong section. None of the fixtures do it, but the
+        # corpus is ~4,000 acts nobody has read: an ambiguous anchor is dropped
+        # and the reference falls back to plain text.
+        seen: set[str] = set()
+        for sect in root.iter("sect"):
+            sect_id = sect.get("id")
+            if not sect_id:
+                continue
+            heading = _section_heading_text(sect)
+            if not heading:
+                continue
+            anchor = _anchor(heading)
+            if anchor in seen:
+                ctx.anchors = {k: v for k, v in ctx.anchors.items() if v != anchor}
+                continue
+            seen.add(anchor)
+            ctx.anchors[sect_id] = anchor
+
+        self._parse_body(body, paragraphs, ctx)
 
         # Parse backmatter (schedules, tables, notes)
         backmatter = root.find("backmatter")
         if backmatter is not None:
-            self._parse_backmatter(backmatter, paragraphs)
+            self._parse_backmatter(backmatter, paragraphs, ctx)
 
-        # Flush collected footnote definitions (pattern: UK parser)
-        if _footnote_defs:
+        # The definitions for every [^n] marker emitted above. Without this the
+        # published corpus carries dangling Markdown references — 35 of them in
+        # a single act before this landed.
+        if ctx.footnotes:
             paragraphs.append(Paragraph(css_class="h2", text="Footnotes"))
-            for fn_num, fn_body in _footnote_defs:
-                paragraphs.append(Paragraph(css_class="parrafo", text=f"[^{fn_num}]: {fn_body}"))
-            _footnote_defs.clear()
+            paragraphs.extend(
+                Paragraph(css_class="parrafo", text=f"[^{num}]: {body_text}")
+                for num, body_text in ctx.footnotes
+            )
 
         if not paragraphs:
             return []
@@ -361,27 +382,31 @@ class ISBTextParser(TextParser):
         )
         return [block]
 
-    def _parse_body(self, body: etree._Element, paragraphs: list[Paragraph]) -> None:
+    def _parse_body(
+        self, body: etree._Element, paragraphs: list[Paragraph], ctx: _ParseContext | None = None
+    ) -> None:
         """Walk the body element tree and emit paragraphs."""
         for child in body:
             tag = child.tag if isinstance(child.tag, str) else ""
 
             if tag == "part":
-                self._parse_part(child, paragraphs)
+                self._parse_part(child, paragraphs, ctx)
             elif tag == "chapter":
-                self._parse_chapter(child, paragraphs)
+                self._parse_chapter(child, paragraphs, ctx)
             elif tag == "sect":
-                self._parse_section(child, paragraphs)
+                self._parse_section(child, paragraphs, ctx)
             elif tag == "schedule":
-                self._parse_schedule(child, paragraphs)
+                self._parse_schedule(child, paragraphs, ctx)
             elif tag == "p":
-                self._parse_paragraph(child, paragraphs)
+                self._parse_paragraph(child, paragraphs, ctx)
             elif tag == "table":
-                md = _table_to_markdown(child)
+                md = _table_to_markdown(child, ctx)
                 if md:
                     paragraphs.append(Paragraph(css_class="parrafo", text=md))
 
-    def _parse_part(self, part: etree._Element, paragraphs: list[Paragraph]) -> None:
+    def _parse_part(
+        self, part: etree._Element, paragraphs: list[Paragraph], ctx: _ParseContext | None = None
+    ) -> None:
         """Parse a <part> element."""
         title_el = part.find("title")
         if title_el is not None:
@@ -392,19 +417,21 @@ class ISBTextParser(TextParser):
         for child in part:
             tag = child.tag if isinstance(child.tag, str) else ""
             if tag == "chapter":
-                self._parse_chapter(child, paragraphs)
+                self._parse_chapter(child, paragraphs, ctx)
             elif tag == "sect":
-                self._parse_section(child, paragraphs)
+                self._parse_section(child, paragraphs, ctx)
             elif tag == "p":
-                self._parse_paragraph(child, paragraphs)
+                self._parse_paragraph(child, paragraphs, ctx)
             elif tag == "table":
-                md = _table_to_markdown(child)
+                md = _table_to_markdown(child, ctx)
                 if md:
                     paragraphs.append(Paragraph(css_class="parrafo", text=md))
             elif tag == "schedule":
-                self._parse_schedule(child, paragraphs)
+                self._parse_schedule(child, paragraphs, ctx)
 
-    def _parse_chapter(self, chapter: etree._Element, paragraphs: list[Paragraph]) -> None:
+    def _parse_chapter(
+        self, chapter: etree._Element, paragraphs: list[Paragraph], ctx: _ParseContext | None = None
+    ) -> None:
         """Parse a <chapter> element."""
         title_el = chapter.find("title")
         if title_el is not None:
@@ -415,32 +442,23 @@ class ISBTextParser(TextParser):
         for child in chapter:
             tag = child.tag if isinstance(child.tag, str) else ""
             if tag == "sect":
-                self._parse_section(child, paragraphs)
+                self._parse_section(child, paragraphs, ctx)
             elif tag == "p":
-                self._parse_paragraph(child, paragraphs)
+                self._parse_paragraph(child, paragraphs, ctx)
             elif tag == "table":
-                md = _table_to_markdown(child)
+                md = _table_to_markdown(child, ctx)
                 if md:
                     paragraphs.append(Paragraph(css_class="parrafo", text=md))
 
-    def _parse_section(self, sect: etree._Element, paragraphs: list[Paragraph]) -> None:
+    def _parse_section(
+        self, sect: etree._Element, paragraphs: list[Paragraph], ctx: _ParseContext | None = None
+    ) -> None:
         """Parse a <sect> element (a numbered section/article)."""
-        # Section heading: number + title
-        number_el = sect.find("number")
-        title_el = sect.find("title")
-
-        heading_parts = []
-        if number_el is not None:
-            num_text = _inline_text(number_el)
-            if num_text:
-                heading_parts.append(num_text)
-        if title_el is not None:
-            title_text = _inline_text(title_el)
-            if title_text:
-                heading_parts.append(title_text)
-
-        if heading_parts:
-            paragraphs.append(Paragraph(css_class="articulo", text=" ".join(heading_parts)))
+        # Same helper that seeded ctx.anchors, so the anchor a cross-reference
+        # points at and the heading actually emitted cannot come apart.
+        heading = _section_heading_text(sect)
+        if heading:
+            paragraphs.append(Paragraph(css_class="articulo", text=heading))
 
         # Section body paragraphs
         for child in sect:
@@ -448,16 +466,21 @@ class ISBTextParser(TextParser):
             if tag in ("number", "title"):
                 continue  # Already handled
             if tag == "p":
-                self._parse_paragraph(child, paragraphs)
+                self._parse_paragraph(child, paragraphs, ctx)
             elif tag == "table":
-                md = _table_to_markdown(child)
+                md = _table_to_markdown(child, ctx)
                 if md:
                     paragraphs.append(Paragraph(css_class="parrafo", text=md))
             elif tag == "sect":
                 # Nested subsections (rare but possible)
-                self._parse_section(child, paragraphs)
+                self._parse_section(child, paragraphs, ctx)
 
-    def _parse_schedule(self, schedule: etree._Element, paragraphs: list[Paragraph]) -> None:
+    def _parse_schedule(
+        self,
+        schedule: etree._Element,
+        paragraphs: list[Paragraph],
+        ctx: _ParseContext | None = None,
+    ) -> None:
         """Parse a <schedule> element (annex/appendix)."""
         # Schedule heading
         title_el = schedule.find("title")
@@ -471,34 +494,41 @@ class ISBTextParser(TextParser):
             if tag == "title":
                 continue
             if tag == "p":
-                self._parse_paragraph(child, paragraphs)
+                self._parse_paragraph(child, paragraphs, ctx)
             elif tag == "table":
-                md = _table_to_markdown(child)
+                md = _table_to_markdown(child, ctx)
                 if md:
                     paragraphs.append(Paragraph(css_class="parrafo", text=md))
             elif tag == "part":
-                self._parse_part(child, paragraphs)
+                self._parse_part(child, paragraphs, ctx)
             elif tag == "sect":
-                self._parse_section(child, paragraphs)
+                self._parse_section(child, paragraphs, ctx)
 
-    def _parse_backmatter(self, backmatter: etree._Element, paragraphs: list[Paragraph]) -> None:
+    def _parse_backmatter(
+        self,
+        backmatter: etree._Element,
+        paragraphs: list[Paragraph],
+        ctx: _ParseContext | None = None,
+    ) -> None:
         """Parse <backmatter> which contains schedules, tables, and notes."""
         for child in backmatter:
             tag = child.tag if isinstance(child.tag, str) else ""
             if tag == "schedule":
-                self._parse_schedule(child, paragraphs)
+                self._parse_schedule(child, paragraphs, ctx)
             elif tag == "p":
-                text = _inline_text(child)
+                text = _inline_text(child, ctx)
                 if text:
                     paragraphs.append(Paragraph(css_class="firma_rey", text=text))
             elif tag == "table":
-                md = _table_to_markdown(child)
+                md = _table_to_markdown(child, ctx)
                 if md:
                     paragraphs.append(Paragraph(css_class="parrafo", text=md))
 
-    def _parse_paragraph(self, p: etree._Element, paragraphs: list[Paragraph]) -> None:
+    def _parse_paragraph(
+        self, p: etree._Element, paragraphs: list[Paragraph], ctx: _ParseContext | None = None
+    ) -> None:
         """Parse a <p> element into a Paragraph."""
-        text = _inline_text(p)
+        text = _inline_text(p, ctx)
         if not text:
             return
 
