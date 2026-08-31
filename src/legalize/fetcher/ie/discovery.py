@@ -41,7 +41,11 @@ class ISBDiscovery(NormDiscovery):
         """Yield norm IDs for all enacted Acts.
 
         Paginates through the Oireachtas API catalog.
+        Includes the Constitution (not in the API) as a special first entry.
         """
+        # Constitution is not in the Oireachtas API — yield it explicitly
+        yield "IE-1937-constitution"
+
         isb: ISBClient = client  # type: ignore[assignment]
         skip = 0
         total = 0
