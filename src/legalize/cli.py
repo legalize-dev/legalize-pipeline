@@ -7,6 +7,7 @@ Unified CLI with --country flag for all operations.
 
 from __future__ import annotations
 
+import importlib
 import logging
 from datetime import date
 
@@ -529,6 +530,48 @@ def daily(
         from legalize.pipeline import generic_daily
 
         generic_daily(config, country, target_date=parsed_date, dry_run=dry_run)
+
+
+# ─────────────────────────────────────────────
+# REVISED
+# ─────────────────────────────────────────────
+
+
+@cli.command()
+@_country_option()
+@click.option("--limit", default=None, type=int, help="Max norms to process.")
+@click.option("--dry-run", is_flag=True, help="Simulate without creating commits.")
+@click.pass_context
+def revised(
+    ctx: click.Context,
+    country: str,
+    limit: int | None,
+    dry_run: bool,
+) -> None:
+    """Apply a country's consolidated-text pass on top of a bootstrap.
+
+    Some sources publish the enacted text and the consolidated text in
+    separate places — Ireland's ISB and the Law Reform Commission's Revised
+    Acts, for instance. Where that is true the country ships a `revised`
+    module and this command runs it; where it is not, there is nothing to
+    apply and the command says so rather than inventing a second version.
+
+    Examples:
+        legalize revised -c ie                   # All revised acts
+        legalize revised -c ie --limit 10        # First 10 only
+        legalize revised -c ie --dry-run         # Simulate
+    """
+    try:
+        module = importlib.import_module(f"legalize.fetcher.{country}.revised")
+    except ModuleNotFoundError:
+        console.print(
+            f"[red]{country} has no consolidated-text pass "
+            f"(no legalize.fetcher.{country}.revised).[/red]"
+        )
+        raise SystemExit(1) from None
+
+    config = ctx.obj["config"]
+    module.apply_revised_acts(config, dry_run=dry_run, limit=limit)
 
 
 # ─────────────────────────────────────────────

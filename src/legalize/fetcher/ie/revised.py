@@ -4,22 +4,28 @@ After the initial bootstrap (enacted text), this module fetches
 consolidated text from revisedacts.lawreform.ie for the ~560 acts
 that have revised versions, and creates a second commit per law
 with the updated text.
+
+Uses the standard GitRepo + build_commit_info infrastructure for
+commit creation, ensuring consistent commit format, proper trailers,
+and idempotency via Source-Id checks.
 """
 
 from __future__ import annotations
 
 import logging
-import os
-import subprocess
 from datetime import date
 from pathlib import Path
 
 from rich.console import Console
 
+from legalize.committer.git_ops import GitRepo
+from legalize.committer.message import build_commit_info
 from legalize.config import Config
 from legalize.fetcher.ie.client import ISBClient
-from legalize.fetcher.ie.parser import parse_revised_html
-from legalize.transformer.markdown import render_paragraphs
+from legalize.fetcher.ie.parser import ISBMetadataParser, parse_revised_html
+from legalize.models import Block, CommitType, Reform, Version
+from legalize.transformer.markdown import render_norm_at_date
+from legalize.transformer.slug import norm_to_filepath
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -34,8 +40,13 @@ def apply_revised_acts(
     """Fetch and apply Revised Acts versions to the Ireland repo.
 
     For each norm in the repo, checks if a Revised Acts version exists.
-    If it does, overwrites the MD file with the consolidated text and
-    creates a REFORM commit dated at the "Updated to" date.
+    If it does, renders the consolidated text through the standard
+    pipeline (render_norm_at_date) and creates a REFORM commit via
+    GitRepo + build_commit_info.
+
+    Safe to re-run: a norm whose consolidated text has not moved renders
+    byte-identical markdown, write_and_add reports no change, and no commit
+    is made.
 
     Returns the number of commits created.
     """
@@ -48,8 +59,14 @@ def apply_revised_acts(
 
     console.print("[bold]Revised Acts — applying consolidated versions[/bold]\n")
 
+    # Standard committer infrastructure
+    repo = GitRepo(repo_path, config.git.committer_name, config.git.committer_email)
+
+    metadata_parser = ISBMetadataParser()
+
     commits_created = 0
     revised_found = 0
+    skipped_unchanged = 0
     errors = 0
 
     with ISBClient.create(cc) as client:
@@ -59,6 +76,12 @@ def apply_revised_acts(
         for i, norm_id in enumerate(norm_ids):
             if limit and revised_found >= limit:
                 break
+
+            # A distinct prefix so Source-Id != Norm-Id. It carries no date:
+            # the DB's reform key is (law_id, source_id, date), so successive
+            # consolidations of one act are already distinct rows, and a
+            # stable Source-Id is what the history-fix script can reproduce.
+            source_id = f"revised-{norm_id}"
 
             # Try to fetch revised text
             try:
@@ -82,92 +105,67 @@ def apply_revised_acts(
             if updated_to is None:
                 updated_to = date.today()
 
-            # Render to markdown
-            md_content = render_paragraphs(paragraphs)
+            # Fetch metadata for this norm (needed for proper commit message)
+            try:
+                meta_data = client.get_metadata(norm_id)
+                metadata = metadata_parser.parse(meta_data, norm_id)
+            except Exception:
+                logger.debug("Could not fetch metadata for %s, using fallback", norm_id)
+                metadata = metadata_parser._fallback_metadata(norm_id)
 
-            # Read existing frontmatter from the enacted version
-            file_path = repo_path / "ie" / f"{norm_id}.md"
-            if not file_path.exists():
-                logger.debug("No enacted file for %s, skipping", norm_id)
-                continue
+            # Build Block/Version from revised paragraphs
+            block = Block(
+                id="full-text",
+                block_type="document",
+                title="",
+                versions=(
+                    Version(
+                        norm_id=norm_id,
+                        publication_date=updated_to,
+                        effective_date=updated_to,
+                        paragraphs=tuple(paragraphs),
+                    ),
+                ),
+            )
+            blocks = [block]
 
-            existing = file_path.read_text(encoding="utf-8")
-            # Extract frontmatter
-            if existing.startswith("---"):
-                parts = existing.split("---", 2)
-                if len(parts) >= 3:
-                    frontmatter = parts[1]
-                    # Update last_updated in frontmatter
-                    import re
-
-                    frontmatter = re.sub(
-                        r'last_updated: ".*?"',
-                        f'last_updated: "{updated_to.isoformat()}"',
-                        frontmatter,
-                    )
-                    new_content = f"---{frontmatter}---\n{md_content}\n"
-                else:
-                    new_content = f"{md_content}\n"
-            else:
-                new_content = f"{md_content}\n"
-
-            # Check if content actually changed
-            if new_content == existing:
-                logger.debug("No change for %s", norm_id)
-                continue
+            # Render to full markdown with frontmatter via standard pipeline
+            file_path = norm_to_filepath(metadata)
+            markdown = render_norm_at_date(metadata, blocks, updated_to, include_all=True)
 
             if dry_run:
                 console.print(f"  [yellow]DRY-RUN[/yellow] {norm_id} → revised {updated_to}")
                 commits_created += 1
                 continue
 
-            # Write updated content
-            file_path.write_text(new_content, encoding="utf-8")
-
-            # Git add + commit
-            rel_path = f"ie/{norm_id}.md"
-            subprocess.run(
-                ["git", "-C", str(repo_path), "add", rel_path],
-                check=True,
-                capture_output=True,
-            )
-
-            # Check if there's actually a diff staged
-            result = subprocess.run(
-                ["git", "-C", str(repo_path), "diff", "--cached", "--quiet"],
-                capture_output=True,
-            )
-            if result.returncode == 0:
-                # No changes staged
+            # Write and stage. This is the idempotency check: write_and_add
+            # returns False when the rendered markdown is byte-identical to
+            # what is already committed, which is what makes the pass
+            # re-runnable — a skip keyed on Source-Id alone would apply the
+            # first consolidation and then never see a later one.
+            changed = repo.write_and_add(file_path, markdown)
+            if not changed:
+                skipped_unchanged += 1
                 continue
 
-            commit_msg = f"[reforma] {norm_id} — consolidated version {updated_to}"
-            env = os.environ.copy()
-            env["GIT_AUTHOR_DATE"] = f"{updated_to.isoformat()}T12:00:00"
-            env["GIT_COMMITTER_DATE"] = f"{updated_to.isoformat()}T12:00:00"
-            env["GIT_COMMITTER_NAME"] = config.git.committer_name
-            env["GIT_COMMITTER_EMAIL"] = config.git.committer_email
-
-            subprocess.run(
-                [
-                    "git",
-                    "-C",
-                    str(repo_path),
-                    "commit",
-                    "-m",
-                    commit_msg,
-                    "--trailer",
-                    f"Source-Id={norm_id}",
-                    "--trailer",
-                    f"Source-Date={updated_to.isoformat()}",
-                    "--trailer",
-                    f"Norm-Id={norm_id}",
-                ],
-                check=True,
-                capture_output=True,
-                env=env,
+            # Create reform and commit via standard infrastructure
+            reform = Reform(
+                date=updated_to,
+                norm_id=source_id,
+                affected_blocks=(),
             )
-            commits_created += 1
+            info = build_commit_info(
+                CommitType.REFORM,
+                metadata,
+                reform,
+                blocks,
+                file_path,
+                markdown,
+            )
+            sha = repo.commit(info)
+
+            if sha:
+                commits_created += 1
 
             if (revised_found % 50) == 0:
                 console.print(
@@ -179,6 +177,7 @@ def apply_revised_acts(
         f"\n[bold green]✓ Revised Acts complete[/bold green]\n"
         f"  {revised_found} revised versions found\n"
         f"  {commits_created} commits created\n"
+        f"  {skipped_unchanged} skipped (text unchanged)\n"
         f"  {errors} errors"
     )
     return commits_created
