@@ -104,6 +104,20 @@ class BOEClient(HttpClient):
         path = f"/api/legislacion-consolidada/id/{id_boe}/texto"
         return self._fetch(self._build_url(path), bypass_cache=bypass_cache)
 
+    def get_updated(self, start: date, end: date) -> bytes:
+        """Norms whose consolidated text the BOE updated in [start, end].
+
+        ``/api/legislacion-consolidada?from=&to=`` filters on ``fecha_actualizacion``,
+        i.e. when the BOE folded an amendment into the consolidated text — which is
+        the only place the source states what actually changed. Never cached: the
+        answer for a window keeps growing until the BOE finishes consolidating it.
+        """
+        path = (
+            f"/api/legislacion-consolidada"
+            f"?from={start.strftime('%Y%m%d')}&to={end.strftime('%Y%m%d')}"
+        )
+        return self._fetch(self._build_url(path), bypass_cache=True)
+
     def get_metadata(self, id_boe: str) -> bytes:
         """Fetches metadata for a norm: /api/legislacion-consolidada/id/{id}/metadatos."""
         path = f"/api/legislacion-consolidada/id/{id_boe}/metadatos"

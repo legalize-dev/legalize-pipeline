@@ -58,25 +58,6 @@ def _infer_rank_from_title(title: str) -> Rank | None:
     return None
 
 
-def _is_correction(title: str) -> bool:
-    """Detects whether this is an error correction."""
-    lower = title.lower()
-    return "corrección de errores" in lower or "correccion de errores" in lower
-
-
-def _extract_affected_norms(title: str) -> list[str]:
-    """Attempts to extract BOE-IDs of affected norms from the title.
-
-    Looks for patterns like 'por el que se modifica la Ley...' but
-    cannot resolve the BOE-ID from the title alone — this requires
-    querying the API. Returns an empty list for now.
-    """
-    # Summary titles do not contain BOE-IDs directly.
-    # Affected norm resolution is done in the pipeline when
-    # downloading the consolidated text.
-    return []
-
-
 def parse_summary(xml_data: bytes, scope: ScopeConfig) -> list[Disposition]:
     """Parses a BOE daily summary and filters by scope.
 
@@ -137,20 +118,17 @@ def _parse_item(item: etree._Element, department: str, scope: ScopeConfig) -> Di
     if scope.ranks and rank is not None and rank not in scope.ranks:
         return None
 
-    # If we cannot infer the rank, include it only if it's section 1
-    # (general dispositions) — we'll filter later when downloading metadata
-    is_correction = _is_correction(title)
-    is_new = not is_correction and "modifica" not in title.lower()
-
+    # What the disposition *does* is not decided here. A summary title is prose:
+    # "por el que se modifica" and "Reforma del apartado 3 del artículo 69" are the
+    # same act described two ways, and reading the word told us the fourth reform of
+    # the Constitution was a new law. The pipeline asks the source instead — whether
+    # the BOE keeps a consolidated text for it, and which norm stamps each block.
     return Disposition(
         id_boe=id_boe,
         title=title,
         rank=rank,
         department=department,
         url_xml=url_xml,
-        affected_norms=tuple(_extract_affected_norms(title)),
-        is_new=is_new,
-        is_correction=is_correction,
     )
 
 

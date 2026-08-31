@@ -248,6 +248,3 @@ class Disposition:
     rank: Optional[Rank]
     department: str
     url_xml: str
-    affected_norms: tuple[str, ...]
-    is_new: bool = False
-    is_correction: bool = False

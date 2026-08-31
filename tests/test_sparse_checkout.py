@@ -102,3 +102,18 @@ def test_a_full_checkout_is_untouched(tmp_path):
     repo = GitRepo(clone, "Legalize", "bot@legalize.dev")
     assert repo.write_and_add("pt/2025/law.md", LAW) is False
     assert repo.write_and_add("pt/2026/otra.md", OTHER) is True
+
+
+def test_a_tracked_law_outside_the_cone_is_still_in_the_repo(tmp_path):
+    """``has_file`` asks HEAD, because the disk lies under a sparse checkout.
+
+    Spain's daily skipped every amendment for five days after the cone landed: it
+    tested ``Path.exists()`` on a law the checkout was hiding and read that as a
+    law the corpus had never published.
+    """
+    clone = _sparse_clone(tmp_path, _origin_with_two_years(tmp_path))
+    repo = GitRepo(clone, "Legalize", "bot@legalize.dev")
+
+    assert not (clone / "pt" / "2026" / "law.md").exists()
+    assert repo.has_file("pt/2026/law.md") is True
+    assert repo.has_file("pt/2026/never-published.md") is False

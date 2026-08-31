@@ -158,6 +158,18 @@ class GitRepo:
         self._run(["add", rel_path])
         return True
 
+    def has_file(self, rel_path: str) -> bool:
+        """Whether HEAD tracks this path — the repo's answer, not the disk's.
+
+        ``Path.exists()`` is the wrong question in CI: the corpus is cloned with a
+        sparse checkout (8546e8b), so a published law is absent from the working
+        tree and a daily that asked the filesystem concluded the repo did not hold
+        it and skipped every amendment. Spain published no reform for the five days
+        that followed, with a green run each morning.
+        """
+        listed = self._run(["ls-tree", "-r", "--name-only", "HEAD", "--", rel_path], check=False)
+        return bool(listed)
+
     def sync_index(self) -> None:
         """Rebuild the index from HEAD, so the next commit's tree comes from it.
 
