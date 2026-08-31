@@ -139,12 +139,14 @@ class ISBClient(HttpClient):
         data = self._get(url, params=query)
         return json.loads(data)
 
-    def get_updated_since(self, since_date: str, **params: str) -> dict:
+    def get_updated_since(
+        self, since_date: str, *, skip: int = 0, limit: int = 50, **params: str
+    ) -> dict:
         """Fetch legislation updated since a date (for daily discovery).
 
         since_date: ISO date string, e.g. '2026-04-01'.
         """
-        return self.get_legislation_page(last_updated=since_date, **params)
+        return self.get_legislation_page(skip=skip, limit=limit, last_updated=since_date, **params)
 
     def get_revised_text(self, norm_id: str) -> bytes | None:
         """Fetch consolidated text from Revised Acts (revisedacts.lawreform.ie).
