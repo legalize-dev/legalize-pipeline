@@ -715,6 +715,25 @@ class ISBTextParser(TextParser):
 # ── Revised Acts parser ──────────────────────────────────────────────
 
 
+# Revised Acts fills <div class="number"> with the section's anchor instead of
+# its number for a handful of sections inserted by amendment — "SEC30N" where
+# the section is 30N, ">257E" where it is 257E. Eight headings across two of the
+# ~560 revised acts, which published as "##### SEC30N. **…**": not addressable
+# by the number the section actually has.
+_SECTION_NUMBER_JUNK = re.compile(r"^(?:SEC|>)+", re.IGNORECASE)
+
+
+def _clean_section_number(raw: str) -> str:
+    """The section number, with the anchor the source sometimes sends instead.
+
+    Only rewrites when what is left is a section number. Anything else is
+    returned untouched: a heading that reads oddly is better than one carrying
+    a number we invented.
+    """
+    cleaned = _SECTION_NUMBER_JUNK.sub("", raw.strip())
+    return cleaned if re.fullmatch(r"\d+[A-Z]*", cleaned) else raw
+
+
 def parse_revised_html(data: bytes) -> tuple[list[Paragraph], date | None]:
     """Parse Revised Acts HTML into paragraphs + updated_to date.
 
@@ -777,7 +796,7 @@ def parse_revised_html(data: bytes) -> tuple[list[Paragraph], date | None]:
             num_div = section.find("div[@class='number']")
             title_div = section.find("div[@class='title']")
 
-            sec_num = _html_text(num_div) if num_div is not None else ""
+            sec_num = _clean_section_number(_html_text(num_div)) if num_div is not None else ""
             sec_title = ""
             if title_div is not None:
                 # Title is in <b> inside <p> inside the title div

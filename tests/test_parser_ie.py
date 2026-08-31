@@ -11,6 +11,7 @@ from legalize.fetcher.ie.parser import (
     ISBMetadataParser,
     _ParseContext,
     _anchor,
+    _clean_section_number,
     _inline_text,
 )
 from legalize.countries import get_text_parser, get_metadata_parser
@@ -481,3 +482,20 @@ class TestCrossReferences:
             _anchor("8. **Continuation of An Garda Síochána**")
             == "8-continuation-of-an-garda-síochána"
         )
+
+
+class TestRevisedSectionNumber:
+    """Revised Acts sometimes sends the anchor where the number goes."""
+
+    def test_anchor_forms_are_reduced_to_the_number(self):
+        assert _clean_section_number("SEC30N") == "30N"
+        assert _clean_section_number(">257E") == "257E"
+
+    def test_ordinary_numbers_are_untouched(self):
+        for raw in ("1", "30", "257E", "12A"):
+            assert _clean_section_number(raw) == raw
+
+    def test_anything_else_is_left_alone_rather_than_guessed(self):
+        """A heading that reads oddly beats one carrying an invented number."""
+        for raw in ("Schedule", "SEC", "", "Part II"):
+            assert _clean_section_number(raw) == raw
