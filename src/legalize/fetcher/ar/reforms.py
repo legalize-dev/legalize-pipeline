@@ -150,10 +150,24 @@ def _ref_targets_norm(reference: str, target_norm_number: str) -> bool:
 # "Sustitúyese el artículo X (de la Ley Y)? por el siguiente: <new text>"
 _SUBSTITUTE_SINGLE_RE = re.compile(
     r"Sustit[úu]yese\s+el\s+art[íi]culo\s+(?P<art>\d+\s*(?:bis|ter|quáter|quater)?)"
-    r"\s*[°º]?(?P<between>[^:]{0,400}?)"
+    r"\s*[°º]?(?P<between>.{0,400}?)"
     r"(?:por\s+el\s+siguiente|por\s+el\s+texto\s+siguiente|el\s+que\s+quedar[áa]\s+redactado[^:]{0,80})"
     r"\s*[:\.]\s*(?P<body>.+?)"
-    r"(?=\bArt\.?\s*\d+[\.°º]?\s*[\-–]|\bARTICULO\s+\d+|\Z)",
+    r"(?=\bArt[ií]culo\s+\d+[\.°º]?\s*[\-—\.]|\bArt\.?\s*\d+[\.°º]?\s*[\-—\.]|\Z)",
+    re.IGNORECASE | re.DOTALL,
+)
+
+# Alternative substitution formulas used in older legislation (pre-1983):
+# "El artículo X tendrá la siguiente redacción: <new text>"
+# "El artículo X quedará redactado de la siguiente forma: <new text>"
+# "El artículo X quedará redactado de la siguiente manera: <new text>"
+_SUBSTITUTE_ALT_RE = re.compile(
+    r"[Ee]l\s+art[íi]culo\s+(?P<art>\d+\s*(?:bis|ter|qu[áa]ter|quater)?)"
+    r"\s*[°º]?(?P<between>[^:]{0,300}?)"
+    r"(?:tendr[áa]\s+la\s+siguiente\s+redacci[oó]n"
+    r"|quedar[áa]?\s+redactado\s+de\s+la\s+siguiente\s+(?:forma|manera))"
+    r"\s*[:\.]\s*(?P<body>.+?)"
+    r"(?=\b[Ee]l\s+art[íi]culo\s+\d+|\bArt\.?\s*\d+[\.°º]?\s*[\-—]|\bARTICULO\s+\d+|\Z)",
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -177,7 +191,7 @@ _QUOTED_ARTICLE_RE = re.compile(
 
 _REPEAL_SINGLE_RE = re.compile(
     r"Der[óo]gase\s+el\s+art[íi]culo\s+(?P<art>\d+(?:\s*bis|\s*ter)?)"
-    r"\s*[°º]?(?P<between>[^.]{0,300})\.",
+    r"\s*[°º]?(?P<between>.{0,300}?)\.",
     re.IGNORECASE,
 )
 
@@ -196,7 +210,7 @@ def _split_modificatoria_blocks(plain: str) -> list[str]:
     Each block starts with ``Art. N.-`` or ``ARTICULO N.-`` and runs until
     the next such header (or end of document).
     """
-    return re.split(r"(?=\bArt\.?\s*\d+[\.°º]?\s*[\-–])", plain)
+    return re.split(r"(?=\bArt\.?\s*\d+[\.°º]?\s*[\-—])", plain)
 
 
 def _strip_article_header(body: str) -> str:
@@ -253,7 +267,7 @@ def extract_modifications(modificatoria_html: bytes, target_norm_number: str) ->
         if not block.strip():
             continue
 
-        source_art_match = re.match(r"\bArt\.?\s*(\d+)[\.°º]?\s*[\-–]", block)
+        source_art_match = re.match(r"\b(?:Art[ií]culo|Art\.?)\s*(\d+)[\.°º]?\s*[\-–\.]", block, re.IGNORECASE)
         source_art = source_art_match.group(1) if source_art_match else ""
 
         # Single substitution
@@ -267,6 +281,24 @@ def extract_modifications(modificatoria_html: bytes, target_norm_number: str) ->
                     target_norm_number=target,
                     kind=ModificationKind.SUBSTITUTE,
                     article_id=m.group("art").strip().replace(" ", " "),
+                    new_text=_trim_body(body),
+                    source_article=source_art,
+                    raw_excerpt=block[:300].strip(),
+                )
+            )
+        # Alternative substitution formulas (older legislation)
+        for m in _SUBSTITUTE_ALT_RE.finditer(block):
+            between = m.group("between") or ""
+            # The law reference may be in the enclosing article header,
+            # not in the "between" group — accept if target appears anywhere in block
+            if not _ref_targets_norm(between, target) and not _ref_targets_norm(block[:500], target):
+                continue
+            body = _strip_article_header(m.group("body"))
+            mods.append(
+                Modification(
+                    target_norm_number=target,
+                    kind=ModificationKind.SUBSTITUTE,
+                    article_id=m.group("art").strip(),
                     new_text=_trim_body(body),
                     source_article=source_art,
                     raw_excerpt=block[:300].strip(),
