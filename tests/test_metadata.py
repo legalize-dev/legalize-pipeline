@@ -63,3 +63,71 @@ class TestParseMetadatos:
         )
         meta = parse_metadata(xml, "BOE-A-1978-31229")
         assert meta.status == NormStatus.REPEALED
+
+
+# The analysis block of the diary XML, which is where the subsequent references
+# come from. Two element shapes: the diary's own (referencia + <palabra>) and the
+# consolidated-legislation API's (<id_norma> + <relacion>) for the same block.
+_DIARIO_OLD = b"""<?xml version="1.0" encoding="utf-8"?>
+<documento><analisis><referencias>
+  <anteriores><anterior referencia="BOE-A-1995-7240"><palabra>DEROGA</palabra></anterior></anteriores>
+  <posteriores>
+    <posterior referencia="BOE-A-2015-5744"><palabra>SE MODIFICA</palabra></posterior>
+  </posteriores>
+</referencias></analisis></documento>"""
+
+_DIARIO_NEW = b"""<?xml version="1.0" encoding="utf-8"?>
+<documento><analisis><referencias>
+  <anteriores>
+    <anterior><id_norma>BOE-A-1995-7240</id_norma><relacion codigo="210">DEROGA</relacion>
+      <texto>Ley 2/1995, de 23 de marzo</texto></anterior>
+  </anteriores>
+  <posteriores>
+    <posterior><id_norma>BOE-A-2020-7311</id_norma>
+      <relacion codigo="331">SE DICTA EN RELACION</relacion>
+      <texto>con el art. 348 bis, sobre suspension hasta el 31 de diciembre de 2020</texto>
+    </posterior>
+  </posteriores>
+</referencias></analisis></documento>"""
+
+# 21 subsequent references: one more than the slice this used to take.
+_DIARIO_MANY = (
+    b'<?xml version="1.0" encoding="utf-8"?><documento><analisis><referencias><posteriores>'
+    + b"".join(
+        f'<posterior referencia="BOE-A-2020-{n:04d}"><palabra>SE MODIFICA</palabra></posterior>'.encode()
+        for n in range(21)
+    )
+    + b"</posteriores></referencias></analisis></documento>"
+)
+
+
+def _extra(diario: bytes) -> dict:
+    meta = parse_metadata(CONSTITUCION_META_XML, "BOE-A-1978-31229", diario_xml=diario)
+    return dict(meta.extra)
+
+
+class TestSubsequentReferences:
+    """What the gazette says happened to a law after it was published.
+
+    It is the only record of anything that touches a law without rewriting it —
+    a suspension above all, which produces no version and therefore no commit.
+    """
+
+    def test_the_diary_element_shape_parses(self):
+        assert _extra(_DIARIO_OLD)["references_subsequent"] == "SE MODIFICA BOE-A-2015-5744"
+
+    def test_the_other_endpoints_shape_parses_too(self):
+        extra = _extra(_DIARIO_NEW)
+        assert extra["references_subsequent"].startswith("SE DICTA EN RELACION BOE-A-2020-7311:")
+        assert extra["references_previous"].startswith("DEROGA BOE-A-1995-7240:")
+
+    def test_the_sentence_comes_with_it(self):
+        """The verb says "SE DICTA EN RELACION". Only the text says "suspension"."""
+        assert "suspension" in _extra(_DIARIO_NEW)["references_subsequent"]
+
+    def test_nothing_is_dropped_past_the_twentieth(self):
+        """The slice was [:20], and the LSC's 31st reference is the suspension."""
+        extra = _extra(_DIARIO_MANY)
+        assert extra["references_subsequent_count"] == "21"
+        assert extra["references_subsequent"].count(" | ") == 20
+        assert "BOE-A-2020-0020" in extra["references_subsequent"]

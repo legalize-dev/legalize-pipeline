@@ -354,6 +354,29 @@ def parse_metadata(
     )
 
 
+def _reference(el) -> str:
+    """One entry of the BOE's own analysis: "VERB BOE-id: what it says".
+
+    ``<texto>`` is the half this used to drop, and it is not decoration. The
+    verb is a code from a closed list, and the closed list has no word for a
+    suspension: the one that stopped article 348 bis of the LSC until 31
+    December 2020 is filed under "SE DICTA EN RELACIÓN", and the only place
+    *suspensión* is written is in the sentence.
+
+    Both element shapes are read — ``referencia``/``<palabra>``, which is what
+    the diary XML sends, and ``<id_norma>``/``<relacion>``, which is what the
+    consolidated-legislation API sends for the same block. The two endpoints
+    disagree today; whichever one a caller passes, this keeps working.
+    """
+    rid = (el.get("referencia") or el.findtext("id_norma") or "").strip()
+    if not rid.startswith("BOE-"):
+        return ""
+    verb = (el.findtext("palabra") or el.findtext("relacion") or "").strip()
+    note = " ".join((el.findtext("texto") or "").split())
+    entry = f"{verb} {rid}".strip()
+    return f"{entry}: {note}" if note else entry
+
+
 def _parse_diario_xml(
     diario_xml: bytes,
 ) -> tuple[list[str], str | None, list[tuple[str, str]]]:
@@ -412,26 +435,32 @@ def _parse_diario_xml(
         if referencias is not None:
             ants = referencias.find("anteriores")
             if ants is not None:
-                refs = []
-                for a in ants.findall("anterior"):
-                    rid = a.get("referencia", "")
-                    if rid.startswith("BOE-"):
-                        verb_el = a.find("palabra")
-                        verb = verb_el.text if verb_el is not None and verb_el.text else ""
-                        refs.append(f"{verb} {rid}".strip())
+                refs = [_reference(a) for a in ants.findall("anterior")]
+                refs = [r for r in refs if r]
                 if refs:
-                    extra.append(("references_previous", "; ".join(refs)))
+                    extra.append(("references_previous", " | ".join(refs)))
             posts = referencias.find("posteriores")
             if posts is not None:
-                refs = []
-                for p in posts.findall("posterior"):
-                    rid = p.get("referencia", "")
-                    if rid.startswith("BOE-"):
-                        verb_el = p.find("palabra")
-                        verb = verb_el.text if verb_el is not None and verb_el.text else ""
-                        refs.append(f"{verb} {rid}".strip())
+                # Whole, and with the sentence the BOE writes about each one.
+                #
+                # This was the 20 most recent, verb and id only. Both halves lost
+                # the same thing: what touches a law without rewriting it. The
+                # LSC has 31 subsequent references, and the one saying article
+                # 348 bis was suspended until 31 December 2020 is the 31st — cut
+                # by the slice — filed under "SE DICTA EN RELACIÓN", so even
+                # uncut the verb alone would not have said "suspension". The word
+                # is only in the text: "sobre suspensión hasta el 31 de diciembre
+                # de 2020, de lo indicado de los apartados 1 y 4".
+                #
+                # A suspension changes no words, so it produces no version and no
+                # commit: this field is the only place in the corpus it exists.
+                #
+                # Entries are separated by " | " rather than "; " because the
+                # sentences carry semicolons of their own. Readers accept both.
+                refs = [_reference(p) for p in posts.findall("posterior")]
+                refs = [r for r in refs if r]
                 if refs:
-                    extra.append(("references_subsequent", "; ".join(refs[:20])))
+                    extra.append(("references_subsequent", " | ".join(refs)))
                     extra.append(("references_subsequent_count", str(len(refs))))
 
     return subjects, pdf_url, extra
