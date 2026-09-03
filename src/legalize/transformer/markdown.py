@@ -34,7 +34,10 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     # --- structural headings (no pair) ---
     "libro_num": lambda t: f"# {t}\n",
     "parte_num": lambda t: f"# {t}\n",
+    "libro": lambda t: f"# {t}\n",
+    "parte": lambda t: f"# {t}\n",
     "titulo": lambda t: f"## {t}\n",
+    "capitulo": lambda t: f"### {t}\n",
     "titulo_tit": lambda t: f"## {t}\n",
     "capitulo_tit": lambda t: f"### {t}\n",
     "seccion": lambda t: f"#### {t}\n",

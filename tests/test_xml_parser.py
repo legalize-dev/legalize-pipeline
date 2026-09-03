@@ -331,3 +331,42 @@ class TestLegalNumberingIsNotClaimedByMarkdown:
         marked as a list item carries its own class and its own formatter."""
         monkeypatch.setattr(countries, "ESCAPES_LEGAL_NUMBERING", {"zz"})
         assert "1\\." not in self._render("1. primero", "zz", css="list_item")
+
+
+class TestWhatTheInlineExtractorWasLosing:
+    """Three defects measured against the source, one sample each (#106)."""
+
+    @staticmethod
+    def _paragraphs(inner: bytes) -> tuple:
+        blocks = parse_text_xml(
+            b'<?xml version="1.0" encoding="utf-8"?><response><data><texto>'
+            b'<bloque id="a1" tipo="precepto" titulo="Art 1">'
+            b'<version id_norma="X" fecha_publicacion="19680101">' + inner + b"</version>"
+            b"</bloque></texto></data></response>"
+        )
+        return blocks[0].versions[0].paragraphs
+
+    def test_an_image_that_is_a_cells_whole_content_survives(self):
+        """10 of the 11 images in BOE-A-1968-963 were lost this way: the
+        extractor only reached an <img> nested inside another element."""
+        paragraphs = self._paragraphs(
+            b'<table><tr><td><img alt="Imagen" src="/img/A1.png"/></td><td>texto</td></tr></table>'
+        )
+        table = next(p for p in paragraphs if p.css_class == "table")
+        assert "![Imagen](https://www.boe.es/img/A1.png)" in table.text
+
+    def test_a_reference_to_an_autonomous_gazette_keeps_its_link(self):
+        """The BOE writes `<a class="refPost">` with no href and the id only in
+        the anchor text. The pattern matched `BOE-` alone, so 49 of 3,869
+        anchors — BON, BORM, DOGC — came out as plain prose."""
+        paragraphs = self._paragraphs(
+            b'<p class="parrafo">Vease <a class="refPost">BON-n-1999-90001</a>.</p>'
+        )
+        assert "(https://www.boe.es/buscar/doc.php?id=BON-n-1999-90001)" in paragraphs[0].text
+
+    def test_the_acts_own_body_wrapper_is_not_stripped(self):
+        """`textoCompleto` was on the strip list with the table-cell fragments,
+        but it is the body of a corrección de errores, not viewer chrome: 18
+        occurrences across 13 of 46 sampled files."""
+        paragraphs = self._paragraphs(b'<p class="textoCompleto">Donde dice X, debe decir Y.</p>')
+        assert any("Donde dice X" in p.text for p in paragraphs)
