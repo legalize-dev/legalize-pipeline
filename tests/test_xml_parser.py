@@ -191,3 +191,76 @@ class TestTheDateAVersionTookEffect:
         )
         assert get_block_at_date(block, date(2021, 4, 1)).norm_id == "printed_later_applies_earlier"
         assert get_block_at_date(block, date(2021, 8, 1)).norm_id == "printed_earlier_applies_later"
+
+
+class TestABlockTheSourceSaysIsGone:
+    """`bloque@fecha_caducidad` marks the date a unit ceased to exist, and the
+    pipeline read none of it (#106).
+
+    The BOE materialises most repeals as one more version whose body is
+    "(Derogado)", and those rendered correctly. Where it does not, the block
+    keeps only its last live text and `get_block_at_date` published it as
+    current law: 622 of 9,723 sampled blocks (6.4 %) across 10 of 53 documents,
+    378 of them in `BOE-A-1984-12106` alone, and the Código Civil still prints
+    1889 transitional provisions marked gone since 1981.
+    """
+
+    @staticmethod
+    def _block(expiry: date | None, *versions: Version) -> Block:
+        return Block(
+            id="a244",
+            block_type="precepto",
+            title="Art. 244",
+            versions=versions,
+            expiry_date=expiry,
+        )
+
+    @staticmethod
+    def _version(text: str, published: date) -> Version:
+        return Version(
+            norm_id="BOE-A-1984-12106",
+            publication_date=published,
+            effective_date=None,
+            paragraphs=(Paragraph(css_class="parrafo", text=text),),
+        )
+
+    def test_an_unmaterialised_repeal_removes_the_block(self):
+        block = self._block(
+            date(2012, 3, 6), self._version("Para el régimen interior…", date(1984, 5, 30))
+        )
+        assert get_block_at_date(block, date(2012, 3, 5)) is not None
+        assert get_block_at_date(block, date(2012, 3, 6)) is None
+        assert get_block_at_date(block, date(2025, 1, 3)) is None
+
+    def test_a_materialised_repeal_still_answers(self):
+        """659 of the 1,281 expired blocks carry a "(Derogado)" version. Those
+        render today and must keep rendering — the marker is the law."""
+        block = self._block(
+            date(2012, 3, 6),
+            self._version("Para el régimen interior…", date(1984, 5, 30)),
+            self._version("**(Derogado)**", date(2012, 3, 6)),
+        )
+        version = get_block_at_date(block, date(2025, 1, 3))
+        assert version is not None
+        assert version.paragraphs[0].text == "**(Derogado)**"
+
+    def test_the_indefinite_validity_sentinel_is_not_an_expiry(self):
+        """The BOE writes 99999999 for "no end date"; `_parse_date` already
+        drops it, so the block never expires."""
+        blocks = parse_text_xml(
+            b'<?xml version="1.0" encoding="utf-8"?><response><data><texto>'
+            b'<bloque id="a1" tipo="precepto" titulo="Art 1" fecha_caducidad="99999999">'
+            b'<version id_norma="X" fecha_publicacion="19840530"><p class="parrafo">t</p></version>'
+            b"</bloque></texto></data></response>"
+        )
+        assert blocks[0].expiry_date is None
+        assert get_block_at_date(blocks[0], date(2025, 1, 1)) is not None
+
+    def test_the_expiry_is_read_off_the_block(self):
+        blocks = parse_text_xml(
+            b'<?xml version="1.0" encoding="utf-8"?><response><data><texto>'
+            b'<bloque id="a244" tipo="precepto" titulo="Art 244" fecha_caducidad="20120306">'
+            b'<version id_norma="X" fecha_publicacion="19840530"><p class="parrafo">t</p></version>'
+            b"</bloque></texto></data></response>"
+        )
+        assert blocks[0].expiry_date == date(2012, 3, 6)
