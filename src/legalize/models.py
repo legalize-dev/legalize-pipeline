@@ -113,12 +113,67 @@ class TextState(str, Enum):
 # ─────────────────────────────────────────────
 
 
+class ParagraphRole(str, Enum):
+    """What a paragraph *is*, in words no single source owns.
+
+    The shared renderer's contract used to be one country's stylesheet: 51 BOE
+    CSS class names lived in `transformer/markdown.py`, so 13 countries emitted
+    Spanish class names to get their own structure rendered — `ie` marking an
+    Irish section `articulo`, `nl` signing a Dutch minister with `firma_rey`,
+    which means "the King's signature line" (#128).
+
+    Written against a class string, "does this norm contain an article?"
+    becomes 34 near-copies. Written against a role it is one function every
+    country gets for free, which is what `article_count`, `provision_count`
+    and the empty-render gate are built on.
+    """
+
+    BOOK = "book"
+    PART = "part"
+    TITLE = "title"
+    CHAPTER = "chapter"
+    SECTION = "section"
+    SUBSECTION = "subsection"
+    ARTICLE = "article"
+    ANNEX = "annex"
+    APPENDIX = "appendix"
+    PREAMBLE = "preamble"
+    SIGNATURE = "signature"
+    QUOTE = "quote"
+    NOTE = "note"
+    TABLE = "table"
+    IMAGE = "image"
+    LIST_ITEM = "list_item"
+    BODY = "body"
+
+
+#: Roles that open a unit of the law — what "did this render produce a
+#: structure?" means, and what a heading level is assigned to.
+HEADING_ROLES = frozenset(
+    {
+        ParagraphRole.BOOK,
+        ParagraphRole.PART,
+        ParagraphRole.TITLE,
+        ParagraphRole.CHAPTER,
+        ParagraphRole.SECTION,
+        ParagraphRole.SUBSECTION,
+        ParagraphRole.ARTICLE,
+        ParagraphRole.ANNEX,
+        ParagraphRole.APPENDIX,
+    }
+)
+
+
 @dataclass(frozen=True)
 class Paragraph:
     """A paragraph within a block version."""
 
     css_class: str
     text: str
+    # Set by a parser that knows its own vocabulary. When it is not, the role
+    # is resolved from `css_class` through the shared table in `markdown.py`,
+    # which is the migration path out of #128 — no corpus moves either way.
+    role: ParagraphRole | None = None
 
 
 @dataclass(frozen=True)
