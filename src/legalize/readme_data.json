@@ -658,7 +658,7 @@
         "Documento: https://www.suin-juriscol.gov.co/viewDocument.asp?id={id}",
         "Dataset (Datos Abiertos Colombia): https://www.datos.gov.co/Justicia-y-Derecho/Lista-de-normas-cargadas-en-el-Sistema-nico-de-Inf/fiev-nid6"
       ],
-      "data_license": "Dominio público (textos oficiales del Estado, libre reproducción)",
+      "data_license": "Textos normativos oficiales del Estado colombiano, reproducibles conforme al art. 41 de la Ley 23 de 1982, con la obligación de conformarse con la edición oficial. Los campos editoriales que acompañan a cada norma (vigencia, subtipo, sector, materia) y el historial de reformas provienen de la anotación de SUIN-Juriscol (Ministerio de Justicia y del Derecho); Legalize no reclama derechos sobre ellos, ni reproduce el formato, el diseño ni la marca del portal. La licencia MIT cubre el código del pipeline, nunca el contenido normativo.",
       "scope": "Cobertura de la normativa nacional colombiana publicada en SUIN-Juriscol, con texto consolidado por norma. SUIN no expone API ni catálogo: las normas se descubren enumerando identificadores numéricos internos del portal (viewDocument.asp?id=...). Cada archivo es una norma; el historial de reformas se reconstruye a partir de los bloques \"LEGISLACIÓN ANTERIOR\" que SUIN incrusta por artículo, con su rango de vigencia.",
       "norm_types": [
         {
