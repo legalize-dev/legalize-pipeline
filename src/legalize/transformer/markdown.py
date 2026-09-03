@@ -187,17 +187,29 @@ def render_norm_at_date(
         else:
             version = get_block_at_date(block, target_date)
         selected.append(version)
-    if metadata.country == "eu":
-        if include_all and not any(selected):
-            selected = [
-                min(b.versions, key=lambda v: v.in_force_from) if b.versions else None
-                for b in blocks
-            ]
-        effective = [v.in_force_from for v in selected if v is not None]
-        if effective:
-            target_date = max(effective)
+
+    # ``include_all`` used to fill every unresolved block from its earliest
+    # *future* version, one block at a time, so a bootstrap commit dated 1985
+    # carried articles written in 2015: the LOPJ shipped with `Artículo 4 bis`
+    # on European Union law eight years before Spain joined the EEC. 2,553
+    # files and 20,523 headings in `es` alone (#106).
+    #
+    # The fallback is what keeps a norm whose versions all post-date its own
+    # enactment from rendering as an empty file — Austria's ABGB went from 12
+    # to 759 sections on it (9705ecb) — so it is kept, but only for that: when
+    # the whole render would otherwise be empty. Measured on `es`: 0 of 8,758.
+    if include_all and not any(selected):
+        selected = [
+            min(block.versions, key=lambda v: v.in_force_from) if block.versions else None
+            for block in blocks
+        ]
+
+    # The date the law reads as. The spec defines it as "the date this version
+    # took effect", which is a property of what ended up in the file, not of
+    # the day the run happened (#106).
+    in_force = [v.in_force_from for v in selected if v is not None]
     parts: list[str] = []
-    parts.append(render_frontmatter(metadata, target_date))
+    parts.append(render_frontmatter(metadata, max(in_force) if in_force else target_date))
 
     title = metadata.title.rstrip(". ").strip()
     parts.append(f"# {title}\n\n")
@@ -206,10 +218,7 @@ def render_norm_at_date(
     if notice:
         parts.append(f"{notice}\n")
 
-    for block, version in zip(blocks, selected, strict=True):
-        if version is None and include_all and metadata.country != "eu" and block.versions:
-            version = min(block.versions, key=lambda v: v.publication_date)
-
+    for version in selected:
         if version is None:
             continue
 
