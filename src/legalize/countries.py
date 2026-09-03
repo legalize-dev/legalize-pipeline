@@ -53,6 +53,19 @@ TEXT_STATE: dict[str, TextState] = {
     # The country default is the majority; the parser overrides the consolidated
     # ones back to POINT_IN_TIME per norm.
     "pt": TextState.AS_ENACTED,
+    # The BOE consolidates 12,387 norms and publishes everything else as
+    # enacted — 78,908 acts of Sección I since 1979, counted by the source, so
+    # ~5x the consolidated catalogue. The country default is the majority and
+    # `fetcher/es/metadata.py` promotes the consolidated ones back per norm,
+    # the exact mirror of `pt`.
+    #
+    # Invisible in today's output: the key is only written when the state is
+    # not POINT_IN_TIME, so every consolidated file is byte-identical either
+    # way. The choice is about which way it fails. A broken promotion shows up
+    # as 12,387 files *gaining* a line; the other arrangement would publish
+    # `point_in_time` — the spec's strongest claim — over an unamended 1979
+    # text, in silence. Underclaiming is recoverable.
+    "es": TextState.AS_ENACTED,
     "se": TextState.CURRENT,  # SFS gives one current text + an amendment register
     "uy": TextState.CURRENT,  # IMPO: consolidated text, single bootstrap point
 }
