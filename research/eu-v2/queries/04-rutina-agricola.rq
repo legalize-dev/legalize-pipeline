@@ -1,0 +1,24 @@
+# §4.2 — composición del cubo de derogados: ley real vs gestión agrícola diaria.
+# Cambiar el filtro de estado para medir el otro cubo.
+PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?clase (COUNT(DISTINCT ?work) AS ?n) WHERE {
+  ?work cdm:work_has_resource-type ?rtype .
+  ?work cdm:resource_legal_id_celex ?celex .
+  FILTER(?rtype IN (<http://publications.europa.eu/resource/authority/resource-type/REG>, <http://publications.europa.eu/resource/authority/resource-type/REG_IMPL>, <http://publications.europa.eu/resource/authority/resource-type/REG_DEL>, <http://publications.europa.eu/resource/authority/resource-type/REG_FINANC>))
+  FILTER NOT EXISTS { ?work cdm:work_has_resource-type <http://publications.europa.eu/resource/authority/resource-type/CORRIGENDUM> . }
+  ?work cdm:resource_legal_in-force "false"^^xsd:boolean .
+  ?expr cdm:expression_belongs_to_work ?work .
+  ?expr cdm:expression_uses_language <http://publications.europa.eu/resource/authority/language/ENG> .
+  ?expr cdm:expression_title ?t .
+  ?manifest cdm:manifestation_manifests_expression ?expr .
+  ?manifest cdm:manifestation_type ?mtype .
+  FILTER(STR(?mtype) IN ("xhtml","html"))
+  BIND(IF(
+    CONTAINS(?t,"standard import value") || CONTAINS(?t,"import duties in the cereals")
+    || CONTAINS(?t,"export refunds") || CONTAINS(?t,"representative prices")
+    || CONTAINS(?t,"production refunds") || CONTAINS(?t,"minimum selling price")
+    || CONTAINS(?t,"tendering procedure") || CONTAINS(?t,"import licence")
+    || CONTAINS(?t,"rates of the refunds") || CONTAINS(?t,"aid for private storage"),
+    "rutina-agricola", "otro") AS ?clase)
+} GROUP BY ?clase
