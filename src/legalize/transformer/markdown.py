@@ -16,6 +16,7 @@ Refactored 2026-04-22 (research/RESEARCH-ES-v2.md):
 
 from __future__ import annotations
 
+import logging
 import re
 from datetime import date
 from typing import Callable
@@ -25,6 +26,8 @@ from legalize.models import Block, NormMetadata, Paragraph, TextState
 from legalize.transformer.frontmatter import render_frontmatter
 from legalize.transformer.structure import count_structure
 from legalize.transformer.xml_parser import get_block_at_date
+
+logger = logging.getLogger(__name__)
 
 
 # ─────────────────────────────────────────────
@@ -127,6 +130,17 @@ _PAIRED_CLASSES: dict[str, tuple[str, str]] = {
 }
 
 
+#: Where "this act declares nothing" stops being plausible. Measured on the
+#: published corpus: of the 73 files with no heading at all, the median holds
+#: 11 paragraphs and 26 hold 20 or more — and 9 of those 26 were losing real
+#: `capitulo` headings to an unmapped class.
+_STRUCTURELESS_PARAGRAPHS = 20
+
+#: Reported once per process, not per paragraph: a run over a corpus hits the
+#: same unmapped class thousands of times and the point is the name, not the
+#: count.
+_UNMAPPED_SEEN: set[str] = set()
+
 # A body line CommonMark would read as an ordered-list item: "3. " or "3) ".
 _ORDERED_LIST_MARKER = re.compile(r"^(\d{1,9})([.)])(\s)")
 
@@ -169,7 +183,14 @@ def render_paragraphs(
                 lines.append(rendered)
                 lines.append("")
         else:
-            # Unknown class — default to plain paragraph
+            # Unknown class — default to plain paragraph, and say so once. A
+            # class nobody mapped is the quiet half of every structure defect
+            # in this corpus: `capitulo` was falling through to prose and took
+            # the five section headings of `BOE-A-2022-1453` with it, in a file
+            # of 510 paragraphs that reported no structure at all.
+            if css not in _UNMAPPED_SEEN:
+                _UNMAPPED_SEEN.add(css)
+                logger.warning("unmapped paragraph class %r — rendered as body text", css)
             lines.append(_escape_numbering(text) if escape_numbering else text)
             lines.append("")
 
@@ -220,6 +241,18 @@ def render_norm_at_date(
     structure = count_structure(
         metadata.country, [p for v in selected if v is not None for p in v.paragraphs]
     )
+    if structure is not None and structure.headings == 0:
+        # Not a gate. 73 of the 12,299 published files legitimately have no
+        # structure — a 1945 Orden, a Resolución that is prose — and refusing
+        # them would lose real law. But a long act with nothing declared is
+        # how the pre-2005 gazette XML fails: `BOE-A-1993-15903` has 482
+        # paragraphs, every one of them `parrafo`, and `Artículo 1.` as prose.
+        paragraphs = sum(len(v.paragraphs) for v in selected if v is not None)
+        if paragraphs >= _STRUCTURELESS_PARAGRAPHS:
+            logger.warning(
+                "%s: %d paragraphs and no declared structure", metadata.identifier, paragraphs
+            )
+
     parts: list[str] = []
     parts.append(
         render_frontmatter(metadata, max(in_force) if in_force else target_date, structure)

@@ -159,3 +159,43 @@ class TestRoles:
         }
         assert known - set(_CSS_ROLES) == deliberately_body
         assert not set(_CSS_ROLES) - known
+
+
+class TestWhatTheRunReports:
+    """The instrumentation that would have caught the defects above.
+
+    `capitulo` was not in the renderer's map, so `BOE-A-2022-1453` — 510
+    paragraphs of the annual tax control plan — published its five section
+    headings as prose and looked structureless. Measured over the 26 published
+    files that have 20+ paragraphs and no heading at all, **9 were losing real
+    `capitulo` headings**; the other 17 declare no structure at source.
+    """
+
+    def test_an_unmapped_class_is_named_once(self, caplog):
+        from legalize.transformer import markdown
+
+        markdown._UNMAPPED_SEEN.clear()
+        with caplog.at_level("WARNING"):
+            markdown.render_paragraphs([_p("siempreSeVe", "x"), _p("siempreSeVe", "y")])
+        assert sum("siempreSeVe" in r.getMessage() for r in caplog.records) == 1
+
+    def test_a_long_act_with_nothing_declared_is_reported(self, caplog):
+        with caplog.at_level("WARNING"):
+            _render("es", *[_p("parrafo", f"Artículo {i}. Texto.") for i in range(25)])
+        assert any("no declared structure" in r.getMessage() for r in caplog.records)
+
+    def test_a_short_prose_act_is_not(self):
+        """73 published files have no heading and are correct — a 1945 Orden,
+        a Resolución that is prose. A gate here would lose real law."""
+        import logging
+
+        logger = logging.getLogger("legalize.transformer.markdown")
+        records: list[logging.LogRecord] = []
+        handler = logging.Handler()
+        handler.emit = records.append
+        logger.addHandler(handler)
+        try:
+            _render("es", *[_p("parrafo", "Texto llano.") for _ in range(11)])
+        finally:
+            logger.removeHandler(handler)
+        assert not [r for r in records if "no declared structure" in r.getMessage()]
