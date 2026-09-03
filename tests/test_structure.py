@@ -176,8 +176,19 @@ class TestWhatTheRunReports:
 
         markdown._UNMAPPED_SEEN.clear()
         with caplog.at_level("WARNING"):
-            markdown.render_paragraphs([_p("siempreSeVe", "x"), _p("siempreSeVe", "y")])
-        assert sum("siempreSeVe" in r.getMessage() for r in caplog.records) == 1
+            markdown.render_paragraphs([_p("nuevaClase", "x"), _p("nuevaClase", "y")])
+        assert sum("nuevaClase" in r.getMessage() for r in caplog.records) == 1
+
+    def test_plain_body_text_is_not_reported_as_unmapped(self, caplog):
+        """`parrafo` and `parrafo_2` have no formatter because they need none.
+        They were 208 of the 246 reports over a 105-law sample — enough noise
+        to bury the three classes that actually were unmapped."""
+        from legalize.transformer import markdown
+
+        markdown._UNMAPPED_SEEN.clear()
+        with caplog.at_level("WARNING"):
+            markdown.render_paragraphs([_p("parrafo", "x"), _p("parrafo_2", "y"), _p("abs", "z")])
+        assert not caplog.records
 
     def test_a_long_act_with_nothing_declared_is_reported(self, caplog):
         with caplog.at_level("WARNING"):

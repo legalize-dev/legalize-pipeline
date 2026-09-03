@@ -370,3 +370,71 @@ class TestWhatTheInlineExtractorWasLosing:
         occurrences across 13 of 46 sampled files."""
         paragraphs = self._paragraphs(b'<p class="textoCompleto">Donde dice X, debe decir Y.</p>')
         assert any("Donde dice X" in p.text for p in paragraphs)
+
+
+class TestTheBoeTalkingAboutTheAct:
+    """Three classes found by rendering 105 real laws through both engines and
+    reading what came out unmapped."""
+
+    @staticmethod
+    def _render(css: str, text: str) -> str:
+        from legalize.transformer.markdown import render_paragraphs
+
+        return render_paragraphs([Paragraph(css_class=css, text=text)])
+
+    def test_the_status_banner_is_a_note_not_the_acts_first_words(self):
+        """`siempreSeVe` carries "Norma derogada, con efectos de 19 de enero de
+        2021, por la disposición derogatoria de…" — the BOE's own editorial
+        banner. It was published as a plain paragraph at the top of the body,
+        where it reads as the act's opening. 23 of 105 sampled laws."""
+        rendered = self._render("siempreSeVe", "Norma derogada, con efectos de 19 de enero.")
+        assert rendered.startswith("> <small>")
+
+    def test_consolidation_provenance_is_a_note_too(self):
+        """`textoCompleto`: "Incluye las correcciones de errores publicadas en
+        BOE núm. 257…". Worth keeping — it is provenance — but it is not law."""
+        rendered = self._render("textoCompleto", "Incluye las correcciones de errores.")
+        assert rendered.startswith("> <small>")
+
+    def test_the_viewer_chrome_does_not_reach_the_corpus(self):
+        """`inforel` is the "Información relacionada" box heading. Nothing ever
+        appears under it, and it was landing as a bare paragraph of that text."""
+        blocks = parse_text_xml(
+            b'<?xml version="1.0" encoding="utf-8"?><response><data><texto>'
+            b'<bloque id="a1" tipo="precepto" titulo="Art 1">'
+            b'<version id_norma="X" fecha_publicacion="20200101">'
+            b'<p class="inforel">Informacion relacionada</p>'
+            b'<p class="parrafo">El texto.</p></version></bloque></texto></data></response>"'
+        )
+        texts = [p.text for p in blocks[0].versions[0].paragraphs]
+        assert texts == ["El texto."]
+
+
+class TestATitleWithoutItsNumber:
+    """`libro_tit` and `anexo_tit` appeared in the unmapped census: the pairing
+    rule only reaches them through their `_num` half, and an orphan fell
+    through to prose — losing the heading of a whole book or annex."""
+
+    @staticmethod
+    def _render(css: str) -> str:
+        from legalize.transformer.markdown import render_paragraphs
+
+        return render_paragraphs([Paragraph(css_class=css, text="De las obligaciones")])
+
+    def test_an_orphan_title_still_opens_its_unit(self):
+        assert self._render("libro_tit").startswith("# ")
+        assert self._render("parte_tit").startswith("# ")
+        assert self._render("anexo_tit").startswith("## ")
+        assert self._render("apendice_tit").startswith("## ")
+        assert self._render("disp_tit").startswith("## ")
+
+    def test_the_pair_still_merges_into_one_heading(self):
+        from legalize.transformer.markdown import render_paragraphs
+
+        rendered = render_paragraphs(
+            [
+                Paragraph(css_class="libro_num", text="LIBRO PRIMERO"),
+                Paragraph(css_class="libro_tit", text="De las obligaciones"),
+            ]
+        )
+        assert rendered.startswith("# LIBRO PRIMERO. De las obligaciones")
