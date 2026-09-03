@@ -206,3 +206,68 @@ class TestFrontmatterKeyNames:
         meta = parse_metadata(CONSTITUCION_META_XML, "BOE-A-1978-31229", diario_xml=diario)
         assert meta.pdf_url == "https://www.boe.es/boe/dias/2002/01/15/pdfs/A00544-00548.pdf"
         assert "url_pdf" not in dict(meta.extra)
+
+
+class TestEveryRankTheSourcePublishes:
+    """A rank the map does not have is not a missing label — it is a guess.
+
+    `_parse_rank` falls through to `_infer_rank_from_title`, whose first test is
+    "constitución" in the title. `BOE-A-2026-10881` is *Reforma del apartado 3
+    del artículo 69 de la Constitución Española*, the fourth amendment to the
+    Constitution in history, and `rango codigo="1676"` was not mapped — so the
+    act that amends the Constitution was typed as the Constitution.
+    """
+
+    # `GET https://www.boe.es/datosabiertos/api/datos-auxiliares/rangos`,
+    # captured 2026-09-04. The source's whole vocabulary for consolidated
+    # legislation, so this is coverage, not a sample.
+    BOE_RANGOS = {
+        "1020": "Acuerdo",
+        "1180": "Acuerdo Internacional",
+        "1390": "Circular",
+        "1070": "Constitución",
+        "1510": "Decreto",
+        "1480": "Decreto Foral Legislativo",
+        "1470": "Decreto Legislativo",
+        "1500": "Decreto-ley",
+        "1325": "Decreto-ley Foral",
+        "1410": "Instrucción",
+        "1300": "Ley",
+        "1450": "Ley Foral",
+        "1290": "Ley Orgánica",
+        "1350": "Orden",
+        "1340": "Real Decreto",
+        "1310": "Real Decreto Legislativo",
+        "1320": "Real Decreto-ley",
+        "1220": "Reglamento",
+        "1370": "Resolución",
+    }
+
+    def test_the_whole_published_vocabulary_is_mapped(self):
+        from legalize.fetcher.es.metadata import _RANK_CODE_MAP
+
+        missing = {c: n for c, n in self.BOE_RANGOS.items() if c not in _RANK_CODE_MAP}
+        assert not missing, f"ranks the BOE publishes and the parser would guess: {missing}"
+
+    def test_a_reforma_is_not_the_constitution(self):
+        from legalize.models import Rank
+
+        xml = CONSTITUCION_META_XML.replace(
+            b'<rango codigo="1070">Constitucion</rango>',
+            b'<rango codigo="1676">Reforma</rango>',
+        ).replace(
+            b"<titulo>Constitucion Espanola.</titulo>",
+            b"<titulo>Reforma del apartado 3 del articulo 69 de la Constitucion Espanola.</titulo>",
+        )
+        meta = parse_metadata(xml, "BOE-A-2026-10881")
+        assert meta.rank == Rank.REFORMA
+
+    def test_the_gazette_ranks_that_are_not_norms_are_named_not_guessed(self):
+        from legalize.fetcher.es.metadata import _RANK_CODE_MAP
+        from legalize.models import Rank
+
+        assert _RANK_CODE_MAP["1590"] == Rank.CORRECCION
+        assert _RANK_CODE_MAP["1240"] == Rank.SENTENCIA
+        assert _RANK_CODE_MAP["1250"] == Rank.AUTO
+        assert _RANK_CODE_MAP["63"] == Rank.PROVIDENCIA
+        assert _RANK_CODE_MAP["41"] == Rank.NOTA_DIPLOMATICA
