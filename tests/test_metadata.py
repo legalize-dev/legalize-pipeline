@@ -90,6 +90,12 @@ _DIARIO_NEW = b"""<?xml version="1.0" encoding="utf-8"?>
   </posteriores>
 </referencias></analisis></documento>"""
 
+# The diary's own shape, with the code where the diary puts it: on <palabra>.
+_DIARIO_CODED = b"""<?xml version="1.0" encoding="utf-8"?>
+<documento><analisis><referencias><posteriores>
+  <posterior referencia="BOE-A-2021-0001"><palabra codigo="440">SE TRANSPONE</palabra></posterior>
+</posteriores></referencias></analisis></documento>"""
+
 # 21 subsequent references: one more than the slice this used to take.
 _DIARIO_MANY = (
     b'<?xml version="1.0" encoding="utf-8"?><documento><analisis><referencias><posteriores>'
@@ -118,8 +124,26 @@ class TestSubsequentReferences:
 
     def test_the_other_endpoints_shape_parses_too(self):
         extra = _extra(_DIARIO_NEW)
-        assert extra["references_subsequent"].startswith("SE DICTA EN RELACION BOE-A-2020-7311:")
-        assert extra["references_previous"].startswith("DEROGA BOE-A-1995-7240:")
+        assert extra["references_subsequent"].startswith(
+            "SE DICTA EN RELACION [331] BOE-A-2020-7311:"
+        )
+        assert extra["references_previous"].startswith("DEROGA [210] BOE-A-1995-7240:")
+
+    def test_the_verbs_numeric_code_is_kept(self):
+        """The only language-neutral half of the relation (#87, #129).
+
+        210 is DEROGA whatever the label says, so a cross-country normalisation
+        can be built on it later without a reprocess. The code rides on
+        ``<palabra>`` in the diary shape and on ``<relacion>`` in the API's;
+        both are read.
+        """
+        assert "[210]" in _extra(_DIARIO_NEW)["references_previous"]
+        assert "[331]" in _extra(_DIARIO_NEW)["references_subsequent"]
+        assert "[440]" in _extra(_DIARIO_CODED)["references_subsequent"]
+
+    def test_an_uncoded_verb_still_reads(self):
+        """The older diary shape sends no code; the entry keeps its grammar."""
+        assert _extra(_DIARIO_OLD)["references_subsequent"] == "SE MODIFICA BOE-A-2015-5744"
 
     def test_the_sentence_comes_with_it(self):
         """The verb says "SE DICTA EN RELACION". Only the text says "suspension"."""
@@ -131,3 +155,54 @@ class TestSubsequentReferences:
         assert extra["references_subsequent_count"] == "21"
         assert extra["references_subsequent"].count(" | ") == 20
         assert "BOE-A-2020-0020" in extra["references_subsequent"]
+
+
+class TestFrontmatterKeyNames:
+    """The published key names are the corpus's contract (#129).
+
+    Renaming one rewrites all 12,299 files, so it can only ride a reprocess.
+    These assertions exist so the next rename is a decision rather than an
+    accident: nothing else in the engine, web, enrichment or the SDKs reads
+    these keys by name, so a silent change would reach production unnoticed.
+    """
+
+    def test_scope_code_is_english(self):
+        meta = parse_metadata(CONSTITUCION_META_XML, "BOE-A-1978-31229")
+        keys = dict(meta.extra)
+        assert keys["scope_code"] == "1"
+        assert "ambito_code" not in keys
+
+    def test_the_consolidated_html_url_drops_the_spanish_suffix(self):
+        meta = parse_metadata(CONSTITUCION_META_XML, "BOE-A-1978-31229")
+        keys = dict(meta.extra)
+        assert keys["url_html"].endswith("id=BOE-A-1978-31229")
+        assert "url_html_consolidada" not in keys
+
+    def test_co_official_pdf_urls_use_iso_639_1_codes(self):
+        """A Belgian corpus emits url_pdf_nl and a consumer written against es
+        keeps working; with Spanish exonyms nothing joins."""
+        diario = (
+            b'<?xml version="1.0" encoding="utf-8"?><documento><metadatos>'
+            b"<url_pdf>/boe/dias/2002/01/15/pdfs/A00544-00548.pdf</url_pdf>"
+            b"<url_pdf_catalan>/boe_catalan/x.pdf</url_pdf_catalan>"
+            b"<url_pdf_euskera>/boe_euskera/x.pdf</url_pdf_euskera>"
+            b"<url_pdf_gallego>/boe_gallego/x.pdf</url_pdf_gallego>"
+            b"<url_pdf_valenciano>/boe_valenciano/x.pdf</url_pdf_valenciano>"
+            b"</metadatos></documento>"
+        )
+        keys = _extra(diario)
+        assert set(keys) >= {"url_pdf_ca", "url_pdf_eu", "url_pdf_gl", "url_pdf_va"}
+        assert not [
+            k for k in keys if k.endswith(("_catalan", "_euskera", "_gallego", "_valenciano"))
+        ]
+
+    def test_the_pdf_url_ships_once(self):
+        """It used to ship twice, identical in 12,298 of 12,299 files."""
+        diario = (
+            b'<?xml version="1.0" encoding="utf-8"?><documento><metadatos>'
+            b"<url_pdf>/boe/dias/2002/01/15/pdfs/A00544-00548.pdf</url_pdf>"
+            b"</metadatos></documento>"
+        )
+        meta = parse_metadata(CONSTITUCION_META_XML, "BOE-A-1978-31229", diario_xml=diario)
+        assert meta.pdf_url == "https://www.boe.es/boe/dias/2002/01/15/pdfs/A00544-00548.pdf"
+        assert "url_pdf" not in dict(meta.extra)

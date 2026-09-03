@@ -308,7 +308,7 @@ def parse_metadata(
     # From /metadatos
     add("department_code", _code_of(meta, "departamento"))
     add("rank_code", _code_of(meta, "rango"))
-    add("ambito_code", _code_of(meta, "ambito"))
+    add("scope_code", _code_of(meta, "ambito"))
     add("official_number", _text_of(meta, "numero_oficial"))
     enactment_date = _parse_date_boe(_text_of(meta, "fecha_disposicion"))
     if enactment_date:
@@ -327,7 +327,7 @@ def parse_metadata(
     add("consolidation_status", _text_of(meta, "estado_consolidacion"))
     add("scope", _text_of(meta, "ambito"))
     add("url_eli", _text_of(meta, "url_eli"))
-    add("url_html_consolidada", _text_of(meta, "url_html_consolidada"))
+    add("url_html", _text_of(meta, "url_html_consolidada"))
 
     # From /diario_boe/xml.php (richer, if provided)
     subjects: list[str] = []
@@ -367,13 +367,24 @@ def _reference(el) -> str:
     the diary XML sends, and ``<id_norma>``/``<relacion>``, which is what the
     consolidated-legislation API sends for the same block. The two endpoints
     disagree today; whichever one a caller passes, this keeps working.
+
+    ``palabra@codigo`` is kept because it is the only language-neutral half of
+    the relation: 210 is DEROGA, 270 MODIFICA, 231 SUSPENDE, 426 TRANSPONE. A
+    cross-country normalisation built on the code costs nothing later; built on
+    the Spanish label it costs a reprocess (#87, #129). It also delimits the
+    entry, which the label alone cannot — verbs carry spaces ("SE DICTA EN
+    RELACIÓN").
     """
     rid = (el.get("referencia") or el.findtext("id_norma") or "").strip()
     if not rid.startswith("BOE-"):
         return ""
-    verb = (el.findtext("palabra") or el.findtext("relacion") or "").strip()
+    word = el.find("palabra")
+    if word is None:
+        word = el.find("relacion")
+    verb = (word.text or "").strip() if word is not None else ""
+    code = (word.get("codigo") or "").strip() if word is not None else ""
     note = " ".join((el.findtext("texto") or "").split())
-    entry = f"{verb} {rid}".strip()
+    entry = " ".join(p for p in (verb, f"[{code}]" if code else "", rid) if p)
     return f"{entry}: {note}" if note else entry
 
 
@@ -400,14 +411,17 @@ def _parse_diario_xml(
     if dm is not None:
         url_pdf = _text_of(dm, "url_pdf")
         if url_pdf:
+            # Emitted once, as the core `pdf_url`. It used to ship twice under both
+            # spellings, identical in 12,298 of 12,299 files (#129).
             pdf_url = f"https://www.boe.es{url_pdf}" if url_pdf.startswith("/") else url_pdf
-            extra.append(("url_pdf", pdf_url))
         for name, key in (
             ("url_epub", "url_epub"),
-            ("url_pdf_catalan", "url_pdf_catalan"),
-            ("url_pdf_euskera", "url_pdf_euskera"),
-            ("url_pdf_gallego", "url_pdf_gallego"),
-            ("url_pdf_valenciano", "url_pdf_valenciano"),
+            # ISO 639-1, not the Spanish exonym: a Belgian corpus emits url_pdf_nl /
+            # url_pdf_fr and a consumer written against es keeps working (#129).
+            ("url_pdf_catalan", "url_pdf_ca"),
+            ("url_pdf_euskera", "url_pdf_eu"),
+            ("url_pdf_gallego", "url_pdf_gl"),
+            ("url_pdf_valenciano", "url_pdf_va"),
             ("pagina_inicial", "page_start"),
             ("pagina_final", "page_end"),
             ("letra_imagen", "image_marker"),
