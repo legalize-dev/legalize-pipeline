@@ -79,6 +79,7 @@ _CSS_ROLES: dict[str, ParagraphRole] = {
     "preamble": ParagraphRole.PREAMBLE,
     "siempreSeVe": ParagraphRole.NOTE,
     "textoCompleto": ParagraphRole.NOTE,
+    "publicado": ParagraphRole.NOTE,
 }
 
 

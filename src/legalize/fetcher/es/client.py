@@ -118,6 +118,18 @@ class BOEClient(HttpClient):
         )
         return self._fetch(self._build_url(path), bypass_cache=True)
 
+    def get_catalog(self, limit: int, offset: int) -> bytes:
+        """One page of the consolidated catalogue.
+
+        ``/api/legislacion-consolidada?limit=&offset=`` is the filterable
+        catalogue endpoint this module's docstring said the BOE does not
+        expose. It caps a page at 10,000 entries, so the whole catalogue —
+        12,387 norms — is two requests, against the 14,926 daily summaries the
+        sweep it replaces would have walked (#99).
+        """
+        path = f"/api/legislacion-consolidada?limit={limit}&offset={offset}"
+        return self._fetch(self._build_url(path))
+
     def get_metadata(self, id_boe: str) -> bytes:
         """Fetches metadata for a norm: /api/legislacion-consolidada/id/{id}/metadatos."""
         path = f"/api/legislacion-consolidada/id/{id_boe}/metadatos"

@@ -82,6 +82,10 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "nota_pie_2": lambda t: f"> <small>{t}</small>\n",
     "siempreSeVe": lambda t: f"> <small>{t}</small>\n",
     "textoCompleto": lambda t: f"> <small>{t}</small>\n",
+    # `publicado` marks content the BOE chose not to reproduce:
+    # "[ Omitido el “Formulario normalizado 1 - ES” (7 págs.) ]". A reader has
+    # to be able to tell that from a paragraph of the act.
+    "publicado": lambda t: f"> <small>{t}</small>\n",
     # --- signatories ---
     "firma_rey": lambda t: f"**{t}**\n",
     "firma_ministro": lambda t: f"**{t}**\n",
