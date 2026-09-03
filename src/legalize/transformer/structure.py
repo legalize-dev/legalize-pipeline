@@ -77,6 +77,8 @@ _CSS_ROLES: dict[str, ParagraphRole] = {
     "table": ParagraphRole.TABLE,
     "table_row": ParagraphRole.TABLE,
     "preamble": ParagraphRole.PREAMBLE,
+    "siempreSeVe": ParagraphRole.NOTE,
+    "textoCompleto": ParagraphRole.NOTE,
 }
 
 

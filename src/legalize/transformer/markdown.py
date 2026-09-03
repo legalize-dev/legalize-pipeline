@@ -39,7 +39,9 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "libro_num": lambda t: f"# {t}\n",
     "parte_num": lambda t: f"# {t}\n",
     "libro": lambda t: f"# {t}\n",
+    "libro_tit": lambda t: f"# {t}\n",
     "parte": lambda t: f"# {t}\n",
+    "parte_tit": lambda t: f"# {t}\n",
     "titulo": lambda t: f"## {t}\n",
     "capitulo": lambda t: f"### {t}\n",
     "titulo_tit": lambda t: f"## {t}\n",
@@ -51,9 +53,12 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "articulo": lambda t: f"###### {t}\n",
     "anexo": lambda t: f"### {t}\n",
     "anexo_num": lambda t: f"## {t}\n",
+    "anexo_tit": lambda t: f"## {t}\n",
     "apendice": lambda t: f"### {t}\n",
     "apendice_num": lambda t: f"## {t}\n",
+    "apendice_tit": lambda t: f"## {t}\n",
     "disp_num": lambda t: f"## {t}\n",
+    "disp_tit": lambda t: f"## {t}\n",
     # --- legacy / pseudo-centred headings ---
     "centro_redonda": lambda t: f"### {t}\n",
     "centro_negrita": lambda t: f"# {t}\n",
@@ -66,9 +71,17 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "sangrado": lambda t: f"    {t}\n",
     "sangrado_2": lambda t: f"        {t}\n",
     "sangrado_articulo": lambda t: f"    {t}\n",
-    # --- nota_pie: reform provenance — keep as quoted small text ---
+    # --- editorial notes: the BOE talking about the act, not the act ---
+    # Rendered as quoted small text so a reader can tell them from the law.
+    # `siempreSeVe` is the status banner ("Norma derogada, con efectos de…"),
+    # `textoCompleto` the consolidation's provenance ("Incluye las correcciones
+    # de errores publicadas en…"). Both were being published as plain
+    # paragraphs at the top of the body, where they read as the act's own
+    # opening words.
     "nota_pie": lambda t: f"> <small>{t}</small>\n",
     "nota_pie_2": lambda t: f"> <small>{t}</small>\n",
+    "siempreSeVe": lambda t: f"> <small>{t}</small>\n",
+    "textoCompleto": lambda t: f"> <small>{t}</small>\n",
     # --- signatories ---
     "firma_rey": lambda t: f"**{t}**\n",
     "firma_ministro": lambda t: f"**{t}**\n",
@@ -136,6 +149,12 @@ _PAIRED_CLASSES: dict[str, tuple[str, str]] = {
 #: `capitulo` headings to an unmapped class.
 _STRUCTURELESS_PARAGRAPHS = 20
 
+#: What the sources send for a plain paragraph. They have no formatter because
+#: they need none, so they are not "unmapped" and must not be reported as such:
+#: they are 208 of the 246 unmapped-class reports over a 105-law sample, which
+#: is enough noise to bury the three that matter.
+_BODY_CLASSES = frozenset({"parrafo", "parrafo_2", "abs", ""})
+
 #: Reported once per process, not per paragraph: a run over a corpus hits the
 #: same unmapped class thousands of times and the point is the name, not the
 #: count.
@@ -188,7 +207,7 @@ def render_paragraphs(
             # in this corpus: `capitulo` was falling through to prose and took
             # the five section headings of `BOE-A-2022-1453` with it, in a file
             # of 510 paragraphs that reported no structure at all.
-            if css not in _UNMAPPED_SEEN:
+            if css not in _BODY_CLASSES and css not in _UNMAPPED_SEEN:
                 _UNMAPPED_SEEN.add(css)
                 logger.warning("unmapped paragraph class %r — rendered as body text", css)
             lines.append(_escape_numbering(text) if escape_numbering else text)

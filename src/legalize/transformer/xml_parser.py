@@ -45,6 +45,10 @@ _STRIP_CLASSES = {
     "cuerpo_tabla_izq",
     "cuerpo_tabla_centro",
     "cuerpo_tabla_der",
+    # The BOE viewer's "Información relacionada" box heading. Nothing but the
+    # label ever appears under it, and it was reaching the corpus as a bare
+    # paragraph reading "Información relacionada".
+    "inforel",
 }
 
 
