@@ -272,7 +272,7 @@ Dos redundancias que además hay que limpiar en la reemisión:
 
 | Sonda | Resultado |
 |---|---|
-| Web de EUR-Lex (`legal-content/EN/ALL/?uri=CELEX:...`) | HTTP 202, 0 bytes — defensa anti-bot, no sirve |
+| Web de EUR-Lex (`legal-content/EN/ALL/?uri=CELEX:...`) | HTTP 202, 0 bytes. **Ojo: era una caída del servicio**, no una defensa anti-bot — comprobado en navegador el 3-sep, todo documento redirige a `TodayOJ` con el aviso *"EUR-Lex is temporarily not fully available"*. Habrá que reintentarlo. |
 | `Accept: application/xml;notice=branch` | HTTP 400 |
 | `notice=object` sobre `32005R0002` (cubo sin campo) | 200, 53 KB, **sin ninguna mención de estado** |
 | `notice=tree` sobre el mismo | 200, 1 MB, **igual** |
@@ -305,6 +305,27 @@ Y la clasificación por título, con un patrón deliberadamente ancho:
 
 El patrón sobredispara a propósito — en el cubo de derogados marca un 31 % que
 sí es ley sustantiva. Aun así el contraste es 95 % contra 31 %.
+
+**Tercero: comprobado acto por acto, en el navegador y en el texto (3/4-sep).**
+
+| Acto | Qué se comprobó | Resultado |
+|---|---|---|
+| `32005R0002` | Su propio texto en CELLAR | *"This Regulation shall enter into force on 4 January 2005."* Su contenido es una tabla de valores para ese día. |
+| **La serie entera** | Cuántos actos comparten ese título | **5.510 reglamentos** *"standard import values for determining the entry price"*, del **3-ene-1995 al 30-may-2017** — uno por día laborable durante 22 años. Ese único patrón es el 43 % del cubo. |
+| `32026R1214`, `32026R1166`, `32026R1167` | Navegador, página del DO | **Aparecen en el Diario Oficial del 3-sep-2026.** O sea: hoy. |
+
+**Y eso último obliga a un matiz que la regla no tenía.** El cubo sin campo no es
+homogéneo: tiene el grueso agotado *y una cola de actos recién publicados a los
+que EUR-Lex aún no ha asignado el flag*. Son pocos — la tabla por décadas da **4
+en los 2020**, y resultan ser exactamente estos, de la Gaceta de hoy — pero el
+error sería el peor posible: **publicar como `expired` un reglamento que acaba de
+entrar en vigor**, que además es el que más gente va a consultar.
+
+**Guardarraíl obligatorio, entonces:** la regla `campo ausente → expired` **solo
+se aplica pasada una ventana de gracia** desde la publicación en el DO (algo del
+orden de 6-12 meses, a medir contra el ritmo real con que EUR-Lex asigna el
+flag). Dentro de la ventana el acto no se clasifica: o se espera, o se publica
+sin tocar el estado. El daily lo recogerá cuando EUR-Lex lo marque.
 
 **Conclusión: no hay `status` desconocido aquí, hay `status: expired`** — que ya
 está en el vocabulario de la spec v0.4 y no requiere cambiarla. La regla honesta
@@ -361,7 +382,8 @@ expirar es que se cumplió el plazo que la propia norma se puso. Publicar 82.326
 ```
 in-force = true   → in_force
 in-force = false  → repealed
-campo ausente     → expired      (con la regla del §2.1 documentada al lado)
+campo ausente     → expired   SOLO si el acto lleva publicado más que la ventana
+                              de gracia; dentro de ella, no se clasifica (§2.1)
 ```
 
 Y, como cinturón: si alguna vez apareciera un acto sin el campo **con**
