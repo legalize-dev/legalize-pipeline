@@ -9,6 +9,8 @@ See adding-a-country/README.md for full walkthrough.
 
 from __future__ import annotations
 
+import re
+
 from typing import TYPE_CHECKING
 
 from legalize.models import TextState
@@ -82,6 +84,35 @@ ESCAPES_LEGAL_NUMBERING: set[str] = set()
 def escapes_legal_numbering(country_code: str) -> bool:
     """Whether this corpus has been re-emitted with legal numbering escaped."""
     return country_code in ESCAPES_LEGAL_NUMBERING
+
+
+# What the heading of an article looks like, per country. This is the one place
+# a language belongs — a regex for "Artículo" cannot live in `transformer/`
+# (CLAUDE.md), and a shared renderer has no business knowing the word.
+#
+# A country appears here once its own vocabulary has been measured against its
+# published corpus, and only then does the engine emit structure counts for it.
+# Guessing would be worse than the regex in `enrichment` that does the job
+# today: Latvia and Romania scored 95 % and 86 % on coverage alone and were
+# almost all false positives — regulation points and articles *cited from
+# another law*.
+#
+# Measured for `es` on 73,341 article-level headings across 2,500 published
+# files: 49,452 match (67.4 %). Everything it leaves out is a provision that is
+# not an article — "Disposición final segunda", "Primero." — which is exactly
+# the line between `article_count` and `provision_count`. The 710 headings that
+# open with a bare number are annex sections, and stay out on purpose.
+ARTICLE_HEADING: dict[str, re.Pattern[str]] = {
+    # `\b` goes inside the first alternative only: after "art." the boundary
+    # is between two non-word characters and never matches, which lost every
+    # abbreviated heading — `Art. 384 bis.` is how the LECrim writes them.
+    "es": re.compile(r"^\s*(?:art[íi]culos?\b|art\.)", re.IGNORECASE),
+}
+
+
+def article_heading_for(country_code: str) -> re.Pattern[str] | None:
+    """None means the engine does not count this country's articles yet."""
+    return ARTICLE_HEADING.get(country_code)
 
 
 REGISTRY: dict[str, dict[str, tuple[str, str]]] = {

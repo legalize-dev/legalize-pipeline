@@ -29,9 +29,14 @@ from datetime import date
 from legalize.countries import text_state_for
 from legalize.fetcher._text import strip_control
 from legalize.models import NormMetadata, NormStatus, TextState
+from legalize.transformer.structure import StructureCounts
 
 
-def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
+def render_frontmatter(
+    metadata: NormMetadata,
+    version_date: date,
+    structure: StructureCounts | None = None,
+) -> str:
     """Generates the YAML frontmatter block for a norm at a given date.
 
     Core fields first (fixed order), then department/jurisdiction,
@@ -79,6 +84,12 @@ def render_frontmatter(metadata: NormMetadata, version_date: date) -> str:
         lines.append(f'jurisdiction: "{_escape_yaml(metadata.jurisdiction)}"')
     if metadata.pdf_url:
         lines.append(f'pdf_url: "{_escape_yaml(metadata.pdf_url)}"')
+    # Counted off the structure the source declared, not guessed from the
+    # rendered Markdown by a regex downstream. Emitted only for countries whose
+    # article vocabulary has been measured — see `countries.ARTICLE_HEADING`.
+    if structure is not None:
+        lines.append(f"article_count: {structure.articles}")
+        lines.append(f"provision_count: {structure.provisions}")
     if metadata.subjects:
         subj_yaml = ", ".join(f'"{_escape_yaml(s)}"' for s in metadata.subjects)
         lines.append(f"subjects: [{subj_yaml}]")

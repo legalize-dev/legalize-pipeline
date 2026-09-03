@@ -23,6 +23,7 @@ from typing import Callable
 from legalize.countries import escapes_legal_numbering, text_state_for
 from legalize.models import Block, NormMetadata, Paragraph, TextState
 from legalize.transformer.frontmatter import render_frontmatter
+from legalize.transformer.structure import count_structure
 from legalize.transformer.xml_parser import get_block_at_date
 
 
@@ -216,8 +217,13 @@ def render_norm_at_date(
     # took effect", which is a property of what ended up in the file, not of
     # the day the run happened (#106).
     in_force = [v.in_force_from for v in selected if v is not None]
+    structure = count_structure(
+        metadata.country, [p for v in selected if v is not None for p in v.paragraphs]
+    )
     parts: list[str] = []
-    parts.append(render_frontmatter(metadata, max(in_force) if in_force else target_date))
+    parts.append(
+        render_frontmatter(metadata, max(in_force) if in_force else target_date, structure)
+    )
 
     title = metadata.title.rstrip(". ").strip()
     parts.append(f"# {title}\n\n")
