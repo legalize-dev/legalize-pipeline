@@ -77,11 +77,13 @@ _MOD_MARKER_RE = re.compile(r"\[?\*{0,2}[►▼][A-Z]\d*\*{0,2}\]?")
 _MOD_END_RE = re.compile(r"\*{0,2}[◄▲]\*{0,2}")
 
 
-def _clean(text: str) -> str:
-    """Clean text: strip control chars, normalize whitespace."""
-    text = strip_control(text)
-    text = _MULTI_SPACE_RE.sub(" ", text)
-    return text.strip()
+def _is_separator(text: str) -> bool:
+    """Pre-2005 CELEX text uses a run of plus signs as a typographic separator.
+
+    The EEC Treaty opens with one. It carries no legal content and would
+    otherwise render as a literal ``++++`` paragraph.
+    """
+    return bool(text) and not text.strip("+ ")
 
 
 # Normalize list markers: ensure "(a) text" has exactly one space after marker.
@@ -154,6 +156,11 @@ def _extract_text(el: ET.Element) -> str:
             parts.append(child.tail)
 
     result = "".join(parts)
+    # Sanitise at the source boundary: C0/C1 control characters reach the output
+    # from real gazettes and are invisible until something downstream chokes on
+    # them. Until now the EU parser imported strip_control but never called it —
+    # the only caller was a _clean() helper nothing referenced.
+    result = strip_control(result)
     # Strip modification markers and normalize list marker whitespace
     result = _strip_mod_markers(result)
     return _normalize_list_marker(result)
@@ -500,7 +507,7 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
     # Detect "Article N" as headings for structural consistency.
     if tag == "p" and not cls:
         text = _extract_text(el).strip()
-        if text:
+        if text and not _is_separator(text):
             if re.match(r"^Article\s+\d+\w*\s*$", text):
                 paragraphs.append(Paragraph("h4", text))
             else:
@@ -518,8 +525,13 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
             paragraphs.append(Paragraph("h1", text))
         return paragraphs
 
-    # Container divs — recurse
-    if tag in ("div", "body", "html"):
+    # Container divs — recurse.
+    # ``txt_te`` is the body wrapper of EUR-Lex's pre-2005 HTML4 documents; every
+    # paragraph of those acts hangs off it, so leaving it out stopped the walk at
+    # the door and emitted the act as one blob (1,926 published files, see
+    # research/RESEARCH-EU.md §3.3). It is listed rather than recursing into any
+    # unknown element because <head> is one too.
+    if tag in ("div", "body", "html", "txt_te"):
         for child in el:
             ctag = _tag(child)
             child_cls = child.get("class", "")
@@ -586,6 +598,16 @@ def _parse_xhtml_to_paragraphs(data: bytes) -> list[Paragraph]:
 
     # Fallback for old HTML: no namespace, look for plain tags
     container = root.find(".//div[@class='eli-container']")
+    if container is not None:
+        return _walk_body(container)
+
+    # Pre-2005 HTML4: the act's body is a <TXT_TE> element, and it sits *inside*
+    # a class-less <p>. Walking the document body therefore hits that <p> first,
+    # treats it as a leaf, and flattens the whole act into a single paragraph.
+    # Name TXT_TE as a content container, the same way eli-container is named.
+    container = root.find(f".//{_xh('txt_te')}")
+    if container is None:
+        container = root.find(".//txt_te")
     if container is not None:
         return _walk_body(container)
 
