@@ -33,7 +33,7 @@ from lxml import etree
 
 from legalize.fetcher._text import decode_utf8, strip_control
 
-from legalize.models import NormMetadata, NormStatus, Rank
+from legalize.models import NormMetadata, NormStatus, Rank, TextState
 from legalize.fetcher.es.titulos import get_short_title
 
 logger = logging.getLogger(__name__)
@@ -351,6 +351,13 @@ def parse_metadata(
         pdf_url=pdf_url,
         subjects=tuple(subjects),
         extra=tuple(extra),
+        # The promotion the country default expects. The condition is not a
+        # test, it is where this function is: `/api/legislacion-consolidada`
+        # answers for a norm the BOE consolidates and 404s for everything else,
+        # so reaching here *is* "this norm has a consolidated text". An act
+        # read off the gazette surface goes through its own parser and keeps
+        # the country default, which is `as_enacted` (#66, #106).
+        text_state=TextState.POINT_IN_TIME,
     )
 
 
