@@ -97,9 +97,23 @@ class TestMetadataParser:
         data = _load("32016R0679_metadata.json")
         meta = meta_parser.parse(data, "32016R0679")
         extra_keys = {k for k, v in meta.extra}
-        assert "celex" in extra_keys
         assert "eli" in extra_keys
-        assert "regulation_type" in extra_keys
+        assert "resource_type" in extra_keys
+
+    def test_celex_is_not_repeated_in_extra(self, meta_parser: EURLexMetadataParser):
+        """``celex`` was the identifier a second time, byte for byte."""
+        data = _load("32016R0679_metadata.json")
+        meta = meta_parser.parse(data, "32016R0679")
+        assert meta.identifier == "32016R0679"
+        assert "celex" not in {k for k, v in meta.extra}
+
+    def test_resource_type_replaces_regulation_type(self, meta_parser: EURLexMetadataParser):
+        """The old name stops being true as soon as directives are in scope."""
+        data = _load("32016R0679_metadata.json")
+        meta = meta_parser.parse(data, "32016R0679")
+        extra = dict(meta.extra)
+        assert extra["resource_type"] == "REG"
+        assert "regulation_type" not in extra
 
     def test_source_is_eli(self, meta_parser: EURLexMetadataParser):
         data = _load("32016R0679_metadata.json")

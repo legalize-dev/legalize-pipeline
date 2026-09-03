@@ -1,7 +1,9 @@
 """EUR-Lex discovery — European Union.
 
-Uses SPARQL queries against the CELLAR endpoint to discover all EU
-regulations in scope (REG, REG_IMPL, REG_DEL, REG_FINANC).
+Uses SPARQL queries against the CELLAR endpoint to discover every act whose
+resource type is in scope (``reg_types`` in config.yaml: regulations,
+directives, decisions, treaties and international agreements) and whose status
+EUR-Lex states.
 
 Discovery is paginated via cursor-based filtering to handle Virtuoso's
 OFFSET limitations (errors above ~10K offset). Each page fetches 1000
@@ -56,12 +58,13 @@ class EURLexDiscovery(NormDiscovery):
         return f"FILTER (?rtype IN ({type_uris}))"
 
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
-        """Discover all in-force regulation CELEX numbers.
+        """Discover every act in scope, whatever its current status.
 
         Uses cursor-based pagination with ``FILTER (?celex > "last")`` to
         avoid Virtuoso timeout errors on large OFFSET values.
 
-        Only returns regulations that are currently in force.
+        Returns acts EUR-Lex states a status for — in force or not. See the
+        comment on the in-force clause below for what that leaves out and why.
         """
         if not isinstance(client, EURLexClient):
             raise TypeError(f"Expected EURLexClient, got {type(client).__name__}")
@@ -87,7 +90,11 @@ SELECT DISTINCT ?celex WHERE {{
     ?work cdm:work_has_resource-type <{_RTYPE_BASE}CORRIGENDUM> .
   }}
   FILTER NOT EXISTS {{ ?work cdm:do_not_index "true"^^xsd:boolean . }}
-  ?work cdm:resource_legal_in-force "true"^^xsd:boolean .
+  # Bound, not true: repealed and expired law is law, and a corpus without it
+  # cannot answer what a rule said in 2010. What stays out is the act EUR-Lex
+  # states no status for at all — 82,326 spent one-shot instruments whose
+  # status we would have to invent (RESEARCH-EU.md §2.1, §4.3).
+  ?work cdm:resource_legal_in-force ?force .
   ?work cdm:resource_legal_id_celex ?celex .
   ?expr cdm:expression_belongs_to_work ?work .
   ?expr cdm:expression_uses_language <{_LANG_ENG}> .

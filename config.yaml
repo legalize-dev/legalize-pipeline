@@ -518,11 +518,27 @@ countries:
       request_timeout: 30
       max_retries: 5
       requests_per_second: 5.0
+      # Scope approved 2026-09-03 (research/RESEARCH-EU.md §6): 87,227 acts.
+      # Was regulations only, which is why the corpus held no directive at all.
+      # Out by decision, not by oversight:
+      #   DEC_ENTSCHEID — 51 % say "Only the X text is authentic", so the
+      #                   English text we would publish is not the law (§4.4)
+      #   RECO          — soft law, undecided
+      # Acts EUR-Lex states no in-force status for are excluded in discovery,
+      # not here: they are spent one-shot instruments (§4.3).
       reg_types:
         - "REG"
         - "REG_IMPL"
         - "REG_DEL"
         - "REG_FINANC"
+        - "DIR"
+        - "DIR_IMPL"
+        - "DIR_DEL"
+        - "DEC"
+        - "DEC_IMPL"
+        - "DEC_DEL"
+        - "TREATY"
+        - "AGREE_INTERNATION"
 
   ch:
     repo_path: "../countries/ch"

@@ -177,6 +177,17 @@ LAYOUT: dict[str, str] = {
     # this one is legible. Sharding by type was measured too and rejected: one
     # type holds 49 % of the corpus, which is the flat problem again.
     "pt": "{directory}/{year}/{identifier}.md",
+    # 15,919 files today and 87,227 after the scope widens (RESEARCH-EU.md §4.5),
+    # which is 354 MB becoming ~1.9 GB — against a 2.00 GiB ceiling. Flat, that
+    # is Portugal's wall again, so the rebuild that widens the scope is also the
+    # one that shards.
+    #
+    # By hash, not by year, even though a CELEX carries one at a fixed position
+    # (3*2016*R0679): the year is not a frontmatter field here, and adding one to
+    # 87,227 files to serve the path buys nothing that 256 even buckets of ~341
+    # files do not. {id_sha1_2} is the spec's own recommended default for exactly
+    # this case.
+    "eu": SHARDED,
 }
 
 

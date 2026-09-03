@@ -31,7 +31,15 @@ from typing import Any
 from xml.etree import ElementTree as ET
 
 from legalize.fetcher.base import MetadataParser, TextParser
-from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
+from legalize.models import (
+    Block,
+    NormMetadata,
+    NormStatus,
+    Paragraph,
+    Rank,
+    TextState,
+    Version,
+)
 from legalize.fetcher._text import strip_control
 
 logger = logging.getLogger(__name__)
@@ -45,11 +53,24 @@ _MULTI_NEWLINE_RE = re.compile(r"\n{3,}")
 
 # ─── Rank mapping ───
 _RTYPE_BASE = "http://publications.europa.eu/resource/authority/resource-type/"
+# Every resource type the fetcher may discover. A type missing here used to
+# fall back to "regulation", which would have published 4,326 directives and
+# 23,390 decisions as regulations the moment the scope widened.
 _RANK_MAP: dict[str, str] = {
     "REG": "regulation",
     "REG_IMPL": "implementing_regulation",
     "REG_DEL": "delegated_regulation",
     "REG_FINANC": "financial_regulation",
+    "DIR": "directive",
+    "DIR_IMPL": "implementing_directive",
+    "DIR_DEL": "delegated_directive",
+    "DEC": "decision",
+    "DEC_IMPL": "implementing_decision",
+    "DEC_DEL": "delegated_decision",
+    "DEC_ENTSCHEID": "decision_sui_generis",
+    "RECO": "recommendation",
+    "TREATY": "treaty",
+    "AGREE_INTERNATION": "international_agreement",
 }
 
 # ─── Author mapping ───
@@ -109,6 +130,35 @@ def _normalize_list_marker(text: str) -> str:
     after the marker regardless of source format.
     """
     return _LIST_MARKER_RE.sub(r"\1 ", text)
+
+
+_EEA_SUFFIX_RE = re.compile(r"\s*\(?Text with EEA relevance\)?\s*", re.IGNORECASE)
+
+# EUR-Lex titles lead with the act's own name and then break into the signature
+# ("… of 27 April 2016 …") or the subject ("… on the protection of …").
+_CUT_WORDS = (" of ", " on ")
+
+
+def _short_title(title: str) -> str:
+    """The act's own name, for commit subjects and listings.
+
+    This used to keep everything *after* the first " on ", which is the subject
+    matter — so the act's identity, which sits before it, was thrown away. Real
+    commits in legalize-eu read "[reform] product intervention and positions"
+    and "[reform] type-approval of motor vehicles", naming no act at all.
+
+    Cutting *before* that word instead yields "Regulation (EU) 2016/679". A cut
+    is only taken when what it leaves still carries a number, so old acts whose
+    title has none — "Council Decision of 22 July 1993 concerning …" — keep
+    their full title: a long subject beats an anonymous one.
+    """
+    cleaned = _EEA_SUFFIX_RE.sub(" ", title).strip().rstrip(" .,;")
+    cleaned = _MULTI_SPACE_RE.sub(" ", cleaned)
+    for word in _CUT_WORDS:
+        head = cleaned.split(word, 1)[0].strip().rstrip(" .,;")
+        if head != cleaned and any(ch.isdigit() for ch in head):
+            return head
+    return cleaned
 
 
 def _extract_text(el: ET.Element) -> str:
@@ -371,13 +421,9 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
 
     # Main title block
     if "eli-main-title" in cls:
-        parts: list[str] = []
-        for child in el:
-            text = _extract_text(child).strip()
-            if text:
-                parts.append(text)
-        if parts:
-            paragraphs.append(Paragraph("h1", " ".join(parts)))
+        # The document's own title. render_norm_at_date already writes
+        # "# {title}" from the frontmatter, so emitting it here put the title in
+        # every file twice — visible on legalize.dev.
         return paragraphs
 
     # Lists
@@ -425,10 +471,7 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
         return paragraphs
 
     if "oj-doc-ti" in cls:
-        text = _extract_text(el).strip()
-        if text:
-            paragraphs.append(Paragraph("h1", text))
-        return paragraphs
+        return paragraphs  # document title — already rendered from frontmatter
 
     if "oj-normal" in cls:
         text = _extract_text(el).strip()
@@ -518,11 +561,8 @@ def _walk_body(el: ET.Element, depth: int = 0) -> list[Paragraph]:
     if tag == "h1":
         return paragraphs  # Skip — CELEX is not the title
 
-    # <strong> as title in old HTML
+    # <strong> as title in old HTML — same duplicate as the two above
     if tag == "strong":
-        text = _extract_text(el).strip()
-        if text and len(text) > 20:
-            paragraphs.append(Paragraph("h1", text))
         return paragraphs
 
     # Container divs — recurse.
@@ -796,27 +836,36 @@ class EURLexMetadataParser(MetadataParser):
 
         # Title
         title = first.get("title", {}).get("value", norm_id)
-        # Clean up title — remove "(Text with EEA relevance)" suffix
-        short_title = title
-        for suffix in ["(Text with EEA relevance)", "(Text with EEA relevance) "]:
-            short_title = short_title.replace(suffix, "").strip()
-        # Extract a shorter title if possible (after "on ..." part)
-        on_match = re.search(r"\bon\b\s+(.+?)(?:\s*\(|$)", short_title)
-        if on_match:
-            short_title = on_match.group(1).rstrip(" .,")
+        short_title = _short_title(title)
 
-        # CELEX
-        celex = first.get("celex", {}).get("value", norm_id)
+        # CELEX. 1,394 acts in scope carry a path separator in theirs —
+        # "11997D/TXT" is the Treaty of Amsterdam, "11951K/CDT/P01" an ECSC
+        # protocol — and spec v0.4 §Directory layout requires a publisher to
+        # reject a path value containing "/". Rejecting would drop the founding
+        # treaties, so the separator becomes "-" in the identifier and the
+        # source's own string is kept in `celex`.
+        #
+        # Measured over the whole 87,227-act scope: the substitution creates no
+        # collision, and no CELEX already contains "-", so it is reversible.
+        # These acts have never been published, so no URL breaks.
+        source_celex = first.get("celex", {}).get("value", norm_id)
+        celex = source_celex.replace("/", "-")
 
         # ELI
         eli = first.get("eli", {}).get("value", "")
 
-        # Date
+        # Date. Spec v0.4 §Dates names today() as a forbidden placeholder: a
+        # 1968 regulation stamped with the day of the run is a wrong date, and a
+        # wrong date is harder to find than a missing one. Every one of the
+        # 87,227 acts in scope has work_date_document, so this cannot fire on a
+        # healthy run — which is exactly why it must shout when it does.
         date_str = first.get("date", {}).get("value", "")
         try:
             pub_date = date.fromisoformat(date_str)
-        except (ValueError, TypeError):
-            pub_date = date.today()
+        except (ValueError, TypeError) as exc:
+            raise ValueError(
+                f"{norm_id}: source states no publication date ({date_str!r})"
+            ) from exc
 
         # Entry into force — may have multiple values, take the earliest
         entry_force_dates: list[date] = []
@@ -838,17 +887,38 @@ class EURLexMetadataParser(MetadataParser):
             except ValueError:
                 pass
 
-        # In-force status
+        # Status. "The source does not say" is not "repealed": reading it that
+        # way is what marked ~1,900 living Austrian laws dead (#123), and here it
+        # would have invented 82,326 repeals that never happened. Those acts are
+        # out of scope by decision (RESEARCH-EU.md §4.3), so meeting one means
+        # discovery changed and the run should stop, not guess.
+        #
+        # And within "no longer in force", repealing is an act of the legislature
+        # while expiring is a deadline the norm set itself. 9,269 acts in scope
+        # have a repealing act; the other ~41,000 simply ran out.
         force_val = first.get("force", {}).get("value", "")
+        repealed_by = next(
+            (b.get("repealedBy", {}).get("value", "") for b in bindings if b.get("repealedBy")),
+            "",
+        )
         if force_val in ("1", "true"):
             status = NormStatus.IN_FORCE
+        elif force_val in ("0", "false"):
+            status = NormStatus.REPEALED if repealed_by else NormStatus.EXPIRED
         else:
-            status = NormStatus.REPEALED
+            raise ValueError(
+                f"{norm_id}: EUR-Lex states no in-force status; "
+                "such acts are out of scope (see RESEARCH-EU.md §4.3)"
+            )
 
         # Resource type → rank
         rtype_uri = first.get("rtype", {}).get("value", "")
         rtype_code = rtype_uri.replace(_RTYPE_BASE, "")
-        rank = Rank(_RANK_MAP.get(rtype_code, "regulation"))
+        if rtype_code not in _RANK_MAP:
+            raise ValueError(
+                f"{norm_id}: unmapped resource type {rtype_code!r} — add it to _RANK_MAP"
+            )
+        rank = Rank(_RANK_MAP[rtype_code])
 
         # Authors — collect all unique
         authors: list[str] = []
@@ -868,6 +938,24 @@ class EURLexMetadataParser(MetadataParser):
             eli if eli else f"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:{celex}"
         )
 
+        # Text state. EUR-Lex consolidates 9 % of the corpus and publishes the
+        # rest as adopted, so the country default is as_enacted (countries.py)
+        # and the consolidated ones are overridden back here — the same shape
+        # Portugal uses. When a consolidation exists the pipeline commits one
+        # version per consolidation, and each of those bodies really is the law
+        # as it stood on that date.
+        has_cons = first.get("hasCons", {}).get("value", "") in ("1", "true")
+        text_state = TextState.POINT_IN_TIME if has_cons else None
+
+        # An as-enacted file that has been amended must name its most recent
+        # amending act; one nobody has touched must not (spec v0.4 §Text state).
+        last_amendment = first.get("lastAmendment", {}).get("value", "") or None
+        if has_cons:
+            last_amendment = None
+
+        subjects_raw = first.get("subjects", {}).get("value", "")
+        subjects = tuple(x for x in subjects_raw.split("|") if x)
+
         # Extra metadata
         extra_fields: list[tuple[str, str]] = []
         if eli:
@@ -876,8 +964,21 @@ class EURLexMetadataParser(MetadataParser):
             extra_fields.append(("entry_into_force", entry_force.isoformat()))
         if end_validity:
             extra_fields.append(("end_of_validity", end_validity.isoformat()))
-        extra_fields.append(("celex", celex))
-        extra_fields.append(("regulation_type", rtype_code))
+        signature = first.get("signature", {}).get("value", "")
+        if signature:
+            extra_fields.append(("signature_date", signature))
+        eea = first.get("eea", {}).get("value", "")
+        if eea:
+            extra_fields.append(("eea_relevance", "true" if eea in ("1", "true") else "false"))
+        if status is NormStatus.REPEALED and repealed_by:
+            extra_fields.append(("repealed_by", repealed_by))
+        # `celex` is only emitted where it differs from the identifier, which is
+        # exactly the acts sanitised above. Everywhere else it was the identifier
+        # a second time, byte for byte.
+        if celex != source_celex:
+            extra_fields.append(("celex", source_celex))
+        # `regulation_type` was the name when only regulations existed.
+        extra_fields.append(("resource_type", rtype_code))
 
         return NormMetadata(
             title=title,
@@ -889,5 +990,8 @@ class EURLexMetadataParser(MetadataParser):
             status=status,
             department=department,
             source=source,
+            subjects=subjects,
             extra=tuple(extra_fields),
+            text_state=text_state,
+            last_amendment=last_amendment,
         )
