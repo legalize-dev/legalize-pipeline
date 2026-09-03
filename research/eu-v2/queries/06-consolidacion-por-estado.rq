@@ -1,0 +1,16 @@
+# §2.1 — la prueba de que "sin campo in-force" = acto agotado, no laguna:
+# quien fue modificado alguna vez tiene consolidacion. Cambiar la clausula de
+# estado para medir los otros dos cubos.
+#   in-force=true  -> 3.055 de 16.171 (18,9 %)
+#   in-force=false -> 3.005 de 46.217 ( 6,5 %)
+#   campo ausente  ->    20 de 82.326 ( 0,02 %)
+PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT (COUNT(DISTINCT ?work) AS ?n) WHERE {
+  ?work cdm:work_has_resource-type ?rtype .
+  ?work cdm:resource_legal_id_celex ?celex .
+  FILTER(?rtype IN (<http://publications.europa.eu/resource/authority/resource-type/REG>, <http://publications.europa.eu/resource/authority/resource-type/REG_IMPL>, <http://publications.europa.eu/resource/authority/resource-type/REG_DEL>, <http://publications.europa.eu/resource/authority/resource-type/REG_FINANC>))
+  FILTER NOT EXISTS { ?work cdm:work_has_resource-type <http://publications.europa.eu/resource/authority/resource-type/CORRIGENDUM> . }
+  FILTER NOT EXISTS { ?work cdm:resource_legal_in-force ?f . }
+  ?c cdm:act_consolidated_based_on_resource_legal ?work .
+}

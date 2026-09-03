@@ -3,6 +3,8 @@
 > **Fecha:** 2026-09-03 · **Spec:** v0.4 · **Estado del país:** publicando, sin revisar
 > (uno de los 30 de `PLAN-MADUREZ-PAISES.md` §2).
 >
+> **Alcance aprobado el 3-sep-2026: 87.227 actos** (§6). Sin empezar.
+>
 > Este documento no existía. `eu` se onboardeó en abril de 2026 con el playbook
 > anterior: no tiene RESEARCH, ni `TEXT_STATE`, ni `LAYOUT`, ni pasó el gate de
 > calidad. Es la primera aplicación del `adding-a-country/` actual a este país.
@@ -24,7 +26,9 @@ Tres cosas, ninguna documentada, explican el 82 % que falta:
 1. **`config.yaml` limita `reg_types` a `REG, REG_IMPL, REG_DEL, REG_FINANC`.**
    Solo reglamentos. **No hay ni una directiva en el corpus.**
 2. **`discovery.py:88` exige `resource_legal_in-force = true`.** Se lleva 128.543
-   reglamentos, y no todos por la razón que parece (§3.1).
+   reglamentos. De ellos, 46.217 son derecho derogado de verdad y hay que
+   recuperarlos; los otros 82.326 no llevan el campo, y resultaron ser
+   instrumentos agotados el día que se publicaron (§3.1).
 3. **El parser solo entiende el marcado moderno de EUR-Lex** (§0.7.2). Esto no
    limita el alcance: lo rompe. **1.926 ficheros ya publicados son bloques de
    texto sin un solo artículo** (§3.3).
@@ -257,21 +261,60 @@ Dos redundancias que además hay que limpiar en la reemisión:
 | **§Amending acts — `amends`** | ⚪ Ausente y opcional. Pero `resource_legal_amends_resource_legal` está ahí (§0.3): es de las pocas fuentes que permite emitirlo **completo**, que es lo que la spec exige para poder emitirlo. |
 | **§Dates** | ✅ Sin placeholders detectados. |
 
-### §2.1 Un hueco de la propia spec que este corpus destapa
+### §2.1 `status` cuando la fuente calla — investigado el 3-sep, y NO hace falta tocar la spec
 
-`status` es obligatorio y su vocabulario es cerrado: `in_force`, `repealed`,
-`partially_repealed`, `annulled`, `expired`. **No hay forma de decir "la fuente
-no lo dice".**
+> **Corrección.** La primera versión de este documento sostenía que la ausencia
+> del campo `in-force` en 82.326 reglamentos era una laguna de metadatos de
+> EUR-Lex, y proponía añadir `status: unknown` a la spec v0.5. **Las dos cosas
+> eran falsas.** Lo que sigue es lo que salió al ir a buscar el dato de verdad.
 
-Y aquí la fuente no lo dice para **82.326 reglamentos** (57% del total). De
-ellos, solo 36 tienen fecha de fin de validez y 213 constan derogados por otro
-acto: **82.077 no tienen absolutamente ningún dato de estado.**
+**Primero: CELLAR no tiene el dato, y está verificado con control positivo.**
 
-La spec ya resolvió este mismo problema para las fechas —"un campo de fecha
-lleva una fecha que la fuente afirma", y si no la afirma se omite. `status` no
-tiene esa cláusula. O se le añade un valor `unknown`, o se hace condicional como
-las fechas. **Mientras no exista, la única salida honesta es no publicar los
-actos cuyo estado la fuente no declara**, que es lo que recomienda el §4.3.
+| Sonda | Resultado |
+|---|---|
+| Web de EUR-Lex (`legal-content/EN/ALL/?uri=CELEX:...`) | HTTP 202, 0 bytes — defensa anti-bot, no sirve |
+| `Accept: application/xml;notice=branch` | HTTP 400 |
+| `notice=object` sobre `32005R0002` (cubo sin campo) | 200, 53 KB, **sin ninguna mención de estado** |
+| `notice=tree` sobre el mismo | 200, 1 MB, **igual** |
+| **`notice=object` sobre `32016R0679` (control)** | 200, 900 KB, **`RESOURCE_LEGAL_IN-FORCE` ×2 con `<VALUE>true</VALUE>`** |
+
+El control es lo que hace válido el negativo: el mismo tipo de petición sí trae
+el campo cuando existe. **No hay un endpoint escondido con el estado.**
+
+**Segundo, y es lo que cambia la conclusión: la ausencia del campo _es_
+información.** EUR-Lex mantiene el flag para el corpus vigente que cura; nunca
+metió ahí los actos que se agotaron al publicarse. Dos medidas independientes lo
+demuestran:
+
+| Cubo | Works | Con texto consolidado | Tasa |
+|---|---:|---:|---:|
+| `in-force = true` | 16.171 | 3.055 | 18,9 % |
+| `in-force = false` | 46.217 | 3.005 | 6,5 % |
+| **campo ausente** | **82.326** | **20** | **0,02 %** |
+
+**20 de 82.326.** Un acto que alguien modificó alguna vez tiene consolidación;
+estos no la tienen porque **nunca se modificaron**, que es lo que le pasa a un
+acto que fija el precio del arroz para el martes que viene.
+
+Y la clasificación por título, con un patrón deliberadamente ancho:
+
+| Cubo | Instrumento agotado | Resto |
+|---|---:|---:|
+| **campo ausente** | **12.154 (95,3 %)** | 594 |
+| `in-force = false` *(control)* | 11.105 (31 %) | 24.714 |
+
+El patrón sobredispara a propósito — en el cubo de derogados marca un 31 % que
+sí es ley sustantiva. Aun así el contraste es 95 % contra 31 %.
+
+**Conclusión: no hay `status` desconocido aquí, hay `status: expired`** — que ya
+está en el vocabulario de la spec v0.4 y no requiere cambiarla. La regla honesta
+es: *un acto que EUR-Lex nunca incorporó al corpus vigente y que nunca fue
+modificado, está agotado.*
+
+Esto **no** cierra el caso de Austria (#123), que es el contrario y sigue abierto:
+allí hay ~1.900 leyes **vivas** marcadas como derogadas. Una fuente que calla
+sobre un acto agotado y una fuente que miente sobre un acto vivo no son el mismo
+problema, y solo el segundo es un argumento para tocar la spec.
 
 ### §2.2 La consecuencia: esto es una reemisión, no una ampliación
 
@@ -292,7 +335,7 @@ pero una reconstrucción los regenera en inglés sin trabajo extra.
 
 ## §3 Defectos del código actual
 
-### §3.1 🔴 `status` se inventa — el fallo de Austria, a cinco veces la escala
+### §3.1 🔴 `status` se inventa cuando la fuente calla
 
 `fetcher/eu/parser.py:820-824`:
 
@@ -301,30 +344,29 @@ force_val = first.get("force", {}).get("value", "")
 if force_val in ("1", "true"):
     status = NormStatus.IN_FORCE
 else:
-    status = NormStatus.REPEALED      # ← "no lo sé" se publica como "derogado"
+    status = NormStatus.REPEALED      # ← "la fuente no dice nada" → "derogado"
 ```
 
-Hoy no muerde porque el discovery solo trae `in-force = true`. **En cuanto se
-toque el filtro, los 82.326 works sin el campo se publican como `repealed`**, y
-eso es falso: el reparto por décadas demuestra que la ausencia del campo es una
-laguna de metadatos de EUR-Lex, no un estado legal.
+Hoy no muerde porque el discovery solo trae `in-force = true`. En cuanto se toque
+el filtro, los 82.326 works sin el campo se publican como `repealed`, y eso es
+falso por partida doble: ni la fuente lo dice, ni es el valor correcto — son
+actos **agotados**, y la spec tiene `expired` para eso (§2.1).
 
-| Década | `true` | `false` | **campo ausente** |
-|---|---:|---:|---:|
-| 1960s | 43 | 1.545 | 4.965 |
-| 1970s | 190 | 9.571 | 21.096 |
-| 1980s | 369 | 13.589 | 20.504 |
-| 1990s | 1.034 | 11.112 | 20.511 |
-| 2000s | 1.976 | 6.379 | 12.402 |
-| 2010s | 6.043 | 3.202 | 2.839 |
-| **2020s** | **6.509** | **813** | **4** |
+`repealed` y `expired` no son sinónimos: derogar es un acto del legislador,
+expirar es que se cumplió el plazo que la propia norma se puso. Publicar 82.326
+"derogados" inventa 82.326 derogaciones que nunca ocurrieron.
 
-En los 2020 faltan 4 de 7.326. En los 70, dos tercios. EUR-Lex nunca rellenó el
-campo hacia atrás. Es el mismo error de razonamiento que las ~1.900 leyes vivas
-marcadas como derogadas en Austria (issue #123).
+**Arreglo:** tres ramas explícitas en vez de dos.
 
-**Arreglo:** `status` solo se emite cuando la fuente lo afirma; y hasta que la
-spec tenga cómo decir "no consta", esos actos no se publican (§4.3).
+```
+in-force = true   → in_force
+in-force = false  → repealed
+campo ausente     → expired      (con la regla del §2.1 documentada al lado)
+```
+
+Y, como cinturón: si alguna vez apareciera un acto sin el campo **con**
+consolidación (hoy son 20 de 82.326), es que la regla no aplica a ese caso —
+merece un aviso en el log, no un `expired` silencioso.
 
 ### §3.2 🔴 Una directiva se publicaría con `rank: regulation`
 
@@ -443,7 +485,7 @@ Sin ese arreglo, el Nivel 1 añade ~5.943 bloques sin estructura y el Nivel 2
 otros 37.403. **Con él hecho, los dos niveles vuelven a ser lo que parecían: una
 línea de `config.yaml`.**
 
-### §4.1 Nivel 1 — los tipos que faltan, vigentes · **+20.588** · 🟢 hacer
+### §4.1 Nivel 1 — los tipos que faltan, vigentes · **+20.588** · ✅ **APROBADO 3-sep-2026**
 
 `DIR` 1.303 + `DEC` 12.519 + `TREATY` 5.723 + `AGREE` 1.043.
 
@@ -457,7 +499,7 @@ pública sale con 1.212 párrafos, igual que un reglamento moderno (§0.7.2). El
 
 Coste, hecho el §4.0: una línea de `config.yaml` y el mapa de rangos del §3.2.
 
-### §4.2 Nivel 2 — el derecho derogado · **+50.512** · 🟢 hacer, después del §4.0
+### §4.2 Nivel 2 — el derecho derogado · **+50.512** · ✅ **APROBADO 3-sep-2026** · después del §4.0
 
 `REG` 35.819 + `DIR` 3.022 + `DEC` 9.053 + `TREATY` 1.262 + `AGREE` 1.356.
 
@@ -478,34 +520,60 @@ justamente lo que vende el producto.
 depende por completo del §4.0. Meterlo antes sería multiplicar por 20 el defecto
 §3.3.
 
-### §4.3 Nivel 3 — los que no declaran estado · **+16.396** · 🔴 no hacer
+### §4.3 Nivel 3 — los que no declaran estado · **+16.396** · 🔴 no · **decidido**
 
 `REG` 12.748 + `DEC` 1.818 + `RECO` 1.374 + resto.
 
-Dos razones independientes, y cualquiera de las dos basta:
+Fuera, y ahora con una razón más limpia que la que había: **el 95,3 % son
+instrumentos agotados el día de su publicación**, medido con un patrón de título
+deliberadamente ancho (12.154 de 12.748; el resto son 594). Y solo 20 de 82.326
+llegaron a tener una consolidación, es decir, **casi ninguno se modificó jamás**
+(§2.1).
 
-1. **67 % es gestión agrícola diaria.** Muestra literal del cubo: *"establishing
-   the standard import values for determining the entry price of certain fruit
-   and vegetables"* (uno por día laborable durante décadas), *"amending the
-   import duties in the cereals sector applicable from 4 January 2005"*,
-   *"fixing the representative prices and the additional import duties for
-   molasses"*. Vigencia de un día. Meterlos hunde la relevancia del buscador
-   (`PLAN-BUSCADOR.md`) y el peso del repo por material que nadie consulta.
-2. **La fuente no declara su estado y la spec no permite decirlo** (§2.1).
-   Publicarlos obliga a inventar un `status`, que es el defecto §3.1.
+Muestra literal: *"establishing the standard import values for determining the
+entry price of certain fruit and vegetables"* (uno por día laborable durante
+décadas), *"opening an invitation to tender for the reduction in the duty on
+sorghum imported into Spain"*, *"determining the world market price for unginned
+cotton"*, *"suspending the buying-in of butter in certain Member States"*.
 
-**Se revisa** si la spec gana `status: unknown`, y aun entonces filtrando la
-rutina agrícola.
+Meterlos hundiría la relevancia del buscador (`PLAN-BUSCADOR.md`) y sumaría
+~900 MB de repo por material con vigencia de un día. **Ya sabemos cómo
+etiquetarlos correctamente si algún día se quieren** (`expired`, §2.1), así que
+la puerta queda abierta y sin deuda de diseño.
 
-### §4.4 `DEC_ENTSCHEID` — decidir · **+21.149** · 🟡
+### §4.4 `DEC_ENTSCHEID` — **fuera, decidido el 3-sep-2026** · 🟡 revisable
 
-21.149 decisiones pre-Lisboa con estado declarado. Vinculantes, pero la mayoría
-dirigidas a un destinatario concreto (ayudas de Estado, competencia): son actos
-administrativos individuales más que legislación general. Equivalen a las
-"resoluciones" que España sí piensa publicar (#66).
+21.149 decisiones pre-Lisboa con estado declarado. La razón de peso no es que
+sean actos individuales, es una que se puede medir:
 
-No bloquea nada: se decide después del Nivel 2, cuando ya se vea cómo respira el
-repo.
+| | «Only the X text is authentic» | Inglés auténtico |
+|---|---:|---:|
+| **`DEC_ENTSCHEID`** | **10.789 (51 %)** | 10.361 |
+| `DEC` + `DEC_IMPL` + `DEC_DEL` *(los que sí entran)* | 487 (2,3 %) | 21.086 |
+
+**En la mitad de ellas, el texto inglés no es la ley** — es una traducción de
+cortesía, y el propio título lo dice. Publicarlas en un corpus que solo sirve
+inglés sería servir 10.789 documentos que no son auténticos en el único idioma
+en el que los servimos. La frontera entre lo que entra y lo que no resulta ser
+un criterio de la propia fuente (51 % contra 2,3 %), no una preferencia nuestra.
+
+**¿Encaja en el producto? ¿Alguien lo buscaría?** Sí hay demanda real: los
+abogados de ayudas de Estado y competencia viven de estas decisiones. Pero no
+buscan lo que tendríamos:
+
+- Las citan por **número de asunto** (`SA.38517`, `N 341/2007`), no por CELEX, y
+  hoy no capturamos ese número.
+- Necesitan el texto **auténtico** en su idioma, que es justo el que no damos.
+- Y ya tienen dónde: el registro de asuntos de competencia de la Comisión es
+  público, gratuito y buscable por asunto.
+
+Entraríamos terceros con la copia peor. Un corpus de 21.149 documentos que un
+especialista descarta a la primera vale menos que no tenerlo.
+
+**Cuándo reabrirlo:** solo si Legalize deja de ser monolingüe en `eu`. Ahí la
+pregunta cambia entera, porque entonces sí podríamos servir el texto auténtico.
+Mientras tanto, el trabajo que rinde en esta dirección son las `DEC` normales
+(12.519 vigentes), que ya están en el Nivel 1 y sí son auténticas en inglés.
 
 ### §4.5 El total
 
@@ -545,19 +613,28 @@ Los pasos 1-5 son de código, no dependen del bootstrap, y se pueden mergear sin
 decidir todavía el alcance final. El paso 1 tiene valor por sí solo aunque el
 resto no se haga nunca.
 
-## §6 Lo que hay que decidir
+## §6 Decisiones
 
-1. **¿Nivel 2 entra?** Es el 58 % del corpus propuesto y lo que convierte `eu` en
-   el segundo repo más grande. Sin él, `eu` sigue sin poder responder qué decía
-   una norma antes de derogarse.
-2. **¿`DEC_ENTSCHEID`?** 21.149 actos que empujan el repo por encima de 2 GiB, lo
-   que obliga a partirlo o a apretar el sharding. La pregunta es la misma que en
-   España con las resoluciones.
-3. **¿Se propone `status: unknown` para la spec v0.5?** El corpus de la UE es la
-   prueba con cifras de que hace falta: 82.077 actos sin ningún dato de estado.
-   Afecta también a `at` (#123) y probablemente a más países.
-4. **`RECO` (recomendaciones, soft law): ¿dentro?** 580 vigentes. No vinculan, y
-   `rank` es libre, así que cabrían sin violentar nada.
+Tomadas el **3-sep-2026**:
+
+| Pregunta | Decisión | Dónde |
+|---|---|---|
+| ¿Entra el derecho derogado? | **Sí.** 50.512 actos. | §4.2 |
+| ¿`DEC_ENTSCHEID`? | **No**, y anotado por qué se podría reabrir. | §4.4 |
+| ¿`status: unknown` para la spec v0.5? | **No hace falta.** Se fue a buscar el dato y resultó que el valor correcto es `expired`, que la spec ya tiene. | §2.1 |
+| `RECO` (soft law, 580 vigentes) | **Pendiente.** No bloquea nada; se decide con el Nivel 1 delante. | §4 |
+
+**Alcance aprobado: 87.227 actos** (36.715 vigentes + 50.512 derogados), ×5,5 el
+corpus de hoy.
+
+### Lo que queda por decidir, y no corre prisa
+
+1. **`RECO`.** 580 recomendaciones vigentes. No vinculan, pero `rank` es libre y
+   caben sin violentar nada.
+2. **PDF/A** (§0.7.1). Techamos en 64.694 de 144.714 reglamentos por leer solo
+   HTML. Se revisa **después** del §4.2, cuando se vea qué queda fuera de verdad.
+3. **Si el repo se pasa de 2 GiB** con el alcance aprobado (proyección: ~1,9 GB,
+   con poco margen). El sharding del paso 5 es lo que decide si aguanta.
 
 ## §7 Lo que este análisis NO cubre
 

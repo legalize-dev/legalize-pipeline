@@ -17,3 +17,24 @@
   ```sh
   cd engine/research/eu-v2 && PYTHONPATH=../../src python3 parse-test.py
   ```
+
+## Sondas del 3-sep (segunda tanda, tras las decisiones)
+
+- `queries/06-consolidacion-por-estado.rq` — la que corrigió el §2.1: 20 de
+  82.326 actos sin campo `in-force` tienen consolidación, frente al 18,9 % de los
+  vigentes. Nunca se modificaron porque estaban agotados.
+- `queries/07-texto-autentico.rq` — la que decidió `DEC_ENTSCHEID`: el 51 % no es
+  auténtico en inglés, contra el 2,3 % de las decisiones que sí entran.
+
+**Control positivo del §2.1** (que CELLAR no tiene el dato, y no es que la
+consulta esté mal):
+
+```sh
+curl -sL -H "Accept: application/xml;notice=object" \
+  https://publications.europa.eu/resource/celex/32016R0679 | grep -c "RESOURCE_LEGAL_IN-FORCE"   # → 2
+curl -sL -H "Accept: application/xml;notice=object" \
+  https://publications.europa.eu/resource/celex/32005R0002 | grep -c "RESOURCE_LEGAL_IN-FORCE"   # → 0
+```
+
+La web de EUR-Lex (`legal-content/EN/ALL/?uri=CELEX:...`) devuelve HTTP 202 con 0
+bytes a un cliente no-navegador: no sirve como fuente del estado.
