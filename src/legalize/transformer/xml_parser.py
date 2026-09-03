@@ -32,7 +32,10 @@ logger = logging.getLogger(__name__)
 
 BOE_BASE = "https://www.boe.es"
 
-_BOE_ID_RE = re.compile(r"\bBOE-[A-Z]-\d{4}-\d+\b")
+# The BOE's own id, and the autonomous gazettes it cross-references with the
+# same anchor shape: BON (Navarra), BORM (Murcia), DOGC (Catalunya), and the
+# rest. 49 of 3,869 anchors carried one and lost their link (#106).
+_BOE_ID_RE = re.compile(r"\b[A-Z]{2,6}-[A-Za-z]-\d{4}-\d+\b")
 
 # CSS classes that should NEVER appear as standalone paragraphs — they are
 # either table-cell fragments (handled by the table renderer) or chrome
@@ -42,7 +45,6 @@ _STRIP_CLASSES = {
     "cuerpo_tabla_izq",
     "cuerpo_tabla_centro",
     "cuerpo_tabla_der",
-    "textoCompleto",
 }
 
 
@@ -153,6 +155,14 @@ def _cell_text(cell: etree._Element) -> str:
     inner_parts: list[str] = []
     for child in cell:
         if not isinstance(child.tag, str):
+            continue
+        if child.tag.lower() == "img":
+            # _extract_inline only reaches an <img> nested inside another
+            # element, so an image that is the cell's whole content vanished:
+            # 10 of the 11 images in BOE-A-1968-963.
+            image = _image_paragraph(child)
+            if image:
+                inner_parts.append(image.text)
             continue
         t = _extract_inline(child).strip()
         if t:

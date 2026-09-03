@@ -40,3 +40,56 @@ class TestMalformedSpans:
             "<tr><td>C</td><td>D</td><td>E</td></tr></table>"
         )
         assert "A" in rendered and "E" in rendered
+
+
+class TestTheHeaderRow:
+    """Markdown pipe tables need a header; most source tables have none."""
+
+    def test_a_table_without_a_thead_keeps_its_first_row_as_data(self):
+        """It used to be promoted into the header, so the row stopped being a
+        row: 250 of 543 sampled tables. The BOE's borderless layout tables —
+        side-by-side signature blocks — have no header by definition."""
+        rendered = _render(
+            "<table><tr><td>M.ª ROSA PUIG</td><td>JAUME MATAS</td></tr>"
+            "<tr><td>Secretaria</td><td>Presidente</td></tr></table>"
+        )
+        lines = rendered.splitlines()
+        assert lines[0] == "|  |  |"
+        assert lines[1] == "| --- | --- |"
+        assert "| M.ª ROSA PUIG | JAUME MATAS |" in lines
+        assert "| Secretaria | Presidente |" in lines
+
+    def test_a_declared_thead_is_still_the_header(self):
+        rendered = _render(
+            "<table><thead><tr><th>Zona</th><th>Especie</th></tr></thead>"
+            "<tbody><tr><td>CAT1/01</td><td>Bivalvia</td></tr></tbody></table>"
+        )
+        lines = rendered.splitlines()
+        assert lines[0] == "| Zona | Especie |"
+        assert lines[2] == "| CAT1/01 | Bivalvia |"
+
+
+class TestTheCaption:
+    def test_a_caption_becomes_the_paragraph_above_the_table(self):
+        """23 of 23 sampled captions were dropped — the table's own title."""
+        rendered = _render(
+            "<table><caption>Tabla I. Valores paramétricos</caption>"
+            "<tr><td>A</td><td>B</td></tr></table>"
+        )
+        assert rendered.startswith("Tabla I. Valores paramétricos\n\n|")
+
+    def test_a_table_without_one_is_unchanged(self):
+        assert _render("<table><tr><td>A</td></tr></table>").startswith("|")
+
+
+class TestNestedTables:
+    def test_the_inner_table_does_not_leak_rows_into_the_outer_grid(self):
+        """`iter()` walked the whole subtree, so the inner rows were spliced in
+        and every outer row padded to the wider of the two."""
+        rendered = _render(
+            "<table><tr><td>outer</td></tr>"
+            "<tr><td><table><tr><td>in-a</td><td>in-b</td></tr></table></td></tr></table>"
+        )
+        rows = [line for line in rendered.splitlines() if not set(line) <= set("| -")]
+        assert len(rows) == 2, rendered
+        assert all(row.count("|") == 2 for row in rows), rendered
