@@ -2,7 +2,16 @@
 
 from datetime import date
 
-from legalize.models import Block, Paragraph, Version
+from legalize import countries
+from legalize.models import (
+    Block,
+    NormMetadata,
+    NormStatus,
+    Paragraph,
+    Rank,
+    Version,
+)
+from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.xml_parser import (
     extract_reforms,
     get_block_at_date,
@@ -264,3 +273,61 @@ class TestABlockTheSourceSaysIsGone:
             b"</bloque></texto></data></response>"
         )
         assert blocks[0].expiry_date == date(2012, 3, 6)
+
+
+class TestLegalNumberingIsNotClaimedByMarkdown:
+    """`3. El Estado…` is a numbered paragraph of the law, not list item 1.
+
+    CommonMark takes the first number of a run as its start value and renumbers
+    from there, so `BOE-A-1882-6036`, whose source reads 10, 6, 7, displays
+    1, 2, 3. 167,666 of the 391,038 runs `es` published (42.9 %) do not start
+    at 1 or are not consecutive, across 9,396 of 12,299 files.
+    """
+
+    @staticmethod
+    def _render(text: str, country: str, css: str = "parrafo") -> str:
+        metadata = NormMetadata(
+            title="Ley de prueba",
+            short_title="Ley",
+            identifier="TEST-1",
+            country=country,
+            rank=Rank.LEY,
+            publication_date=date(2000, 1, 1),
+            status=NormStatus.IN_FORCE,
+            department="X",
+            source="https://example.test",
+        )
+        block = Block(
+            id="a1",
+            block_type="precepto",
+            title="Artículo 1",
+            versions=(
+                Version(
+                    norm_id="TEST-1",
+                    publication_date=date(2000, 1, 1),
+                    effective_date=None,
+                    paragraphs=(Paragraph(css_class=css, text=text),),
+                ),
+            ),
+        )
+        return render_norm_at_date(metadata, [block], date(2010, 1, 1))
+
+    def test_a_corpus_that_has_been_re_emitted_escapes_the_marker(self, monkeypatch):
+        monkeypatch.setattr(countries, "ESCAPES_LEGAL_NUMBERING", {"zz"})
+        assert "3\\. El Estado" in self._render("3. El Estado se organiza", "zz")
+
+    def test_a_corpus_that_has_not_is_left_exactly_as_it_was(self):
+        """The escape rewrites every numbered paragraph in a file, so landing it
+        on a daily would put a whole-file reformat inside one reform's diff."""
+        assert "3. El Estado" in self._render("3. El Estado se organiza", "ar")
+        assert "3\\." not in self._render("3. El Estado se organiza", "ar")
+
+    def test_a_number_inside_the_sentence_is_untouched(self, monkeypatch):
+        monkeypatch.setattr(countries, "ESCAPES_LEGAL_NUMBERING", {"zz"})
+        assert "Artículo 3. El Estado" in self._render("Artículo 3. El Estado", "zz")
+
+    def test_a_list_the_source_itself_sent_is_left_alone(self, monkeypatch):
+        """Only the plain-paragraph path is escaped: a paragraph the source
+        marked as a list item carries its own class and its own formatter."""
+        monkeypatch.setattr(countries, "ESCAPES_LEGAL_NUMBERING", {"zz"})
+        assert "1\\." not in self._render("1. primero", "zz", css="list_item")

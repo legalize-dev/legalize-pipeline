@@ -16,10 +16,11 @@ Refactored 2026-04-22 (research/RESEARCH-ES-v2.md):
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from typing import Callable
 
-from legalize.countries import text_state_for
+from legalize.countries import escapes_legal_numbering, text_state_for
 from legalize.models import Block, NormMetadata, Paragraph, TextState
 from legalize.transformer.frontmatter import render_frontmatter
 from legalize.transformer.xml_parser import get_block_at_date
@@ -122,8 +123,19 @@ _PAIRED_CLASSES: dict[str, tuple[str, str]] = {
 }
 
 
-def render_paragraphs(paragraphs: list[Paragraph] | tuple[Paragraph, ...]) -> str:
-    """Convert a list of paragraphs to Markdown."""
+# A body line CommonMark would read as an ordered-list item: "3. " or "3) ".
+_ORDERED_LIST_MARKER = re.compile(r"^(\d{1,9})([.)])(\s)")
+
+
+def render_paragraphs(
+    paragraphs: list[Paragraph] | tuple[Paragraph, ...],
+    escape_numbering: bool = False,
+) -> str:
+    """Convert a list of paragraphs to Markdown.
+
+    ``escape_numbering`` protects the law's own numbering from the renderer;
+    see ``countries.ESCAPES_LEGAL_NUMBERING`` for why it is per country.
+    """
     lines: list[str] = []
     plist = list(paragraphs)
     i = 0
@@ -154,12 +166,22 @@ def render_paragraphs(paragraphs: list[Paragraph] | tuple[Paragraph, ...]) -> st
                 lines.append("")
         else:
             # Unknown class — default to plain paragraph
-            lines.append(text)
+            lines.append(_escape_numbering(text) if escape_numbering else text)
             lines.append("")
 
         i += 1
 
     return "\n".join(lines)
+
+
+def _escape_numbering(text: str) -> str:
+    """Keep "3. El Estado…" from being renumbered as list item 1.
+
+    Only the marker is escaped, so the character the source published is what
+    a reader sees. A paragraph the source itself sent as a list item never
+    reaches here — those carry their own class and their own formatter.
+    """
+    return _ORDERED_LIST_MARKER.sub(r"\1\\\2\3", text, count=1)
 
 
 def render_norm_at_date(
@@ -205,7 +227,9 @@ def render_norm_at_date(
         if version is None:
             continue
 
-        md = render_paragraphs(version.paragraphs)
+        md = render_paragraphs(
+            version.paragraphs, escape_numbering=escapes_legal_numbering(metadata.country)
+        )
         if md.strip():
             parts.append(md)
             if not md.endswith("\n\n"):

@@ -42,6 +42,10 @@ TEXT_STATE: dict[str, TextState] = {
     "ad": TextState.AS_ENACTED,  # BOPA publishes acts, never a consolidated text
     "de": TextState.CURRENT,  # gesetze-im-internet: current text, undated standangabe
     "dk": TextState.AS_ENACTED,  # Retsinformation: each act is its own document
+    # EUR-Lex consolidates 9,593 acts and publishes the other 92,505 as adopted.
+    # The country default is the majority; the parser overrides the consolidated
+    # ones back to POINT_IN_TIME per norm, the same shape as pt.
+    "eu": TextState.AS_ENACTED,
     "gr": TextState.AS_ENACTED,  # each FEK A' issue is an atomic act
     # DRE consolidates 5,561 diplomas and publishes the other 159,000 as enacted.
     # The country default is the majority; the parser overrides the consolidated
@@ -55,6 +59,29 @@ TEXT_STATE: dict[str, TextState] = {
 def text_state_for(country_code: str) -> TextState:
     """Country default text state. Absent means POINT_IN_TIME (spec v0.3)."""
     return TEXT_STATE.get(country_code, TextState.POINT_IN_TIME)
+
+
+# Corpora that escape the law's own numbering so Markdown cannot claim it.
+#
+# Sources publish a numbered legal paragraph as plain text — the BOE has no
+# `<ol>` — so `3. El Estado…` reaches the file verbatim and every CommonMark
+# reader treats it as an ordered-list item, takes the first number of the run
+# as the start value and renumbers from there. Of the 391,038 runs `es`
+# published, 167,666 (42.9 %) did not start at 1 or were not consecutive, in
+# 9,396 of 12,299 files: `BOE-A-1882-6036` reads 10, 6, 7 in the source and
+# displays 1, 2, 3.
+#
+# The escape rewrites every numbered paragraph in a file, so a country joins
+# this set only when its corpus is re-emitted. Landing it on a daily instead
+# would make the next reform of a law carry a whole-file reformat in its diff,
+# which is what `diff_law` shows a reader. Measured share of files that move:
+# es 86.2 %, ie 14.7 %, ar 9.3 %, pt 4.4 %, se 1.0 %, uy 1.5 %.
+ESCAPES_LEGAL_NUMBERING: set[str] = set()
+
+
+def escapes_legal_numbering(country_code: str) -> bool:
+    """Whether this corpus has been re-emitted with legal numbering escaped."""
+    return country_code in ESCAPES_LEGAL_NUMBERING
 
 
 REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
