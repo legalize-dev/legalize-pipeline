@@ -90,6 +90,20 @@ _RANK_CODE_MAP: dict[str, Rank] = {
     "1500": Rank.DECRETO_LEY,
     "1325": Rank.DECRETO_LEY_FORAL,
     "1480": Rank.DECRETO_FORAL_LEGISLATIVO,
+    # The last code of the BOE's own vocabulary
+    # (`/api/datos-auxiliares/rangos`, 19 entries) that this map did not have.
+    "1220": Rank.REGLAMENTO,
+    # Ranks the gazette uses and the consolidated vocabulary does not list.
+    # `1676` is the one that mattered: with no entry here `_parse_rank` fell
+    # through to `_infer_rank_from_title`, whose first test is "constitución"
+    # in the title — so `BOE-A-2026-10881`, the fourth amendment to the Spanish
+    # Constitution, was typed as the Constitution itself.
+    "1676": Rank.REFORMA,
+    "1590": Rank.CORRECCION,
+    "1240": Rank.SENTENCIA,
+    "1250": Rank.AUTO,
+    "63": Rank.PROVIDENCIA,
+    "41": Rank.NOTA_DIPLOMATICA,
 }
 
 

@@ -46,6 +46,18 @@ class Rank(str):
     DECRETO = "decreto"
     ACUERDO = "acuerdo"
     REGLAMENTO = "reglamento"
+    # An act that amends another. The fourth amendment to the Constitution in
+    # history is one, and with no rank of its own it was being typed as the
+    # Constitution itself.
+    REFORMA = "reforma"
+    # Published in Sección I but not norms: the BOE gives each its own rank
+    # code, and mapping them is what keeps them from being guessed from a
+    # title.
+    CORRECCION = "correccion"
+    SENTENCIA = "sentencia"
+    AUTO = "auto"
+    PROVIDENCIA = "providencia"
+    NOTA_DIPLOMATICA = "nota_diplomatica"
 
     # Spain — autonomous communities (foral/regional equivalents)
     LEY_FORAL = "ley_foral"
