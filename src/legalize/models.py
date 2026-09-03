@@ -154,6 +154,11 @@ class Block:
     block_type: str
     title: str
     versions: tuple[Version, ...]
+    # The date the source says this unit ceased to exist. Most sources
+    # materialise a repeal as one more version reading "(Derogado)"; when they
+    # do not, the block's last live text is all there is, and rendering it
+    # publishes repealed articles as current law (#106).
+    expiry_date: date | None = None
 
 
 # ─────────────────────────────────────────────

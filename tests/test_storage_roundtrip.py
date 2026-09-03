@@ -167,3 +167,19 @@ class TestTheDateInForceSurvivesTheJson:
         back = load_norma_from_json(save_structured_json(tmp_path, original))
         assert back.blocks[0].versions[0].effective_date is None
         assert back.blocks[0].versions[0].in_force_from == date(1994, 1, 22)
+
+
+class TestTheExpiryOfABlockSurvivesTheJson:
+    """`commit_all_fast` renders from the JSON, not from the parser, so a block
+    field that is not persisted is a field the corpus never sees."""
+
+    def test_an_expiry_date_comes_back(self, tmp_path):
+        norm = _norm()
+        block = dataclasses.replace(norm.blocks[0], expiry_date=date(2012, 3, 6))
+        original = dataclasses.replace(norm, blocks=(block,))
+        back = load_norma_from_json(save_structured_json(tmp_path, original))
+        assert back.blocks[0].expiry_date == date(2012, 3, 6)
+
+    def test_a_block_with_no_expiry_comes_back_without_one(self, tmp_path):
+        back = load_norma_from_json(save_structured_json(tmp_path, _norm()))
+        assert back.blocks[0].expiry_date is None

@@ -46,7 +46,7 @@ _STRIP_CLASSES = {
 }
 
 
-def _parse_date(date_str: str) -> date | None:
+def _parse_date(date_str: str | None) -> date | None:
     """Converts YYYYMMDD → date. Handles BOE's indefinite-validity sentinel 99999999."""
     if not date_str or date_str.strip() in ("", "99999999"):
         return None
@@ -338,7 +338,8 @@ def parse_text_xml(xml_data: bytes | str) -> list[Block]:
             if parsed_pub is None:
                 continue
 
-            parsed_vig = _parse_date(fecha_vig) if fecha_vig else parsed_pub
+            # None when the source is silent, not a copy of the publication date.
+            parsed_vig = _parse_date(fecha_vig)
 
             versions.append(
                 Version(
@@ -355,6 +356,7 @@ def parse_text_xml(xml_data: bytes | str) -> list[Block]:
                 block_type=block_el.get("tipo", ""),
                 title=block_el.get("titulo", ""),
                 versions=tuple(versions),
+                expiry_date=_parse_date(block_el.get("fecha_caducidad")),
             )
         )
 
@@ -391,6 +393,14 @@ def get_block_at_date(block: Block, target_date: date) -> Version | None:
     dates always agree renders byte-for-byte as before.
     """
     applicable = [v for v in block.versions if v.in_force_from <= target_date]
+    if block.expiry_date and block.expiry_date <= target_date:
+        # The source says the unit is gone by this date. Where it materialises
+        # the repeal it emits one more version reading "(Derogado)", and that
+        # one still answers; where it does not, the block has nothing left to
+        # say and the last live text is not it. 622 of 9,723 sampled ES blocks
+        # (6.4 %) were being published as current law on that path — 378 of
+        # them in one file (#106).
+        applicable = [v for v in applicable if v.in_force_from >= block.expiry_date]
     if not applicable:
         return None
     return max(applicable, key=lambda v: v.in_force_from)

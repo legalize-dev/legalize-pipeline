@@ -235,6 +235,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             "position": i,
             "versions": [],
         }
+        if block.expiry_date:
+            article["expiry_date"] = block.expiry_date.isoformat()
 
         for version in block.versions:
             text = "\n\n".join(p.text for p in version.paragraphs)
@@ -364,6 +366,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 id=art["block_id"],
                 block_type=art["block_type"],
                 title=art["title"],
+                expiry_date=(
+                    date.fromisoformat(art["expiry_date"]) if art.get("expiry_date") else None
+                ),
                 versions=tuple(versions),
             )
         )
