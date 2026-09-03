@@ -137,3 +137,33 @@ class TestEveryPersistedFieldComesBack:
             and getattr(back.reforms[0], name) != getattr(original.reforms[0], name)
         ]
         assert not lost, f"dropped by the JSON round-trip: {lost}"
+
+
+class TestTheDateInForceSurvivesTheJson:
+    """`effective_date` was written to the JSON as the publication date and read
+    back as the publication date, so the parsed `fecha_vigencia` was destroyed
+    between the parser and the commit — the exact shape this file exists for.
+
+    It is on 100 % of the BOE's block-level `<version>` stamps and differs from
+    publication on 96.4 % of them, in bytes the pipeline already downloads.
+    """
+
+    @staticmethod
+    def _with_version(effective: date | None) -> ParsedNorm:
+        norm = _norm()
+        version = dataclasses.replace(norm.blocks[0].versions[0], effective_date=effective)
+        block = dataclasses.replace(norm.blocks[0], versions=(version,))
+        return dataclasses.replace(norm, blocks=(block,))
+
+    def test_a_date_in_force_that_differs_comes_back(self, tmp_path):
+        original = self._with_version(date(1994, 6, 30))
+        back = load_norma_from_json(save_structured_json(tmp_path, original))
+        assert back.blocks[0].versions[0].effective_date == date(1994, 6, 30)
+
+    def test_not_being_told_comes_back_as_not_being_told(self, tmp_path):
+        """Distinct from "took effect on publication", which is what the old
+        round-trip turned it into."""
+        original = self._with_version(None)
+        back = load_norma_from_json(save_structured_json(tmp_path, original))
+        assert back.blocks[0].versions[0].effective_date is None
+        assert back.blocks[0].versions[0].in_force_from == date(1994, 1, 22)

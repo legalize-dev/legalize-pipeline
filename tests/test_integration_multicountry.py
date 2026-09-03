@@ -5,6 +5,7 @@ correctly for norms from different countries (ES, FR, SE).
 No HTTP calls — all data is synthetic ParsedNorm objects.
 """
 
+import dataclasses
 import subprocess
 from datetime import date
 from pathlib import Path
@@ -703,8 +704,21 @@ class TestSlugMultiCountry:
 
 
 class TestBootstrapIncludesAllBlocks:
-    """Bootstrap commit must include ALL blocks, even those with dates
-    after the first reform. This tests the include_all fix."""
+    """A bootstrap commit carries the law as it stood that day — and nothing
+    newer.
+
+    This class used to assert the opposite, and that is how 2,553 files and
+    20,523 headings reached `legalize-es` claiming a date their body does not
+    match: `es/BOE-A-1985-12666.md` (LOPJ), bootstrap dated 1985-07-02, shipped
+    `Artículo 4 bis` on the application of European Union law, added in 2015 —
+    Spain joined the EEC in 1986. The file declares itself `point_in_time` and
+    was not (#106).
+
+    `include_all` survives for the one case it was needed for: a norm whose
+    every version post-dates its own enactment would otherwise render as an
+    empty file, which is what took Austria's ABGB from 759 sections to 12
+    (9705ecb). That case is covered below.
+    """
 
     @staticmethod
     def _make_norm_with_mismatched_dates() -> ParsedNorm:
@@ -758,8 +772,8 @@ class TestBootstrapIncludesAllBlocks:
 
         return ParsedNorm(metadata=metadata, blocks=tuple(blocks), reforms=tuple(reforms))
 
-    def test_bootstrap_includes_all_three_blocks(self, test_config):
-        """First commit (bootstrap) must include all 3 blocks, not just a1."""
+    def test_bootstrap_carries_only_what_was_in_force_that_day(self, test_config):
+        """The 2000-01-01 commit holds a1 and nothing written in 2005 or 2010."""
         norm = self._make_norm_with_mismatched_dates()
         _save_norm(test_config, norm)
         commit_one(test_config, norm.metadata.country, norm.metadata.identifier)
@@ -780,13 +794,34 @@ class TestBootstrapIncludesAllBlocks:
         )
         content = show.stdout
 
-        assert "Original text of article 1" in content, "Block a1 should be in bootstrap"
-        assert "Text of article 2 added later" in content, (
-            "Block a2 should be in bootstrap (include_all)"
+        assert "Original text of article 1" in content, "a1 was in force on 2000-01-01"
+        assert "Text of article 2 added later" not in content, (
+            "a2 was written in 2005 and cannot appear in a commit dated 2000"
         )
-        assert "Original text of article 3" in content, (
-            "Block a3 should be in bootstrap (include_all)"
+        assert "Original text of article 3" not in content, (
+            "a3 was written in 2005 and cannot appear in a commit dated 2000"
         )
+        assert 'last_updated: "2000-01-01"' in content, (
+            "and the file must date itself as what it holds"
+        )
+
+    def test_a_norm_whose_every_version_is_later_still_renders(self, test_config):
+        """The case `include_all` exists for: without the fallback this file
+        would be frontmatter and a title. Austria's ABGB is the real one."""
+        norm = self._make_norm_with_mismatched_dates()
+        early = dataclasses.replace(norm.metadata, publication_date=date(1990, 1, 1))
+        blocks = tuple(b for b in norm.blocks if b.id != "a1")
+        reforms = (Reform(date=date(1990, 1, 1), norm_id="SRC-ORIG", affected_blocks=()),)
+        _save_norm(
+            test_config,
+            ParsedNorm(metadata=early, blocks=blocks, reforms=reforms),
+        )
+        commit_one(test_config, "es", "TEST-INCLUDE-ALL")
+
+        md_path = Path(test_config.get_country("es").repo_path) / "es" / "TEST-INCLUDE-ALL.md"
+        content = md_path.read_text(encoding="utf-8")
+        assert "Text of article 2 added later" in content
+        assert "Original text of article 3" in content
 
     def test_reform_only_changes_affected_block(self, test_config):
         """Second commit (reform) should change only article 3."""

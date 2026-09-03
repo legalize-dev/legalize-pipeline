@@ -243,6 +243,11 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
                 "source_id": version.norm_id,
                 "text": text,
             }
+            # Only when the source said so and it differs: the cache stays
+            # comparable with what earlier runs wrote, and "not told" keeps
+            # being distinguishable from "took effect on publication".
+            if version.effective_date and version.effective_date != version.publication_date:
+                version_dict["effective_date"] = version.effective_date.isoformat()
             # Preserve CSS classes for lossless round-trip
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
@@ -348,7 +353,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 Version(
                     norm_id=v["source_id"],
                     publication_date=date.fromisoformat(v["date"]),
-                    effective_date=date.fromisoformat(v["date"]),
+                    effective_date=(
+                        date.fromisoformat(v["effective_date"]) if v.get("effective_date") else None
+                    ),
                     paragraphs=tuple(paragraphs),
                 )
             )

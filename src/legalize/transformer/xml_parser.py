@@ -344,7 +344,7 @@ def parse_text_xml(xml_data: bytes | str) -> list[Block]:
                 Version(
                     norm_id=version_el.get("id_norma", ""),
                     publication_date=parsed_pub,
-                    effective_date=parsed_vig if parsed_vig is not None else parsed_pub,
+                    effective_date=parsed_vig,
                     paragraphs=tuple(paragraphs),
                 )
             )
@@ -382,10 +382,18 @@ def extract_reforms(blocks: list[Block]) -> list[Reform]:
 
 
 def get_block_at_date(block: Block, target_date: date) -> Version | None:
-    applicable = [v for v in block.versions if v.publication_date <= target_date]
+    """The version of this block in force on ``target_date``.
+
+    Selected by the date the version took effect, not the date its amendment
+    was published — the spec defines point-in-time text as "the law as in
+    force", and for Spain those differ on 88.6 % of norms. A source that
+    declares no date in force falls back to publication, so a corpus whose two
+    dates always agree renders byte-for-byte as before.
+    """
+    applicable = [v for v in block.versions if v.in_force_from <= target_date]
     if not applicable:
         return None
-    return max(applicable, key=lambda v: v.publication_date)
+    return max(applicable, key=lambda v: v.in_force_from)
 
 
 # ─────────────────────────────────────────────

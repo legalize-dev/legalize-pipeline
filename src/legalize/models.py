@@ -127,8 +127,23 @@ class Version:
 
     norm_id: str
     publication_date: date
-    effective_date: date
+    # None when the source does not say. It used to be filled with the
+    # publication date instead, which made "took effect on publication" and
+    # "we were not told" the same value and cost the distinction for every
+    # country (#106). Readers fall back with `effective_or_published`.
+    effective_date: date | None
     paragraphs: tuple[Paragraph, ...]
+
+    @property
+    def in_force_from(self) -> date:
+        """When this version started to apply — what a point-in-time read wants.
+
+        Falls back to the publication date, which is what every source that
+        does not declare a date in force effectively means. For Spain the two
+        differ on 88.6 % of norms (7,525 later, 233 retroactive), by more than
+        30 days on 808 of them.
+        """
+        return self.effective_date or self.publication_date
 
 
 @dataclass(frozen=True)

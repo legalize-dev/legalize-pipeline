@@ -290,7 +290,7 @@ class ESbirkaTextParser(TextParser):
                 Version(
                     norm_id="",
                     publication_date=date(1970, 1, 1),
-                    effective_date=date(1970, 1, 1),
+                    effective_date=None,  # the source does not publish one
                     paragraphs=tuple(paragraphs),
                 ),
             ),
