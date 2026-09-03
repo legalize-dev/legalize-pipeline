@@ -1,12 +1,11 @@
 """Norm discovery in the BOE catalog.
 
-The BOE API does not expose a directly filterable catalog endpoint.
-For bootstrap, we use two strategies:
-1. Fixed norms list (fixed_norms in config): always processed
-2. Summary sweep: iterate summaries by date to discover new norms
-
-For Phase 2, the bootstrap works primarily with fixed_norms.
-Automatic discovery via summaries is used in the daily flow.
+It does expose one. ``/api/legislacion-consolidada?limit=&offset=`` returns the
+whole consolidated catalogue — 12,387 norms — in **two** requests, because a
+page caps at 10,000 entries. The sweep it replaces walked 14,926 daily
+summaries to reconstruct the same list (#99), and `discover_all` had been
+calling a function that was never written, so `legalize bootstrap -c es` raised
+an ImportError before fetching anything.
 """
 
 from __future__ import annotations
@@ -16,6 +15,7 @@ from collections.abc import Iterator
 from datetime import date, timedelta
 
 import requests
+from lxml import etree
 
 from legalize.config import Config
 from legalize.fetcher.es.client import BOEClient
@@ -23,6 +23,38 @@ from legalize.fetcher.es.config import ScopeConfig
 from legalize.fetcher.es.sumario import parse_summary
 
 logger = logging.getLogger(__name__)
+
+
+#: The API's own ceiling for one page. Asking for more returns 10,000.
+_PAGE_SIZE = 10_000
+
+
+def iter_norms_from_catalog(client: BOEClient, config: Config | None = None) -> Iterator[str]:
+    """Every norm the BOE keeps a consolidated text for, newest first.
+
+    Paged by offset, which the source orders by `fecha_actualizacion`. That
+    order can shift between two requests seconds apart, so identifiers are
+    de-duplicated: a norm consolidated mid-sweep must not be yielded twice, and
+    one that slides across the page boundary is picked up by the daily.
+    """
+    offset = 0
+    seen: set[str] = set()
+    while True:
+        root = etree.fromstring(client.get_catalog(_PAGE_SIZE, offset))
+        code = root.findtext("status/code", "").strip()
+        if code != "200":
+            raise ValueError(f"BOE catalogue returned {code}: {root.findtext('status/text', '')}")
+        entries = root.findall("data/item")
+        if not entries:
+            return
+        for entry in entries:
+            identifier = (entry.findtext("identificador") or "").strip()
+            if identifier and identifier not in seen:
+                seen.add(identifier)
+                yield identifier
+        if len(entries) < _PAGE_SIZE:
+            return
+        offset += len(entries)
 
 
 def iter_fixed_norms(config: Config) -> Iterator[str]:

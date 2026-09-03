@@ -396,6 +396,13 @@ class TestTheBoeTalkingAboutTheAct:
         rendered = self._render("textoCompleto", "Incluye las correcciones de errores.")
         assert rendered.startswith("> <small>")
 
+    def test_an_omission_marker_is_a_note(self):
+        """`publicado` is the BOE saying it did not reproduce something:
+        "[ Omitido el 'Formulario normalizado 1 - ES' (7 págs.) ]". Found by
+        running a real 20-law bootstrap and reading what the run reported."""
+        rendered = self._render("publicado", "[ Omitido el Formulario normalizado 1 (7 pags.) ]")
+        assert rendered.startswith("> <small>")
+
     def test_the_viewer_chrome_does_not_reach_the_corpus(self):
         """`inforel` is the "Información relacionada" box heading. Nothing ever
         appears under it, and it was landing as a bare paragraph of that text."""
