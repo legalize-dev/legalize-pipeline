@@ -612,28 +612,69 @@ opcional a partir del Nivel 1.
 
 ---
 
-## §5 El orden
+## §5 El orden — estado al 4-sep-2026
 
-Nada de esto es un parche incremental: el §2.2 obliga a reemitir, así que el
-orden lo manda lo que congela el código. Y el primer paso resultó ser el que
-menos se esperaba: **lo que hay que arreglar de todos modos es lo que desbloquea
-el resto.**
+Reproceso completo aprobado, asi que todo entra en el mismo rebuild. Nada
+publicado todavia: cinco commits locales en `engine`, sin push.
 
-| # | Paso | Por qué aquí |
+| # | Paso | Estado |
 |---|---|---|
-| 1 | **Parser despachado por marcado (§3.3)** | Arregla 1.926 ficheros rotos **hoy** y es el prerrequisito de los dos niveles (§4.0). Si solo se hace una cosa de esta lista, es esta. |
-| 2 | **`status` (§3.1) y `_RANK_MAP` (§3.2)** | Los dos que corrompen datos. Van antes de tocar el alcance, no después. |
-| 3 | **`short_title` (§3.4) y H1 doble (§3.5)** | Baratos, y se llevan por delante todo el log al reemitir. |
-| 4 | **Declarar `TEXT_STATE["eu"] = AS_ENACTED`** + override por norma | Una línea. Decide qué dicen de sí mismos 92.505 ficheros. |
-| 5 | **`.legalize.yml` + sharding `{id_sha1_2}`** en `layout.py::LAYOUT` | El manifiesto y el sharding son el mismo cambio, y una entrada en un dict. |
-| 6 | **Ampliar `reg_types`** a Nivel 1 + Nivel 2 | Ya sin riesgo, porque 1-5 están hechos. |
-| 7 | **Ampliar el frontmatter** con el §0.3 (EuroVoc, base jurídica, EEE, DO) | Mismo pase, mismo coste. |
-| 8 | **Inventario §0.2/§0.4 y ensayo de bootstrap** sobre muestra estratificada | El gate que falta (§7). |
-| 9 | **Reemisión completa + `legalize push`** | 87.227 actos, ~3,5 h de fetch. |
+| 1 | Parser despachado por marcado (§3.3) | ✅ `84fd81e` — legacy 2 → 238/283/31 párrafos; los modernos intactos |
+| 2 | `status` (§3.1) y `_RANK_MAP` (§3.2) | ✅ `97a32c2` — tres ramas + `expired`; 14 tipos, sin fallback |
+| 3 | `short_title` (§3.4) y H1 doble (§3.5) | ✅ `97a32c2` |
+| 4 | `TEXT_STATE["eu"] = AS_ENACTED` + override | ✅ `97a32c2` |
+| 5 | `.legalize.yml` + sharding `{id_sha1_2}` | ✅ `97a32c2` — `LAYOUT["eu"]` |
+| 6 | Ampliar `reg_types` a Nivel 1 + 2 | ✅ `97a32c2` — **87.227 verificados contra el endpoint real** |
+| 7 | Frontmatter §0.3 | ✅ `97a32c2` — subjects (EuroVoc), signature_date, eea_relevance, repealed_by |
+| 8 | Inventario §0.2/§0.4 y ensayo | 🟡 el ensayo corrió y encontró 3 defectos (§5.1); el §0.4 sigue pendiente |
+| 9 | Reemisión completa + `legalize push` | ⬜ pendiente |
 
-Los pasos 1-5 son de código, no dependen del bootstrap, y se pueden mergear sin
-decidir todavía el alcance final. El paso 1 tiene valor por sí solo aunque el
-resto no se haga nunca.
+Además, dos cosas que el análisis no había previsto y el código sí necesitaba:
+
+- **Catálogo en bloque** (`97a32c2`, `0c56f79`). El metadato por acto costaba
+  ~2,4 s; con 3 consultas por acto el bootstrap entero salía a ~22 h, por
+  encima del techo de 6 h de CI. Ahora es una consulta paginada de 1.000 en
+  1.000 y el catálogo entero tarda ~4 min.
+- **Identificadores con separador** (`97a32c2`). 1.394 actos llevan `/` en el
+  CELEX y la spec obliga a rechazarlos; se sanean a `-` conservando el
+  original. **Decisión de identificador pendiente de confirmar.**
+
+### §5.1 Lo que encontró el ensayo, y que ninguna medida previa vio
+
+Los tres en el mismo acto: `21994A0103(51)`, el Anexo I del Acuerdo del EEE.
+
+1. **21 autores × varios derogadores = más de 1.000 filas para un solo acto**,
+   o sea una página entera que ningún cursor por CELEX puede saltar. Se probó
+   `GROUP BY` + `GROUP_CONCAT`: correcto pero Virtuoso da timeout porque agrupa
+   sobre las 87.227 en cada página. La forma que queda: catálogo con escalares,
+   y cada hecho de lista en su propia consulta de dos columnas.
+2. **Ese acto está modificado por más de 1.000 actos** (cierto: las Decisiones
+   del Comité Mixto lo enmiendan sin parar). Las consultas auxiliares llevan
+   ahora cursor compuesto `(celex, valor)`, que avanza también *dentro* de un
+   acto.
+3. **Las materias EuroVoc devolvían 503**: pedían la etiqueta junto a cada par
+   (acto, concepto), así que el filtro de idioma corría sobre cientos de miles
+   de filas. Ahora son dos consultas —conceptos por acto y el vocabulario
+   entero (7.515 conceptos)— unidas en Python.
+
+### §5.2 Lo que bloquea el paso 9 ahora mismo
+
+**CELLAR va intermitente.** EUR-Lex estuvo caído el 3-sep por la tarde, y por la
+noche el SPARQL devuelve 503 y read timeouts bajo carga sostenida: el catálogo
+completo no llegó a terminar en tres intentos. Mitigado en `0f507e4`
+(`request_timeout` 30 → 120 s, 8 reintentos, y checkpoint del listado base en
+`catalog.core.json` antes del enriquecimiento), pero **el bootstrap necesita una
+ventana con el endpoint estable**.
+
+Antes de lanzarlo, en este orden:
+
+1. Reconstruir el catálogo entero y comprobar que termina (~5 min con red buena).
+2. Ensayo con `--limit` sobre una muestra estratificada, y **hacer el §0.4** —
+   cotejo de tablas, notas y anexos contra el original. Es el gate que falta, y
+   el precedente de `es` (30 % del payload perdido en tablas anidadas) dice que
+   no se salta.
+3. Bootstrap completo: ~100.000 descargas, ~1,5-2 h de fetch.
+4. `legalize push` en tramos.
 
 ## §6 Decisiones
 
