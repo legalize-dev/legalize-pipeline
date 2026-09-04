@@ -867,7 +867,7 @@ class EURLexMetadataParser(MetadataParser):
                 f"{norm_id}: source states no publication date ({date_str!r})"
             ) from exc
 
-        # Entry into force — may have multiple values, take the earliest
+        # Entry into force — an act can have several, take the earliest.
         entry_force_dates: list[date] = []
         for b in bindings:
             ef_str = b.get("entryForce", {}).get("value", "")
@@ -897,10 +897,7 @@ class EURLexMetadataParser(MetadataParser):
         # while expiring is a deadline the norm set itself. 9,269 acts in scope
         # have a repealing act; the other ~41,000 simply ran out.
         force_val = first.get("force", {}).get("value", "")
-        repealed_by = next(
-            (b.get("repealedBy", {}).get("value", "") for b in bindings if b.get("repealedBy")),
-            "",
-        )
+        repealed_by = first.get("repealedBy", {}).get("value", "")
         if force_val in ("1", "true"):
             status = NormStatus.IN_FORCE
         elif force_val in ("0", "false"):
@@ -920,17 +917,18 @@ class EURLexMetadataParser(MetadataParser):
             )
         rank = Rank(_RANK_MAP[rtype_code])
 
-        # Authors — collect all unique
+        # Authors. GROUP_CONCAT joins the distinct ones with "|", so an act
+        # with 30 signatory states is one row rather than 30.
         authors: list[str] = []
         seen_authors: set[str] = set()
-        for b in bindings:
-            author_uri = b.get("author", {}).get("value", "")
-            if author_uri:
-                author_code = author_uri.replace(_AUTHOR_BASE, "")
-                author_name = _AUTHOR_MAP.get(author_code, author_code)
-                if author_name not in seen_authors:
-                    seen_authors.add(author_name)
-                    authors.append(author_name)
+        for author_uri in first.get("authors", {}).get("value", "").split("|"):
+            if not author_uri:
+                continue
+            author_code = author_uri.replace(_AUTHOR_BASE, "")
+            author_name = _AUTHOR_MAP.get(author_code, author_code)
+            if author_name not in seen_authors:
+                seen_authors.add(author_name)
+                authors.append(author_name)
         department = ", ".join(authors) if authors else "European Union"
 
         # Source URL

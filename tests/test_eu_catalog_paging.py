@@ -91,3 +91,64 @@ def test_empty_catalog():
     got, client = _collect([])
     assert got == {}
     assert client.queries == 1
+
+
+# ─── Compound cursor (auxiliary queries) ───────────────────────────────────
+
+
+class _FakePairs(EURLexClient):
+    """Serves (celex, value) rows, honouring the compound cursor."""
+
+    def __init__(self, rows):
+        super().__init__(requests_per_second=1000.0)
+        self._rows = sorted(rows, key=lambda r: (r["celex"]["value"], r["v"]["value"]))
+        self.queries = 0
+
+    def sparql_query(self, query: str) -> dict:
+        self.queries += 1
+        rows = self._rows
+        if 'STR(?celex) > "' in query:
+            key = query.split('STR(?celex) > "')[1].split('"')[0]
+            tie = query.split('STR(?v) > "')[1].split('"')[0]
+            rows = [r for r in rows if (r["celex"]["value"], r["v"]["value"]) > (key, tie)]
+        return {"results": {"bindings": rows[: eu_client._CATALOG_PAGE_SIZE]}}
+
+
+def _pair(celex: str, value: str) -> dict:
+    return {"celex": {"value": celex}, "v": {"value": value}}
+
+
+def test_compound_cursor_pages_inside_one_act():
+    """The EEA Agreement's Annex I is amended by more than 1,000 acts.
+
+    A cursor on the act alone can never step over it — that is the RuntimeError
+    the group pager raises, and why the auxiliary queries order on the pair.
+    """
+    rows = [_pair("A", f"m{i:03d}") for i in range(9)] + [_pair("B", "m1")]
+    client = _FakePairs(rows)
+    got = list(
+        client._paged_rows(lambda k, t: client._pair_cursor("celex", "v", k, t), "celex", "v")
+    )
+    assert len(got) == 10
+    assert [r["v"]["value"] for r in got if r["celex"]["value"] == "A"] == [
+        f"m{i:03d}" for i in range(9)
+    ]
+    assert client.queries > 1, "fixture too small to exercise paging"
+
+
+def test_compound_cursor_stops_without_forward_progress():
+    """A server that ignores the cursor must not spin forever."""
+
+    class _Stuck(_FakePairs):
+        def sparql_query(self, query: str) -> dict:
+            self.queries += 1
+            if self.queries > 20:
+                raise AssertionError("looped")
+            return {"results": {"bindings": self._rows[: eu_client._CATALOG_PAGE_SIZE]}}
+
+    client = _Stuck([_pair("A", f"m{i}") for i in range(4)])
+    got = list(
+        client._paged_rows(lambda k, t: client._pair_cursor("celex", "v", k, t), "celex", "v")
+    )
+    assert client.queries <= 3
+    assert got

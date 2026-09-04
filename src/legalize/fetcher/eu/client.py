@@ -64,6 +64,46 @@ _LANG_ENG = "http://publications.europa.eu/resource/authority/language/ENG"
 # Regulation types to include in discovery (v1 scope)
 DEFAULT_REG_TYPES = ["REG", "REG_IMPL", "REG_DEL", "REG_FINANC"]
 
+# What the catalog asks for per act.
+#
+# Deliberately *not* aggregated, and deliberately without the list-valued facts.
+# Two roads were measured on the EEA Agreement's Annex I (21994A0103(51)):
+#
+#   plain columns for author + entryForce + repealedBy → >1,000 rows for that
+#     one act, a whole page nothing can page past;
+#   GROUP BY with GROUP_CONCAT → one row, but the grouping runs over the whole
+#     87K corpus on every page and Virtuoso times out at 30 s.
+#
+# So the list-valued facts (authors, repealing act, subjects, last amendment)
+# each get their own small query and are merged onto the act afterwards, which
+# leaves this one cheap and its rows per act in the low single digits.
+_CATALOG_SELECT = """SELECT ?celex ?eli ?title ?date ?entryForce ?endValidity ?force ?rtype
+       ?hasCons ?eea ?signature"""
+
+# The act itself, shared by the bulk catalog and the per-act fallback so the two
+# can never drift into returning different shapes.
+_ACT_PATTERN = """  ?work cdm:work_has_resource-type ?rtype .
+  FILTER(?rtype IN ({types}))
+  FILTER NOT EXISTS {{ ?work cdm:work_has_resource-type <RTYPE_BASECORRIGENDUM> . }}
+  FILTER NOT EXISTS {{ ?work cdm:do_not_index "true"^^xsd:boolean . }}
+  ?work cdm:resource_legal_id_celex ?celex .
+  ?work cdm:resource_legal_in-force ?force .
+  ?work cdm:work_date_document ?date .
+  ?expr cdm:expression_belongs_to_work ?work .
+  ?expr cdm:expression_uses_language <LANG_ENG> .
+  ?expr cdm:expression_title ?title .
+  ?manifest cdm:manifestation_manifests_expression ?expr .
+  ?manifest cdm:manifestation_type ?mtype .
+  FILTER(STR(?mtype) IN ("xhtml", "html"))
+  OPTIONAL {{ ?work cdm:resource_legal_eli ?eli . }}
+  OPTIONAL {{ ?work cdm:resource_legal_date_entry-into-force ?entryForce . }}
+  OPTIONAL {{ ?work cdm:resource_legal_date_end-of-validity ?endValidity . }}
+  OPTIONAL {{ ?work cdm:resource_legal_eea ?eea . }}
+  OPTIONAL {{ ?work cdm:resource_legal_date_signature ?signature . }}
+  BIND(EXISTS {{ ?cons cdm:act_consolidated_based_on_resource_legal ?work }} AS ?hasCons)""".replace(
+    "RTYPE_BASE", _RTYPE_BASE
+).replace("LANG_ENG", _LANG_ENG)
+
 
 class EURLexClient(HttpClient):
     """Client for EU legislation via CELLAR SPARQL + REST.
@@ -82,7 +122,10 @@ class EURLexClient(HttpClient):
             max_retries=int(source.get("max_retries", 5)),
             requests_per_second=float(source.get("requests_per_second", 2.0)),
             reg_types=source.get("reg_types", DEFAULT_REG_TYPES),
-            cache_dir=country_config.cache_dir or source.get("cache_dir", ""),
+            # data_dir, not cache_dir: cache_dir is the shared HTTP response
+            # cache (52,000 files and counting) and the catalog is derived data
+            # about the corpus, which is what data_dir is for.
+            data_dir=country_config.data_dir or "",
         )
 
     def __init__(
@@ -93,7 +136,7 @@ class EURLexClient(HttpClient):
         max_retries: int = 5,
         requests_per_second: float = 2.0,
         reg_types: list[str] | None = None,
-        cache_dir: str = "",
+        data_dir: str = "",
     ) -> None:
         super().__init__(
             request_timeout=request_timeout,
@@ -103,7 +146,7 @@ class EURLexClient(HttpClient):
         self._sparql_url = sparql_url
         self._reg_types = reg_types or DEFAULT_REG_TYPES
 
-        self._cache_dir = cache_dir
+        self._data_dir = data_dir
 
         # Cache: celex → bundled XHTML bytes
         self._bundle_cache: dict[str, bytes] = {}
@@ -188,36 +231,10 @@ class EURLexClient(HttpClient):
         def build(cursor: str) -> str:
             cursor_filter = f'FILTER(STR(?celex) >= "{cursor}")' if cursor else ""
             return f"""PREFIX cdm: <{_CDM}>
-SELECT ?celex ?eli ?title ?date ?entryForce ?endValidity ?force ?rtype ?author ?repealedBy
-       ?hasCons ?eea ?signature
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+{_CATALOG_SELECT}
 WHERE {{
-  ?work cdm:work_has_resource-type ?rtype .
-  FILTER(?rtype IN ({self._rtype_uris()}))
-  FILTER NOT EXISTS {{ ?work cdm:work_has_resource-type <{_RTYPE_BASE}CORRIGENDUM> . }}
-  FILTER NOT EXISTS {{ ?work cdm:do_not_index "true"^^<http://www.w3.org/2001/XMLSchema#boolean> . }}
-  ?work cdm:resource_legal_id_celex ?celex .
-  ?work cdm:resource_legal_in-force ?force .
-  ?work cdm:work_date_document ?date .
-  ?expr cdm:expression_belongs_to_work ?work .
-  ?expr cdm:expression_uses_language <{_LANG_ENG}> .
-  ?expr cdm:expression_title ?title .
-  ?manifest cdm:manifestation_manifests_expression ?expr .
-  ?manifest cdm:manifestation_type ?mtype .
-  FILTER(STR(?mtype) IN ("xhtml", "html"))
-  OPTIONAL {{ ?work cdm:resource_legal_eli ?eli . }}
-  OPTIONAL {{ ?work cdm:resource_legal_date_entry-into-force ?entryForce . }}
-  OPTIONAL {{ ?work cdm:resource_legal_date_end-of-validity ?endValidity . }}
-  OPTIONAL {{ ?work cdm:work_created_by_agent ?author . }}
-  OPTIONAL {{
-    ?repealer cdm:resource_legal_repeals_resource_legal ?work .
-    ?repealer cdm:resource_legal_id_celex ?repealedBy .
-  }}
-  OPTIONAL {{ ?work cdm:resource_legal_eea ?eea . }}
-  OPTIONAL {{ ?work cdm:resource_legal_date_signature ?signature . }}
-  # Whether a consolidated text exists decides the file's text_state, and it is
-  # asked as EXISTS rather than joined so one act stays one row per author
-  # instead of one per consolidation.
-  BIND(EXISTS {{ ?cons cdm:act_consolidated_based_on_resource_legal ?work }} AS ?hasCons)
+{_ACT_PATTERN.format(types=self._rtype_uris())}
   {cursor_filter}
 }}
 ORDER BY ?celex
@@ -230,6 +247,12 @@ LIMIT {_CATALOG_PAGE_SIZE}"""
 
         # Multi-valued facts ride in their own queries and are merged onto the
         # act's first row, so the parser reads them the same way either route.
+        for celex, authors in self._fetch_authors().items():
+            if celex in catalog:
+                catalog[celex][0]["authors"] = {"value": "|".join(authors)}
+        for celex, repealers in self._fetch_repealers().items():
+            if celex in catalog:
+                catalog[celex][0]["repealedBy"] = {"value": repealers[0]}
         for celex, amender in self._fetch_amendments().items():
             if celex in catalog:
                 catalog[celex][0]["lastAmendment"] = {"value": amender}
@@ -237,6 +260,45 @@ LIMIT {_CATALOG_PAGE_SIZE}"""
             if celex in catalog:
                 catalog[celex][0]["subjects"] = {"value": "|".join(labels)}
         return catalog
+
+    def _paged_rows(self, build_query, key: str, tiebreak: str):
+        """Cursor-paged SPARQL over ``(key, tiebreak)``, yielding raw rows.
+
+        The auxiliary queries fold their rows per act anyway, so they do not
+        need the group-at-a-time guarantee ``_paged`` gives — and they do need
+        to survive an act whose rows outnumber a page. The EEA Agreement's
+        Annex I (21994A0103(51)) is amended by more than 1,000 acts, which a
+        cursor on the act alone can never step over.
+
+        Ordering on the pair and cutting on it lexicographically lets the
+        cursor advance *inside* an act as well as between acts.
+        """
+        last_key = last_tie = ""
+        while True:
+            result = self.sparql_query(build_query(last_key, last_tie))
+            bindings = result.get("results", {}).get("bindings", [])
+            if not bindings:
+                return
+            for b in bindings:
+                yield b
+            if len(bindings) < _CATALOG_PAGE_SIZE:
+                return
+            tail = bindings[-1]
+            new_key = tail.get(key, {}).get("value", "")
+            new_tie = tail.get(tiebreak, {}).get("value", "")
+            if (new_key, new_tie) <= (last_key, last_tie):
+                return  # no forward progress; stop rather than loop
+            last_key, last_tie = new_key, new_tie
+
+    @staticmethod
+    def _pair_cursor(key: str, tiebreak: str, last_key: str, last_tie: str) -> str:
+        """SPARQL filter for "ordered pair strictly after (last_key, last_tie)"."""
+        if not last_key:
+            return ""
+        return (
+            f'FILTER(STR(?{key}) > "{last_key}" || '
+            f'(STR(?{key}) = "{last_key}" && STR(?{tiebreak}) > "{last_tie}"))'
+        )
 
     def _fetch_amendments(self) -> dict[str, str]:
         """CELEX → CELEX of the most recent act amending it.
@@ -248,8 +310,8 @@ LIMIT {_CATALOG_PAGE_SIZE}"""
         they would claim to have never been touched.
         """
 
-        def build(cursor: str) -> str:
-            cursor_filter = f'FILTER(STR(?celex) >= "{cursor}")' if cursor else ""
+        def build(last_key: str, last_tie: str) -> str:
+            cursor_filter = self._pair_cursor("celex", "amenderCelex", last_key, last_tie)
             return f"""PREFIX cdm: <{_CDM}>
 SELECT ?celex ?amenderCelex ?amenderDate WHERE {{
   ?work cdm:work_has_resource-type ?rtype .
@@ -262,50 +324,139 @@ SELECT ?celex ?amenderCelex ?amenderDate WHERE {{
   ?amender cdm:work_date_document ?amenderDate .
   {cursor_filter}
 }}
-ORDER BY ?celex
+ORDER BY ?celex ?amenderCelex
 LIMIT {_CATALOG_PAGE_SIZE}"""
 
+        best_date: dict[str, str] = {}
         latest: dict[str, str] = {}
-        for celex, rows in self._paged(build, "celex"):
-            best = max(rows, key=lambda r: r.get("amenderDate", {}).get("value", ""))
-            amender = best.get("amenderCelex", {}).get("value", "")
+        for row in self._paged_rows(build, "celex", "amenderCelex"):
+            celex = row.get("celex", {}).get("value", "")
+            amender = row.get("amenderCelex", {}).get("value", "")
+            when = row.get("amenderDate", {}).get("value", "")
             # CELLAR returns junk CELEX values for consolidated-text fragments
             # ("04", "B", "05" all came back for Regulation 1017/68), and the
             # spec is explicit that this field names an act in this repo.
-            if _CELEX_RE.match(amender):
+            if not celex or not _CELEX_RE.match(amender):
+                continue
+            if when > best_date.get(celex, ""):
+                best_date[celex] = when
                 latest[celex] = amender
         logger.info("Amendments: %d acts carry a last_amendment", len(latest))
         return latest
 
-    def _fetch_subjects(self) -> dict[str, list[str]]:
-        """CELEX → EuroVoc concept labels, the source's own subject vocabulary.
+    def _simple_pairs(self, predicate_block: str, value_var: str) -> dict[str, list[str]]:
+        """CELEX → the values of one list-valued fact, in bulk.
 
-        Multi-valued, so it is its own query: joined into the catalog it would
-        multiply every act's rows by its number of concepts.
+        Every list-valued fact is fetched this way — two columns, no OPTIONALs —
+        because joining them into the catalog multiplies its rows by their
+        product. See the comment on _CATALOG_SELECT.
         """
 
-        def build(cursor: str) -> str:
-            cursor_filter = f'FILTER(STR(?celex) >= "{cursor}")' if cursor else ""
+        def build(last_key: str, last_tie: str) -> str:
+            cursor_filter = self._pair_cursor("celex", value_var, last_key, last_tie)
             return f"""PREFIX cdm: <{_CDM}>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-SELECT ?celex ?label WHERE {{
+SELECT ?celex ?{value_var} WHERE {{
   ?work cdm:work_has_resource-type ?rtype .
   FILTER(?rtype IN ({self._rtype_uris()}))
   ?work cdm:resource_legal_id_celex ?celex .
   ?work cdm:resource_legal_in-force ?force .
-  ?work cdm:work_is_about_concept_eurovoc ?concept .
+{predicate_block}
+  {cursor_filter}
+}}
+ORDER BY ?celex ?{value_var}
+LIMIT {_CATALOG_PAGE_SIZE}"""
+
+        out: dict[str, set[str]] = {}
+        for row in self._paged_rows(build, "celex", value_var):
+            celex = row.get("celex", {}).get("value", "")
+            value = row.get(value_var, {}).get("value", "")
+            if celex and value:
+                out.setdefault(celex, set()).add(value)
+        return {k: sorted(v) for k, v in out.items()}
+
+    def _fetch_authors(self) -> dict[str, list[str]]:
+        """CELEX → the corporate bodies that adopted it.
+
+        An international agreement can carry one per signatory state — 21 rows
+        for the EEA Agreement's Annex I on its own.
+        """
+        authors = self._simple_pairs("  ?work cdm:work_created_by_agent ?author .", "author")
+        logger.info("Authors: %d acts", len(authors))
+        return authors
+
+    def _fetch_repealers(self) -> dict[str, list[str]]:
+        """CELEX → CELEX of the acts that repeal it.
+
+        What separates `repealed` from `expired`: 9,269 acts in scope have one.
+        """
+        block = (
+            "  ?repealer cdm:resource_legal_repeals_resource_legal ?work .\n"
+            "  ?repealer cdm:resource_legal_id_celex ?repealedBy ."
+        )
+        repealers = self._simple_pairs(block, "repealedBy")
+        logger.info("Repealers: %d acts have one", len(repealers))
+        return repealers
+
+    def _merge_list_facts(self, celex: str, result: dict) -> None:
+        """Attach the list-valued facts to a per-act result.
+
+        The fallback path has to end up with the same fields the catalog path
+        produces, or an act served by one route would silently lose its authors
+        and its repealing act.
+        """
+        bindings = result.get("results", {}).get("bindings", [])
+        if not bindings:
+            return
+        authors = self._simple_pairs(
+            f'  ?work cdm:work_created_by_agent ?author .\n  FILTER(STR(?celex) = "{celex}")',
+            "author",
+        ).get(celex, [])
+        if authors:
+            bindings[0]["authors"] = {"value": "|".join(authors)}
+
+    def _fetch_eurovoc_labels(self) -> dict[str, str]:
+        """EuroVoc concept URI → its English label.
+
+        Fetched once for the whole vocabulary (~7,000 concepts) rather than
+        joined per act: asking for the label alongside every (act, concept) pair
+        made Virtuoso answer 503, because the language filter then runs over
+        hundreds of thousands of rows instead of the concept list.
+        """
+
+        def build(last_key: str, last_tie: str) -> str:
+            cursor_filter = self._pair_cursor("concept", "label", last_key, last_tie)
+            return f"""PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?concept ?label WHERE {{
+  ?concept skos:inScheme <http://eurovoc.europa.eu/100141> .
   ?concept skos:prefLabel ?label .
   FILTER(LANG(?label) = "en")
   {cursor_filter}
 }}
-ORDER BY ?celex
+ORDER BY ?concept ?label
 LIMIT {_CATALOG_PAGE_SIZE}"""
 
-        subjects: dict[str, list[str]] = {}
-        for celex, rows in self._paged(build, "celex"):
-            labels = sorted({r.get("label", {}).get("value", "") for r in rows} - {""})
-            if labels:
-                subjects[celex] = labels
+        labels: dict[str, str] = {}
+        for row in self._paged_rows(build, "concept", "label"):
+            concept = row.get("concept", {}).get("value", "")
+            label = row.get("label", {}).get("value", "")
+            if concept and label:
+                labels.setdefault(concept, label)
+        logger.info("EuroVoc: %d concept labels", len(labels))
+        return labels
+
+    def _fetch_subjects(self) -> dict[str, list[str]]:
+        """CELEX → EuroVoc labels, the source's own subject vocabulary."""
+        concepts = self._simple_pairs(
+            "  ?work cdm:work_is_about_concept_eurovoc ?concept .", "concept"
+        )
+        if not concepts:
+            return {}
+        labels = self._fetch_eurovoc_labels()
+        subjects = {
+            celex: sorted({labels[c] for c in uris if c in labels})
+            for celex, uris in concepts.items()
+        }
+        subjects = {k: v for k, v in subjects.items() if v}
         logger.info("Subjects: %d acts carry EuroVoc concepts", len(subjects))
         return subjects
 
@@ -326,9 +477,9 @@ LIMIT {_CATALOG_PAGE_SIZE}"""
             return self._catalog_data
 
     def _catalog_path(self) -> Path | None:
-        if not self._cache_dir:
+        if not self._data_dir:
             return None
-        return Path(self._cache_dir) / "eu-catalog.json"
+        return Path(self._data_dir) / "catalog.json"
 
     def get_consolidated_versions(self, celex: str) -> list[dict]:
         """Get all consolidated text versions for a base regulation.
@@ -400,32 +551,18 @@ LIMIT 1"""
         return None
 
     def get_metadata_sparql(self, celex: str) -> dict:
-        """Fetch full metadata for a regulation via SPARQL.
+        """Metadata for one act, straight from SPARQL.
 
-        Returns the raw SPARQL JSON result with fields: celex, eli, title,
-        date, entryForce, endValidity, force, rtype, author.
+        Shares _ACT_PATTERN and _AGGREGATED_SELECT with the bulk catalog so both
+        routes return the identical shape — the parser must not be able to tell
+        which one served it.
         """
-        rtype_values = ", ".join(f"<{_RTYPE_BASE}{t}>" for t in self._reg_types)
         query = f"""PREFIX cdm: <{_CDM}>
-SELECT DISTINCT ?celex ?eli ?title ?date ?entryForce ?endValidity ?force ?rtype ?author WHERE {{
-  ?work cdm:resource_legal_id_celex ?celex .
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+{_CATALOG_SELECT}
+WHERE {{
+{_ACT_PATTERN.format(types=self._rtype_uris())}
   FILTER(STR(?celex) = "{celex}")
-  ?work cdm:work_has_resource-type ?rtype .
-  FILTER(?rtype IN ({rtype_values}))
-  FILTER NOT EXISTS {{
-    ?work cdm:work_has_resource-type <{_RTYPE_BASE}CORRIGENDUM> .
-  }}
-  OPTIONAL {{ ?work cdm:resource_legal_eli ?eli . }}
-  OPTIONAL {{ ?work cdm:work_date_document ?date . }}
-  OPTIONAL {{ ?work cdm:resource_legal_date_entry-into-force ?entryForce . }}
-  OPTIONAL {{ ?work cdm:resource_legal_date_end-of-validity ?endValidity . }}
-  OPTIONAL {{ ?work cdm:resource_legal_in-force ?force . }}
-  OPTIONAL {{
-    ?expr cdm:expression_belongs_to_work ?work .
-    ?expr cdm:expression_uses_language <{_LANG_ENG}> .
-    ?expr cdm:expression_title ?title .
-  }}
-  OPTIONAL {{ ?work cdm:work_created_by_agent ?author . }}
 }}"""
         return self.sparql_query(query)
 
@@ -547,6 +684,7 @@ SELECT DISTINCT ?celex ?eli ?title ?date ?entryForce ?endValidity ?force ?rtype 
         if rows is None:
             logger.debug("%s not in catalog — falling back to per-act SPARQL", norm_id)
             result = self.get_metadata_sparql(norm_id)
+            self._merge_list_facts(norm_id, result)
         else:
             result = {"results": {"bindings": rows}}
         return json.dumps(result).encode("utf-8")
