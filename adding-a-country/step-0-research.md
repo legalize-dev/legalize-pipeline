@@ -5,8 +5,9 @@
 
 **Do not skip this step.** Every quality problem we have ever shipped (mojibake,
 missing metadata, lost tables, wrong dates) was caused by skipping it. Produce a
-`RESEARCH-{CC}.md` file at the root of this repo (`engine/RESEARCH-XX.md`)
-before writing any code.
+`RESEARCH-{CC}.md` file in `engine/research/` before writing any code. Anything bulkier
+than the document itself — per-probe measurements, request logs, raw censuses — goes in
+`engine/research/{cc}-v2/` alongside it, as `es` does.
 
 ## 0.1 Identify the source(s)
 
@@ -21,6 +22,66 @@ Document in `RESEARCH-{CC}.md`:
 - Whether historical versions are available (see "Version history strategies" below)
 - Any robots.txt / Crawl-delay constraints
 - Estimated total norm count and cadence of daily updates
+
+### 0.1.1 Find every index the source publishes — do not stop at the first one
+
+A discovery design is only as good as the indexes you found, and the cheap ones are
+routinely not where you look. Spain cost a full research pass to learn this: three
+independent probes tested `https://www.boe.es/sitemap.xml` (404) and grepped `robots.txt`
+for a `Sitemap:` directive (absent) and concluded *"the daily summary is the only index;
+nothing else enumerates"*, then designed a **14,926-request, 2 GB** sweep on top of that
+conclusion. The real index is at `/eli/sitemap.xml` with a companion Atom feed, it is
+linked in prose from a documentation page nobody opened, and it enumerates the corpus in
+**4 requests**. That is a 3,700× error, and it was a research error, not a source
+limitation.
+
+So work the list, and write down what each one returned — including the misses, because
+the next person needs to know what was already tried:
+
+- [ ] `/sitemap.xml`, `/sitemap_index.xml`, and **the standard-adjacent paths a CMS
+      actually uses** (`/{section}/sitemap.xml`, `/eli/sitemap.xml`, `/sitemaps/`)
+- [ ] `robots.txt` — for a `Sitemap:` directive, and read it in full: it may also list
+      **suppressed document ids** that discovery must filter out (BOE's is 487 KB and
+      names 1,740 right-to-be-forgotten documents)
+- [ ] **The site's own navigation and documentation pages**, not just the API docs. Follow
+      the "information", "about the data", "standards" and "legal identifiers" links. An
+      ELI/URN/permalink page is where a national gazette usually announces its bulk index
+- [ ] RSS and Atom feeds (`/rss/`, `/feeds/`, `*.atom`) — a rolling change feed makes a
+      missed cron self-healing, which no date-keyed sweep does
+- [ ] OAI-PMH (`/oai`), SPARQL, a bulk download or dump, an OpenSearch descriptor
+- [ ] The search UI: **submit a query in a browser and read the network requests**, so you
+      learn whether the results come from a JSON endpoint you can call directly or from a
+      server-rendered page you would have to parse. Either answer is worth having: for the
+      BOE the trace was 21 requests and **zero XHR**, which proved there is no cleaner
+      endpoint hiding behind the HTML and turned "maybe we should look harder" into a
+      closed question in three minutes
+- [ ] Whether the search reports an **exact result total**. A count up front means the
+      bootstrap knows what "complete" means before it starts, instead of learning it as a
+      by-product four hours in
+
+**Prefer a concrete, documented call over parsing a page — but verify the population before
+you prefer it.** Cheaper is not the same as correct, and this is the second half of the same
+Spanish lesson. The ELI sitemap enumerates 103,070 norms in 4 requests against the search's
+40; it is also a *different set* — it carries Sección III material the corpus does not want
+and omits the court rulings the corpus may want. Indexing from it and filtering after the
+fetch would have cost ~26,000 out-of-scope document downloads, wiping out the saving many
+times over. So for each index you find, record:
+
+| Index | Requests to enumerate | What it covers | What it omits | Documented? |
+|---|---:|---|---|---|
+
+and choose per job: the section- or type-filtered index for the **id list**, the sitemap for
+`lastmod` **change detection** and any shard key its URIs carry, the feed for the **daily**.
+They are not competitors.
+
+Two rules that follow from this and have both been paid for:
+
+1. **An undocumented HTML surface can be the right answer, but it needs a tripwire.** If the
+   design parses a search page, assert the parsed row count against the total the page itself
+   states and fall back to a documented path on mismatch. Markup changes silently; a count
+   assertion does not.
+2. **Never conclude "nothing enumerates" from two negative probes.** Say what you tested,
+   with the URL and the status code, so the claim is falsifiable by the next reader.
 
 ## 0.2 Save 5 representative fixtures
 
