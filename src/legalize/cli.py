@@ -1108,6 +1108,47 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
 _AMENDED_SHOWN = 10
 
 
+def _print_subsequent(front: dict | None, recorded: set[str]) -> None:
+    """What the source records against a law that its own history does not.
+
+    ``references_subsequent`` is one line of "VERB [code] BOE-id: sentence"
+    entries joined by " | ". Split rather than reformatted: the sentence is the
+    only place a suspension is written, so it is shown whole.
+
+    Entries whose act already appears as the ``Source-Id`` of one of this law's
+    commits are dropped — the history above already showed them, with a date and
+    a sha, and repeating them would bury the ones it could not show.
+    """
+    from rich.markup import escape
+
+    raw = str((front or {}).get("references_subsequent") or "").strip()
+    if not raw:
+        return
+    # " | " since #87; the corpus published before it joins with "; " and carries
+    # no sentences, so nothing with a semicolon inside it is torn either way.
+    sep = " | " if " | " in raw else "; "
+    entries = [e.strip() for e in raw.split(sep) if e.strip()]
+    # "SE MODIFICA [270] BOE-A-2012-7445: el art. 4" -> BOE-A-2012-7445
+    entries = [e for e in entries if not (recorded & set(e.partition(":")[0].split()))]
+    if not entries:
+        return
+    console.print(
+        f"\n  [bold]The source records {len(entries)} act(s) not in this history[/bold]\n"
+    )
+    for entry in entries[:_AMENDED_SHOWN]:
+        head, _, note = entry.partition(": ")
+        # No padding when there is no sentence to align against: the corpus
+        # published before #87 carries none, and a column of trailing spaces is
+        # all the alignment buys there.
+        if note:
+            console.print(f"  {escape(head[:64]):<64}  [dim]{escape(note[:70])}[/dim]")
+        else:
+            console.print(f"  {escape(head[:76])}")
+    if len(entries) > _AMENDED_SHOWN:
+        console.print(f"  [dim]… and {len(entries) - _AMENDED_SHOWN} more[/dim]")
+    console.print()
+
+
 @cli.command()
 @_country_option()
 @click.argument("law_id")
@@ -1168,6 +1209,7 @@ def reforms(ctx: click.Context, country: str, law_id: str, diff: bool) -> None:
 
     own: list[list[str]] = []
     amended: list[tuple[str, str, str]] = []
+    recorded: set[str] = set()
     for record in log.split("\0"):
         if not record.strip():
             continue
@@ -1183,6 +1225,7 @@ def reforms(ctx: click.Context, country: str, law_id: str, diff: bool) -> None:
         # there the commit's Norm-Id is the law this act changed.
         if trailer.get("Norm-Id") == law_id:
             own.append([sha, when, subject])
+            recorded.add(trailer.get("Source-Id", ""))
         else:
             amended.append((when, trailer.get("Norm-Id", "?"), subject))
 
@@ -1191,6 +1234,7 @@ def reforms(ctx: click.Context, country: str, law_id: str, diff: bool) -> None:
         raise SystemExit(1)
 
     state = "point_in_time"
+    front: dict | None = None
     if own:
         path = _git("log", "-1", "--name-only", "--format=", own[0][0])
         if path:
@@ -1211,6 +1255,21 @@ def reforms(ctx: click.Context, country: str, law_id: str, diff: bool) -> None:
             "  [dim]The body is the act as published and does not change. Each commit\n"
             "  records an amendment; the amending act is a file of its own.[/dim]\n"
         )
+    # The history is never the whole answer, and the gap has a different size in
+    # each state rather than a different shape — so one rule covers both: show
+    # the acts the source records against this law that no commit here names.
+    #
+    # As enacted, that is all of them: the body never changes, so nothing after
+    # the bootstrap produces a commit and "what changed?" would go unanswered on
+    # the entire non-consolidated corpus (#66).
+    #
+    # Point in time, it is the changes that leave no version behind — a
+    # suspension, a Constitutional Court ruling — which is exactly the class a
+    # history walk cannot see. Ley 19/2022 has two subsequent acts and one
+    # commit; the ruling that declared on it is in neither the log nor the diff.
+    #
+    # Printed after the history below, because it is what the history did not
+    # show: above it, a reader takes it for the history itself.
 
     for sha, when, subject in own:
         body = _git("log", "-1", "--format=%b", sha)
@@ -1236,6 +1295,8 @@ def reforms(ctx: click.Context, country: str, law_id: str, diff: bool) -> None:
                 stat = _git("show", "--stat", "--format=", sha)
                 for line in stat.splitlines():
                     console.print(f"              [dim]{escape(line.strip())}[/dim]")
+
+    _print_subsequent(front, recorded)
 
     # The other direction. Listed rather than counted, because "amends 1,425
     # laws" and "amends these 1,425 laws" are different answers, but capped
