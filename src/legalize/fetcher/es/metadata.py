@@ -27,6 +27,7 @@ Actual API structure (XML):
 from __future__ import annotations
 
 import logging
+import re
 from datetime import date
 
 from lxml import etree
@@ -346,8 +347,9 @@ def parse_metadata(
     # From /diario_boe/xml.php (richer, if provided)
     subjects: list[str] = []
     pdf_url: str | None = None
+    last_amendment: str | None = None
     if diario_xml:
-        subjects, pdf_url, diario_extra = _parse_diario_xml(diario_xml)
+        subjects, pdf_url, diario_extra, last_amendment = _parse_diario_xml(diario_xml)
         extra.extend(diario_extra)
 
     return NormMetadata(
@@ -365,6 +367,11 @@ def parse_metadata(
         pdf_url=pdf_url,
         subjects=tuple(subjects),
         extra=tuple(extra),
+        # Parsed on every norm, written only on the ones whose body does not
+        # change. It also outranks the commit path: `_with_last_amendment` fills
+        # this in from the reform that happens to land, and the source's own
+        # answer is better than a guess made from whatever arrived last.
+        last_amendment=last_amendment,
         # The promotion the country default expects. The condition is not a
         # test, it is where this function is: `/api/legislacion-consolidada`
         # answers for a norm the BOE consolidates and 404s for everything else,
@@ -409,24 +416,93 @@ def _reference(el) -> str:
     return f"{entry}: {note}" if note else entry
 
 
+# Which relation codes actually changed the act, as opposed to merely citing
+# it. Measured over 367 non-consolidated Sección I acts (2026-09-04): 21 codes
+# appear under <posteriores>, and only these change the words or whether they
+# apply. The ones left out — 331 SE DICTA EN RELACIÓN, 440 SE DICTA DE
+# CONFORMIDAD, 693 SE DICTA, 490 SE DESARROLLA, 300 SE PUBLICA, 402 SE
+# INTERPRETA — are acts that invoke this one without touching it, and naming
+# one as the last amendment tells a reader the text moved when it did not.
+#
+# 470 SE DECLARA is in: it is the Constitutional Court annulling a provision,
+# which changes what is in force without rewriting a word. So are the three
+# correction codes — a rectification changes the official text with legal
+# effect, which is why Portugal counts them too (fetcher/pt/amendments.py).
+#
+# The BOE publishes no vocabulary for this: /api/datos-auxiliares/relaciones
+# is a 404. So the list is measured, and a code outside it is simply not an
+# amendment as far as this is concerned — the whole relation still ships in
+# `references_subsequent`, which is never filtered.
+_AMENDING_CODES = frozenset(
+    {"201", "202", "203", "210", "245", "270", "401", "404", "406", "407", "408", "470"}
+)
+
+# BOE-A-2021-21788 -> (2021, 21788). The sequence is monotonic within a year.
+_BOE_SEQ = re.compile(r"^BOE-[A-Z]{1,6}-(\d{4})-(\d+)$")
+
+
+def last_amendment_of(referencias) -> str | None:
+    """The most recent act that changed this one, from the BOE's own analysis.
+
+    This is spec v0.3's ``last_amendment``, and it only means anything on a body
+    that does not change: on a consolidated norm the amendments *are* the
+    versions, so the value is parsed here and then never written — the emitter
+    skips the key whenever the state is point-in-time.
+
+    It is what makes the non-consolidated corpus (#66) honest. Those acts are
+    published as enacted and never gain a second commit, so nothing on the
+    commit path can name the act that superseded them; the BOE, however, ships
+    ``<posteriores>`` inside the same ``xml.php`` response as the text, for acts
+    that have no consolidated version at all. Measured over 367 of them: 127
+    carry a subsequent reference and 96 carry an amending one.
+
+    Ordered by identifier, never by document order. ``<posterior orden="">`` is
+    empty on every entry seen, and the order the BOE ships is newest-first in
+    only 106 of 127 acts — taking the first entry names the wrong act in 10 of
+    96 (10.4 %). The identifier carries the year and a sequence monotonic within
+    it, so ``(year, seq)`` is a total order needing no date parsing, no
+    ``<texto>`` prose, and no second request.
+    """
+    best: tuple[tuple[int, int], str] | None = None
+    for el in referencias.findall("posteriores/posterior"):
+        # Both element shapes, for the same reason `_reference` reads both: the
+        # diary puts the code on <palabra>, the consolidated API on <relacion>.
+        # And `is None`, never truthiness — a childless lxml element is falsy,
+        # so `find("palabra") or find("relacion")` silently drops every code.
+        word = el.find("palabra")
+        if word is None:
+            word = el.find("relacion")
+        if word is None or (word.get("codigo") or "").strip() not in _AMENDING_CODES:
+            continue
+        rid = (el.get("referencia") or el.findtext("id_norma") or "").strip()
+        match = _BOE_SEQ.match(rid)
+        if match is None:
+            continue
+        key = (int(match.group(1)), int(match.group(2)))
+        if best is None or key > best[0]:
+            best = (key, rid)
+    return best[1] if best else None
+
+
 def _parse_diario_xml(
     diario_xml: bytes,
-) -> tuple[list[str], str | None, list[tuple[str, str]]]:
+) -> tuple[list[str], str | None, list[tuple[str, str]], str | None]:
     """Extract subjects, pdf_url and cross-reference metadata from the
     /diario_boe/xml.php payload.
 
     Returns:
-        (subjects, pdf_url, extra_fields)
+        (subjects, pdf_url, extra_fields, last_amendment)
     """
     subjects: list[str] = []
     pdf_url: str | None = None
     extra: list[tuple[str, str]] = []
+    last_amendment: str | None = None
 
     try:
         root = etree.fromstring(diario_xml)
     except Exception:
         logger.warning("diario XML parse failed")
-        return subjects, pdf_url, extra
+        return subjects, pdf_url, extra, last_amendment
 
     dm = root.find("metadatos")
     if dm is not None:
@@ -468,6 +544,7 @@ def _parse_diario_xml(
                 extra.append(("alerts", "; ".join(alist)))
         referencias = analisis.find("referencias")
         if referencias is not None:
+            last_amendment = last_amendment_of(referencias)
             ants = referencias.find("anteriores")
             if ants is not None:
                 refs = [_reference(a) for a in ants.findall("anterior")]
@@ -498,4 +575,4 @@ def _parse_diario_xml(
                     extra.append(("references_subsequent", " | ".join(refs)))
                     extra.append(("references_subsequent_count", str(len(refs))))
 
-    return subjects, pdf_url, extra
+    return subjects, pdf_url, extra, last_amendment
