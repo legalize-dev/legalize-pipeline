@@ -28,6 +28,20 @@ for _var in (
 ):
     os.environ.pop(_var, None)
 
+# Rich colours its output when it thinks a terminal is watching, and a CLI test
+# asserts on the string the command printed: `"2 commit(s)" in result.output`
+# fails against `"\x1b[1m2\x1b[0m commit(s)"`, on an assertion about content
+# that is perfectly correct. Whether it fails depends on the environment the
+# suite happens to run in, which is the worst version of the problem — 13 tests
+# passed here and failed inside the pre-push hook, so the hook could not be
+# satisfied from a colour-capable terminal and the fix people learned was to
+# remember `TERM=dumb NO_COLOR=1` by hand.
+#
+# Set once, next to the other environment this file already sanitises, and
+# before any test imports the module that builds the Console at import time.
+os.environ["NO_COLOR"] = "1"
+os.environ["TERM"] = "dumb"
+
 
 @pytest.fixture
 def constitucion_xml() -> bytes:
