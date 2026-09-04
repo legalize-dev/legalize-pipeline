@@ -221,7 +221,7 @@ class EURLexClient(HttpClient):
                 )
             cursor = last_key
 
-    def _fetch_catalog(self) -> dict[str, list[dict]]:
+    def _fetch_catalog(self, cache_path: Path | None = None) -> dict[str, list[dict]]:
         """Every in-scope act with its metadata, keyed by CELEX.
 
         One row per (act × author × entry-into-force date …), exactly as the
@@ -244,6 +244,19 @@ LIMIT {_CATALOG_PAGE_SIZE}"""
         for celex, rows in self._paged(build, "celex"):
             catalog[celex] = rows
         logger.info("Catalog: %d acts", len(catalog))
+
+        # Checkpoint before enrichment. The core listing costs ~4 minutes and
+        # CELLAR is intermittent — 503s and read timeouts under sustained load —
+        # so a failure in one of the four enrichment queries below should not
+        # throw that away. None of them is optional: authors become the
+        # department, and the repealing act is what separates `repealed` from
+        # `expired`, so a run that loses one must fail rather than publish
+        # without it.
+        if cache_path is not None:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            (cache_path.parent / "catalog.core.json").write_text(
+                json.dumps(catalog), encoding="utf-8"
+            )
 
         # Multi-valued facts ride in their own queries and are merged onto the
         # act's first row, so the parser reads them the same way either route.
@@ -470,7 +483,7 @@ LIMIT {_CATALOG_PAGE_SIZE}"""
                 logger.info("Loading catalog from %s", cached)
                 self._catalog_data = json.loads(cached.read_text(encoding="utf-8"))
                 return self._catalog_data
-            self._catalog_data = self._fetch_catalog()
+            self._catalog_data = self._fetch_catalog(cache_path=cached)
             if cached is not None:
                 cached.parent.mkdir(parents=True, exist_ok=True)
                 cached.write_text(json.dumps(self._catalog_data), encoding="utf-8")

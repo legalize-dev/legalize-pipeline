@@ -515,8 +515,12 @@ countries:
     max_workers: 8
     source:
       sparql_url: "https://publications.europa.eu/webapi/rdf/sparql"
-      request_timeout: 30
-      max_retries: 5
+      # 30 s was enough for one act at a time. The bulk catalog asks Virtuoso
+      # for 1,000 rows at a time over the whole corpus and it answers 503 or
+      # simply stops replying under sustained load, so the window has to be
+      # wider and the retries more patient.
+      request_timeout: 120
+      max_retries: 8
       requests_per_second: 5.0
       # Scope approved 2026-09-03 (research/RESEARCH-EU.md §6): 87,227 acts.
       # Was regulations only, which is why the corpus held no directive at all.
