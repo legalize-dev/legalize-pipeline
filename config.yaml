@@ -557,14 +557,13 @@ countries:
     repo_path: "../countries/uk"
     data_dir: "../countries/data-uk"
     cache_dir: ".cache"
-    # legislation.gov.uk CLML + Atom. Public, OGL v3.0. robots.txt sets
-    # Crawl-delay: 5 but no hard rate limit is documented. We keep each
-    # worker at 1 req/s and run 4 workers — effective 4 req/s, well
-    # under what the service tolerates in practice.
+    # legislation.gov.uk CLML + Atom. Public, OGL v3.0. The client limits
+    # each worker to 1 req/s, so 4 workers target 4 req/s, under the
+    # fair-use cap in fetcher/uk/client.py.
     # Primary legislation bootstrap (2026-04-18): ~3h fetch + ~1h commits
     # (fast-import), producing 38,004 commits across 4 jurisdictions.
     # Secondary legislation (87K SIs) bootstrapped from bulk CLML data.
-    max_workers: 8
+    max_workers: 4
     source:
       base_url: "https://www.legislation.gov.uk"
       request_timeout: 45

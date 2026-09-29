@@ -12,8 +12,11 @@ URL patterns used:
     Publication log       /update/data.feed?start-date={D}&end-date={D}
     Change timeline       /changes/affected/{type}/{year}/{number}/data.feed?...
 
-robots.txt sets Crawl-delay: 5. We default to 1.0 req/s per worker; callers
-can tune up if their workers run strictly sequentially.
+The fair-use policy (https://www.legislation.gov.uk/fair-use-policy) caps
+each user, across all their IPs, at 1,500 requests per 5 minutes. The site
+answers 404 to a request with no User-Agent. Its robots.txt sets
+Crawl-delay: 5. The client defaults to 1.0 req/s per worker; callers can
+raise it if their workers run strictly sequentially.
 """
 
 from __future__ import annotations
