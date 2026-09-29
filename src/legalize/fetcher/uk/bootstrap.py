@@ -5,6 +5,11 @@ Legislation Research bulk dump (Legislative Texts Data + Statute Book
 Metadata). Used for the one-time SI bootstrap (~150K commits across
 uksi/ssi/wsi/nisr/nisro). Daily updates continue to use the API.
 
+The dump comes from https://research.legislation.gov.uk/data, behind HTTP
+Basic auth; access is by invitation from The National Archives. The
+archives serve HTTP Range requests, so zipfile can list an archive's
+members without downloading it.
+
 Detected automatically by ``pipeline.generic_bootstrap`` via the optional
 ``fetcher/{country}/bootstrap.py`` hook.
 
