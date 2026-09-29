@@ -449,14 +449,16 @@ def discover_norm_ids(
     cache = Path(cc.data_dir) / "discovery_ids.txt"
 
     if cache.exists() and not rediscover:
-        norm_ids = [line.strip() for line in cache.read_text().splitlines() if line.strip()]
+        norm_ids = [
+            line.strip() for line in cache.read_text(encoding="utf-8").splitlines() if line.strip()
+        ]
         console.print(f"[dim]Loaded {len(norm_ids)} IDs from discovery cache[/dim]")
     else:
         with get_client_class(country).create(cc) as client:
             discovery = get_discovery_class(country).create({**cc.source, "cache_dir": cc.data_dir})
             norm_ids = list(discovery.discover_all(client))
         cache.parent.mkdir(parents=True, exist_ok=True)
-        cache.write_text("\n".join(norm_ids) + "\n")
+        cache.write_text("\n".join(norm_ids) + "\n", encoding="utf-8")
         console.print(f"[dim]Saved {len(norm_ids)} IDs to discovery cache[/dim]")
 
     if offset:
