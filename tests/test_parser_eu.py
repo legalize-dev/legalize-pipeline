@@ -170,6 +170,98 @@ class TestTextParser:
         texts = [p.text for p in paragraphs]
         assert any("Article 99" in t for t in texts)
 
+    def test_gdpr_no_empty_articles(self, text_parser: EURLexTextParser):
+        """验证 GDPR 99 个条款均不为空（Issue #19 核心验收标准：#### Article N 后面不能只有副标题）。"""
+        import re
+
+        data = _load("32016R0679.xhtml")
+        blocks = text_parser.parse_text(data)
+        paragraphs = blocks[0].versions[0].paragraphs
+
+        article_count = 0
+        empty_articles = []
+
+        for i, p in enumerate(paragraphs):
+            if p.css_class == "h4" and re.match(r"^Article\s+\d+", p.text):
+                article_count += 1
+                j = i + 1
+                # 跳过副标题（h5）
+                if j < len(paragraphs) and paragraphs[j].css_class == "h5":
+                    j += 1
+                # 检查副标题后是否直接接下一个大标题或结束（无正文）
+                if j >= len(paragraphs) or paragraphs[j].css_class in ("h1", "h2", "h3", "h4"):
+                    empty_articles.append(p.text)
+
+        assert article_count == 99, f"期望 99 个条款，实际解析得到 {article_count}"
+        assert not empty_articles, f"以下条款正文为空: {empty_articles}"
+
+    def test_gdpr_article_24_25_55_have_content(self, text_parser: EURLexTextParser):
+        """验证曾被遗漏正文的第 24、25、55 条等条款正文与编号段落完整恢复。"""
+        data = _load("32016R0679.xhtml")
+        blocks = text_parser.parse_text(data)
+        paragraphs = blocks[0].versions[0].paragraphs
+
+        def get_article_paras(art_title: str) -> list:
+            capturing = False
+            art_paras = []
+            for p in paragraphs:
+                if p.css_class == "h4" and art_title in p.text:
+                    capturing = True
+                elif capturing and p.css_class in ("h1", "h2", "h3", "h4"):
+                    break
+                if capturing:
+                    art_paras.append(p)
+            return art_paras
+
+        # 检查第 24 条
+        art24 = get_article_paras("Article 24")
+        assert len(art24) >= 4  # h4 + h5 + 3 个 abs 编号段落
+        assert any("Responsibility of the controller" in p.text for p in art24)
+        assert any("1. Taking into account" in p.text for p in art24)
+        assert any("2. Where proportionate" in p.text for p in art24)
+        assert any("3. Adherence to approved codes" in p.text for p in art24)
+
+        # 检查第 25 条
+        art25 = get_article_paras("Article 25")
+        assert len(art25) >= 4  # h4 + h5 + 3 个 abs 编号段落
+        assert any("Data protection by design and by default" in p.text for p in art25)
+        assert any("1. Taking into account the state of the art" in p.text for p in art25)
+
+        # 检查第 55 条
+        art55 = get_article_paras("Article 55")
+        assert len(art55) >= 4  # h4 + h5 + 3 个 abs 编号段落
+        assert any("Competence" in p.text for p in art55)
+        assert any("1. Each supervisory authority shall be competent" in p.text for p in art55)
+
+    def test_gdpr_article_6_structure(self, text_parser: EURLexTextParser):
+        """验证带列表与后续解释段的编号条款（如第 6 条）结构完整。"""
+        data = _load("32016R0679.xhtml")
+        blocks = text_parser.parse_text(data)
+        paragraphs = blocks[0].versions[0].paragraphs
+
+        # 获取第 6 条各段落
+        art6_paras = []
+        capturing = False
+        for p in paragraphs:
+            if p.css_class == "h4" and "Article 6" in p.text:
+                capturing = True
+            elif capturing and p.css_class in ("h1", "h2", "h3", "h4"):
+                break
+            if capturing:
+                art6_paras.append(p)
+
+        # 验证段落序号 1. 前缀拼接在引言段
+        intro_p1 = [p for p in art6_paras if "1. Processing shall be lawful" in p.text]
+        assert len(intro_p1) == 1, "第 6 条第 1 款前导句应保留段号 1."
+
+        # 验证列表项 (a)-(f) 均存在
+        lists = [p for p in art6_paras if p.css_class == "list"]
+        assert len(lists) >= 6, "第 6 条应包含 (a)-(f) 等列表项"
+
+        # 验证后续段落存在
+        sub_paras = [p for p in art6_paras if "Point (f) of the first subparagraph" in p.text]
+        assert len(sub_paras) == 1, "列表后的补充解释段落不应丢失"
+
     def test_mica_has_tables(self, text_parser: EURLexTextParser):
         """MiCA regulation has tables that should be parsed."""
         data = _load("32023R1114.xhtml")
