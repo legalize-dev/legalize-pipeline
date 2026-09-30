@@ -119,16 +119,24 @@ def _drop_title(nodes: list[dict]) -> tuple[list[dict], str]:
 
     The subject starts in lower case ("w sprawie …", "zmieniające …", "o …"); a preamble or
     "Na podstawie …" does not, so it stays, as does anything printed above the title (a note,
-    "Sygn. akt …"). Returns the rest and the genitive of the act type ("" if the title was not
+    "Sygn. akt …"). Titles without a "z dnia" line (some international agreements) stay. Returns the rest and the genitive of the act type ("" if the title was not
     found or the type is unknown).
     """
     lead = 0
-    while lead < len(nodes) and nodes[lead]["type"] == "text" and not nodes[lead].get("quoted"):
+    while (
+        lead < len(nodes)
+        and nodes[lead]["type"] in ("text", "note", "ocr")
+        and not nodes[lead].get("quoted")
+    ):
         lead += 1
     for i in range(min(lead, 8)):
-        if _TITLE_DATE.match(_clean(nodes[i]["text"])):
+        if nodes[i]["type"] == "text" and _TITLE_DATE.match(_clean(nodes[i]["text"])):
             first = i
-            while first > 0 and _clean(nodes[first - 1]["text"]).isupper():
+            while (
+                first > 0
+                and nodes[first - 1]["type"] == "text"
+                and _clean(nodes[first - 1]["text"]).isupper()
+            ):
                 first -= 1
             end = i + 1
             if end < lead and _clean(nodes[end]["text"])[:1].islower():
@@ -141,10 +149,15 @@ def _drop_title(nodes: list[dict]) -> tuple[list[dict], str]:
 def tree_to_blocks(tree: dict, norm_id: str, pub_date: date) -> list[Block]:
     """Blocks from the tree of units of ``pdf.tree.md_to_tree``."""
     blocks: list[Block] = []
+    seen: dict[str, int] = {}
 
     def emit(block_id: str, block_type: str, title: str, paras: list[Paragraph]) -> None:
         if not paras:
             return
+        # a consolidated text may print an article twice (DU/2025/450: Art. 96 and "(uchylony)")
+        seen[block_id] = seen.get(block_id, 0) + 1
+        if seen[block_id] > 1:
+            block_id = f"{block_id}-{seen[block_id]}"
         version = Version(
             norm_id=norm_id,
             publication_date=pub_date,
@@ -194,7 +207,7 @@ def tree_to_blocks(tree: dict, norm_id: str, pub_date: date) -> list[Block]:
 
 
 def parse_pdf(pdf: bytes, *, norm_id: str, pub_date: date) -> list[Block]:
-    """Blocks of an act from its PDF. Empty list if the PDF cannot be read."""
+    """Blocks of an act from its PDF. Raises ValueError if the PDF cannot be read."""
     from legalize.fetcher.pl.pdf.convert import convert, to_markdown
     from legalize.fetcher.pl.pdf.tree import md_to_tree
 
@@ -206,7 +219,8 @@ def parse_pdf(pdf: bytes, *, norm_id: str, pub_date: date) -> list[Block]:
             f.write(pdf)
             f.flush()
             markdown = to_markdown(convert(f.name, position=position))
-    except Exception as exc:  # noqa: BLE001 — a broken PDF must not stop the run
-        logger.warning("Failed to parse PL PDF for %s: %s", norm_id, exc)
-        return []
+    except Exception as exc:  # noqa: BLE001 — pdfminer raises many kinds of errors
+        # ValueError: the pipeline logs it and skips the act instead of committing a law
+        # with no text.
+        raise ValueError(f"Failed to parse PL PDF for {norm_id}: {exc}") from exc
     return tree_to_blocks(md_to_tree(markdown), norm_id, pub_date)

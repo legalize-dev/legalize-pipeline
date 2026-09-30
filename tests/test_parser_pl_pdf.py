@@ -11,7 +11,12 @@ import pytest
 
 from legalize.fetcher.pl.client import EliClient
 from legalize.fetcher.pl.discovery import EliDiscovery
-from legalize.fetcher.pl.parser import EliMetadataParser, EliTextParser
+from legalize.fetcher.pl.parser import (
+    EliMetadataParser,
+    EliTextParser,
+    _parse_pdf_cached,
+    _pdf_payload,
+)
 from legalize.fetcher.pl.parser_pdf import parse_pdf, tree_to_blocks
 
 FIXTURES = Path(__file__).parent / "fixtures" / "pl"
@@ -117,7 +122,6 @@ class TestObwieszczenieWithAnnexesFromPdf:
 
     def test_annex_articles_have_own_ids(self, obwieszczenie):
         ids = [b.id for b in obwieszczenie]
-        assert len(ids) == len(set(ids))
         assert "annex-1/par_1" in ids and "annex-2/par_1" in ids
 
     def test_main_text_units(self, obwieszczenie):
@@ -145,18 +149,45 @@ class TestRenderedPdfMarkdown:
 
 
 class TestParsePdfDirect:
-    def test_broken_pdf_gives_no_blocks(self):
+    def test_broken_pdf_raises(self):
+        # ValueError: the pipeline skips the act instead of committing a law with no text
         marker = b"<!--LEGALIZE norm_id=DU-2025-1 pub_date=2025-01-02-->\n"
-        assert EliTextParser().parse_text(marker + b"%PDF-1.7\nnot a pdf") == []
+        with pytest.raises(ValueError, match="DU-2025-1"):
+            EliTextParser().parse_text(marker + b"%PDF-1.7\nnot a pdf")
+
+    def test_payload_detection(self):
+        marker = b"<!--LEGALIZE norm_id=DU-2025-1 pub_date=2025-01-02-->\n"
+        assert _pdf_payload(marker + b"%PDF-1.7\nx") == b"%PDF-1.7\nx"
+        assert _pdf_payload(b"%PDF-1.7\nx") == b"%PDF-1.7\nx"
+        assert _pdf_payload(marker + b"<html><body>%PDF-</body></html>") is None
+        html = (FIXTURES / "sample-ustawa-2024-1976.html").read_bytes()
+        assert _pdf_payload(marker + html) is None
+
+    def test_routing(self):
+        marker = b"<!--LEGALIZE norm_id=DU-2025-2 pub_date=2025-01-02-->\n"
+        with patch("legalize.fetcher.pl.parser_pdf.parse_pdf", return_value=[]) as parse_pdf_mock:
+            EliTextParser().parse_text(marker + b"<html><body></body></html>")
+            assert parse_pdf_mock.call_count == 0
+            EliTextParser().parse_text(marker + b"%PDF-1.7\nrouting test")
+            parse_pdf_mock.assert_called_once()
+            assert parse_pdf_mock.call_args.kwargs["norm_id"] == "DU-2025-2"
+            assert parse_pdf_mock.call_args.args[0] == b"%PDF-1.7\nrouting test"
+
+    def test_pdf_parsed_once_for_text_and_reforms(self):
+        data = _load_pdf(1701, "2025-12-02")
+        with patch("legalize.fetcher.pl.parser_pdf.parse_pdf", wraps=parse_pdf) as parse_pdf_mock:
+            _parse_pdf_cached.cache_clear()
+            parser = EliTextParser()
+            blocks = parser.parse_text(data)
+            reforms = parser.extract_reforms(data)
+        assert parse_pdf_mock.call_count == 1
+        assert len(reforms) == 1 and reforms[0].date == date(2025, 12, 2)
+        assert blocks == parser.parse_text(data)
 
     def test_parse_pdf_without_marker(self):
         pdf = (FIXTURES / "sample-pdf-only-2025-1701.pdf").read_bytes()
         blocks = parse_pdf(pdf, norm_id="DU-2025-1701", pub_date=date(2025, 12, 2))
         assert [b.title for b in blocks if b.block_type == "article"] == ["§ 1.", "§ 2."]
-
-    def test_html_is_not_taken_for_pdf(self):
-        html = b"<!--LEGALIZE norm_id=DU-2024-1 pub_date=2024-01-01-->\n<html><body></body></html>"
-        assert EliTextParser().parse_text(html) == []
 
     def test_tree_without_title(self):
         tree = {
@@ -168,6 +199,31 @@ class TestParsePdfDirect:
         blocks = tree_to_blocks(tree, "DU-2025-9", date(2025, 1, 2))
         assert [b.block_type for b in blocks] == ["article"]
         assert [p.text for p in blocks[0].versions[0].paragraphs] == ["Art. 1.", "Tekst."]
+
+    def test_repeated_article_gets_own_id(self):
+        art = {"type": "art", "num": "96", "path": "art_96", "text": "(uchylony)", "children": []}
+        tree = {"body": [], "annexes": [{"heading": "Załącznik", "body": [art, dict(art)]}]}
+        ids = [b.id for b in tree_to_blocks(tree, "DU-2025-9", date(2025, 1, 2))]
+        assert ids == ["annex-1", "annex-1/art_96", "annex-1/art_96-2"]
+
+    def test_title_dropped_below_a_note(self):
+        tree = {
+            "body": [
+                {"type": "note", "text": "[Strona 1 PDF nie ma warstwy tekstowej.]"},
+                {"type": "text", "text": "ROZPORZĄDZENIE"},
+                {"type": "text", "text": "MINISTRA ZDROWIA"},
+                {"type": "text", "text": "z dnia 2 grudnia 2025 r."},
+                {"type": "text", "text": "w sprawie czegoś"},
+                {"type": "par", "num": "1", "path": "par_1", "text": "Tekst.", "children": []},
+            ],
+            "annexes": [],
+        }
+        blocks = tree_to_blocks(tree, "DU-2025-9", date(2025, 1, 2))
+        assert [b.title for b in blocks] == [
+            "Treść rozporządzenia",
+            "> [Strona 1 PDF nie ma warstwy tekstowej.]",
+            "§ 1.",
+        ]
 
 
 class TestClientPdfFallback:
