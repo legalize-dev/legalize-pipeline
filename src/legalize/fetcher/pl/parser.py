@@ -150,6 +150,14 @@ def _extract_marker(data: bytes) -> tuple[str, date | None]:
     return norm_id, pub_date
 
 
+def _pdf_payload(data: bytes) -> bytes | None:
+    """The PDF behind the marker, if get_text() returned a PDF (acts without HTML)."""
+    start = data.find(b"%PDF-", 0, 400)
+    if start < 0 or not (start == 0 or data.startswith(b"<!--LEGALIZE")):
+        return None
+    return data[start:]
+
+
 # ─────────────────────────────────────────────
 # Rank mapping
 # ─────────────────────────────────────────────
@@ -611,6 +619,14 @@ class EliTextParser(TextParser):
 
         norm_id, marker_date = _extract_marker(data)
         pub_date = marker_date or date(1900, 1, 1)
+
+        pdf = _pdf_payload(data)
+        if pdf is not None:
+            # Acts served only as PDF (EliClient.get_text). Imported here: pdfplumber is only
+            # needed for them.
+            from legalize.fetcher.pl.parser_pdf import parse_pdf
+
+            return parse_pdf(pdf, norm_id=norm_id, pub_date=pub_date)
 
         try:
             tree = lxml_html.fromstring(data, parser=_HTML_PARSER)
