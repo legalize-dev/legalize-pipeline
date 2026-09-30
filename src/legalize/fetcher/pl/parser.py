@@ -30,6 +30,7 @@ Content constructs handled inside article bodies:
 
 from __future__ import annotations
 
+import functools
 import json
 import logging
 import re
@@ -148,6 +149,29 @@ def _extract_marker(data: bytes) -> tuple[str, date | None]:
         except ValueError:
             pub_date = None
     return norm_id, pub_date
+
+
+@functools.lru_cache(maxsize=4)
+def _parse_pdf_cached(data: bytes) -> tuple[Block, ...]:
+    """Acts served only as PDF (EliClient.get_text). Cached: extract_reforms parses the same
+    bytes again, and a long PDF takes seconds. Imported here: pdfplumber is only needed for them.
+    """
+    from legalize.fetcher.pl.parser_pdf import parse_pdf
+
+    norm_id, marker_date = _extract_marker(data)
+    pdf = _pdf_payload(data) or b""
+    return tuple(parse_pdf(pdf, norm_id=norm_id, pub_date=marker_date or date(1900, 1, 1)))
+
+
+def _pdf_payload(data: bytes) -> bytes | None:
+    """The PDF right behind the marker line, if get_text() returned a PDF (acts without HTML)."""
+    if data.startswith(b"%PDF-"):
+        return data
+    if data.startswith(b"<!--LEGALIZE"):
+        end = data.find(b"-->\n", 0, 400)
+        if end >= 0 and data.startswith(b"%PDF-", end + 4):
+            return data[end + 4 :]
+    return None
 
 
 # ─────────────────────────────────────────────
@@ -611,6 +635,9 @@ class EliTextParser(TextParser):
 
         norm_id, marker_date = _extract_marker(data)
         pub_date = marker_date or date(1900, 1, 1)
+
+        if _pdf_payload(data) is not None:
+            return list(_parse_pdf_cached(data))
 
         try:
             tree = lxml_html.fromstring(data, parser=_HTML_PARSER)

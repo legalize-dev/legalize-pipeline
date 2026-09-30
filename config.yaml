@@ -263,7 +263,7 @@ countries:
     source:
       # ELI API of the Polish Sejm — public, no auth.
       # See RESEARCH-POLAND.md for the full inventory.
-      # Scope v1: DU publisher only, HTML-only client-side filter.
+      # Scope: DU publisher only; HTML, plus PDF-only acts from pdf_from_year on.
       # The API's WAF rejects unknown query parameters, so `html_only` is
       # enforced by the discovery layer, not by the URL.
       #
@@ -279,6 +279,10 @@ countries:
       publisher: "DU"
       year_start: 2000
       html_only: true
+      # Acts with no HTML but a PDF go through parser_pdf from this year on: all of 2025+
+      # (0 of 3178 DU acts have HTML, 2026-09-30) and 98 acts of 2020-2023. Before 2012 the
+      # PDFs are pages of whole issues (19615 PDF-only acts in 2000-2011), not enabled yet.
+      pdf_from_year: 2012
       request_timeout: 30
       max_retries: 5
       requests_per_second: 8.0
