@@ -33,10 +33,16 @@ def _parse_norm_id(norm_id: str) -> tuple[int, str, str]:
     - IE-2024-act-1  → (2024, "act", "1")
     - IE-2015-act-C34 → (2015, "ca", "34")  (Constitutional Amendment)
     - IE-2023-act-P1  → (2023, "prv", "1")  (Private Act)
+    - IE-1937-constitution → (1937, "cons", "1")  (Constitution)
     """
     parts = norm_id.split("-")
     # IE-2024-act-1 → ["IE", "2024", "act", "1"]
     year = int(parts[1])
+
+    # Constitution: IE-1937-constitution
+    if len(parts) == 3 and parts[2] == "constitution":
+        return year, "cons", "1"
+
     raw_num = parts[3]
 
     if raw_num.startswith("C"):
@@ -85,15 +91,24 @@ class ISBClient(HttpClient):
         """Fetch the Act text from ISB.
 
         Tries XML first (/enacted/en/xml). If 404, falls back to
-        the print HTML view (/enacted/en/print) — pre-1995 acts
-        only have HTML, not XML.
+        the print HTML view (/enacted/en/print). Most acts have XML
+        available; the fallback is rare.
 
-        Supports act types: act, ca (constitutional amendment), prv (private).
+        Special case: Constitution (IE-1937-constitution) only exists
+        as HTML at /eli/cons/en/html — no XML endpoint.
+
+        Supports act types: act, ca (constitutional amendment),
+        prv (private), cons (constitution).
         """
         year, act_type, number = _parse_norm_id(norm_id)
+
+        # Constitution: only available as HTML
+        if act_type == "cons":
+            return self._get(f"{self._base_url}/eli/cons/en/html")
+
         eli_path = f"{self._base_url}/eli/{year}/{act_type}/{number}/enacted/en"
 
-        # Try XML first (available for ~1995+ acts)
+        # Try XML first (available for most acts)
         try:
             return self._get(f"{eli_path}/xml")
         except requests.HTTPError as e:
@@ -110,8 +125,17 @@ class ISBClient(HttpClient):
 
         URL: /v1/legislation?act_year={year}&act_no={number}&limit=1
         Returns the raw JSON response bytes.
+
+        Constitution (cons type) is not in the API — return empty
+        JSON to avoid a wasted round-trip. The parser handles
+        Constitution metadata directly.
         """
         year, act_type, number = _parse_norm_id(norm_id)
+
+        # Constitution is not in the Oireachtas API
+        if act_type == "cons":
+            return b'{"results": [], "head": {}}'
+
         url = f"{self._api_base}/v1/legislation"
         return self._get(
             url,
