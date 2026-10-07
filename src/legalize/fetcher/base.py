@@ -159,6 +159,18 @@ class HttpClient(LegislativeClient):
                     time.sleep(wait)
                     self._wait_rate_limit()
                     continue
+                if resp.status_code >= 500:
+                    # raise_for_status() keeps the URL and drops the body, and the body
+                    # is what says whether the source is down, rate-limiting us or
+                    # refusing the runner. Without it a daily that fails every day in CI
+                    # but works from a laptop (legalize-lt) cannot be diagnosed.
+                    logger.warning(
+                        "%s %s -> HTTP %d: %s",
+                        method,
+                        url,
+                        resp.status_code,
+                        resp.text[:300].replace("\n", " "),
+                    )
                 resp.raise_for_status()
                 return resp
             except requests.HTTPError:
