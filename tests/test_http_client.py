@@ -143,6 +143,25 @@ class TestHttpClientRetry:
         client.close()
 
 
+class TestHttpClientServerError:
+    def test_logs_the_body_of_a_500(self, caplog):
+        """A 500 that only ever shows up from CI is undiagnosable without its body."""
+        client = ConcreteHttpClient(max_retries=3, requests_per_second=0)
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 500
+        mock_resp.text = "Access denied\nfor this network"
+        mock_resp.raise_for_status = MagicMock(side_effect=requests.HTTPError("500"))
+        client._session.request = MagicMock(return_value=mock_resp)
+
+        with caplog.at_level("WARNING"), pytest.raises(requests.HTTPError):
+            client._get("https://example.com/test")
+
+        assert "HTTP 500: Access denied for this network" in caplog.text
+        assert client._session.request.call_count == 1  # 500 is still not retried
+        client.close()
+
+
 class TestHttpClientRateLimit:
     def test_rate_limit_enforced(self):
         """Rate limiter should sleep between requests."""
