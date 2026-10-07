@@ -150,7 +150,10 @@ class TestHttpClientServerError:
 
         mock_resp = MagicMock()
         mock_resp.status_code = 500
-        mock_resp.text = "Access denied\nfor this network"
+        mock_resp.text = (
+            "<!DOCTYPE HTML><html><head><style>html { margin: 0 }</style></head>"
+            "<body><h1>Access denied</h1>\n<p>for this network</p></body></html>"
+        )
         mock_resp.raise_for_status = MagicMock(side_effect=requests.HTTPError("500"))
         client._session.request = MagicMock(return_value=mock_resp)
 

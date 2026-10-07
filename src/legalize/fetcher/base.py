@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import threading
+import re
 import time
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
@@ -72,6 +73,13 @@ _DEFAULT_USER_AGENT = "legalize-bot/1.0 (+https://github.com/legalize-dev/legali
 # all our endpoints are GETs with idempotent semantics.
 # 409 added for Normattiva's WAF which returns Conflict under load.
 _RETRY_STATUS_CODES = (409, 429, 502, 503, 504)
+
+
+def _body_snippet(text: str, limit: int = 300) -> str:
+    """The readable part of an error body: an HTML error page opens with its doctype and CSS."""
+    text = re.sub(r"<(style|script)\b.*?</\1>", " ", text, flags=re.S | re.I)
+    text = re.sub(r"<[^>]+>", " ", text)
+    return re.sub(r"\s+", " ", text).strip()[:limit]
 
 
 class HttpClient(LegislativeClient):
@@ -169,7 +177,7 @@ class HttpClient(LegislativeClient):
                         method,
                         url,
                         resp.status_code,
-                        resp.text[:300].replace("\n", " "),
+                        _body_snippet(resp.text),
                     )
                 resp.raise_for_status()
                 return resp
