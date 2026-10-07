@@ -54,6 +54,7 @@ METADATA_FIELDS = {
 }
 
 REFORM_FIELDS = {
+    "has_source_date": "persisted",
     "date": "persisted",
     "norm_id": "persisted",
     # Reconstructed on load from the versions when absent, so it is not written
@@ -78,7 +79,7 @@ def _norm() -> ParsedNorm:
         jurisdiction="pt-20",
         last_modified=date(1999, 3, 23),
         pdf_url="https://files.diariodarepublica.pt/x.pdf",
-        subjects=("Ensino Superior", "Estatuto"),
+        subjects=("Ensino Superior", "area of freedom, security and justice"),
         summary="Aprova o Estatuto",
         extra=(("surface", "pub"), ("official_number", "16/94")),
         text_state=TextState.AS_ENACTED,
@@ -96,6 +97,7 @@ def _norm() -> ParsedNorm:
         norm_id="DRE-DEC-LEI-94-1999",
         affected_blocks=("texto",),
         change_note="Alterada a redacção do artº 34º e aditado o art. 56º-A",
+        has_source_date=False,
     )
     return ParsedNorm(metadata=metadata, blocks=(block,), reforms=(reform,))
 

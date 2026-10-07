@@ -45,9 +45,10 @@ def build_commit_info(
 
     trailers = {
         "Source-Id": reform.norm_id,
-        "Source-Date": reform.date.isoformat(),
         "Norm-Id": norm_metadata.identifier,
     }
+    if reform.has_source_date:
+        trailers["Source-Date"] = reform.date.isoformat()
 
     # The pipeline's own identity, never the ambient git config. These commits
     # get regenerated, and an author taken from whoever ran it makes every
@@ -67,7 +68,7 @@ def build_commit_info(
         trailers=trailers,
         author_name=author_name,
         author_email=author_email,
-        author_date=reform.date,
+        author_date=reform.date if reform.has_source_date else norm_metadata.publication_date,
         file_path=file_path,
         content=content,
     )
@@ -133,7 +134,7 @@ def _build_body(
     body = (
         f"Norm: {metadata.identifier}\n"
         f"Disposition: {reform.norm_id}\n"
-        f"Date: {date_str}\n"
+        f"{'Date' if reform.has_source_date else 'Version effective date'}: {date_str}\n"
         f"Source: {metadata.source}\n"
         f"\n"
         f"Affected articles: {affected_str}"

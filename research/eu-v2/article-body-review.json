@@ -1,0 +1,154 @@
+{
+  "scope": "All 18,545 law files in the final rebuilt Git tree; all 14 metric candidates reviewed against their exact cached official sources.",
+  "candidates": [
+    {
+      "law": "32009R0392",
+      "source_id": "02009R0392-20190726",
+      "heading": "#### Article 17",
+      "scope": "data-eu-reprocess",
+      "classification": "source_omission",
+      "evidence": "The reproduced Athens Convention deliberately omits these provisions; source notes E0006/E0007 identify the exclusion.",
+      "source_sha256": "ca541f9c17bca808c10bf747ac32cce405370451675737dd3923fed46780d3ad",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02009R0392-20190726"
+    },
+    {
+      "law": "32009R0392",
+      "source_id": "02009R0392-20190726",
+      "heading": "#### Article 17bis",
+      "scope": "data-eu-reprocess",
+      "classification": "source_omission",
+      "evidence": "The reproduced Athens Convention deliberately omits these provisions; source notes E0006/E0007 identify the exclusion.",
+      "source_sha256": "ca541f9c17bca808c10bf747ac32cce405370451675737dd3923fed46780d3ad",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02009R0392-20190726"
+    },
+    {
+      "law": "32009R0392",
+      "source_id": "02009R0392-20190726",
+      "heading": "#### Article 22",
+      "scope": "data-eu-reprocess",
+      "classification": "source_omission",
+      "evidence": "The reproduced Athens Convention deliberately omits these provisions; source notes E0006/E0007 identify the exclusion.",
+      "source_sha256": "ca541f9c17bca808c10bf747ac32cce405370451675737dd3923fed46780d3ad",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02009R0392-20190726"
+    },
+    {
+      "law": "32011R0492",
+      "source_id": "02011R0492-20210801",
+      "heading": "#### Article 13",
+      "scope": "data-eu-reprocess",
+      "classification": "deleted",
+      "evidence": "The official modref link carries a DELETED annotation and a dash placeholder.",
+      "source_sha256": "59f56189620c60c00f65c1919036ebc84f08f7f5e8d7257470e20d8846addb70",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02011R0492-20210801"
+    },
+    {
+      "law": "32013R0321",
+      "source_id": "02013R0321-20251104",
+      "heading": "#### Article 4",
+      "scope": "data-eu-reprocess",
+      "classification": "reserved",
+      "evidence": "The official subtitle explicitly says Not used.",
+      "source_sha256": "73ee9aeda46296e405d057737436e37954b665136cf7440b609884ffa9c221bd",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02013R0321-20251104"
+    },
+    {
+      "law": "32016R1076",
+      "source_id": "02016R1076-20200820",
+      "heading": "##### Article 6",
+      "scope": "data-eu-reprocess",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "beb3485da37eeb3e455035912fe13cbf057b7c7d1c2472325518ed51d9dac4ea",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02016R1076-20200820"
+    },
+    {
+      "law": "32021R1423",
+      "source_id": "32021R1423",
+      "heading": "#### Article 6",
+      "scope": "data-eu-reprocess",
+      "classification": "substantive_subtitle",
+      "evidence": "The official subtitle is itself the complete review obligation; the metric ignores subtitle text.",
+      "source_sha256": "1d90cf49612d8bea50fbf3560d8fcb4ac5c61b13f4e1047f10570385fb33edf0",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1423"
+    },
+    {
+      "law": "32017D0824",
+      "source_id": "02017D0824-20211101",
+      "heading": "##### Article 2",
+      "scope": "data-eu-expansion",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "b3099c7a4ddbb47b8682d8c383f9906759bc70a7b1456b78fa27ba8c01a19de3",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02017D0824-20211101"
+    },
+    {
+      "law": "32017D0824",
+      "source_id": "02017D0824-20211101",
+      "heading": "##### Article 7",
+      "scope": "data-eu-expansion",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "b3099c7a4ddbb47b8682d8c383f9906759bc70a7b1456b78fa27ba8c01a19de3",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02017D0824-20211101"
+    },
+    {
+      "law": "32017D0824",
+      "source_id": "02017D0824-20211101",
+      "heading": "##### Article 9",
+      "scope": "data-eu-expansion",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "b3099c7a4ddbb47b8682d8c383f9906759bc70a7b1456b78fa27ba8c01a19de3",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02017D0824-20211101"
+    },
+    {
+      "law": "32017D0824",
+      "source_id": "02017D0824-20211101",
+      "heading": "##### Article 11",
+      "scope": "data-eu-expansion",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "b3099c7a4ddbb47b8682d8c383f9906759bc70a7b1456b78fa27ba8c01a19de3",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02017D0824-20211101"
+    },
+    {
+      "law": "32017D0824",
+      "source_id": "02017D0824-20211101",
+      "heading": "##### Article 13",
+      "scope": "data-eu-expansion",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "b3099c7a4ddbb47b8682d8c383f9906759bc70a7b1456b78fa27ba8c01a19de3",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02017D0824-20211101"
+    },
+    {
+      "law": "32017D0824",
+      "source_id": "02017D0824-20211101",
+      "heading": "##### Article 14",
+      "scope": "data-eu-expansion",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "b3099c7a4ddbb47b8682d8c383f9906759bc70a7b1456b78fa27ba8c01a19de3",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02017D0824-20211101"
+    },
+    {
+      "law": "32017D0824",
+      "source_id": "02017D0824-20211101",
+      "heading": "##### Article 22",
+      "scope": "data-eu-expansion",
+      "classification": "internal_heading",
+      "evidence": "The source contains provisions below a subdivision heading; the Markdown heading closes this structural metric early.",
+      "source_sha256": "b3099c7a4ddbb47b8682d8c383f9906759bc70a7b1456b78fa27ba8c01a19de3",
+      "official_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02017D0824-20211101"
+    }
+  ],
+  "counts": {
+    "source_omission": 3,
+    "deleted": 1,
+    "reserved": 1,
+    "internal_heading": 8,
+    "substantive_subtitle": 1
+  },
+  "confirmed_dropped_body_candidates": 0,
+  "corpus_head": "f78c15e5652859371b7e1062964d3ea383c2f041"
+}

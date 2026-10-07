@@ -149,7 +149,8 @@ fix it later" — every bootstrap rewrites thousands of commits.
 ### 2. Historical versions
 
 Legalize exists so that **every reform becomes a git commit**. One commit per
-version, in chronological order, authored at the date the reform took effect.
+version, in source-version order. Git author dates follow the source's official
+publication dates, as required by SPEC v0.4 §Dates.
 Without this, the repo is just "current text as a file", which does not
 differentiate from any other scrape.
 
@@ -161,9 +162,12 @@ Before you write a single line of parser code, you must answer:
    or point-in-time queries.)
 2. What is the fetch cost for the full history? (Number of HTTP requests,
    approximate bytes per version, rate-limit tolerance.)
-3. What is the effective date of each version? (Required to set
-   `GIT_AUTHOR_DATE` correctly. If the source only gives promulgation dates,
-   use those; otherwise use entry-into-force dates.)
+3. What are each version's publication and effective dates? Keep them distinct:
+   the effective date selects the text and its `last_updated`; `Source-Date`
+   and `GIT_AUTHOR_DATE` use official publication. When that publication date
+   is unknown, omit `Source-Date` and use the norm's publication date for the
+   Git author, as the spec requires. Never invent a publication date from a
+   consolidation's applicability date.
 
 **Do not ship a single-snapshot country** (one commit per law = the current
 text) unless you have tried and **documented in RESEARCH-{CC}.md** why

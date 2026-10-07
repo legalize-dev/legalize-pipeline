@@ -1,5 +1,25 @@
 {
+  "head": {
+    "link": [],
+    "vars": [
+      "celex",
+      "eli",
+      "title",
+      "date",
+      "entryForce",
+      "endValidity",
+      "force",
+      "rtype",
+      "hasCons",
+      "eea",
+      "signature",
+      "publicationDate",
+      "journal"
+    ]
+  },
   "results": {
+    "distinct": false,
+    "ordered": true,
     "bindings": [
       {
         "celex": {
@@ -15,7 +35,7 @@
         "title": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
+          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users’ rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -41,54 +61,27 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32015R2120"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2015/2120/oj"
-        },
-        "title": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-25"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2016-04-30"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2020-12-20"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "authors": {
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL|http://publications.europa.eu/resource/authority/corporate-body/EP"
         },
-        "author": {
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2015-11-26"
+        },
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/eff0e4b0-93df-11e5-983e-01aa75ed71a1"
         }
       },
       {
@@ -105,7 +98,7 @@
         "title": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
+          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users’ rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -131,54 +124,24 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32015R2120"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2015/2120/oj"
-        },
-        "title": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-25"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2016-04-30"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2022-06-30"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2015-11-26"
         },
-        "author": {
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/eff0e4b0-93df-11e5-983e-01aa75ed71a1"
         }
       },
       {
@@ -195,7 +158,7 @@
         "title": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
+          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users’ rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -221,54 +184,24 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32015R2120"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2015/2120/oj"
-        },
-        "title": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-25"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2016-04-30"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "9999-12-31"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2015-11-26"
         },
-        "author": {
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/eff0e4b0-93df-11e5-983e-01aa75ed71a1"
         }
       },
       {
@@ -285,7 +218,7 @@
         "title": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
+          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users’ rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -311,54 +244,24 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32015R2120"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2015/2120/oj"
-        },
-        "title": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-25"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-29"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2022-06-30"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2015-11-26"
         },
-        "author": {
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/eff0e4b0-93df-11e5-983e-01aa75ed71a1"
         }
       },
       {
@@ -375,7 +278,7 @@
         "title": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
+          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users’ rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -401,54 +304,24 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32015R2120"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2015/2120/oj"
-        },
-        "title": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-25"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-29"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "9999-12-31"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2015-11-26"
         },
-        "author": {
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/eff0e4b0-93df-11e5-983e-01aa75ed71a1"
         }
       },
       {
@@ -465,7 +338,7 @@
         "title": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
+          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users’ rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -491,54 +364,24 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32015R2120"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2015/2120/oj"
-        },
-        "title": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "Regulation (EU) 2015/2120 of the European Parliament and of the Council of 25 November 2015 laying down measures concerning open internet access and amending Directive 2002/22/EC on universal service and users\u2019 rights relating to electronic communications networks and services and Regulation (EU) No 531/2012 on roaming on public mobile communications networks within the Union (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-25"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2015-11-29"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2020-12-20"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2015-11-26"
         },
-        "author": {
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/eff0e4b0-93df-11e5-983e-01aa75ed71a1"
         }
       }
     ]

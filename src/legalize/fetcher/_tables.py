@@ -62,7 +62,7 @@ def render_table(
     # Detect <thead> for header row — fall back to first row otherwise
     head_row_idx = -1
     raw_rows: list[list[tuple[str, int, int]]] = []
-    for tr in table_el.iter():
+    for tr in _rows_of(table_el):
         tag = (tr.tag or "").lower() if isinstance(tr.tag, str) else ""
         if tag != "tr":
             continue
@@ -113,15 +113,55 @@ def render_table(
         while len(r) < width:
             r.append("")
 
-    header = expanded[0] if head_row_idx < 0 else expanded[head_row_idx]
-    body = [r for i, r in enumerate(expanded) if r is not header]
+    # Markdown pipe tables require a header row; the source often has none.
+    # Promoting the first row of data was losing it as data — 250 of 543
+    # sampled tables — and a borderless layout table (the BOE uses them for
+    # side-by-side signature blocks) has no header by definition.
+    if head_row_idx < 0:
+        header = [""] * width
+        body = expanded
+    else:
+        header = expanded[head_row_idx]
+        body = [r for r in expanded if r is not header]
 
-    # If no thead and first row looks like a data row, still promote it as header
     lines = ["| " + " | ".join(_clean(c) for c in header) + " |"]
     lines.append("| " + " | ".join("---" for _ in range(width)) + " |")
     for r in body:
         lines.append("| " + " | ".join(_clean(c) for c in r) + " |")
+
+    caption = _caption_of(table_el, cell_extractor)
+    if caption:
+        return f"{caption}\n\n" + "\n".join(lines)
     return "\n".join(lines)
+
+
+def _rows_of(table_el: etree._Element):
+    """Every <tr> of *this* table, not of the tables inside its cells.
+
+    ``iter()`` walked the whole subtree, so a nested table's rows were spliced
+    into the outer grid and padded to the wider of the two.
+    """
+    for child in table_el:
+        if not isinstance(child.tag, str):
+            continue
+        tag = child.tag.lower()
+        if tag == "tr":
+            yield child
+        elif tag in ("thead", "tbody", "tfoot"):
+            for tr in child:
+                if isinstance(tr.tag, str) and tr.tag.lower() == "tr":
+                    yield tr
+
+
+def _caption_of(
+    table_el: etree._Element,
+    cell_extractor: Callable[[etree._Element], str],
+) -> str:
+    """The table's own title, emitted as the paragraph above it."""
+    for child in table_el:
+        if isinstance(child.tag, str) and child.tag.lower() == "caption":
+            return _clean(cell_extractor(child))
+    return ""
 
 
 def _clean(text: str) -> str:

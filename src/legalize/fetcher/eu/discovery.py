@@ -1,7 +1,9 @@
 """EUR-Lex discovery — European Union.
 
-Uses SPARQL queries against the CELLAR endpoint to discover all EU
-regulations in scope (REG, REG_IMPL, REG_DEL, REG_FINANC).
+Uses SPARQL queries against the CELLAR endpoint to discover every act whose
+resource type is in scope (``reg_types`` in config.yaml: regulations,
+directives, decisions, treaties and international agreements) and whose status
+EUR-Lex states.
 
 Discovery is paginated via cursor-based filtering to handle Virtuoso's
 OFFSET limitations (errors above ~10K offset). Each page fetches 1000
@@ -20,6 +22,7 @@ from legalize.fetcher.eu.client import (
     DEFAULT_REG_TYPES,
     EURLexClient,
     _CDM,
+    _ACT_PATTERN,
     _LANG_ENG,
     _RTYPE_BASE,
 )
@@ -56,12 +59,13 @@ class EURLexDiscovery(NormDiscovery):
         return f"FILTER (?rtype IN ({type_uris}))"
 
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
-        """Discover all in-force regulation CELEX numbers.
+        """Discover every act in scope, whatever its current status.
 
         Uses cursor-based pagination with ``FILTER (?celex > "last")`` to
         avoid Virtuoso timeout errors on large OFFSET values.
 
-        Only returns regulations that are currently in force.
+        Returns acts EUR-Lex states a status for — in force or not. See the
+        comment on the in-force clause below for what that leaves out and why.
         """
         if not isinstance(client, EURLexClient):
             raise TypeError(f"Expected EURLexClient, got {type(client).__name__}")
@@ -87,7 +91,11 @@ SELECT DISTINCT ?celex WHERE {{
     ?work cdm:work_has_resource-type <{_RTYPE_BASE}CORRIGENDUM> .
   }}
   FILTER NOT EXISTS {{ ?work cdm:do_not_index "true"^^xsd:boolean . }}
-  ?work cdm:resource_legal_in-force "true"^^xsd:boolean .
+  # Bound, not true: repealed and expired law is law, and a corpus without it
+  # cannot answer what a rule said in 2010. What stays out is the act EUR-Lex
+  # states no status for at all — 82,326 spent one-shot instruments whose
+  # status we would have to invent (RESEARCH-EU.md §2.1, §4.3).
+  ?work cdm:resource_legal_in-force ?force .
   ?work cdm:resource_legal_id_celex ?celex .
   ?expr cdm:expression_belongs_to_work ?work .
   ?expr cdm:expression_uses_language <{_LANG_ENG}> .
@@ -131,10 +139,7 @@ LIMIT {_PAGE_SIZE}"""
     ) -> Iterator[str]:
         """Discover regulations published or amended on a specific date.
 
-        Two queries:
-        1. New regulations with ``work_date_document == target_date``
-        2. Regulations with new consolidated text dated ``target_date``
-           (amendment published that day)
+        Find journal publications, source snapshots and affected base acts.
         """
         if not isinstance(client, EURLexClient):
             raise TypeError(f"Expected EURLexClient, got {type(client).__name__}")
@@ -147,13 +152,8 @@ LIMIT {_PAGE_SIZE}"""
         query = f"""PREFIX cdm: <{_CDM}>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT DISTINCT ?celex WHERE {{
-  ?work cdm:work_has_resource-type ?rtype .
-  {rtype_filter}
-  FILTER NOT EXISTS {{
-    ?work cdm:work_has_resource-type <{_RTYPE_BASE}CORRIGENDUM> .
-  }}
-  ?work cdm:resource_legal_id_celex ?celex .
-  ?work cdm:work_date_document "{iso_date}"^^xsd:date .
+{_ACT_PATTERN.format(types=client._rtype_uris())}
+  FILTER(?publicationDate = "{iso_date}"^^xsd:date)
 }}"""
         result = client.sparql_query(query)
         for binding in result.get("results", {}).get("bindings", []):
@@ -170,13 +170,37 @@ SELECT DISTINCT ?baseCelex WHERE {{
   ?cons cdm:work_has_resource-type <{_RTYPE_BASE}CONS_TEXT> .
   ?cons cdm:work_date_document "{iso_date}"^^xsd:date .
   ?cons cdm:resource_legal_id_celex ?consCelex .
-  FILTER(REGEX(?consCelex, "^0[0-9]{{4}}R"))
   ?cons cdm:act_consolidated_based_on_resource_legal ?baseWork .
+  ?baseWork cdm:work_has_resource-type ?rtype .
+  {rtype_filter}
+  ?baseWork cdm:resource_legal_in-force ?force .
   ?baseWork cdm:resource_legal_id_celex ?baseCelex .
 }}"""
         result = client.sparql_query(query)
         for binding in result.get("results", {}).get("bindings", []):
             celex = binding["baseCelex"]["value"]
+            if celex not in seen:
+                seen.add(celex)
+                yield celex
+
+        # 3. An unconsolidated law still needs an amendment-history commit.
+        query = f"""PREFIX cdm: <{_CDM}>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?celex WHERE {{
+  ?work cdm:work_has_resource-type ?rtype .
+  {rtype_filter}
+  ?work cdm:resource_legal_id_celex ?celex .
+  ?work cdm:resource_legal_in-force ?force .
+  ?amender cdm:resource_legal_amends_resource_legal ?work .
+  OPTIONAL {{ ?amender cdm:resource_legal_published_in_official-journal ?journal .
+    ?journal cdm:work_date_document ?journalDate . }}
+  OPTIONAL {{ ?amender cdm:official-journal-act_date_publication ?actPublicationDate . }}
+  BIND(COALESCE(?actPublicationDate, ?journalDate) AS ?publicationDate)
+  FILTER(?publicationDate = "{iso_date}"^^xsd:date)
+}}"""
+        result = client.sparql_query(query)
+        for binding in result.get("results", {}).get("bindings", []):
+            celex = binding["celex"]["value"]
             if celex not in seen:
                 seen.add(celex)
                 yield celex

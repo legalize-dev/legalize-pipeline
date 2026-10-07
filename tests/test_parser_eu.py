@@ -58,7 +58,8 @@ class TestMetadataParser:
         assert meta.country == "eu"
         assert meta.rank == Rank("regulation")
         assert meta.status == NormStatus.IN_FORCE
-        assert meta.publication_date == date(2016, 4, 27)
+        assert meta.publication_date == date(2016, 5, 4)
+        assert dict(meta.extra)["document_date"] == "2016-04-27"
         assert "protection" in meta.title.lower() or "personal data" in meta.title.lower()
         assert meta.department  # Should have authors
         assert "European Parliament" in meta.department
@@ -68,7 +69,8 @@ class TestMetadataParser:
         meta = meta_parser.parse(data, "32024R0903")
         assert meta.identifier == "32024R0903"
         assert meta.country == "eu"
-        assert meta.publication_date == date(2024, 3, 13)  # document date, not entry into force
+        assert meta.publication_date == date(2024, 3, 22)
+        assert dict(meta.extra)["document_date"] == "2024-03-13"
 
     def test_sfdr_metadata(self, meta_parser: EURLexMetadataParser):
         data = _load("32019R2088_metadata.json")
@@ -97,9 +99,23 @@ class TestMetadataParser:
         data = _load("32016R0679_metadata.json")
         meta = meta_parser.parse(data, "32016R0679")
         extra_keys = {k for k, v in meta.extra}
-        assert "celex" in extra_keys
         assert "eli" in extra_keys
-        assert "regulation_type" in extra_keys
+        assert "resource_type" in extra_keys
+
+    def test_celex_is_not_repeated_in_extra(self, meta_parser: EURLexMetadataParser):
+        """``celex`` was the identifier a second time, byte for byte."""
+        data = _load("32016R0679_metadata.json")
+        meta = meta_parser.parse(data, "32016R0679")
+        assert meta.identifier == "32016R0679"
+        assert "celex" not in {k for k, v in meta.extra}
+
+    def test_resource_type_replaces_regulation_type(self, meta_parser: EURLexMetadataParser):
+        """The old name stops being true as soon as directives are in scope."""
+        data = _load("32016R0679_metadata.json")
+        meta = meta_parser.parse(data, "32016R0679")
+        extra = dict(meta.extra)
+        assert extra["resource_type"] == "REG"
+        assert "regulation_type" not in extra
 
     def test_source_is_eli(self, meta_parser: EURLexMetadataParser):
         data = _load("32016R0679_metadata.json")

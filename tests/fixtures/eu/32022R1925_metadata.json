@@ -1,5 +1,25 @@
 {
+  "head": {
+    "link": [],
+    "vars": [
+      "celex",
+      "eli",
+      "title",
+      "date",
+      "entryForce",
+      "endValidity",
+      "force",
+      "rtype",
+      "hasCons",
+      "eea",
+      "signature",
+      "publicationDate",
+      "journal"
+    ]
+  },
   "results": {
+    "distinct": false,
+    "ordered": true,
     "bindings": [
       {
         "celex": {
@@ -15,52 +35,7 @@
         "title": {
           "type": "literal",
           "xml:lang": "en",
-          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14\u00a0September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2022-09-14"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2022-11-01"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "9999-12-31"
-        },
-        "force": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
-          "value": "1"
-        },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
-        },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32022R1925"
-        },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2022/1925/oj"
-        },
-        "title": {
-          "type": "literal",
-          "xml:lang": "en",
-          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14\u00a0September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
+          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14 September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -86,54 +61,32 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32022R1925"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2022/1925/oj"
-        },
-        "title": {
-          "type": "literal",
-          "xml:lang": "en",
-          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14\u00a0September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2022-09-14"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2023-06-25"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "9999-12-31"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "signature": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-09-14"
         },
-        "author": {
+        "authors": {
+          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL|http://publications.europa.eu/resource/authority/corporate-body/EP"
+        },
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-10-12"
+        },
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/CONSIL"
+          "value": "http://publications.europa.eu/resource/cellar/b9d59d6a-49c6-11ed-92ed-01aa75ed71a1"
         }
       },
       {
@@ -150,7 +103,7 @@
         "title": {
           "type": "literal",
           "xml:lang": "en",
-          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14\u00a0September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
+          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14 September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -176,54 +129,29 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
-        }
-      },
-      {
-        "celex": {
+        "hasCons": {
           "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#string",
-          "value": "32022R1925"
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
         },
-        "eli": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
-          "value": "http://data.europa.eu/eli/reg/2022/1925/oj"
-        },
-        "title": {
-          "type": "literal",
-          "xml:lang": "en",
-          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14\u00a0September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
-        },
-        "date": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2022-09-14"
-        },
-        "entryForce": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "2023-05-02"
-        },
-        "endValidity": {
-          "type": "literal",
-          "datatype": "http://www.w3.org/2001/XMLSchema#date",
-          "value": "9999-12-31"
-        },
-        "force": {
+        "eea": {
           "type": "literal",
           "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
           "value": "1"
         },
-        "rtype": {
-          "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
+        "signature": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-09-14"
         },
-        "author": {
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-10-12"
+        },
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/b9d59d6a-49c6-11ed-92ed-01aa75ed71a1"
         }
       },
       {
@@ -240,7 +168,7 @@
         "title": {
           "type": "literal",
           "xml:lang": "en",
-          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14\u00a0September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
+          "value": "Regulation (EU) 2022/1925 of the European Parliament and of the Council of 14 September 2022 on contestable and fair markets in the digital sector and amending Directives (EU) 2019/1937 and (EU) 2020/1828 (Digital Markets Act) (Text with EEA relevance)"
         },
         "date": {
           "type": "literal",
@@ -266,9 +194,29 @@
           "type": "uri",
           "value": "http://publications.europa.eu/resource/authority/resource-type/REG"
         },
-        "author": {
+        "hasCons": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#integer",
+          "value": "1"
+        },
+        "eea": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+          "value": "1"
+        },
+        "signature": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-09-14"
+        },
+        "publicationDate": {
+          "type": "literal",
+          "datatype": "http://www.w3.org/2001/XMLSchema#date",
+          "value": "2022-10-12"
+        },
+        "journal": {
           "type": "uri",
-          "value": "http://publications.europa.eu/resource/authority/corporate-body/EP"
+          "value": "http://publications.europa.eu/resource/cellar/b9d59d6a-49c6-11ed-92ed-01aa75ed71a1"
         }
       }
     ]

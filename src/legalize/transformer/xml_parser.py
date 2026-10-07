@@ -382,10 +382,10 @@ def extract_reforms(blocks: list[Block]) -> list[Reform]:
 
 
 def get_block_at_date(block: Block, target_date: date) -> Version | None:
-    applicable = [v for v in block.versions if v.publication_date <= target_date]
+    applicable = [v for v in block.versions if v.in_force_from <= target_date]
     if not applicable:
         return None
-    return max(applicable, key=lambda v: v.publication_date)
+    return max(applicable, key=lambda v: v.in_force_from)
 
 
 # ─────────────────────────────────────────────

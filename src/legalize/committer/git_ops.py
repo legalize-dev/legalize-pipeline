@@ -214,7 +214,7 @@ class GitRepo:
         self._run(["sparse-checkout", "add", directory])
         self._cones.add(directory)
 
-    def commit(self, info: CommitInfo) -> str | None:
+    def commit(self, info: CommitInfo, *, allow_empty: bool = False) -> str | None:
         """Creates a commit with the CommitInfo data.
 
         Sets GIT_AUTHOR_DATE to the historical BOE date
@@ -250,7 +250,10 @@ class GitRepo:
             "GIT_COMMITTER_EMAIL": self._committer_email,
         }
 
-        self._run(["commit", "-m", message], env=env)
+        args = ["commit", "-m", message]
+        if allow_empty:
+            args.append("--allow-empty")
+        self._run(args, env=env)
 
         sha = self._run(["rev-parse", "HEAD"])
         logger.info("Commit created: %s — %s", sha[:8], info.subject)
