@@ -52,6 +52,20 @@ TEXT_STATE: dict[str, TextState] = {
 }
 
 
+# Countries whose ``publication_date`` is the date of the version in the file, not of
+# the act. The identifier names the law and not one act, so two files under one name
+# can never be two acts, and a changed date only means a newer version. This is a
+# departure from the spec ("Original publication date"): the proper fix is writing
+# the law's own date, which changes every file of the country and waits for its
+# rebuild. Until then the guard against acts that share a file name (git_ops) must
+# not fire for these, or it refuses every amendment to a law that has changed since.
+VERSIONED_PUBLICATION_DATE: frozenset[str] = frozenset(
+    {
+        "nl",  # BWBR id names the law; publication_date is the toestand's inwerkingtreding
+    }
+)
+
+
 def text_state_for(country_code: str) -> TextState:
     """Country default text state. Absent means POINT_IN_TIME (spec v0.3)."""
     return TEXT_STATE.get(country_code, TextState.POINT_IN_TIME)

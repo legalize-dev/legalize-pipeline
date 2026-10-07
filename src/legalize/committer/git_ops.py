@@ -17,6 +17,7 @@ import subprocess
 from datetime import date as date_type
 from pathlib import Path, PurePosixPath
 
+from legalize.countries import VERSIONED_PUBLICATION_DATE
 from legalize.models import CommitInfo
 from legalize.committer.message import format_commit_message
 
@@ -48,6 +49,7 @@ def _clean_git_env(extra: dict | None = None) -> dict:
 
 
 _PUBLISHED_ON = re.compile(r"^publication_date:\s*\"?(\d{4}-\d{2}-\d{2})", re.MULTILINE)
+_COUNTRY = re.compile(r"^country:\s*\"?([a-z]{2})", re.MULTILINE)
 
 
 def _published_on(markdown: str) -> str | None:
@@ -67,6 +69,9 @@ def _is_another_act(existing: str, incoming: str) -> bool:
     dates have to be readable for the check to fire, so a country that does not
     write one is left exactly as it was.
     """
+    country = _COUNTRY.search(incoming)
+    if country and country.group(1) in VERSIONED_PUBLICATION_DATE:
+        return False
     old, new = _published_on(existing), _published_on(incoming)
     return bool(old and new and old != new)
 
