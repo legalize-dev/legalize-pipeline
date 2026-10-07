@@ -134,3 +134,44 @@ def test_the_commit_index_is_returned_not_just_stored(tmp_path):
     )
     assert ("DRE-SRC-1", "DRE-PORT-953-2008") in repo.load_existing_commits()
     assert repo.has_commit_with_source_id("DRE-SRC-1", "DRE-PORT-953-2008")
+
+
+NL_APRIL = """---
+title: "Algemene wet inzake rijksbelastingen"
+identifier: "BWBR0002320"
+country: "nl"
+publication_date: "2026-04-11"
+---
+# Artikel 1
+"""
+
+NL_OCTOBER = NL_APRIL.replace("2026-04-11", "2026-10-01").replace(
+    "Artikel 1", "Artikel 1, gewijzigd"
+)
+
+
+def test_a_dutch_law_takes_its_new_version(tmp_path):
+    """nl's publication_date is the date of the version, so a new one changes it.
+
+    The guard read that as a second act and refused 16 of the 22 laws amended on
+    2026-10-01: Holland was publishing a quarter of its amendments.
+    """
+    repo = _repo(tmp_path)
+    path = "nl/BWBR0002320.md"
+    repo.write_and_add(path, NL_APRIL)
+
+    assert repo.write_and_add(path, NL_OCTOBER) is True
+    assert (tmp_path / "repo" / path).read_text(encoding="utf-8") == NL_OCTOBER
+    assert repo.refused == []
+
+
+def test_the_guard_still_holds_where_the_date_is_the_acts_own(tmp_path):
+    repo = _repo(tmp_path)
+    path = "pt/DRE-PORT-953-2008.md"
+    repo.write_and_add(path, FIRST.replace("identifier:", 'country: "pt"\nidentifier:'))
+
+    assert (
+        repo.write_and_add(path, SECOND.replace("identifier:", 'country: "pt"\nidentifier:'))
+        is False
+    )
+    assert repo.refused == [path]
