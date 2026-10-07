@@ -54,7 +54,8 @@ def test_amending_act_is_not_repeated_for_a_later_journal_correction(monkeypatch
     ]
 
 
-def test_frozen_source_resume_preserves_provenance_and_rejects_changed_bytes(tmp_path):
+def test_frozen_source_resume_preserves_provenance_and_rejects_changed_bytes(tmp_path, monkeypatch):
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1]))
     from scripts.fetch_eu_reprocess import snapshot
 
     celex = "32016R0679"
