@@ -159,7 +159,7 @@ def daily(
 
             if not norm_ids:
                 console.print("    No changes")
-                state.last_summary_date = current_date
+                state.finish_day(current_date, errors)
                 continue
 
             console.print(f"    {len(norm_ids)} version(s) effective on {current_date}")
@@ -183,7 +183,7 @@ def daily(
                     errors.append(msg)
                     console.print(f"    [red]✗ {msg}[/red]")
 
-            state.last_summary_date = current_date
+            state.finish_day(current_date, errors)
 
     return finalize_daily(
         repo,

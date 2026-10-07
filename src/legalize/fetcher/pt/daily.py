@@ -180,7 +180,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
 
             if not norm_ids:
                 console.print("    No new norms found")
-                state.last_summary_date = current_date
+                state.finish_day(current_date, errors)
                 continue
 
             console.print(f"    {len(norm_ids)} norm(s) found")
@@ -219,7 +219,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                     errors.append(f"Error processing {norm_id}: {exc}")
                     logger.exception("Error processing %s", norm_id)
 
-            state.last_summary_date = current_date
+            state.finish_day(current_date, errors)
 
         # ---- 3. the laws today's acts amended: one commit each, body unchanged ----
         if amended_today and not dry_run:

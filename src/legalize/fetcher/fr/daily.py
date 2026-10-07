@@ -223,14 +223,14 @@ def daily(
         match = _find_increment_for_date(increments, current_date)
         if match is None:
             console.print("    No increment available (holiday/no changes)")
-            state.last_summary_date = current_date
+            state.finish_day(current_date, errors)
             continue
 
         filename, url = match
 
         if dry_run:
             console.print(f"    [dim]Would download {filename}[/dim]")
-            state.last_summary_date = current_date
+            state.finish_day(current_date, errors)
             continue
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -249,7 +249,7 @@ def daily(
 
         if not modified_ids:
             console.print("    No texts modified in scope")
-            state.last_summary_date = current_date
+            state.finish_day(current_date, errors)
             continue
 
         console.print(f"    {len(modified_ids)} text(s) modified")
@@ -308,7 +308,7 @@ def daily(
                 logger.error(msg, exc_info=True)
                 errors.append(msg)
 
-        state.last_summary_date = current_date
+        state.finish_day(current_date, errors)
 
     session.close()
 
