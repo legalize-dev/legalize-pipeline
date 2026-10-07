@@ -90,6 +90,18 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
+      # The resume cursor kept in .pipeline/<country>/state.json only advances over
+      # days that finished clean, so a failed day is retried instead of skipped. A
+      # fresh runner has no such file; this carries it between runs. The cache is
+      # saved only when the job succeeds, and an evicted or missing one falls back
+      # to the cursor read from git, which is how the daily worked before.
+      - name: Restore the daily's resume state
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: .pipeline/${{ matrix.country }}
+          key: daily-state-${{ matrix.country }}-${{ github.run_id }}
+          restore-keys: daily-state-${{ matrix.country }}-
+
       - name: Run daily pipeline
         env:
           INPUT_DATE: ${{ inputs.date }}

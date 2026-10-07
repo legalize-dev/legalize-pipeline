@@ -253,7 +253,7 @@ def generic_daily(
 
             if not modified_ids:
                 console.print("    No changes found")
-                state.last_summary_date = current_date
+                state.finish_day(current_date, errors)
                 continue
 
             console.print(f"    {len(modified_ids)} norm(s) modified")
@@ -302,7 +302,7 @@ def generic_daily(
                     logger.error(msg, exc_info=True)
                     errors.append(msg)
 
-            state.last_summary_date = current_date
+            state.finish_day(current_date, errors)
 
             # Checkpoint: push after each completed day so a mid-run failure
             # keeps the days already finished. Only push at day boundaries —

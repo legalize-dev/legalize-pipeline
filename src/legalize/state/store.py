@@ -58,9 +58,20 @@ def resolve_dates_to_process(
     if target_date:
         return [target_date]
 
+    # Two cursors, and the earlier one wins. Git's is the newest Source-Date, which
+    # says when something happened at the source, not what the daily got through:
+    # a failed day followed by a good one, or a version scheduled ahead of time,
+    # leaves it past work that never ran. The state's only advances over days that
+    # finished clean (see StateStore.finish_day) but does not exist on a fresh CI
+    # runner unless the workflow restored it. Each covers the other's blind spot;
+    # with no state, git alone decides, as it always did.
     start = state.last_summary_date
     if start is None:
         start = infer_last_date_from_git(repo_path)
+    else:
+        from_git = latest_source_date(repo_path)
+        if from_git is not None:
+            start = min(start, from_git)
     if start is None:
         return None
 
@@ -298,6 +309,19 @@ class StateStore:
     @last_summary_date.setter
     def last_summary_date(self, value: date) -> None:
         self._last_summary = value.isoformat()
+
+    def finish_day(self, day: date, errors: list[str]) -> None:
+        """Move the resume cursor over a day the daily has finished.
+
+        Only while the run has seen no error, and never backwards. A day that
+        failed is retried on the next run only if nothing after it advances the
+        cursor; without this a failed day 2 followed by a good day 3 is skipped
+        for good. Reprocessing is safe — commits are deduplicated by Source-Id and
+        Norm-Id — so holding the cursor back costs a refetch, not a duplicate.
+        """
+        current = self.last_summary_date
+        if not errors and (current is None or day > current):
+            self.last_summary_date = day
 
     def record_run(
         self,

@@ -197,3 +197,77 @@ def test_a_failed_save_leaves_the_previous_state_readable(tmp_path):
 
     assert json.loads(path.read_text(encoding="utf-8"))["last_summary"] == "2024-01-01"
     assert not list(tmp_path.glob(".state.json.*")), "the temp file was left behind"
+
+
+class TestFinishDay:
+    """The resume cursor only moves over days the run got through clean."""
+
+    def test_failed_day_holds_back_the_days_after_it(self, tmp_path):
+        """Four days downloaded and day 2 fails: day 2 must be retried, not skipped."""
+        state = StateStore(tmp_path / "state.json")
+        start = TODAY - timedelta(days=4)
+        state.last_summary_date = start
+        errors: list[str] = []
+
+        state.finish_day(start + timedelta(days=1), errors)  # day 1 clean
+        errors.append("Error discovering day 2")  # day 2 fails
+        state.finish_day(start + timedelta(days=3), errors)  # day 3 clean on its own
+        state.finish_day(start + timedelta(days=4), errors)  # day 4 clean on its own
+
+        assert state.last_summary_date == start + timedelta(days=1)
+
+    def test_never_moves_backwards(self, tmp_path):
+        """A backfill of an old date must not drag the cursor behind the live run."""
+        state = StateStore(tmp_path / "state.json")
+        state.last_summary_date = TODAY
+        state.finish_day(TODAY - timedelta(days=7), [])
+
+        assert state.last_summary_date == TODAY
+
+    def test_first_day_sets_it_from_nothing(self, tmp_path):
+        state = StateStore(tmp_path / "state.json")
+        state.finish_day(TODAY, [])
+
+        assert state.last_summary_date == TODAY
+
+
+class TestTwoCursors:
+    """resolve_dates_to_process takes the earlier of the state's cursor and git's."""
+
+    def _repo_at(self, tmp_path, source_date):
+        repo = _init_repo(tmp_path / "repo")
+        _commit(repo, "real data", source_id="X-1", source_date=source_date.isoformat())
+        return repo
+
+    def _state(self, tmp_path, last):
+        state = StateStore(tmp_path / "state.json")
+        if last is not None:
+            state.last_summary_date = last
+        return state
+
+    def test_state_behind_git_wins(self, tmp_path):
+        """Day 2 failed, days 3-4 committed: git says 4, the state still says 1."""
+        repo = self._repo_at(tmp_path, TODAY - timedelta(days=1))
+        state = self._state(tmp_path, TODAY - timedelta(days=4))
+
+        dates = resolve_dates_to_process(state, str(repo), None)
+
+        assert dates[0] == TODAY - timedelta(days=3)
+
+    def test_git_behind_state_wins(self, tmp_path):
+        """A stale or hand-edited state can't push the daily past what git proves."""
+        repo = self._repo_at(tmp_path, TODAY - timedelta(days=4))
+        state = self._state(tmp_path, TODAY)
+
+        dates = resolve_dates_to_process(state, str(repo), None)
+
+        assert dates[0] == TODAY - timedelta(days=3)
+
+    def test_no_state_falls_back_to_git(self, tmp_path):
+        """A fresh CI runner with no cache behaves exactly as before."""
+        repo = self._repo_at(tmp_path, TODAY - timedelta(days=2))
+        state = self._state(tmp_path, None)
+
+        dates = resolve_dates_to_process(state, str(repo), None)
+
+        assert dates[0] == TODAY - timedelta(days=1)

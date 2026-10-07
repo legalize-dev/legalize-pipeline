@@ -257,7 +257,7 @@ def daily(
                     logger.error(msg, exc_info=True)
                     errors.append(msg)
 
-            state.last_summary_date = current_date
+            state.finish_day(current_date, errors)
 
     return finalize_daily(
         repo,

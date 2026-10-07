@@ -327,6 +327,46 @@ class TestDailyATOrchestration:
 
         assert result == 0
 
+    def test_failed_day_is_retried_not_skipped(self, tmp_path):
+        """Several days pending, the second fails: the cursor stops before it.
+
+        Day 3 and the rest finish clean, but moving the cursor over them would
+        skip day 2 for good. The next run has to start at day 2.
+        """
+        from datetime import timedelta
+
+        from legalize.state.store import StateStore
+
+        config = self._make_config(tmp_path)
+        state_path = config.countries["at"].state_path
+        Path(state_path).parent.mkdir(parents=True)
+        seeded = StateStore(state_path)
+        seeded.last_summary_date = date.today() - timedelta(days=8)
+        seeded.save()
+
+        mock_client, mock_client_cls, mock_discovery, mock_disc_cls = self._mock_countries()
+        seen: list[date] = []
+
+        def discover(_client, day):
+            seen.append(day)
+            if len(seen) == 2:
+                raise RuntimeError("source down for this day")
+            return iter([])
+
+        mock_discovery.discover_daily.side_effect = discover
+
+        with (
+            patch("legalize.countries.get_client_class", return_value=mock_client_cls),
+            patch("legalize.countries.get_discovery_class", return_value=mock_disc_cls),
+            pytest.raises(NothingPublished),
+        ):
+            generic_daily(config, "at")
+
+        assert len(seen) >= 3, "the test needs days after the failing one"
+        after = StateStore(state_path)
+        after.load()
+        assert after.last_summary_date == seen[0]
+
     def test_discovery_error_ends_the_run_red(self, tmp_path):
         """Errors and nothing published is a failure, not a quiet zero.
 
