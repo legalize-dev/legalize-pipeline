@@ -143,13 +143,15 @@ def test_resuming_does_not_commit_the_same_reform_twice(corpus, monkeypatch):
     assert len(_dates(repo)) == 12
 
 
-def test_a_second_run_over_a_finished_history_adds_nothing(corpus, monkeypatch):
+def test_a_second_run_over_a_finished_history_adds_nothing(corpus, monkeypatch, capsys):
     config, repo = corpus
     monkeypatch.setattr("legalize.pipeline._IMPORT_CHUNK", 4)
     commit_all_fast(config, "pt")
+    capsys.readouterr()
 
     assert commit_all_fast(config, "pt") == 12
     assert len(_dates(repo)) == 12
+    assert "0 commits created" in capsys.readouterr().out
 
 
 def test_it_refuses_a_branch_it_cannot_continue_from(corpus):

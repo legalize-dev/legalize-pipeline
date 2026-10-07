@@ -1,0 +1,22 @@
+EU source-history spike, captured 2026-10-07
+Base CELEX: 31958R0001
+Official original publication: 1958-10-06 (OJ)
+Text state: point_in_time for dated source snapshots; consolidation dates are applicability, not publication.
+Raw files retained locally under countries/data-eu-reprocess/{sources,pdf}.
+Git pre-1970 author date uses SPEC clamp; Source-Date remains 1958-10-06.
+Consolidations have no source publication date: omit Source-Date, author-date fallback to base publication.
+
+Source ID | applicability/publication | format | bytes | SHA-256
+31958R0001 | 1958-10-06 | html | 4786 | 8f9d521c6c8cdac1de5ddf78716cc05fae0ed611a3003c341399fd872e6f326f
+01958R0001-19730101 | 1973-01-01 | pdf | 24325 | c9026879af5f9cadba8ac6c83deba46b0478582d4f08066ee57214f6c92420af
+01958R0001-19810101 | 1981-01-01 | pdf | 24255 | a1db44f9fd74cd597c938f4516ffa8b8e98848713c9ec84c4a27f384f8183b13
+01958R0001-19860101 | 1986-01-01 | pdf | 24876 | c0d56cfba7cdf17446334aa8eba9ecfef1c72fa4af20307b09346ee44556e919
+01958R0001-19950101 | 1995-01-01 | pdf | 25052 | 471e20378e0316147edaa27e8de8974b8e24b1b55eec697269a31a235a69a365
+01958R0001-20040501 | 2004-05-01 | pdf | 26405 | 45a890b5727a56aa7011779587cccc34faa4a14faa51ed6bc5e4bbc2525cbdf2
+01958R0001-20070101 | 2007-01-01 | html | 14637 | 6a4aaa5288603f86b3690a4c67cc778e0a668e771ac96e651e0c521c1511688c
+01958R0001-20130701 | 2013-07-01 | html | 18574 | 3301d8b236c3d132ec0c49ee8210f46255dde1c68edf584b3cf43f8b98e7fecf
+
+Fetch cost: one original plus seven consolidated source downloads; catalog and version listing measured separately.
+Cross-format review: five historical PDF snapshots and three HTML sources; Articles 2,3,6,7 retain unchanged wording.
+Five-law gate checks all eight versions through the normal renderer and fast-import path.
+Official source: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:31958R0001

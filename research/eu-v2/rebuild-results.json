@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-07",
+  "scope": "Selected English EU institutional legislation; no national corpora",
+  "published_head": "ed827b14dc697af0b25b8ef1a9a383051912810e",
+  "rebuilt_head": "f78c15e5652859371b7e1062964d3ea383c2f041",
+  "backup_commits": 20348,
+  "rebuilt_commits": 32631,
+  "legislative_source_commits": 32628,
+  "scope_counts": {
+    "data-eu-reprocess": 15959,
+    "data-eu-expansion": 2474,
+    "data-eu-amenders": 112
+  },
+  "before_pinned": {
+    "files": 15959,
+    "articles": 81139,
+    "empty_candidates": 7153,
+    "affected_files": 1045,
+    "explicit_placeholders": null
+  },
+  "after_scopes": {
+    "data-eu-reprocess": {
+      "files": 15959,
+      "articles": 88855,
+      "empty_candidates": 7,
+      "affected_files": 5,
+      "explicit_placeholders": 0
+    },
+    "data-eu-expansion": {
+      "files": 2474,
+      "articles": 18427,
+      "empty_candidates": 7,
+      "affected_files": 1,
+      "explicit_placeholders": 0
+    },
+    "data-eu-amenders": {
+      "files": 112,
+      "articles": 853,
+      "empty_candidates": 0,
+      "affected_files": 0,
+      "explicit_placeholders": 0
+    }
+  },
+  "after_entire_tree": {
+    "files": 18545,
+    "articles": 108135,
+    "empty_candidates": 14,
+    "affected_files": 6,
+    "explicit_placeholders": 0
+  },
+  "candidate_review": {
+    "source_omission": 3,
+    "deleted": 1,
+    "reserved": 1,
+    "internal_heading": 8,
+    "substantive_subtitle": 1
+  },
+  "confirmed_dropped_body_candidates": 0,
+  "final_file_differences": 0,
+  "source_identity_date_order_errors": 0,
+  "idempotence": {
+    "before": {
+      "head": "f78c15e5652859371b7e1062964d3ea383c2f041",
+      "tree": "a66bf1695e8383b98295050851afa70828fbc71c",
+      "commits": 32631
+    },
+    "after": {
+      "head": "f78c15e5652859371b7e1062964d3ea383c2f041",
+      "tree": "a66bf1695e8383b98295050851afa70828fbc71c",
+      "commits": 32631
+    },
+    "unchanged": true
+  },
+  "pdf_version_gaps": 89,
+  "pinned_acts_with_pdf_gaps": 23,
+  "required_own_file_gaps": 142,
+  "pinned_laws_with_source_images": 4093,
+  "required_amender_laws_with_source_images": 23,
+  "optional_laws_with_source_images": 0,
+  "health": {
+    "errors": 0,
+    "warnings": 2,
+    "missing_current_last_amendment_references": 8,
+    "current_last_amendment_references": 331
+  },
+  "spec_files_only": {
+    "laws": 18545,
+    "violations": 0
+  },
+  "spec_full_checker": {
+    "violations": 2,
+    "review": {
+      "flags": {
+        "real_multiple_source_commits": 4111,
+        "unamended_future_originals": 14
+      },
+      "examples": [
+        {
+          "law": "32002R2342",
+          "actual_commits": 7,
+          "dated_commits": 1
+        },
+        {
+          "law": "32004R0276",
+          "actual_commits": 2,
+          "dated_commits": 1
+        },
+        {
+          "law": "32015D2169",
+          "actual_commits": 2,
+          "dated_commits": 1
+        }
+      ],
+      "chronology_exception": {
+        "norm_id": "32008R0514",
+        "original_publication": "2008-06-10",
+        "amender_id": "32008R0507",
+        "amender_publication": "2008-06-07",
+        "source_partial_end_of_validity": "2008-06-26",
+        "official_url": "https://eur-lex.europa.eu/legal-content/en/ALL/?uri=CELEX%3A32008R0514"
+      }
+    }
+  },
+  "tests": {
+    "passed": 2201,
+    "skipped": 27
+  },
+  "lint_and_hooks": "pass",
+  "pushed": false
+}

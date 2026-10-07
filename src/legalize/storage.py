@@ -200,7 +200,7 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
 
     # Extra: country-specific fields (department, summary, pdf_url, etc.)
     # These go into a single dict for the extra JSONB column downstream.
-    extra_dict: dict[str, str] = {}
+    extra_dict: dict[str, str | list[str]] = {}
     if meta.department:
         extra_dict["department"] = meta.department
     if meta.summary:
@@ -208,7 +208,7 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
     if meta.pdf_url:
         extra_dict["pdf_url"] = meta.pdf_url
     if meta.subjects:
-        extra_dict["subjects"] = ", ".join(meta.subjects)
+        extra_dict["subjects"] = list(meta.subjects)
     for key, value in meta.extra:
         if value and key not in extra_dict:
             extra_dict[key] = value
@@ -243,6 +243,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
                 "source_id": version.norm_id,
                 "text": text,
             }
+            if version.effective_date and version.effective_date != version.publication_date:
+                version_dict["effective_date"] = version.effective_date.isoformat()
             # Preserve CSS classes for lossless round-trip
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
@@ -251,7 +253,11 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
 
         # current_text = latest version
         if block.versions:
-            last = max(block.versions, key=lambda v: v.publication_date)
+            last = (
+                block.versions[-1]
+                if norm.metadata.country == "eu"
+                else max(block.versions, key=lambda v: v.publication_date)
+            )
             article["current_text"] = "\n\n".join(p.text for p in last.paragraphs)
         else:
             article["current_text"] = ""
@@ -279,6 +285,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
         # this drops is simply lost on the way to the commit.
         if reform.change_note:
             row["change_note"] = reform.change_note
+        if not reform.has_source_date:
+            row["has_source_date"] = False
         reforms.append(row)
 
     return {
@@ -307,9 +315,11 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
     department = extra_dict.pop("department", meta.get("department", ""))
     summary = extra_dict.pop("summary", "")
     pdf_url = extra_dict.pop("pdf_url", None)
-    subjects_str = extra_dict.pop("subjects", "")
+    subjects_raw = extra_dict.pop("subjects", "")
     subjects = (
-        tuple(s.strip() for s in subjects_str.split(",") if s.strip()) if subjects_str else ()
+        tuple(subjects_raw)
+        if isinstance(subjects_raw, list)
+        else tuple(s.strip() for s in subjects_raw.split(",") if s.strip())
     )
     extra = tuple(extra_dict.items())
 
@@ -348,7 +358,7 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 Version(
                     norm_id=v["source_id"],
                     publication_date=date.fromisoformat(v["date"]),
-                    effective_date=date.fromisoformat(v["date"]),
+                    effective_date=date.fromisoformat(v.get("effective_date", v["date"])),
                     paragraphs=tuple(paragraphs),
                 )
             )
@@ -380,6 +390,7 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 norm_id=r["source_id"],
                 affected_blocks=affected,
                 change_note=r.get("change_note", ""),
+                has_source_date=r.get("has_source_date", True),
             )
         )
 

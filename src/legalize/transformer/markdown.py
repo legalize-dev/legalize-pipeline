@@ -167,8 +167,35 @@ def render_norm_at_date(
     blocks: list[Block] | tuple[Block, ...],
     target_date: date,
     include_all: bool = False,
+    source_id: str | None = None,
 ) -> str:
     """Generate the complete Markdown for a norm at a given point in time."""
+    selected = []
+    for block in blocks:
+        if metadata.country == "eu":
+            applicable = [v for v in block.versions if v.in_force_from <= target_date]
+            version = max(applicable, key=lambda v: v.in_force_from) if applicable else None
+            version = next(
+                (
+                    v
+                    for v in block.versions
+                    if v.norm_id == source_id
+                    and (v.in_force_from == target_date or v.publication_date == target_date)
+                ),
+                version,
+            )
+        else:
+            version = get_block_at_date(block, target_date)
+        selected.append(version)
+    if metadata.country == "eu":
+        if include_all and not any(selected):
+            selected = [
+                min(b.versions, key=lambda v: v.in_force_from) if b.versions else None
+                for b in blocks
+            ]
+        effective = [v.in_force_from for v in selected if v is not None]
+        if effective:
+            target_date = max(effective)
     parts: list[str] = []
     parts.append(render_frontmatter(metadata, target_date))
 
@@ -179,10 +206,8 @@ def render_norm_at_date(
     if notice:
         parts.append(f"{notice}\n")
 
-    for block in blocks:
-        version = get_block_at_date(block, target_date)
-
-        if version is None and include_all and block.versions:
+    for block, version in zip(blocks, selected, strict=True):
+        if version is None and include_all and metadata.country != "eu" and block.versions:
             version = min(block.versions, key=lambda v: v.publication_date)
 
         if version is None:

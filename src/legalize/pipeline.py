@@ -181,6 +181,11 @@ def _with_last_amendment(metadata: NormMetadata, reform: Reform) -> NormMetadata
     from legalize.countries import text_state_for
 
     state = metadata.text_state or text_state_for(metadata.country)
+    if metadata.country == "eu" and state is TextState.AS_ENACTED:
+        return replace(
+            metadata,
+            last_amendment=None if reform.norm_id == metadata.identifier else reform.norm_id,
+        )
     if state is not TextState.AS_ENACTED or metadata.last_amendment:
         return metadata
     return replace(metadata, last_amendment=reform.norm_id)
@@ -734,15 +739,23 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
         is_first = reform == reforms[0]
         commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-        norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
-        markdown = render_norm_at_date(norm_meta, blocks, reform.date, include_all=is_first)
+        norm_meta = (
+            metadata if is_first and country != "eu" else _with_last_amendment(metadata, reform)
+        )
+        markdown = render_norm_at_date(
+            norm_meta,
+            blocks,
+            reform.date,
+            include_all=is_first,
+            source_id=reform.norm_id if country == "eu" else None,
+        )
         changed = repo.write_and_add(file_path, markdown)
 
-        if not changed and not is_first:
+        if not changed and not is_first and country != "eu":
             continue
 
         info = build_commit_info(commit_type, metadata, reform, blocks, file_path, markdown)
-        sha = repo.commit(info)
+        sha = repo.commit(info, allow_empty=country == "eu")
 
         if sha:
             commits_created += 1
@@ -988,12 +1001,21 @@ def commit_all_fast(
 
         seen_identifiers.add(norm.metadata.identifier)
         for i, reform in enumerate(reforms):
-            key = (reform.norm_id, norm.metadata.identifier, reform.date.isoformat())
+            key = (
+                reform.norm_id,
+                norm.metadata.identifier,
+                reform.date.isoformat() if reform.has_source_date else "",
+            )
             if already[key] > 0:
                 already[key] -= 1
                 skipped += 1
                 continue
-            all_reforms.append((reform.date, json_file.stem, i, json_file))
+            # A retroactive EU consolidation may precede its base publication
+            # in legal time. Queue the original first without falsifying dates.
+            order_date = (
+                max(norm.metadata.publication_date, reform.date) if country == "eu" else reform.date
+            )
+            all_reforms.append((order_date, json_file.stem, i, json_file))
 
     all_reforms.sort(key=lambda x: x[0])
 
@@ -1078,9 +1100,17 @@ def commit_all_fast(
                     is_first = reform_idx == 0
                     commit_type = CommitType.BOOTSTRAP if is_first else CommitType.REFORM
 
-                    norm_meta = metadata if is_first else _with_last_amendment(metadata, reform)
+                    norm_meta = (
+                        metadata
+                        if is_first and country != "eu"
+                        else _with_last_amendment(metadata, reform)
+                    )
                     markdown = render_norm_at_date(
-                        norm_meta, blocks, reform.date, include_all=is_first
+                        norm_meta,
+                        blocks,
+                        reform.date,
+                        include_all=is_first,
+                        source_id=reform.norm_id if country == "eu" else None,
                     )
                     file_path = norm_to_filepath(metadata)
 
@@ -1108,7 +1138,9 @@ def commit_all_fast(
 
         imported += fi.commit_count
 
-    console.print(f"\n[bold green]✓ {imported} commits created (fast-import)[/bold green]")
+    console.print(
+        f"\n[bold green]✓ {imported - skipped} commits created (fast-import)[/bold green]"
+    )
 
     # Every law that could be written is in the repo before this line, the same
     # order finalize_daily uses for a shadowed act: the run's work is not thrown

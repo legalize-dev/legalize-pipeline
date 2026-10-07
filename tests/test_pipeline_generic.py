@@ -7,6 +7,7 @@ StateStore persistence, and generic pipeline helpers.
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import date
 from unittest.mock import MagicMock
 
@@ -31,7 +32,7 @@ from legalize.models import (
     Reform,
     Version,
 )
-from legalize.pipeline import _extract_reforms_generic
+from legalize.pipeline import _extract_reforms_generic, commit_all_fast, commit_one
 from legalize.state.store import StateStore
 from legalize.storage import load_norma_from_json, save_structured_json
 
@@ -453,3 +454,31 @@ class TestGenericPipeline:
         )
 
         assert result == expected
+
+
+@pytest.mark.parametrize("committer", [commit_one, commit_all_fast])
+def test_eu_source_selection_does_not_activate_other_countries_future_text(tmp_path, committer):
+    norm = _make_norma(country="es")
+    block = norm.blocks[0]
+    original = replace(block.versions[0], paragraphs=(Paragraph("parrafo", "Old provision."),))
+    deferred = Version(
+        norm_id="AMEND-001",
+        publication_date=date(2025, 1, 1),
+        effective_date=date(2026, 1, 1),
+        paragraphs=(Paragraph("parrafo", "Deferred provision."),),
+    )
+    norm = replace(
+        norm,
+        blocks=(replace(block, versions=(original, deferred)),),
+        reforms=(norm.reforms[0], Reform(date(2025, 1, 1), "AMEND-001", (block.id,))),
+    )
+    data, repo = tmp_path / "data", tmp_path / "repo"
+    save_structured_json(data, norm)
+    config = Config(countries={"es": CountryConfig(data_dir=str(data), repo_path=str(repo))})
+    if committer is commit_one:
+        committer(config, "es", norm.metadata.identifier)
+    else:
+        committer(config, "es")
+    markdown = next((repo / "es").rglob("*.md")).read_text()
+    assert "Old provision." in markdown
+    assert "Deferred provision." not in markdown

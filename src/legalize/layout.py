@@ -177,6 +177,7 @@ LAYOUT: dict[str, str] = {
     # this one is legible. Sharding by type was measured too and rejected: one
     # type holds 49 % of the corpus, which is the flat problem again.
     "pt": "{directory}/{year}/{identifier}.md",
+    "eu": SHARDED,
 }
 
 

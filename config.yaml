@@ -511,18 +511,40 @@ countries:
     # Text: XHTML consolidated texts via CELLAR REST (~450KB-4.6MB each).
     # Each regulation needs: 1 SPARQL (consolidations) + N XHTML downloads.
     # Full bootstrap (~16K regs × ~2 consolidations avg): ~48K requests.
-    # At 4 workers × 2 req/s = 8 req/s → ~1.5-2h fetch time.
-    max_workers: 8
+    # 2026-10-07: 50 uncached laws / 85 source versions, 347.9s with one
+    # worker, 160.7s with four at 1 req/s each; zero fetch/parse errors.
+    # Collection across separate jobs must also stay below five connections.
+    max_workers: 4
     source:
       sparql_url: "https://publications.europa.eu/webapi/rdf/sparql"
-      request_timeout: 30
-      max_retries: 5
-      requests_per_second: 5.0
+      # 30 s was enough for one act at a time. The bulk catalog asks Virtuoso
+      # for 1,000 rows at a time over the whole corpus and it answers 503 or
+      # simply stops replying under sustained load, so the window has to be
+      # wider and the retries more patient.
+      request_timeout: 120
+      max_retries: 8
+      requests_per_second: 1.0
+      # Scope approved 2026-09-03 (research/RESEARCH-EU.md §6): 87,227 acts.
+      # Was regulations only, which is why the corpus held no directive at all.
+      # Out by decision, not by oversight:
+      #   DEC_ENTSCHEID — 51 % say "Only the X text is authentic", so the
+      #                   English text we would publish is not the law (§4.4)
+      #   RECO          — soft law, undecided
+      # Acts EUR-Lex states no in-force status for are excluded in discovery,
+      # not here: they are spent one-shot instruments (§4.3).
       reg_types:
         - "REG"
         - "REG_IMPL"
         - "REG_DEL"
         - "REG_FINANC"
+        - "DIR"
+        - "DIR_IMPL"
+        - "DIR_DEL"
+        - "DEC"
+        - "DEC_IMPL"
+        - "DEC_DEL"
+        - "TREATY"
+        - "AGREE_INTERNATION"
 
   ch:
     repo_path: "../countries/ch"

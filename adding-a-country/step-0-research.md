@@ -92,7 +92,10 @@ or any law your research shows has been reformed). Then:
    exposes them (embedded XML, `arch=N` URLs, version table, point-in-time API, etc.)
 2. **Confirm you can extract** for each version:
    - The full text (even roughly — you will refine the parser later)
-   - The effective date (required to set `GIT_AUTHOR_DATE`)
+   - The effective date (for selecting the version and `last_updated`)
+   - The official publication date, if supplied (for `Source-Date` and
+     `GIT_AUTHOR_DATE`; an unknown publication date follows SPEC v0.4's
+     omitted-trailer and author-date fallback rules)
    - A stable identifier that links all versions to the same law
 3. **Save the evidence** as `tests/fixtures/{code}/version-spike.txt` (a summary
    showing "version 1: date X, N paragraphs; version 2: date Y, N paragraphs; ...")

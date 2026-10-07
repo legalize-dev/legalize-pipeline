@@ -127,8 +127,13 @@ class Version:
 
     norm_id: str
     publication_date: date
-    effective_date: date
+    effective_date: date | None
     paragraphs: tuple[Paragraph, ...]
+
+    @property
+    def in_force_from(self) -> date:
+        """Use the declared applicability date, falling back to publication."""
+        return self.effective_date or self.publication_date
 
 
 @dataclass(frozen=True)
@@ -203,6 +208,9 @@ class Reform:
     # legislature, not a property of law, so any taxonomy invented here is one to
     # redo in 34 countries the first time it does not fit.
     change_note: str = ""
+    # False for an undated source snapshot: date still selects its effective
+    # text, but is not an official publication date (SPEC v0.4, Dates).
+    has_source_date: bool = True
 
 
 # ─────────────────────────────────────────────
