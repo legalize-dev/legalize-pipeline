@@ -39,6 +39,11 @@ class TARClient(HttpClient):
     is not used for fetching.
     """
 
+    # data.gov.lt answers an occasional HTTP 500 to a request that succeeds when
+    # repeated (observed 2026-10: ~8% of the norms of a day, the same documents
+    # answering 200 a minute later), so it is retried like the other transient codes.
+    _retry_status_codes = (*HttpClient._retry_status_codes, 500)
+
     @classmethod
     def create(cls, country_config: CountryConfig) -> TARClient:
         """Create TARClient from CountryConfig."""

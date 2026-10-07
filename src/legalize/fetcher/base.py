@@ -91,6 +91,8 @@ class HttpClient(LegislativeClient):
     Subclasses implement get_text/get_metadata using self._get().
     """
 
+    _retry_status_codes: tuple[int, ...] = _RETRY_STATUS_CODES
+
     def __init__(
         self,
         *,
@@ -153,7 +155,7 @@ class HttpClient(LegislativeClient):
                     data=data,
                     timeout=timeout or self._timeout,
                 )
-                if resp.status_code in _RETRY_STATUS_CODES and attempt < self._max_retries - 1:
+                if resp.status_code in self._retry_status_codes and attempt < self._max_retries - 1:
                     wait = 2**attempt
                     logger.warning(
                         "%s %d on %s, retrying in %ds (attempt %d/%d)",
