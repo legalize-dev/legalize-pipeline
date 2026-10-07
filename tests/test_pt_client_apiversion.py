@@ -39,6 +39,15 @@ _HOME_JS_RENAMED = (
     '"k+86ytikYIT6brie_oLQTQ", function (b) {});\n'
 )
 
+# Same screen after the Oct 2026 redeploy: a uuid now sits between the action
+# name and its path.
+_HOME_JS_WITH_UUID = (
+    'return controller.callDataAction("DataActionGetDataAndApplicationSettings", '
+    '"5cb16e73-2768-43a9-ab09-da4ea500479d", '
+    '"screenservices/dr/Home/WB_Serie1_List/DataActionGetDataAndApplicationSettings", '
+    '"1ZNbiINloOPj8IhEJxM3QA", function (b) {});\n'
+)
+
 
 def _html_response(status: int = 200) -> requests.Response:
     """A real Response carrying an OutSystems HTML error page."""
@@ -78,6 +87,21 @@ def _client() -> DREApi:
 
 
 class TestResolveEndpoint:
+    def test_skips_endpoint_uuid_argument(self):
+        """The uuid DRE added before the path must not be read as the path."""
+        url, api_version = _client()._resolve_endpoint(
+            DOCUMENTS_BY_DATE,
+            _HOME_JS_WITH_UUID,
+            "WB_Serie1_List.mvc.js",
+            ("DataActionGetDataAndApplicationSettings",),
+        )
+
+        assert url == (
+            "https://diariodarepublica.pt/dr/"
+            "screenservices/dr/Home/WB_Serie1_List/DataActionGetDataAndApplicationSettings"
+        )
+        assert api_version == "1ZNbiINloOPj8IhEJxM3QA"
+
     def test_finds_renamed_action_by_prefix(self):
         """A suffix added to the action name must not break discovery."""
         client = _client()

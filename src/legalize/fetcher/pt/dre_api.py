@@ -35,8 +35,12 @@ BASE = "https://diariodarepublica.pt/dr"
 _OUTSYSTEMS_JS = f"{BASE}/scripts/OutSystems.js"
 _MODULE_VERSION = f"{BASE}/moduleservices/moduleversioninfo"
 
-# callDataAction("Name", "screenservices/...", "apiVersionHash", ...)
-_CALL_DATA_ACTION = re.compile(r'callDataAction\s*\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"')
+# callDataAction("Name", ["endpoint-uuid",] "screenservices/...", "apiVersionHash", ...)
+# DRE added the uuid as the second argument in Oct 2026 (telemetry only, the
+# request never carries it); without skipping it the uuid is read as the path.
+_CALL_DATA_ACTION = re.compile(
+    r'callDataAction\s*\(\s*"([^"]+)"\s*,\s*(?:"[0-9a-f-]{36}"\s*,\s*)?"([^"]+)"\s*,\s*"([^"]+)"'
+)
 _CSRF_PATTERNS = (
     r'AnonymousCSRFToken\s*=\s*"([^"]+)"',
     r'"X-CSRFToken","([^"]+)"',
