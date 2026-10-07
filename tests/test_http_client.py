@@ -165,6 +165,29 @@ class TestHttpClientServerError:
         client.close()
 
 
+class TestRetryStatusCodesPerClient:
+    def test_a_client_can_retry_a_500(self):
+        """data.gov.lt (TARClient) answers an intermittent 500 that succeeds on repeat."""
+
+        class Flaky(ConcreteHttpClient):
+            _retry_status_codes = (*HttpClient._retry_status_codes, 500)
+
+        client = Flaky(max_retries=3, requests_per_second=0)
+        bad, good = MagicMock(), MagicMock()
+        bad.status_code = 500
+        good.status_code = 200
+        good.content = b"ok"
+        client._session.request = MagicMock(side_effect=[bad, good])
+
+        with patch("legalize.fetcher.base.time.sleep"):
+            assert client._get("https://example.com/test") == b"ok"
+        assert client._session.request.call_count == 2
+        client.close()
+
+    def test_the_default_still_does_not_retry_a_500(self):
+        assert 500 not in HttpClient._retry_status_codes
+
+
 class TestHttpClientRateLimit:
     def test_rate_limit_enforced(self):
         """Rate limiter should sleep between requests."""
@@ -209,3 +232,9 @@ class TestHttpClientClose:
         client._session.close = MagicMock()
         client.close()
         client._session.close.assert_called_once()
+
+
+def test_lt_client_retries_a_500():
+    from legalize.fetcher.lt.client import TARClient
+
+    assert 500 in TARClient._retry_status_codes
