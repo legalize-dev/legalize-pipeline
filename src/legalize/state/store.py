@@ -146,7 +146,15 @@ def latest_source_date(repo_path: str) -> date | None:
     # over stopping early.
     dates = []
     for body in result.stdout.split("\x1e"):
-        for line in body.splitlines():
+        lines = body.splitlines()
+        # A ``Source-Id`` of the form ``<id>@<date>`` is a version stamp: its date
+        # is when that version takes effect, not the day the daily looked at.
+        # Versions are published ahead of time (a reform effective on the 1st goes
+        # in on the 28th), and once the date passes it would read as "processed
+        # through the 1st" and skip every day in between.
+        if any(line.startswith("Source-Id: ") and "@" in line for line in lines):
+            continue
+        for line in lines:
             if not line.startswith("Source-Date: "):
                 continue
             found = _parse_iso_date(line[len("Source-Date: ") :].strip())

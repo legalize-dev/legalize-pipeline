@@ -34,11 +34,15 @@ def _init_repo(path):
     return path
 
 
-def _commit(repo, subject, source_date=None, commit_date=None):
-    """Add one commit, optionally with a Source-Date trailer and a fixed date."""
+def _commit(repo, subject, source_date=None, commit_date=None, source_id=None):
+    """Add one commit, optionally with Source-Id/Source-Date trailers and a fixed date."""
     (repo / "law.md").write_text(subject)
     subprocess.run(["git", "add", "."], cwd=repo, capture_output=True)
-    message = subject if source_date is None else f"{subject}\n\nSource-Date: {source_date}"
+    message = subject
+    if source_id is not None:
+        message += f"\n\nSource-Id: {source_id}"
+    if source_date is not None:
+        message += f"\n\nSource-Date: {source_date}"
     env = dict(os.environ)
     if commit_date is not None:
         stamp = f"{commit_date} 12:00:00 +0000"
@@ -68,6 +72,18 @@ class TestInferLastDateFromGit:
         _commit(repo, "enters into force in 2034", source_date="2034-01-01")
 
         assert infer_last_date_from_git(str(repo)) == date(2026, 4, 2)
+
+    def test_version_stamps_do_not_move_the_cursor(self, tmp_path):
+        """legalize-pt, Oct 2026: a version published on the 28th, effective the 1st.
+
+        Once the 1st passes its trailer is no longer in the future, and read as a
+        cursor it skipped the 30th and the 1st, which had never been processed.
+        """
+        repo = _init_repo(tmp_path / "repo")
+        _commit(repo, "published act", source_id="DRE-2026-1-10", source_date="2026-03-01")
+        _commit(repo, "scheduled version", source_id="DRE-99@2026-03-28", source_date="2026-03-28")
+
+        assert infer_last_date_from_git(str(repo)) == date(2026, 3, 1)
 
     def test_ignores_commits_without_a_trailer_while_walking(self, tmp_path):
         """The 2026-06-23 README/LICENSE sweep sits on top of every country repo."""
