@@ -54,6 +54,7 @@ METADATA_FIELDS = {
 }
 
 REFORM_FIELDS = {
+    "effective_date": "persisted",
     "has_source_date": "persisted",
     "date": "persisted",
     "norm_id": "persisted",

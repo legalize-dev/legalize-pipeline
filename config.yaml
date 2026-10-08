@@ -45,6 +45,7 @@ countries:
       max_retries: 5
       requests_per_second: 2.0
       user_agent: "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
+      diary_since: "2010-01-01"
 
   # fr is deliberately OUT of the daily-update matrix: it has no incremental
   # source. legi_dir below is a local extraction of the LEGI dump that exists

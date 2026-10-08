@@ -39,14 +39,8 @@ BOE_BASE = "https://www.boe.es"
 # rest. 49 of 3,869 anchors carried one and lost their link (#106).
 _BOE_ID_RE = re.compile(r"\b[A-Z]{2,6}-[A-Za-z]-\d{4}-\d+\b")
 
-# CSS classes that should NEVER appear as standalone paragraphs — they are
-# either table-cell fragments (handled by the table renderer) or chrome
-# injected by the BOE viewer that has no legal weight.
+# Viewer chrome, rather than legislative text.
 _STRIP_CLASSES = {
-    "cabeza_tabla",
-    "cuerpo_tabla_izq",
-    "cuerpo_tabla_centro",
-    "cuerpo_tabla_der",
     # The BOE viewer's "Información relacionada" box heading. Nothing but the
     # label ever appears under it, and it was reaching the corpus as a bare
     # paragraph reading "Información relacionada".
@@ -73,6 +67,15 @@ def _parse_date(date_str: str | None) -> date | None:
 # ─────────────────────────────────────────────
 
 
+def _inline_markup(text: str, opening: str, closing: str) -> str:
+    """Keep word separators outside markup, including wrappers containing only whitespace."""
+    if not text.strip():
+        return " " if text else ""
+    leading = " " if text[0].isspace() else ""
+    trailing = " " if text[-1].isspace() else ""
+    return f"{leading}{opening}{text.strip()}{closing}{trailing}"
+
+
 def _extract_inline(element: etree._Element) -> str:
     """Extract the text of an element preserving inline formatting.
 
@@ -97,22 +100,11 @@ def _extract_inline(element: etree._Element) -> str:
             continue
         tag = etree.QName(child.tag).localname
 
-        if tag in ("b", "strong"):
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"**{inner}**")
-        elif tag in ("i", "em"):
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"*{inner}*")
-        elif tag == "sup":
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"<sup>{inner}</sup>")
-        elif tag == "sub":
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"<sub>{inner}</sub>")
+        if tag in ("b", "strong", "i", "em"):
+            marker = "**" if tag in ("b", "strong") else "*"
+            parts.append(_inline_markup(_extract_inline(child), marker, marker))
+        elif tag in {"sup", "sub"}:
+            parts.append(_inline_markup(_extract_inline(child), f"<{tag}>", f"</{tag}>"))
         elif tag == "br":
             parts.append("  \n")
         elif tag == "a":
@@ -135,7 +127,7 @@ def _extract_inline(element: etree._Element) -> str:
                 if m:
                     href = f"{BOE_BASE}/buscar/doc.php?id={m.group(0)}"
             if href:
-                parts.append(f"[{inner.strip()}]({href})")
+                parts.append(_inline_markup(inner, "[", f"]({href})"))
             else:
                 parts.append(inner)
         elif tag == "img":
@@ -317,6 +309,8 @@ def _parse_p(p_el: etree._Element) -> Paragraph | None:
 
     if css in _STRIP_CLASSES:
         return None
+    if css in {"cabeza_tabla", "cuerpo_tabla_izq", "cuerpo_tabla_centro", "cuerpo_tabla_der"}:
+        css = "parrafo"
 
     text = _extract_inline(p_el).strip()
     if not text:
@@ -445,7 +439,11 @@ def get_block_at_date(block: Block, target_date: date) -> Version | None:
     declares no date in force falls back to publication, so a corpus whose two
     dates always agree renders byte-for-byte as before.
     """
-    applicable = [v for v in block.versions if v.in_force_from <= target_date]
+    applicable = [
+        v
+        for v in block.versions
+        if v.in_force_from <= target_date and not v.superseded_before_commencement
+    ]
     if block.expiry_date and block.expiry_date <= target_date:
         # The source says the unit is gone by this date. Where it materialises
         # the repeal it emits one more version reading "(Derogado)", and that

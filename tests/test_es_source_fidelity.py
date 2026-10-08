@@ -13,6 +13,7 @@ import yaml
 
 from legalize.config import Config, CountryConfig
 from legalize.fetcher.es.metadata import parse_metadata
+from legalize.fetcher.es.parser import BOETextParser
 from legalize.models import Block, Paragraph, ParsedNorm, Version
 from legalize.pipeline import generic_fetch_one
 from legalize.storage import load_norma_from_json, save_structured_json
@@ -32,7 +33,7 @@ def parsed(name):
     metadata = parse_metadata(
         payload(name, "metadata"), SAMPLES[name]["identifier"], payload(name, "diary")
     )
-    blocks = parse_text_xml(payload(name, "text"))
+    blocks = BOETextParser().parse_text(payload(name, "text"))
     return ParsedNorm(metadata, tuple(blocks), tuple(extract_reforms(blocks)))
 
 

@@ -79,7 +79,7 @@ def iter_norms_from_summaries(
     Useful for bootstrap when all legislation published in a period
     should be included, not just fixed norms.
 
-    Summaries are published Monday through Saturday only.
+    Includes extraordinary Sunday editions.
 
     Args:
         client: BOE HTTP client.
@@ -99,11 +99,6 @@ def iter_norms_from_summaries(
     current = start_date
 
     while current <= end_date:
-        # No BOE on Sundays
-        if current.weekday() == 6:
-            current += timedelta(days=1)
-            continue
-
         try:
             xml_data = client.get_sumario(current)
             dispositions = parse_summary(xml_data, scope)
@@ -113,7 +108,8 @@ def iter_norms_from_summaries(
                     seen.add(disp.id_boe)
                     yield disp.id_boe
 
-        except requests.RequestException:
-            logger.warning("Error processing summary for %s, continuing", current, exc_info=True)
+        except requests.HTTPError as exc:
+            if exc.response is None or exc.response.status_code != 404:
+                raise
 
         current += timedelta(days=1)

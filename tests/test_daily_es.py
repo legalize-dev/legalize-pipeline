@@ -17,6 +17,7 @@ from unittest.mock import MagicMock
 
 import pytest
 import requests
+from lxml import etree
 
 from legalize.committer.git_ops import GitRepo
 from legalize.fetcher.es.daily import _commit_reforms, _parse_updated_ids, _updated_norms
@@ -112,17 +113,19 @@ class TestParseUpdatedIds:
 
 
 class TestUpdatedNorms:
-    def test_returns_empty_on_http_error(self):
+    def test_http_error_cannot_look_like_an_empty_day(self):
         client = MagicMock()
         client.get_updated.side_effect = requests.RequestException("timeout")
 
-        assert _updated_norms(client, date(2026, 5, 19), date(2026, 5, 20)) == []
+        with pytest.raises(requests.RequestException):
+            _updated_norms(client, date(2026, 5, 19), date(2026, 5, 20))
 
-    def test_returns_empty_on_invalid_xml(self):
+    def test_invalid_xml_cannot_look_like_an_empty_day(self):
         client = MagicMock()
         client.get_updated.return_value = b"not xml at all"
 
-        assert _updated_norms(client, date(2026, 5, 19), date(2026, 5, 20)) == []
+        with pytest.raises(etree.XMLSyntaxError):
+            _updated_norms(client, date(2026, 5, 19), date(2026, 5, 20))
 
 
 @pytest.fixture
@@ -137,7 +140,17 @@ def repo_with_constitution(tmp_path: Path) -> tuple[GitRepo, Path]:
         ["config", "user.name", "Legalize"],
         ["config", "user.email", "legalize@legalize.dev"],
         ["add", "."],
-        ["commit", "-m", "[bootstrap] Constitucion Espanola\n\nSource-Id: BOE-A-1978-31229\n"],
+        [
+            "commit",
+            "-m",
+            "[bootstrap] Constitucion Espanola\n\nSource-Id: BOE-A-1978-31229\nSource-Date: 1978-12-29\nNorm-Id: BOE-A-1978-31229\nEffective-Date: 1978-12-29\n",
+        ],
+        [
+            "commit",
+            "--allow-empty",
+            "-m",
+            "[reform] Historical amendment\n\nSource-Id: BOE-A-1992-20403\nSource-Date: 1992-08-28\nNorm-Id: BOE-A-1978-31229\nEffective-Date: 1992-08-28\n",
+        ],
     ):
         subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True)
 
@@ -234,14 +247,14 @@ class TestCommitReforms:
         assert "BOE-A-2026-10881" not in message
         assert "Formentera" not in (root / "es" / "bb" / "BOE-A-1978-31229.md").read_text()
 
-    def test_skips_norms_the_corpus_does_not_hold(
+    def test_imports_a_first_consolidation_missing_from_the_corpus(
         self, repo_with_constitution, monkeypatch: pytest.MonkeyPatch
     ):
-        """The window also lists autonomic norms this repo never published."""
+        """A late first consolidation is a source of new laws, including regional laws."""
         repo, _ = repo_with_constitution
         monkeypatch.setattr(
             "legalize.fetcher.es.metadata.parse_metadata",
             lambda *a, **kw: replace(CONSTITUTION, identifier="BOE-A-2015-11430"),
         )
 
-        assert _commit_reforms(_client(), repo, date(2026, 5, 19), date(2026, 5, 20), []) == 0
+        assert _commit_reforms(_client(), repo, date(2026, 5, 19), date(2026, 5, 20), []) == 3

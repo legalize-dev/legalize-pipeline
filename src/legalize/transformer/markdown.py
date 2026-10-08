@@ -239,6 +239,7 @@ def render_norm_at_date(
     target_date: date,
     include_all: bool = False,
     source_id: str | None = None,
+    effective_date: date | None = None,
 ) -> str:
     """Generate the complete Markdown for a norm at a given point in time."""
     if (
@@ -246,6 +247,8 @@ def render_norm_at_date(
         and metadata.text_state is TextState.POINT_IN_TIME
         and source_id is not None
     ):
+        if effective_date is not None:
+            target_date = max(target_date, effective_date)
         # A published amendment can apply later; exclude versions not published yet.
         blocks = [
             replace(
@@ -254,10 +257,11 @@ def render_norm_at_date(
             )
             for block in blocks
         ]
-        target_date = max(
-            (v.in_force_from for block in blocks for v in block.versions),
-            default=target_date,
-        )
+        if effective_date is None:
+            target_date = max(
+                (v.in_force_from for block in blocks for v in block.versions),
+                default=target_date,
+            )
 
     selected = []
     for block in blocks:
@@ -322,9 +326,23 @@ def render_norm_at_date(
             )
 
     parts: list[str] = []
-    parts.append(
-        render_frontmatter(metadata, max(in_force) if in_force else target_date, structure)
-    )
+    version_date = max(in_force) if in_force else target_date
+    if metadata.country == "es" and metadata.text_state is TextState.POINT_IN_TIME:
+        undated = [
+            block.id
+            for block, version in zip(blocks, selected, strict=True)
+            if version is not None and version.effective_date is None
+        ]
+        if undated:
+            # SPEC requires an absent date, not publication substituted for unknown commencement.
+            metadata = replace(
+                metadata,
+                extra=metadata.extra + (("effective_date_unknown_blocks", ", ".join(undated)),),
+            )
+            version_date = None
+    if metadata.country == "es" and metadata.text_state is TextState.AS_ENACTED:
+        version_date = target_date
+    parts.append(render_frontmatter(metadata, version_date, structure))
 
     title = metadata.title.rstrip(". ").strip()
     parts.append(f"# {title}\n\n")

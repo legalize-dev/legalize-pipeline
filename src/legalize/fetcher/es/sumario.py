@@ -41,7 +41,7 @@ from legalize.models import Disposition, Rank
 logger = logging.getLogger(__name__)
 
 # BOE sections containing relevant legislative dispositions
-_LEGISLATIVE_SECTIONS = {"1", "1A", "T"}  # I. Disposiciones generales, TC
+_LEGISLATIVE_SECTIONS = {"1", "1A"}  # General provisions; judicial effects come via references.
 
 
 def _infer_rank_from_title(title: str) -> Rank | None:
@@ -69,6 +69,11 @@ def parse_summary(xml_data: bytes, scope: ScopeConfig) -> list[Disposition]:
         List of Disposition within scope.
     """
     root = etree.fromstring(xml_data)
+    code = root.findtext("status/code")
+    if code == "404":
+        return []
+    if code is not None and code != "200":
+        raise ValueError(f"BOE summary returned status {code}")
     dispositions: list[Disposition] = []
 
     # Iterate sections → departments → headings → items

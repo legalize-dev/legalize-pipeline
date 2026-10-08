@@ -245,11 +245,11 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
                 "source_id": version.norm_id,
                 "text": text,
             }
-            # Only when the source said so and it differs: the cache stays
-            # comparable with what earlier runs wrote, and "not told" keeps
-            # being distinguishable from "took effect on publication".
-            if version.effective_date and version.effective_date != version.publication_date:
+            # An explicit same-day commencement is different from an unknown date.
+            if version.effective_date:
                 version_dict["effective_date"] = version.effective_date.isoformat()
+            if version.superseded_before_commencement:
+                version_dict["superseded_before_commencement"] = True
             # Preserve CSS classes for lossless round-trip
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
@@ -301,6 +301,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             row["change_note"] = reform.change_note
         if not reform.has_source_date:
             row["has_source_date"] = False
+        if reform.effective_date is not None:
+            row["effective_date"] = reform.effective_date.isoformat()
         reforms.append(row)
 
     return {
@@ -387,6 +389,7 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                         date.fromisoformat(v["effective_date"]) if v.get("effective_date") else None
                     ),
                     paragraphs=tuple(paragraphs),
+                    superseded_before_commencement=v.get("superseded_before_commencement", False),
                 )
             )
         blocks.append(
@@ -421,6 +424,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 affected_blocks=affected,
                 change_note=r.get("change_note", ""),
                 has_source_date=r.get("has_source_date", True),
+                effective_date=(
+                    date.fromisoformat(r["effective_date"]) if r.get("effective_date") else None
+                ),
             )
         )
 

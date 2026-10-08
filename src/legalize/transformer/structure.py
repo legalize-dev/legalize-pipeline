@@ -120,8 +120,9 @@ def count_structure(country: str, paragraphs: list[Paragraph]) -> StructureCount
         role = role_of(paragraph)
         if role in HEADING_ROLES:
             headings += 1
-        if role is ParagraphRole.ARTICLE:
+        article = role in HEADING_ROLES and bool(pattern.match(paragraph.text.lstrip("*_")))
+        if role is ParagraphRole.ARTICLE or article:
             provisions += 1
-            if pattern.match(paragraph.text):
+            if article:
                 articles += 1
     return StructureCounts(articles=articles, provisions=provisions, headings=headings)

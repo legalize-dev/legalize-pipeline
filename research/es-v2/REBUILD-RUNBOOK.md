@@ -20,6 +20,10 @@ The canonical ELI `/dof/spa/xml` response supplies the diary metadata that the
 consolidated API omits. Transient errors must not be accepted as successful
 metadata-poor downloads. Official publication dates remain `Source-Date`;
 commencement belongs in the rendered version's `last_updated` and source metadata.
+Each explicit commencement stage gets its own `Effective-Date` trailer, including
+source events without a body change. Unknown commencement remains unknown: omit
+`last_updated` when selected blocks lack the source date and record their IDs in
+`extra.effective_date_unknown_blocks`. Never substitute publication for it.
 
 The source-fidelity tests use fresh fixtures under `tests/fixtures/es/`. The
 five-law independent review and a local rehearsal must pass before the full
@@ -68,3 +72,22 @@ own fidelity checks for missing structure and empty source text.
 
 See `00-DECISIONES.md` for the approved scope. Its historical estimates and
 unimplemented proposals are evidence to recheck, not operational commands.
+
+Run the first diary tranche locally with the maintained, resumable runner:
+
+```sh
+python scripts/fetch_es_expansion.py --config candidate.yaml --since 2010-01-01
+```
+
+It uses the official summary index for every calendar day, including extraordinary
+Sunday editions. Successful original XML responses are saved in `diary-raw/`;
+`excluded/` records policy exclusions and `diary-fetch-progress.json` records
+failures. Resolve every failure before reporting the tranche complete. Acts
+without consolidation remain `as_enacted`; a later official consolidation is
+picked up by the daily path. The daily rejects backfills that would overwrite a
+newer body and preserves existing source events on reruns.
+
+Validation on 2026-10-08: both five-law source gates pass independently. The
+consolidated gate includes delayed commencement and a projected Civil Code
+wording superseded before it took effect. The diary gate includes tables, inline
+formulas, multilingual text and original bodies retained across amendment events.

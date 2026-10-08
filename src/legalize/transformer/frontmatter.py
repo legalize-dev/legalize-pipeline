@@ -34,7 +34,7 @@ from legalize.transformer.structure import StructureCounts
 
 def render_frontmatter(
     metadata: NormMetadata,
-    version_date: date,
+    version_date: date | None,
     structure: StructureCounts | None = None,
 ) -> str:
     """Generates the YAML frontmatter block for a norm at a given date.
@@ -65,10 +65,11 @@ def render_frontmatter(
         f'country: "{_escape_yaml(metadata.country)}"',
         f'rank: "{_escape_yaml(str(metadata.rank))}"',
         f'publication_date: "{metadata.publication_date.isoformat()}"',
-        f'last_updated: "{version_date.isoformat()}"',
         f'status: "{_escape_yaml(status)}"',
         f'source: "{_escape_yaml(metadata.source)}"',
     ]
+    if version_date is not None:
+        lines.insert(6, f'last_updated: "{version_date.isoformat()}"')
 
     # Spec v0.3: emitted only when the body is not the law in force at
     # last_updated, so files that already state the law correctly never change.

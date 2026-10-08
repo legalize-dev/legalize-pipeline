@@ -201,6 +201,7 @@ class Version:
     # country (#106). Readers fall back with `effective_or_published`.
     effective_date: date | None
     paragraphs: tuple[Paragraph, ...]
+    superseded_before_commencement: bool = False
 
     @property
     def in_force_from(self) -> date:
@@ -294,6 +295,8 @@ class Reform:
     # False for an undated source snapshot: date still selects its effective
     # text, but is not an official publication date (SPEC v0.4, Dates).
     has_source_date: bool = True
+    # A publication may introduce several successive versions of the same text.
+    effective_date: Optional[date] = None
 
 
 # ─────────────────────────────────────────────
