@@ -1,92 +1,70 @@
-# es — how to run the re-emission
+# Spain v0.4 rebuild
 
-> Written 2026-09-04, after the code landed on `feat/es-reemission`. Everything
-> below has been rehearsed on a 20-law scratch repo; nothing has been pushed.
+Updated 2026-10-08. The September branch was an intermediate implementation,
+not a finished publication. Follow `adding-a-country/README.md` and its gates;
+this document records the Spain-specific choices and push precautions.
 
-The code is done. What is left is one long, irreversible run and two switches
-that must not be flipped before it.
+## Prepare and validate locally
 
-## 0. The two switches
+Use a separate candidate repository and data directory. Preserve the existing
+checkout and all unpublished branches. Fetch the entire consolidated catalogue,
+without a publication-year cutoff. Keep the raw responses for replay and compare
+the final set against both the catalogue snapshot and the current published IDs.
 
-They are deliberately off. Each is a **claim about a repo that already
-exists**, so flipping one before the rebuild breaks the corpus it describes.
+Enable these together in the candidate engine branch:
 
-```diff
---- a/src/legalize/countries.py
--ESCAPES_LEGAL_NUMBERING: set[str] = set()
-+ESCAPES_LEGAL_NUMBERING: set[str] = {"es"}
+- `ESCAPES_LEGAL_NUMBERING` includes `es`.
+- `LAYOUT["es"]` uses `{directory}/{id_sha1_2}/{identifier}.md`.
 
---- a/src/legalize/layout.py
-     "eu": SHARDED,
-+    "es": SHARDED,
- }
-```
+The canonical ELI `/dof/spa/xml` response supplies the diary metadata that the
+consolidated API omits. Transient errors must not be accepted as successful
+metadata-poor downloads. Official publication dates remain `Source-Date`;
+commencement belongs in the rendered version's `last_updated` and source metadata.
 
-- **`ESCAPES_LEGAL_NUMBERING`** — with it on, a daily run would start writing
-  escaped numbering into a corpus that has not been re-emitted, and the next
-  reform of any law would carry a whole-file reformat inside its diff. That is
-  what `diff_law` shows a reader.
-- **`LAYOUT["es"]`** — `.legalize.yml` is generated from it. Published before
-  the rebuild, the manifest promises consumers a path shape the repo is not in
-  and every body 404s.
+The source-fidelity tests use fresh fixtures under `tests/fixtures/es/`. The
+five-law independent review and a local rehearsal must pass before the full
+build. For nested tables, preserve the source grid with intentional HTML; other
+tables use Markdown pipes. Run deep health on the completed build, not while
+fast-import is still materializing its working tree.
 
-Flip both in the same commit as the rebuild, never earlier.
+## Push in bounded slices
 
-## 1. Rebuild
+The supported helper is `legalize push`. `legalize commit --batch` only commits;
+it does not push. The older shell helper mentioned in the September runbook no
+longer exists. Never send the entire rewritten object graph in one first push.
 
-```sh
-cd engine
-legalize bootstrap -c es --fresh          # ~12,400 norms, full history
-```
-
-`--fresh` re-inits `countries/es` and deletes `data-es/json/`. The local repo
-is clean at `origin/main` (`cc3d02128`, 0 unpushed) — verify that first, and
-note that the `countries/data-*` caches were deleted on 2026-08-28, so this
-re-fetches everything: ~12,400 metadata + ~12,400 text requests at the
-configured rate.
-
-Discovery is two requests (`?limit=10000&offset=`); it used to be an
-ImportError.
-
-## 2. Verify before pushing
-
-On the rebuilt `countries/es`:
+Keep the public default branch serving the old corpus while uploading the new
+history to a staging branch. On the candidate clone, configure `origin` to fetch
+only that staging branch: the push helper refreshes origin first, and fetching
+all refs would download the old corpus history into the new candidate.
 
 ```sh
-git -C ../countries/es log --oneline | wc -l          # ~44,000
-find ../countries/es/es -name '*.md' | head -3        # es/61/BOE-A-....md
-cat ../countries/es/.legalize.yml                     # path must say {id_sha1_2}
-grep -c 'article_count' ../countries/es/es/*/*.md | head
+legalize --config candidate.yaml push -c es --branch rebuild/es-v04 --slice 5000 --dry-run
+legalize --config candidate.yaml push -c es --branch rebuild/es-v04 --slice 5000
 ```
 
-and the four the rehearsal checked: sharded paths, a `.legalize.yml` declaring
-that shape, escaped numbering with no unescaped survivors, and **zero per-file
-commit chains out of `Source-Date` order**.
+Verify the remote staging tip equals the candidate HEAD; do not infer completion
+from a process exit code alone. If a slice is too large, reduce the slice size and
+resume. The helper uses SSH keepalives and a stall timeout. Do not rewrite the
+public default branch to a one-law root just to make uploads easier.
 
-## 3. Push
+Before final promotion, preserve the live tip in a reachable backup ref and
+verify that no scheduled update has moved it. Coordinate consumer cache
+invalidation and engine rollout. Promote the already-uploaded candidate with an
+explicit `--force-with-lease` expecting that exact live SHA. Never delete and
+recreate the GitHub repository.
 
-`legalize-es` is 1.6 GiB and GitHub rejects a pack over 2.00 GiB, so it goes in
-slices — `scripts/push_slices.sh`, see `adding-a-country/step-9-production.md`
-§9.4 and the `legalize_push_2gib` note.
+After publication, downstream consumers must reconcile their full local history;
+an incremental lookback cannot discover every rewritten historical commit.
+Verify representative live bodies, version histories and tables.
 
-## 4. Re-seed the database — mandatory
+## Expand coverage in separate tranches
 
-Every SHA changes, so an incremental sync cannot see it:
+Adding new files after the rebuild does not require another rewrite. The approved
+first diary tranche is Section I from 2010 onward. Retain administrative acts with
+source-derived signals instead of invented semantic classifications. Exclude
+image-dominated acts with durable records. Later historical tranches need their
+own fidelity checks for missing structure and empty source text.
 
-```sh
-cd ../enrichment
-law-sync full --repo ../countries/es
-```
-
-`pt` must not ride the same batch (see `full_sync_prod_load`).
-
-## 5. What does *not* go in this pass
-
-- **The non-consolidated corpus (#66).** Adding files later needs no rebuild —
-  only changing the frontmatter or the path of files that already exist does.
-  Tranche 1 is 2010→today, ~14,300 acts, 0 % structure failure in the dry run.
-- **Moving the 51-entry BOE class map into `fetcher/es/`** (the other half of
-  #128). It is a refactor with a byte-for-byte safety net and needs no
-  reprocess.
-- **#131**, the backfill regression. It is about what the backfill does *after*
-  this, and its guard belongs in shared code.
+See `00-DECISIONES.md` for the approved scope. Its historical estimates and
+unimplemented proposals are evidence to recheck, not operational commands.

@@ -91,6 +91,11 @@ def test_config(tmp_path) -> Config:
     return Config(
         git=GitConfig(),
         countries={
+            "lt": CountryConfig(
+                repo_path=str(tmp_path / "lt-repo"),
+                data_dir=str(tmp_path / "lt-data"),
+                state_path=str(tmp_path / "lt-state.json"),
+            ),
             "es": CountryConfig(
                 repo_path=str(tmp_path / "repo"),
                 data_dir=str(tmp_path / "data"),
@@ -125,7 +130,7 @@ class TestGenericFetchErrorHandling:
             patch("legalize.countries.get_text_parser"),
             patch("legalize.countries.get_metadata_parser"),
         ):
-            result = generic_fetch_one(test_config, "es", "TEST-NORM-001", force=True)
+            result = generic_fetch_one(test_config, "lt", "TEST-NORM-001", force=True)
 
         assert result is None
 
@@ -211,7 +216,7 @@ class TestGenericFetchErrorHandling:
             patch("legalize.countries.get_text_parser", return_value=mock_text_parser),
             patch("legalize.countries.get_metadata_parser", return_value=mock_meta_parser),
         ):
-            result = generic_fetch_one(test_config, "es", "TEST-SV", force=True)
+            result = generic_fetch_one(test_config, "lt", "TEST-SV", force=True)
 
         assert result is None
         mock_client.get_suvestine.assert_called_once()
@@ -236,7 +241,7 @@ class TestGenericFetchErrorHandling:
             patch("legalize.countries.get_text_parser"),
             patch("legalize.countries.get_metadata_parser", return_value=mock_meta_parser),
         ):
-            result = generic_fetch_one(test_config, "es", "TEST-NORM-BAD", force=True)
+            result = generic_fetch_one(test_config, "lt", "TEST-NORM-BAD", force=True)
 
         assert result is None
 

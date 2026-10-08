@@ -13,12 +13,27 @@ import requests
 from rich.console import Console
 
 from legalize.config import Config
-from legalize.models import ParsedNorm
+from legalize.models import NormMetadata, ParsedNorm
 from legalize.storage import load_norma_from_json, save_structured_json
 from legalize.transformer.xml_parser import extract_reforms, parse_text_xml
 
 console = Console()
 logger = logging.getLogger(__name__)
+
+
+def fetch_metadata(client, boe_id: str) -> NormMetadata:
+    """Fetch both BOE metadata surfaces, retrying incomplete transient responses."""
+    from legalize.fetcher.es.metadata import parse_metadata
+
+    meta_xml = client.get_metadata(boe_id)
+    metadata = parse_metadata(meta_xml, boe_id)
+    try:
+        diario_xml = client.get_disposition_xml(boe_id, eli_url=metadata.source)
+    except requests.HTTPError as exc:
+        if exc.response is None or exc.response.status_code != 404:
+            raise
+        diario_xml = None
+    return parse_metadata(meta_xml, boe_id, diario_xml=diario_xml)
 
 
 def fetch_one(config: Config, boe_id: str, force: bool = False) -> ParsedNorm | None:
@@ -30,7 +45,6 @@ def fetch_one(config: Config, boe_id: str, force: bool = False) -> ParsedNorm | 
     from legalize.fetcher.cache import FileCache
     from legalize.fetcher.es.client import BOEClient
     from legalize.fetcher.es.config import BOEConfig
-    from legalize.fetcher.es.metadata import parse_metadata
 
     cc = config.get_country("es")
     json_path = Path(cc.data_dir) / "json" / f"{boe_id}.json"
@@ -49,12 +63,7 @@ def fetch_one(config: Config, boe_id: str, force: bool = False) -> ParsedNorm | 
     with BOEClient(boe_config, cache) as client:
         try:
             console.print(f"  Downloading [bold]{boe_id}[/bold]...")
-            meta_xml = client.get_metadata(boe_id)
-            try:
-                diario_xml = client.get_disposition_xml(boe_id)
-            except (requests.RequestException, ValueError):
-                diario_xml = None
-            metadata = parse_metadata(meta_xml, boe_id, diario_xml=diario_xml)
+            metadata = fetch_metadata(client, boe_id)
             text_xml = client.get_consolidated_text(boe_id, bypass_cache=force)
 
             blocks = parse_text_xml(text_xml)

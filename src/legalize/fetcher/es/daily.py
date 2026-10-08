@@ -62,17 +62,12 @@ def _commit_reforms(
     which says "Reforma del apartado 3 del artículo 69" as readily as it says
     "modifica" — and the fourth reform of the Constitution was lost that way.
     """
-    from legalize.fetcher.es.metadata import parse_metadata
+    from legalize.fetcher.es.fetch import fetch_metadata
 
     commits = 0
     for norm_id in _updated_norms(client, start, current_date):
         try:
-            meta_xml = client.get_metadata(norm_id)
-            try:
-                diario_xml = client.get_disposition_xml(norm_id)
-            except (requests.RequestException, ValueError):
-                diario_xml = None
-            metadata = parse_metadata(meta_xml, norm_id, diario_xml=diario_xml)
+            metadata = fetch_metadata(client, norm_id)
 
             file_path = norm_to_filepath(metadata)
             if not repo.has_file(file_path):
@@ -101,7 +96,7 @@ def _commit_reforms(
             if repo.has_commit_with_source_id(reform.norm_id, metadata.identifier):
                 continue
 
-            markdown = render_norm_at_date(metadata, blocks, current_date)
+            markdown = render_norm_at_date(metadata, blocks, reform.date, source_id=reform.norm_id)
             if not repo.write_and_add(file_path, markdown):
                 continue
 
@@ -136,7 +131,7 @@ def daily(
     from legalize.fetcher.cache import FileCache
     from legalize.fetcher.es.client import BOEClient
     from legalize.fetcher.es.config import BOEConfig, ScopeConfig
-    from legalize.fetcher.es.metadata import parse_metadata
+    from legalize.fetcher.es.fetch import fetch_metadata
     from legalize.fetcher.es.sumario import parse_summary
 
     cc = config.get_country("es")
@@ -219,17 +214,18 @@ def daily(
                 # it did to the corpus arrives as an update to the norm it touched —
                 # which the amendment pass above publishes.
                 try:
-                    meta_xml = client.get_metadata(disp.id_boe)
-                    try:
-                        diario_xml = client.get_disposition_xml(disp.id_boe)
-                    except (requests.RequestException, ValueError):
-                        diario_xml = None
-                    metadata = parse_metadata(meta_xml, disp.id_boe, diario_xml=diario_xml)
+                    metadata = fetch_metadata(client, disp.id_boe)
                     text_xml = client.get_consolidated_text(metadata.identifier)
                     blocks = parse_text_xml(text_xml)
 
                     file_path = norm_to_filepath(metadata)
-                    markdown = render_norm_at_date(metadata, blocks, current_date)
+                    markdown = render_norm_at_date(
+                        metadata,
+                        blocks,
+                        metadata.publication_date,
+                        include_all=True,
+                        source_id=metadata.identifier,
+                    )
 
                     if repo.has_commit_with_source_id(disp.id_boe):
                         continue

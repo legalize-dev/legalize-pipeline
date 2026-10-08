@@ -254,6 +254,15 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
                 version_dict["css_classes"] = css_classes
+            if any(p.expiry_date or "\n\n" in p.text for p in version.paragraphs):
+                version_dict["paragraphs"] = [
+                    {
+                        "css_class": p.css_class,
+                        "text": p.text,
+                        **({"expiry_date": p.expiry_date.isoformat()} if p.expiry_date else {}),
+                    }
+                    for p in version.paragraphs
+                ]
             article["versions"].append(version_dict)
 
         # current_text = latest version
@@ -354,7 +363,18 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
         for v in art["versions"]:
             paragraphs = []
             css_classes = v.get("css_classes")
-            if v["text"].strip():
+            if "paragraphs" in v:
+                paragraphs = [
+                    Paragraph(
+                        css_class=p["css_class"],
+                        text=p["text"],
+                        expiry_date=date.fromisoformat(p["expiry_date"])
+                        if p.get("expiry_date")
+                        else None,
+                    )
+                    for p in v["paragraphs"]
+                ]
+            elif v["text"].strip():
                 lines = [line.strip() for line in v["text"].split("\n\n") if line.strip()]
                 for i, line in enumerate(lines):
                     css = css_classes[i] if css_classes and i < len(css_classes) else "parrafo"

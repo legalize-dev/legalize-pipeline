@@ -848,7 +848,7 @@
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Norma suprema del ordenamiento (rango: constitucion).",
           "examples": [
-            "es/BOE-A-1978-31229.md"
+            "es/bb/BOE-A-1978-31229.md"
           ]
         },
         {
@@ -862,7 +862,7 @@
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Leyes ordinarias (rango: ley).",
           "examples": [
-            "es/BOE-A-2015-11430.md"
+            "es/70/BOE-A-2015-11430.md"
           ]
         },
         {
@@ -876,7 +876,7 @@
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Textos refundidos (rango: real_decreto_legislativo).",
           "examples": [
-            "es/BOE-A-1996-8930.md"
+            "es/d9/BOE-A-1996-8930.md"
           ]
         },
         {
@@ -893,13 +893,13 @@
         },
         {
           "label": "Normativa autonómica (foral/regional)",
-          "pattern": "es-XX/BOE-A-AAAA-N.md",
+          "pattern": "es-XX/XX/BOE-A-AAAA-N.md",
           "note": "Leyes y decretos de comunidades autónomas, ubicados en directorios por jurisdicción ELI (es-pv, es-ct, es-ga, etc.). Incluye rangos forales: ley foral, decreto legislativo, decreto-ley, decreto-ley foral, decreto foral legislativo.",
           "examples": []
         }
       ],
       "attribution": "> Fuente de los datos: Agencia Estatal Boletín Oficial del Estado (https://www.boe.es). Datos reutilizados conforme a las condiciones de reutilización del BOE (Resolución de 27 de junio de 2024). Este repositorio es una obra derivada basada en datos de la Agencia Estatal Boletín Oficial del Estado.",
-      "notes": "## Estructura de ficheros\n\nEstructura plana: un directorio por ámbito (es/ para el Estado; es-XX/ por comunidad autónoma según código ELI). El rango de la norma (constitución, ley orgánica, ley, real decreto, etc.) figura en el frontmatter YAML, nunca en la ruta del fichero.\n\n## Limitaciones\n\nLas imágenes del texto original se omiten (el proyecto no incorpora activos binarios). Se conserva el texto, las tablas, el formato enriquecido y los metadatos. El identificador del fichero es el ID oficial del BOE; un cambio de formato implicaría regenerar todo el historial de commits."
+      "notes": "## Estructura de ficheros\n\nUn directorio por ámbito (es/ para el Estado; es-XX/ por comunidad autónoma según código ELI), dividido en subdirectorios con los dos primeros caracteres del SHA-1 del identificador. El manifiesto .legalize.yml declara la ruta de cada norma. El rango figura en el frontmatter YAML.\n\n## Limitaciones\n\nTexto consolidado de carácter meramente informativo. El texto se transforma a Markdown; se conservan referencias a imágenes oficiales, sin copiar activos binarios. Las tablas anidadas se representan como HTML para preservar sus celdas. Las fechas de publicación y de entrada en vigor se distinguen: Source-Date fecha la publicación del acto, y last_updated la entrada en vigor de la redacción incluida."
     },
     "eu": {
       "code": "eu",

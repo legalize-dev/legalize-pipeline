@@ -186,6 +186,7 @@ class Paragraph:
     # is resolved from `css_class` through the shared table in `markdown.py`,
     # which is the migration path out of #128 — no corpus moves either way.
     role: ParagraphRole | None = None
+    expiry_date: date | None = None
 
 
 @dataclass(frozen=True)

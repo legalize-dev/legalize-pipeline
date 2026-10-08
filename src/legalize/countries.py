@@ -102,7 +102,7 @@ def text_state_for(country_code: str) -> TextState:
 # would make the next reform of a law carry a whole-file reformat in its diff,
 # which is what `diff_law` shows a reader. Measured share of files that move:
 # es 86.2 %, ie 14.7 %, ar 9.3 %, pt 4.4 %, se 1.0 %, uy 1.5 %.
-ESCAPES_LEGAL_NUMBERING: set[str] = set()
+ESCAPES_LEGAL_NUMBERING: set[str] = {"es"}
 
 
 def escapes_legal_numbering(country_code: str) -> bool:

@@ -176,8 +176,8 @@ def _meta(identifier: str, country: str, jurisdiction: str | None = None, **kw) 
 
 
 def test_directory_is_the_jurisdiction_then_the_country():
-    assert norm_to_filepath(_meta("BOE-A-1978-31229", "es")) == "es/BOE-A-1978-31229.md"
-    assert norm_to_filepath(_meta("BOE-A-2020-615", "es", "es-pv")) == "es-pv/BOE-A-2020-615.md"
+    assert norm_to_filepath(_meta("BOE-A-1978-31229", "es")) == "es/bb/BOE-A-1978-31229.md"
+    assert norm_to_filepath(_meta("BOE-A-2020-615", "es", "es-pv")) == "es-pv/ff/BOE-A-2020-615.md"
 
 
 def test_a_sharded_country_shards_all_of_its_directories(monkeypatch):

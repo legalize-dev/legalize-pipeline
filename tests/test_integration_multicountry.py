@@ -314,11 +314,7 @@ class TestGenericCommitMultiCountry:
         _save_norm(test_config, norm)
         commit_one(test_config, norm.metadata.country, norm.metadata.identifier)
 
-        md_path = (
-            Path(test_config.get_country("es").repo_path)
-            / expected_dir
-            / f"{norm.metadata.identifier}.md"
-        )
+        md_path = Path(test_config.get_country("es").repo_path) / norm_to_filepath(norm.metadata)
         assert md_path.exists(), f"Expected {md_path} to exist"
 
         content = md_path.read_text(encoding="utf-8")
@@ -338,11 +334,7 @@ class TestGenericCommitMultiCountry:
         _save_norm(test_config, norm)
         commit_one(test_config, norm.metadata.country, norm.metadata.identifier)
 
-        md_path = (
-            Path(test_config.get_country("es").repo_path)
-            / expected_dir
-            / f"{norm.metadata.identifier}.md"
-        )
+        md_path = Path(test_config.get_country("es").repo_path) / norm_to_filepath(norm.metadata)
         content = md_path.read_text(encoding="utf-8")
         assert f'country: "{norm.metadata.country}"' in content
 
@@ -463,7 +455,7 @@ class TestMultiVersionNorm:
         contents = []
         for sha in shas:
             show = subprocess.run(
-                ["git", "show", f"{sha}:es/TEST-FOUR-VERSIONS.md"],
+                ["git", "show", f"{sha}:es/43/TEST-FOUR-VERSIONS.md"],
                 cwd=test_config.get_country("es").repo_path,
                 capture_output=True,
                 text=True,
@@ -615,7 +607,7 @@ class TestCommitAllMultiCountry:
         self._commit_all_countries(test_config)
 
         repo = Path(test_config.get_country("es").repo_path)
-        assert (repo / "es" / "BOE-A-2000-100.md").exists()
+        assert (repo / "es" / "3c" / "BOE-A-2000-100.md").exists()
         assert (repo / "fr" / "LEGITEXT000006070721.md").exists()
         assert (repo / "se" / "SFS-1962-700.md").exists()
 
@@ -628,7 +620,7 @@ class TestCommitAllMultiCountry:
 
         repo = Path(test_config.get_country("es").repo_path)
 
-        es_content = (repo / "es" / "BOE-A-2000-100.md").read_text(encoding="utf-8")
+        es_content = (repo / "es" / "3c" / "BOE-A-2000-100.md").read_text(encoding="utf-8")
         assert 'country: "es"' in es_content
         assert 'rank: "ley"' in es_content
 
@@ -671,7 +663,7 @@ class TestSlugMultiCountry:
 
     def test_spanish_norm_path(self):
         norm = _make_norm_es()
-        assert norm_to_filepath(norm.metadata) == "es/BOE-A-2000-100.md"
+        assert norm_to_filepath(norm.metadata) == "es/3c/BOE-A-2000-100.md"
 
     def test_french_norm_path(self):
         norm = _make_norm_fr()
@@ -695,7 +687,7 @@ class TestSlugMultiCountry:
             source="https://example.com",
             jurisdiction="es-pv",
         )
-        assert norm_to_filepath(meta) == "es-pv/BOE-A-2020-615.md"
+        assert norm_to_filepath(meta) == "es-pv/ff/BOE-A-2020-615.md"
 
 
 # ─────────────────────────────────────────────
@@ -709,7 +701,7 @@ class TestBootstrapIncludesAllBlocks:
 
     This class used to assert the opposite, and that is how 2,553 files and
     20,523 headings reached `legalize-es` claiming a date their body does not
-    match: `es/BOE-A-1985-12666.md` (LOPJ), bootstrap dated 1985-07-02, shipped
+    match: `es/d6/BOE-A-1985-12666.md` (LOPJ), bootstrap dated 1985-07-02, shipped
     `Artículo 4 bis` on the application of European Union law, added in 2015 —
     Spain joined the EEC in 1986. The file declares itself `point_in_time` and
     was not (#106).
@@ -787,7 +779,7 @@ class TestBootstrapIncludesAllBlocks:
         )
         first_sha = result.stdout.strip().splitlines()[0]
         show = subprocess.run(
-            ["git", "show", f"{first_sha}:es/TEST-INCLUDE-ALL.md"],
+            ["git", "show", f"{first_sha}:es/a4/TEST-INCLUDE-ALL.md"],
             cwd=test_config.get_country("es").repo_path,
             capture_output=True,
             text=True,
@@ -818,7 +810,9 @@ class TestBootstrapIncludesAllBlocks:
         )
         commit_one(test_config, "es", "TEST-INCLUDE-ALL")
 
-        md_path = Path(test_config.get_country("es").repo_path) / "es" / "TEST-INCLUDE-ALL.md"
+        md_path = (
+            Path(test_config.get_country("es").repo_path) / "es" / "a4" / "TEST-INCLUDE-ALL.md"
+        )
         content = md_path.read_text(encoding="utf-8")
         assert "Text of article 2 added later" in content
         assert "Original text of article 3" in content
@@ -831,7 +825,9 @@ class TestBootstrapIncludesAllBlocks:
         assert commits == 2
 
         # Get the markdown at the last commit
-        md_path = Path(test_config.get_country("es").repo_path) / "es" / "TEST-INCLUDE-ALL.md"
+        md_path = (
+            Path(test_config.get_country("es").repo_path) / "es" / "a4" / "TEST-INCLUDE-ALL.md"
+        )
         content = md_path.read_text(encoding="utf-8")
 
         # Article 3 should now have the reformed text

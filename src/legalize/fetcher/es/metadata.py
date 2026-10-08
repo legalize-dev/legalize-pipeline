@@ -26,9 +26,10 @@ Actual API structure (XML):
 
 from __future__ import annotations
 
+import json
 import logging
 import re
-from datetime import date
+from datetime import date, datetime
 
 from lxml import etree
 
@@ -162,7 +163,7 @@ def _parse_status(meta: etree._Element) -> NormStatus:
     if repeal_status == "P":
         return NormStatus.PARTIALLY_REPEALED
 
-    annulment = _text_of(meta, "estatus_anulacion")
+    annulment = _text_of(meta, "estatus_anulacion") or _text_of(meta, "judicialmente_anulada")
     if annulment == "S":
         return NormStatus.ANNULLED
 
@@ -237,7 +238,7 @@ def _extract_jurisdiction(meta: etree._Element) -> str | None:
     Uses the departamento code to determine the ELI jurisdiction.
     Returns None for state-level legislation (ambito=1).
     """
-    scope_code = _code_of(meta, "ambito")
+    scope_code = _code_of(meta, "ambito") or _code_of(meta, "origen_legislativo")
     if scope_code != "2":
         return None
 
@@ -323,13 +324,21 @@ def parse_metadata(
     # From /metadatos
     add("department_code", _code_of(meta, "departamento"))
     add("rank_code", _code_of(meta, "rango"))
-    add("scope_code", _code_of(meta, "ambito"))
+    add("scope_code", _code_of(meta, "ambito") or _code_of(meta, "origen_legislativo"))
     add("official_number", _text_of(meta, "numero_oficial"))
     enactment_date = _parse_date_boe(_text_of(meta, "fecha_disposicion"))
     if enactment_date:
         add("enactment_date", enactment_date.isoformat())
     add("official_journal", _text_of(meta, "diario"))
     add("journal_issue", _text_of(meta, "diario_numero"))
+    if effective_date:
+        add("entry_into_force", effective_date.isoformat())
+    updated = _text_of(meta, "fecha_actualizacion")
+    if updated:
+        add("source_updated_at", datetime.strptime(updated, "%Y%m%dT%H%M%SZ").isoformat() + "Z")
+    annulment_date = _parse_date_boe(_text_of(meta, "fecha_anulacion"))
+    if annulment_date:
+        add("annulment_date", annulment_date.isoformat())
     repeal_date = _parse_date_boe(_text_of(meta, "fecha_derogacion"))
     if repeal_date:
         add("repeal_date", repeal_date.isoformat())
@@ -340,9 +349,16 @@ def parse_metadata(
     if validity_exhausted and validity_exhausted != "N":
         add("validity_exhausted", validity_exhausted)
     add("consolidation_status", _text_of(meta, "estado_consolidacion"))
-    add("scope", _text_of(meta, "ambito"))
+    add("consolidation_status_code", _code_of(meta, "estado_consolidacion"))
+    add("scope", _text_of(meta, "ambito") or _text_of(meta, "origen_legislativo"))
     add("url_eli", _text_of(meta, "url_eli"))
     add("url_html", _text_of(meta, "url_html_consolidada"))
+    add("source_notice", "Texto consolidado de carácter meramente informativo.")
+    add(
+        "source_attribution",
+        "Basado en datos de la Agencia Estatal Boletín Oficial del Estado (https://www.boe.es).",
+    )
+    add("reuse_conditions", "https://www.boe.es/informacion/aviso_legal/index.php")
 
     # From /diario_boe/xml.php (richer, if provided)
     subjects: list[str] = []
@@ -404,7 +420,7 @@ def _reference(el) -> str:
     RELACIÓN").
     """
     rid = (el.get("referencia") or el.findtext("id_norma") or "").strip()
-    if not rid.startswith("BOE-"):
+    if not rid:
         return ""
     word = el.find("palabra")
     if word is None:
@@ -498,11 +514,10 @@ def _parse_diario_xml(
     extra: list[tuple[str, str]] = []
     last_amendment: str | None = None
 
-    try:
-        root = etree.fromstring(diario_xml)
-    except Exception:
-        logger.warning("diario XML parse failed")
-        return subjects, pdf_url, extra, last_amendment
+    root = etree.fromstring(strip_control(decode_utf8(diario_xml)).encode("utf-8"))
+    updated = root.get("fecha_actualizacion")
+    if updated:
+        extra.append(("diary_updated_at", datetime.strptime(updated, "%Y%m%d%H%M%S").isoformat()))
 
     dm = root.find("metadatos")
     if dm is not None:
@@ -512,7 +527,6 @@ def _parse_diario_xml(
             # spellings, identical in 12,298 of 12,299 files (#129).
             pdf_url = f"https://www.boe.es{url_pdf}" if url_pdf.startswith("/") else url_pdf
         for name, key in (
-            ("url_epub", "url_epub"),
             # ISO 639-1, not the Spanish exonym: a Belgian corpus emits url_pdf_nl /
             # url_pdf_fr and a consumer written against es keeps working (#129).
             ("url_pdf_catalan", "url_pdf_ca"),
@@ -523,12 +537,25 @@ def _parse_diario_xml(
             ("pagina_final", "page_end"),
             ("letra_imagen", "image_marker"),
             ("estatus_legislativo", "legislative_status"),
+            ("seccion", "section"),
+            ("subseccion", "subsection"),
+            ("suplemento_pagina_inicial", "supplement_page_start"),
+            ("suplemento_pagina_final", "supplement_page_end"),
+            ("suplemento_letra_imagen", "supplement_image_marker"),
         ):
             v = _text_of(dm, name)
             if v:
                 if name.startswith("url_") and v.startswith("/"):
                     v = f"https://www.boe.es{v}"
                 extra.append((key, v))
+        journal_code = _code_of(dm, "diario")
+        if journal_code:
+            extra.append(("official_journal_code", journal_code))
+        epub = dm.find("url_epub")
+        if epub is not None:
+            urls = [text.strip() for text in epub.itertext() if text.strip()]
+            if urls:
+                extra.append(("url_epub", " | ".join(urls)))
 
     analisis = root.find("analisis")
     if analisis is not None:
@@ -542,8 +569,26 @@ def _parse_diario_xml(
             alist = [a.text.strip() for a in alertas.findall("alerta") if a.text]
             if alist:
                 extra.append(("alerts", "; ".join(alist)))
+        for path, key in (
+            ("materias/materia", "subject_codes"),
+            ("alertas/alerta", "alert_codes"),
+            ("notas/nota", "notes"),
+        ):
+            entries = [
+                {"text": " ".join(el.itertext()).strip(), **el.attrib}
+                for el in analisis.findall(path)
+            ]
+            if entries:
+                extra.append((key, json.dumps(entries, ensure_ascii=False, separators=(",", ":"))))
         referencias = analisis.find("referencias")
         if referencias is not None:
+            order = {
+                el.get("referencia"): el.get("orden")
+                for el in referencias.xpath("anteriores/anterior | posteriores/posterior")
+                if el.get("referencia") and el.get("orden")
+            }
+            if order:
+                extra.append(("reference_order", json.dumps(order, ensure_ascii=False)))
             last_amendment = last_amendment_of(referencias)
             ants = referencias.find("anteriores")
             if ants is not None:
@@ -575,4 +620,35 @@ def _parse_diario_xml(
                     extra.append(("references_subsequent", " | ".join(refs)))
                     extra.append(("references_subsequent_count", str(len(refs))))
 
+    rdf = root.find("metadata-eli")
+    if rdf is not None:
+        # Retain the graph's subjects and typed values without embedding raw XML.
+        rdf_ns = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}"
+        graph = {}
+        for node in rdf.iter():
+            subject = node.get(rdf_ns + "about")
+            if not subject:
+                continue
+            properties = graph.setdefault(subject, {})
+            for prop in node:
+                if not isinstance(prop.tag, str):
+                    continue
+                name = etree.QName(prop).localname
+                values = properties.setdefault(name, [])
+                value = prop.get(rdf_ns + "resource") or (prop.text or "").strip()
+                if value:
+                    entry = {"value": value}
+                    if prop.get(rdf_ns + "datatype"):
+                        entry["datatype"] = prop.get(rdf_ns + "datatype")
+                    if entry not in values:
+                        values.append(entry)
+                for child in prop:
+                    if child.get(rdf_ns + "about"):
+                        entry = {"value": child.get(rdf_ns + "about")}
+                        if entry not in values:
+                            values.append(entry)
+        if graph:
+            extra.append(
+                ("eli_metadata", json.dumps(graph, ensure_ascii=False, separators=(",", ":")))
+            )
     return subjects, pdf_url, extra, last_amendment

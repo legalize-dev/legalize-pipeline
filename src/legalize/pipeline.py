@@ -352,6 +352,11 @@ def generic_fetch_one(
     Uses the country's client, text_parser, and metadata_parser.
     Saves structured JSON to data_dir.
     """
+    if country == "es":
+        from legalize.fetcher.es.fetch import fetch_one
+
+        return fetch_one(config, norm_id, force=force)
+
     from legalize.countries import get_client_class, get_metadata_parser, get_text_parser
 
     cc = config.get_country(country)
@@ -747,7 +752,7 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
             blocks,
             reform.date,
             include_all=is_first,
-            source_id=reform.norm_id if country == "eu" else None,
+            source_id=reform.norm_id if country in {"es", "eu"} else None,
         )
         changed = repo.write_and_add(file_path, markdown)
 
@@ -1110,7 +1115,7 @@ def commit_all_fast(
                         blocks,
                         reform.date,
                         include_all=is_first,
-                        source_id=reform.norm_id if country == "eu" else None,
+                        source_id=reform.norm_id if country in {"es", "eu"} else None,
                     )
                     file_path = norm_to_filepath(metadata)
 

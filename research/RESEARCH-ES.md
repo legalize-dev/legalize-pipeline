@@ -158,13 +158,16 @@ difference between an hour and a day. Ask for XML.
 
 ---
 
-## §0.2 Fixtures — **NOT DONE, action item**
+## §0.2 Fixtures — refreshed 2026-10-08
 
-`engine/tests/fixtures/es/` **does not exist.** Verified: `ls tests/fixtures/es` → *No such
-file or directory*, against 51 entries for other countries. Spain's only fixtures are two
-loose files at the top of `tests/fixtures/` (`constitucion-sample.xml`,
-`bcn-constitucion-sample.xml`) from before the per-country convention existed. This research
-pass was read-only and deliberately did not create them.
+The seven source specimens now live in `tests/fixtures/es/`, as deterministic
+`.xml.gz` files. `samples.json` records their identifiers and canonical ELI diary
+URLs. Consolidated samples each include separate metadata, text and diary XML;
+`version-spike.txt` records the live history probe. Tests in
+`tests/test_es_source_fidelity.py` exercise fetch enrichment, cache round-trips,
+publication snapshots with delayed commencement, retroactive amendments and
+expiry of editorial annotations. The measurements below describe the September
+research baseline; the checked-in October XML is authoritative for regression tests.
 
 The five the playbook requires, with the ids this pass established as the right choices:
 
@@ -190,7 +193,38 @@ status-stratified norms, 54 diary documents, 53 consolidated texts (9,723 `<bloq
 **A** = the same document's `<analisis>` · **E** = its `<metadata-eli>` · **T** = `/texto`
 `<bloque>`/`<version>` attributes. `file:line` is under `engine/src/legalize/`.
 
-### Parsed today
+### Implementation update — 2026-10-08
+
+The inventory below records the September defects, retained as research evidence.
+The rebuild now preserves the following previously missing fields in English extras:
+
+- `entry_into_force`, `source_updated_at` (UTC ISO timestamp), `diary_updated_at`
+  (local source timestamp, without an invented UTC offset), `annulment_date`.
+- `consolidation_status_code`, `official_journal_code`, `section`, `subsection`,
+  `supplement_page_start`, `supplement_page_end`, `supplement_image_marker`.
+- Nested `url_epub`; `subject_codes`, `alert_codes`, `notes` as JSON arrays
+  preserving source labels, codes and ordering; `reference_order` for nonempty
+  reference ordering attributes. References retain their text and verb codes,
+  including targets outside the BOE identifier namespace, without truncation.
+- `eli_metadata` as a JSON graph keyed by resource URI, preserving ELI property
+  values, typed literals and links to nested resources. Core fields already
+  representing the same fact (jurisdiction, rank, status) remain canonical.
+
+`bloque@fecha_caducidad` and paragraph/blockquote `caduca` are cached and applied
+when rendering. Empty source values are omitted. `Source-Date` remains the
+publication date required by the current specification; `last_updated` describes
+the effective date of the rendered text. A publication snapshot excludes versions
+published later and includes delayed commencement in the versions already known.
+Tables containing a nested table use intentional, sanitized HTML for that outer
+table: Markdown pipe tables cannot represent nested grids. Other tables remain
+pipe tables. The nested representation preserves source cells and headings and
+is supported by standard Markdown renderers. Visual paragraph indentation stays
+prose, since four-space Markdown indentation would turn legislation into code.
+Daily and bootstrap fetching must both retain diary enrichment. A temporary diary
+failure must be retried, not accepted as a metadata-poor successful fetch.
+
+### September parser baseline
+
 
 | Source field | Surface | Type | Example | Parsed at | Frontmatter | Verdict |
 |---|---|---|---|---|---|---|

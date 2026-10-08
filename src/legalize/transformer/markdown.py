@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import re
+from dataclasses import replace
 from datetime import date
 from typing import Callable
 
@@ -68,9 +69,9 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "cita_con_pleca": lambda t: f"> {t}\n",
     "cita_ley": lambda t: f"> {t}\n",
     "cita_art": lambda t: f"> {t}\n",
-    "sangrado": lambda t: f"    {t}\n",
-    "sangrado_2": lambda t: f"        {t}\n",
-    "sangrado_articulo": lambda t: f"    {t}\n",
+    "sangrado": lambda t: f"{t}\n",
+    "sangrado_2": lambda t: f"{t}\n",
+    "sangrado_articulo": lambda t: f"{t}\n",
     # --- editorial notes: the BOE talking about the act, not the act ---
     # Rendered as quoted small text so a reader can tell them from the law.
     # `siempreSeVe` is the status banner ("Norma derogada, con efectos de…"),
@@ -240,6 +241,24 @@ def render_norm_at_date(
     source_id: str | None = None,
 ) -> str:
     """Generate the complete Markdown for a norm at a given point in time."""
+    if (
+        metadata.country == "es"
+        and metadata.text_state is TextState.POINT_IN_TIME
+        and source_id is not None
+    ):
+        # A published amendment can apply later; exclude versions not published yet.
+        blocks = [
+            replace(
+                block,
+                versions=tuple(v for v in block.versions if v.publication_date <= target_date),
+            )
+            for block in blocks
+        ]
+        target_date = max(
+            (v.in_force_from for block in blocks for v in block.versions),
+            default=target_date,
+        )
+
     selected = []
     for block in blocks:
         if metadata.country == "eu":
@@ -256,6 +275,15 @@ def render_norm_at_date(
             )
         else:
             version = get_block_at_date(block, target_date)
+        if version is not None:
+            version = replace(
+                version,
+                paragraphs=tuple(
+                    p
+                    for p in version.paragraphs
+                    if p.expiry_date is None or target_date < p.expiry_date
+                ),
+            )
         selected.append(version)
 
     # ``include_all`` used to fill every unresolved block from its earliest

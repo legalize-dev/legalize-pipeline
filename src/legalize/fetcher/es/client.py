@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import logging
 from datetime import date
+from urllib.parse import urljoin
+
+from lxml import html
 
 from legalize.fetcher.base import HttpClient
 from legalize.fetcher.es.config import BOEConfig
@@ -135,12 +138,15 @@ class BOEClient(HttpClient):
         path = f"/api/legislacion-consolidada/id/{id_boe}/metadatos"
         return self._fetch(self._build_url(path))
 
-    def get_disposition_xml(self, id_boe: str) -> bytes:
-        """Fetches the raw BOE disposition XML: /diario_boe/xml.php?id={id}.
-
-        This is the full diary entry XML (not the open data API) which
-        contains an <analisis> section with references to affected norms.
-        """
-        base = self._config.base_url.rsplit("/", 1)[0]
-        url = f"{base}/diario_boe/xml.php?id={id_boe}"
-        return self._fetch(url)
+    def get_disposition_xml(self, id_boe: str, *, eli_url: str | None = None) -> bytes:
+        """Fetch the full diary entry through its canonical ELI XML resource."""
+        if not eli_url or not eli_url.startswith("https://www.boe.es/eli/"):
+            page = html.fromstring(self._fetch(f"https://www.boe.es/buscar/doc.php?id={id_boe}"))
+            links = [urljoin("https://www.boe.es", href) for href in page.xpath("//a/@href")]
+            eli_url = next(
+                (url for url in links if url.startswith("https://www.boe.es/eli/")), None
+            )
+        if not eli_url:
+            raise ValueError(f"{id_boe}: source page has no ELI XML resource")
+        eli_url = eli_url.rstrip("/").removesuffix("/dof")
+        return self._fetch(eli_url + "/dof/spa/xml")

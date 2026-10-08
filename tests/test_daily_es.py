@@ -129,8 +129,8 @@ class TestUpdatedNorms:
 def repo_with_constitution(tmp_path: Path) -> tuple[GitRepo, Path]:
     """A repo holding the Constitution as the corpus had it before the 2026 reform."""
     root = tmp_path / "es"
-    (root / "es").mkdir(parents=True)
-    (root / "es" / "BOE-A-1978-31229.md").write_text("# Constitucion Espanola\n")
+    (root / "es" / "bb").mkdir(parents=True)
+    (root / "es" / "bb" / "BOE-A-1978-31229.md").write_text("# Constitucion Espanola\n")
 
     for args in (
         ["init", "-b", "main"],
@@ -185,7 +185,7 @@ class TestCommitReforms:
         assert "Articulo 69" in message
         # dated at the amendment, not at the day the run happened to notice it
         assert message.splitlines()[-1] == "2026-05-20"
-        assert "Formentera" in (root / "es" / "BOE-A-1978-31229.md").read_text()
+        assert "Formentera" in (root / "es" / "bb" / "BOE-A-1978-31229.md").read_text()
 
     def test_second_run_is_a_no_op(self, repo_with_constitution):
         """The window overlaps by a day, so re-seeing a norm must commit nothing."""
@@ -211,7 +211,7 @@ class TestCommitReforms:
         reform for the five days after the sparse checkout landed.
         """
         repo, root = repo_with_constitution
-        (root / "es" / "BOE-A-1978-31229.md").unlink()
+        (root / "es" / "bb" / "BOE-A-1978-31229.md").unlink()
 
         assert _commit_reforms(_client(), repo, date(2026, 5, 19), date(2026, 5, 20), []) == 1
 
@@ -232,7 +232,7 @@ class TestCommitReforms:
             text=True,
         ).stdout
         assert "BOE-A-2026-10881" not in message
-        assert "Formentera" not in (root / "es" / "BOE-A-1978-31229.md").read_text()
+        assert "Formentera" not in (root / "es" / "bb" / "BOE-A-1978-31229.md").read_text()
 
     def test_skips_norms_the_corpus_does_not_hold(
         self, repo_with_constitution, monkeypatch: pytest.MonkeyPatch

@@ -38,12 +38,12 @@ countries:
     repo_path: "../countries/es"
     data_dir: "../countries/data-es"
     cache_dir: ".cache"
-    max_workers: 1
+    max_workers: 4
     source:
       base_url: "https://www.boe.es/datosabiertos"
       request_timeout: 30
       max_retries: 5
-      requests_per_second: 4.0
+      requests_per_second: 2.0
       user_agent: "legalize-bot/1.0 (+https://github.com/legalize-dev/legalize)"
 
   # fr is deliberately OUT of the daily-update matrix: it has no incremental

@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import logging
 import re
+from copy import deepcopy
+from dataclasses import replace
 from datetime import date
 
 from lxml import etree
@@ -146,6 +148,8 @@ def _extract_inline(element: etree._Element) -> str:
         else:
             inner = _extract_inline(child)
             if inner:
+                if tag in {"p", "div", "tr", "td", "th"}:
+                    inner = " " + inner + " "
                 parts.append(inner)
 
         if child.tail:
@@ -155,25 +159,8 @@ def _extract_inline(element: etree._Element) -> str:
 
 
 def _cell_text(cell: etree._Element) -> str:
-    """Cell text extractor for the generic table renderer."""
-    inner_parts: list[str] = []
-    for child in cell:
-        if not isinstance(child.tag, str):
-            continue
-        if child.tag.lower() == "img":
-            # _extract_inline only reaches an <img> nested inside another
-            # element, so an image that is the cell's whole content vanished:
-            # 10 of the 11 images in BOE-A-1968-963.
-            image = _image_paragraph(child)
-            if image:
-                inner_parts.append(image.text)
-            continue
-        t = _extract_inline(child).strip()
-        if t:
-            inner_parts.append(t)
-    if not inner_parts and cell.text:
-        return cell.text.strip()
-    return " ".join(inner_parts)
+    """Preserve cell text, inline markup and tails in document order."""
+    return _extract_inline(cell).strip()
 
 
 # ─────────────────────────────────────────────
@@ -193,6 +180,52 @@ def _image_paragraph(img: etree._Element) -> Paragraph | None:
 
 
 def _table_paragraph(table: etree._Element) -> Paragraph | None:
+    if table.find(".//table") is not None:
+        # Pipe tables cannot represent a table inside a cell without losing its grid.
+        table = deepcopy(table)
+        allowed = {
+            "table",
+            "colgroup",
+            "col",
+            "thead",
+            "tbody",
+            "tfoot",
+            "tr",
+            "th",
+            "td",
+            "caption",
+            "p",
+            "span",
+            "b",
+            "strong",
+            "i",
+            "em",
+            "sup",
+            "sub",
+            "br",
+            "a",
+            "img",
+        }
+        for node in table.iter():
+            if node.tag not in allowed:
+                raise ValueError(f"Unsupported nested-table element: {node.tag}")
+            for key in list(node.attrib):
+                if key not in {"rowspan", "colspan", "href", "src", "alt"}:
+                    del node.attrib[key]
+            for key in ("href", "src"):
+                value = node.get(key)
+                if value and value.startswith("/"):
+                    node.set(key, BOE_BASE + value)
+                elif value and not value.startswith(("https://", "http://", "#")):
+                    del node.attrib[key]
+            if node.text and not node.text.strip():
+                node.text = None
+            if node.tail and not node.tail.strip():
+                node.tail = None
+        return Paragraph(
+            css_class="table",
+            text=etree.tostring(table, encoding="unicode", method="html", with_tail=False),
+        )
     md = render_table(table, _cell_text)
     if not md:
         return None
@@ -250,7 +283,7 @@ def _parse_blockquote(bq_el: etree._Element) -> list[Paragraph]:
                 continue
             if p.css_class in WRAP_CLASSES:
                 # Prefix with `> ` so it renders as a Markdown blockquote.
-                p = Paragraph(css_class="cita", text=p.text)
+                p = replace(p, css_class="cita")
             out.append(p)
         elif inner_tag == "table":
             t = _table_paragraph(inner_el)
@@ -263,6 +296,12 @@ def _parse_blockquote(bq_el: etree._Element) -> list[Paragraph]:
             out.extend(_list_paragraphs(inner_el, ordered=True))
         elif inner_tag == "ul":
             out.extend(_list_paragraphs(inner_el, ordered=False))
+    expiry = _parse_date(bq_el.get("caduca"))
+    if expiry:
+        out = [
+            replace(p, expiry_date=min(p.expiry_date, expiry) if p.expiry_date else expiry)
+            for p in out
+        ]
     return out
 
 
@@ -283,7 +322,7 @@ def _parse_p(p_el: etree._Element) -> Paragraph | None:
     if not text:
         return None
 
-    return Paragraph(css_class=css, text=text)
+    return Paragraph(css_class=css, text=text, expiry_date=_parse_date(p_el.get("caduca")))
 
 
 # ─────────────────────────────────────────────
@@ -417,7 +456,7 @@ def get_block_at_date(block: Block, target_date: date) -> Version | None:
         applicable = [v for v in applicable if v.in_force_from >= block.expiry_date]
     if not applicable:
         return None
-    return max(applicable, key=lambda v: v.in_force_from)
+    return max(applicable, key=lambda v: (v.in_force_from, v.publication_date))
 
 
 # ─────────────────────────────────────────────

@@ -1,0 +1,61 @@
+{
+  "sample-constitution": {
+    "identifier": "BOE-A-1978-31229",
+    "files": {
+      "metadata": "sample-constitution-metadata.xml.gz",
+      "text": "sample-constitution-text.xml.gz",
+      "diary": "sample-constitution-diary.xml.gz"
+    },
+    "diary_url": "https://www.boe.es/eli/es/c/1978/12/27/(1)/dof/spa/xml"
+  },
+  "sample-code": {
+    "identifier": "BOE-A-1889-4763",
+    "files": {
+      "metadata": "sample-code-metadata.xml.gz",
+      "text": "sample-code-text.xml.gz",
+      "diary": "sample-code-diary.xml.gz"
+    },
+    "diary_url": "https://www.boe.es/eli/es/rd/1889/07/24/(1)/dof/spa/xml"
+  },
+  "sample-ordinary-law": {
+    "identifier": "BOE-A-2015-11430",
+    "files": {
+      "metadata": "sample-ordinary-law-metadata.xml.gz",
+      "text": "sample-ordinary-law-text.xml.gz",
+      "diary": "sample-ordinary-law-diary.xml.gz"
+    },
+    "diary_url": "https://www.boe.es/eli/es/rdlg/2015/10/23/2/dof/spa/xml"
+  },
+  "sample-regulation": {
+    "identifier": "BOE-A-2005-895",
+    "files": {
+      "metadata": "sample-regulation-metadata.xml.gz",
+      "text": "sample-regulation-text.xml.gz",
+      "diary": "sample-regulation-diary.xml.gz"
+    },
+    "diary_url": "https://www.boe.es/eli/es/rd/2005/01/14/9/dof/spa/xml"
+  },
+  "sample-with-tables": {
+    "identifier": "BOE-A-2013-7540",
+    "files": {
+      "metadata": "sample-with-tables-metadata.xml.gz",
+      "text": "sample-with-tables-text.xml.gz",
+      "diary": "sample-with-tables-diary.xml.gz"
+    },
+    "diary_url": "https://www.boe.es/eli/es/rd/2013/06/28/506/dof/spa/xml"
+  },
+  "sample-not-consolidated": {
+    "identifier": "BOE-A-2026-10881",
+    "diary_url": "https://www.boe.es/eli/es/ref/2026/05/19/(1)/dof/spa/xml",
+    "files": {
+      "diary": "sample-not-consolidated-diary.xml.gz"
+    }
+  },
+  "sample-image-substituted": {
+    "identifier": "BOE-A-2014-13617",
+    "diary_url": "https://www.boe.es/eli/es/res/2014/12/26/(1)/dof/spa/xml",
+    "files": {
+      "diary": "sample-image-substituted-diary.xml.gz"
+    }
+  }
+}
