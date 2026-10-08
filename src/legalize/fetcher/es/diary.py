@@ -46,8 +46,17 @@ def diary_xml_from_html(page, identifier: str) -> bytes:
     if not bodies or not titles:
         raise ValueError(f"{identifier}: incomplete original HTML without ELI")
     analysis = analyses[0] if analyses else etree.Element("div")
-    # ponytail: these rare pages have no reference graph; fail if that changes.
-    if analysis.xpath('.//a[contains(@href, "id=")]'):
+    reference_links = analysis.xpath('.//a[contains(@href, "id=")]')
+    # ponytail: only identical republication notes are known here; fail on other references.
+    if any(
+        not (
+            link.getparent().tag == "li"
+            and link.getparent().text_content().strip().startswith("Publicada además en el BOE")
+            and link.getparent().text_content().strip().endswith("con el mismo contenido.")
+            and re.fullmatch(r"/buscar/doc\.php\?id=BOE-A-\d{4}-\d+", link.get("href", ""))
+        )
+        for link in reference_links
+    ):
         raise ValueError(f"{identifier}: HTML-only references need explicit parsing")
     fields = {
         dt.text_content().strip().rstrip(":"): dt.getnext().text_content().strip()
@@ -57,7 +66,9 @@ def diary_xml_from_html(page, identifier: str) -> bytes:
         raise ValueError(f"{identifier}: HTML identity mismatch")
     if not fields.get("Sección", "").startswith("I."):
         raise ExcludedDiary("outside-section-i", identifier)
-    if fields.get("Departamento", "").startswith(("Comunidad", "Comunitat")):
+    department = fields.get("Departamento", "")
+    jurisdiction = {"Comunidad Autónoma de la Región de Murcia": "es-mc"}.get(department)
+    if department.startswith(("Comunidad", "Comunitat")) and not jurisdiction:
         raise ValueError(f"{identifier}: HTML-only jurisdiction needs explicit mapping")
     facts = dict(
         item.text_content().split(": ", 1)
@@ -79,6 +90,8 @@ def diary_xml_from_html(page, identifier: str) -> bytes:
         if not facts["Rango"]:
             raise ValueError(f"{identifier}: original HTML has no explicit rank")
     root = etree.Element("documento", source_format="html")
+    if jurisdiction:
+        root.set("jurisdiction", jurisdiction)
     meta = etree.SubElement(root, "metadatos")
     values = {
         "identificador": identifier,
@@ -116,6 +129,7 @@ def diary_xml_from_html(page, identifier: str) -> bytes:
         {
             "fields": fields,
             "analysis": "".join(analysis.itertext()).strip(),
+            "analysis_links": analysis.xpath(".//a/@href"),
             "format_urls": page.xpath('//ul[@class="enlaces-doc"]//a/@href'),
         },
         ensure_ascii=False,
@@ -217,7 +231,12 @@ def parse_diary(xml_data: bytes, identifier: str) -> ParsedNorm:
                 ("source_html_metadata", root.findtext("source_html_metadata", "")),
             )
         )
-    metadata = replace(metadata, text_state=TextState.AS_ENACTED, extra=tuple(extra))
+    metadata = replace(
+        metadata,
+        text_state=TextState.AS_ENACTED,
+        jurisdiction=root.get("jurisdiction") or metadata.jurisdiction,
+        extra=tuple(extra),
+    )
     # Reuse the complete BOE element dispatcher, including tables and quotations.
     wrapper = etree.Element("texto")
     block = etree.SubElement(wrapper, "bloque", id="original", tipo="texto", titulo="")
@@ -229,7 +248,7 @@ def parse_diary(xml_data: bytes, identifier: str) -> ParsedNorm:
     )
     for child in text:
         child = deepcopy(child)
-        if child.tag == "p" and _SIGNATURE.match("".join(child.itertext()).strip()):
+        if child.tag == "p" and _SIGNATURE.match(" ".join("".join(child.itertext()).split())):
             child.set("class", "firma")
         if child.tag == "table" and any(
             img.get("data-pdf", "").lower().startswith("firma_") for img in child.iter("img")

@@ -176,7 +176,13 @@ def test_inline_emphasis_cannot_join_legal_words():
 
 @pytest.mark.parametrize(
     "identifier,paragraphs",
-    [("BOE-A-2010-2329", 43), ("BOE-A-2011-20178", 12), ("BOE-A-2014-3187", 6)],
+    [
+        ("BOE-A-2010-2329", 43),
+        ("BOE-A-2011-20178", 12),
+        ("BOE-A-2014-3187", 6),
+        ("BOE-A-2020-14772", 3),
+        ("BOE-A-2021-3311", 19),
+    ],
 )
 def test_original_html_without_eli_preserves_the_source(identifier, paragraphs):
     import gzip
@@ -196,6 +202,20 @@ def test_original_html_without_eli_preserves_the_source(identifier, paragraphs):
     assert dict(norm.metadata.extra)["source_format"] == "html"
     assert norm.metadata.pdf_url.endswith(identifier + ".pdf")
     assert dict(norm.metadata.extra)["url_epub"].startswith("https://www.boe.es/")
+    if identifier == "BOE-A-2020-14772":
+        import json
+
+        source = json.loads(dict(norm.metadata.extra)["source_html_metadata"])
+        assert source["analysis_links"] == ["/buscar/doc.php?id=BOE-A-2020-12692"]
+        assert "con el mismo contenido" in source["analysis"]
+        body = render_norm_at_date(norm.metadata, norm.blocks, norm.metadata.publication_date)
+        assert "**Palacio del Congreso" in body
+        page.xpath('//*[@id="analisis"]//a')[0].getparent().text = "MODIFICA "
+        with pytest.raises(ValueError, match="references need explicit parsing"):
+            diary_xml_from_html(page, identifier)
+    if identifier == "BOE-A-2021-3311":
+        assert norm.metadata.jurisdiction == "es-mc"
+        assert "department_code" not in dict(norm.metadata.extra)
 
 
 def test_old_official_pdf_names_still_supply_publication_dates(tmp_path):
