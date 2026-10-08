@@ -98,3 +98,16 @@ It retains original source fields, links and analysis, including identical
 republication notes. Regional scope is mapped only from recognized explicit
 department names; unsupported regional identities and reference graphs fail
 rather than being assigned to the state corpus or silently discarded.
+
+A diary's `last_amendment` can identify an excluded correction or judicial act,
+or an act published outside Section I. Preserve the source relationship. Audit
+health's unresolved-reference warning against exclusion records and each
+remaining act's official gazette section; do not delete accurate references to
+make the warning disappear. The completed tranche has no unexplained reference
+misses. A corpus consumer must link unavailable source acts to the official
+record rather than promise a body that is outside this corpus.
+
+The full-history date audit reports the health check's generic 1970 warning.
+All such dates must match `max(Source-Date, 1970-01-02)`: pre-epoch publication
+dates use the clamp required by SPEC §Dates, and genuine 1970 publications
+retain their own date. This warning is not evidence of an unknown source date.

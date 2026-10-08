@@ -970,7 +970,7 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
             if not missing:
                 continue
             rate = len(missing) / len(refs)
-            sample = ", ".join(sorted(set(missing))[:5])
+            missing_examples = ", ".join(sorted(set(missing))[:5])
             # The spec makes `amends` resolvable by definition: it is a list of
             # identifiers "as this repo names them", for a consumer that has the
             # file and not the history. One that does not resolve is a broken
@@ -980,7 +980,7 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
                 (
                     level,
                     f"{len(missing)} of {len(refs)} {field} reference(s) "
-                    f"name no law in this repo ({rate:.1%}): {sample}"
+                    f"name no law in this repo ({rate:.1%}): {missing_examples}"
                     f"{' …' if len(set(missing)) > 5 else ''}",
                 )
             )
