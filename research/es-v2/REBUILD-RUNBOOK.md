@@ -80,7 +80,8 @@ python scripts/fetch_es_expansion.py --config candidate.yaml --since 2010-01-01
 ```
 
 It uses the official summary index for every calendar day, including extraordinary
-Sunday editions. Successful original XML responses are saved in `diary-raw/`;
+Sunday editions. Original responses remain in the HTTP cache; `diary-raw/`
+retains XML (normalized from original HTML when no ELI resource exists);
 `excluded/` records policy exclusions and `diary-fetch-progress.json` records
 failures. Resolve every failure before reporting the tranche complete. Acts
 without consolidation remain `as_enacted`; a later official consolidation is
@@ -91,3 +92,9 @@ Validation on 2026-10-08: both five-law source gates pass independently. The
 consolidated gate includes delayed commencement and a projected Civil Code
 wording superseded before it took effect. The diary gate includes tables, inline
 formulas, multilingual text and original bodies retained across amendment events.
+
+Original HTML without an ELI resource also passes an independent five-law gate.
+It retains original source fields, links and analysis, including identical
+republication notes. Regional scope is mapped only from recognized explicit
+department names; unsupported regional identities and reference graphs fail
+rather than being assigned to the state corpus or silently discarded.
