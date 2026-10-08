@@ -63,20 +63,57 @@ def _body(md: str) -> str:
 
 class TestDefault:
     def test_absent_country_is_point_in_time(self):
-        assert text_state_for("es") is TextState.POINT_IN_TIME
+        assert text_state_for("at") is TextState.POINT_IN_TIME
         assert text_state_for("no-such-country") is TextState.POINT_IN_TIME
 
     def test_point_in_time_emits_nothing(self):
-        md = render_norm_at_date(_norm("es"), _blocks(), date(2024, 2, 17))
+        md = render_norm_at_date(_norm("at"), _blocks(), date(2024, 2, 17))
         assert "text_state" not in md
         assert "last_amendment" not in md
         assert ">" not in md.split("# ", 1)[1].split("\n")[1]
 
     def test_point_in_time_ignores_last_amendment(self):
         md = render_norm_at_date(
-            _norm("es", last_amendment="BOE-A-2024-3099"), _blocks(), date(2024, 2, 17)
+            _norm("at", last_amendment="BOE-A-2024-3099"), _blocks(), date(2024, 2, 17)
         )
         assert "last_amendment" not in md
+
+
+class TestSpainIsMixedAndFailsTheSafeWay:
+    """The BOE consolidates 12,387 norms and publishes ~5x that as enacted, so
+    the country default is `as_enacted` and the parser promotes the
+    consolidated ones per norm — the mirror of `pt` (#66, #106).
+
+    The choice is invisible in the output of a consolidated file: the key is
+    only written when the state is not POINT_IN_TIME. What it decides is the
+    direction of a failure. If a promotion is ever missed — a new code path, a
+    re-parse from cached JSON that lost the override — the file underclaims
+    and 12,387 files gain a line in a diff. The other arrangement would publish
+    `point_in_time`, the spec's strongest claim, over an unamended 1979 text,
+    and nothing would show.
+    """
+
+    def test_the_country_default_is_the_majority(self):
+        assert text_state_for("es") is TextState.AS_ENACTED
+
+    def test_a_consolidated_norm_is_promoted_by_the_parser(self):
+        from legalize.fetcher.es.metadata import parse_metadata
+
+        from tests.test_metadata import CONSTITUCION_META_XML
+
+        meta = parse_metadata(CONSTITUCION_META_XML, "BOE-A-1978-31229")
+        assert meta.text_state is TextState.POINT_IN_TIME
+
+    def test_and_therefore_writes_no_key_at_all(self):
+        """Byte-identical to what the corpus already publishes."""
+        md = render_norm_at_date(
+            _norm("es", text_state=TextState.POINT_IN_TIME), _blocks(), date(2024, 2, 17)
+        )
+        assert "text_state" not in md
+
+    def test_a_norm_that_lost_its_promotion_underclaims_loudly(self):
+        md = render_norm_at_date(_norm("es"), _blocks(), date(2024, 2, 17))
+        assert 'text_state: "as_enacted"' in md
 
 
 class TestAsEnacted:

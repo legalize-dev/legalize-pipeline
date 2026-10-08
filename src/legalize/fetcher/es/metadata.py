@@ -26,14 +26,16 @@ Actual API structure (XML):
 
 from __future__ import annotations
 
+import json
 import logging
-from datetime import date
+import re
+from datetime import date, datetime
 
 from lxml import etree
 
 from legalize.fetcher._text import decode_utf8, strip_control
 
-from legalize.models import NormMetadata, NormStatus, Rank
+from legalize.models import NormMetadata, NormStatus, Rank, TextState
 from legalize.fetcher.es.titulos import get_short_title
 
 logger = logging.getLogger(__name__)
@@ -61,6 +63,7 @@ _RANK_TEXT_MAP: dict[str, Rank] = {
     "reglamento": Rank.REGLAMENTO,
     # Autonomous communities (foral/regional)
     "ley foral": Rank.LEY_FORAL,
+    "decreto foral": Rank.DECRETO_FORAL,
     "decreto legislativo": Rank.DECRETO_LEGISLATIVO,
     "decreto-ley": Rank.DECRETO_LEY,
     "decreto-ley foral": Rank.DECRETO_LEY_FORAL,
@@ -86,10 +89,25 @@ _RANK_CODE_MAP: dict[str, Rank] = {
     "1020": Rank.ACUERDO,
     # Autonomous communities (foral/regional)
     "1450": Rank.LEY_FORAL,
+    "1520": Rank.DECRETO_FORAL,
     "1470": Rank.DECRETO_LEGISLATIVO,
     "1500": Rank.DECRETO_LEY,
     "1325": Rank.DECRETO_LEY_FORAL,
     "1480": Rank.DECRETO_FORAL_LEGISLATIVO,
+    # The last code of the BOE's own vocabulary
+    # (`/api/datos-auxiliares/rangos`, 19 entries) that this map did not have.
+    "1220": Rank.REGLAMENTO,
+    # Ranks the gazette uses and the consolidated vocabulary does not list.
+    # `1676` is the one that mattered: with no entry here `_parse_rank` fell
+    # through to `_infer_rank_from_title`, whose first test is "constitución"
+    # in the title — so `BOE-A-2026-10881`, the fourth amendment to the Spanish
+    # Constitution, was typed as the Constitution itself.
+    "1676": Rank.REFORMA,
+    "1590": Rank.CORRECCION,
+    "1240": Rank.SENTENCIA,
+    "1250": Rank.AUTO,
+    "63": Rank.PROVIDENCIA,
+    "41": Rank.NOTA_DIPLOMATICA,
 }
 
 
@@ -147,7 +165,7 @@ def _parse_status(meta: etree._Element) -> NormStatus:
     if repeal_status == "P":
         return NormStatus.PARTIALLY_REPEALED
 
-    annulment = _text_of(meta, "estatus_anulacion")
+    annulment = _text_of(meta, "estatus_anulacion") or _text_of(meta, "judicialmente_anulada")
     if annulment == "S":
         return NormStatus.ANNULLED
 
@@ -222,7 +240,7 @@ def _extract_jurisdiction(meta: etree._Element) -> str | None:
     Uses the departamento code to determine the ELI jurisdiction.
     Returns None for state-level legislation (ambito=1).
     """
-    scope_code = _code_of(meta, "ambito")
+    scope_code = _code_of(meta, "ambito") or _code_of(meta, "origen_legislativo")
     if scope_code != "2":
         return None
 
@@ -308,13 +326,21 @@ def parse_metadata(
     # From /metadatos
     add("department_code", _code_of(meta, "departamento"))
     add("rank_code", _code_of(meta, "rango"))
-    add("ambito_code", _code_of(meta, "ambito"))
+    add("scope_code", _code_of(meta, "ambito") or _code_of(meta, "origen_legislativo"))
     add("official_number", _text_of(meta, "numero_oficial"))
     enactment_date = _parse_date_boe(_text_of(meta, "fecha_disposicion"))
     if enactment_date:
         add("enactment_date", enactment_date.isoformat())
     add("official_journal", _text_of(meta, "diario"))
     add("journal_issue", _text_of(meta, "diario_numero"))
+    if effective_date:
+        add("entry_into_force", effective_date.isoformat())
+    updated = _text_of(meta, "fecha_actualizacion")
+    if updated:
+        add("source_updated_at", datetime.strptime(updated, "%Y%m%dT%H%M%SZ").isoformat() + "Z")
+    annulment_date = _parse_date_boe(_text_of(meta, "fecha_anulacion"))
+    if annulment_date:
+        add("annulment_date", annulment_date.isoformat())
     repeal_date = _parse_date_boe(_text_of(meta, "fecha_derogacion"))
     if repeal_date:
         add("repeal_date", repeal_date.isoformat())
@@ -325,15 +351,23 @@ def parse_metadata(
     if validity_exhausted and validity_exhausted != "N":
         add("validity_exhausted", validity_exhausted)
     add("consolidation_status", _text_of(meta, "estado_consolidacion"))
-    add("scope", _text_of(meta, "ambito"))
+    add("consolidation_status_code", _code_of(meta, "estado_consolidacion"))
+    add("scope", _text_of(meta, "ambito") or _text_of(meta, "origen_legislativo"))
     add("url_eli", _text_of(meta, "url_eli"))
-    add("url_html_consolidada", _text_of(meta, "url_html_consolidada"))
+    add("url_html", _text_of(meta, "url_html_consolidada"))
+    add("source_notice", "Texto consolidado de carácter meramente informativo.")
+    add(
+        "source_attribution",
+        "Basado en datos de la Agencia Estatal Boletín Oficial del Estado (https://www.boe.es).",
+    )
+    add("reuse_conditions", "https://www.boe.es/informacion/aviso_legal/index.php")
 
     # From /diario_boe/xml.php (richer, if provided)
     subjects: list[str] = []
     pdf_url: str | None = None
+    last_amendment: str | None = None
     if diario_xml:
-        subjects, pdf_url, diario_extra = _parse_diario_xml(diario_xml)
+        subjects, pdf_url, diario_extra, last_amendment = _parse_diario_xml(diario_xml)
         extra.extend(diario_extra)
 
     return NormMetadata(
@@ -351,6 +385,18 @@ def parse_metadata(
         pdf_url=pdf_url,
         subjects=tuple(subjects),
         extra=tuple(extra),
+        # Parsed on every norm, written only on the ones whose body does not
+        # change. It also outranks the commit path: `_with_last_amendment` fills
+        # this in from the reform that happens to land, and the source's own
+        # answer is better than a guess made from whatever arrived last.
+        last_amendment=last_amendment,
+        # The promotion the country default expects. The condition is not a
+        # test, it is where this function is: `/api/legislacion-consolidada`
+        # answers for a norm the BOE consolidates and 404s for everything else,
+        # so reaching here *is* "this norm has a consolidated text". An act
+        # read off the gazette surface goes through its own parser and keeps
+        # the country default, which is `as_enacted` (#66, #106).
+        text_state=TextState.POINT_IN_TIME,
     )
 
 
@@ -367,57 +413,151 @@ def _reference(el) -> str:
     the diary XML sends, and ``<id_norma>``/``<relacion>``, which is what the
     consolidated-legislation API sends for the same block. The two endpoints
     disagree today; whichever one a caller passes, this keeps working.
+
+    ``palabra@codigo`` is kept because it is the only language-neutral half of
+    the relation: 210 is DEROGA, 270 MODIFICA, 231 SUSPENDE, 426 TRANSPONE. A
+    cross-country normalisation built on the code costs nothing later; built on
+    the Spanish label it costs a reprocess (#87, #129). It also delimits the
+    entry, which the label alone cannot — verbs carry spaces ("SE DICTA EN
+    RELACIÓN").
     """
     rid = (el.get("referencia") or el.findtext("id_norma") or "").strip()
-    if not rid.startswith("BOE-"):
+    if not rid:
         return ""
-    verb = (el.findtext("palabra") or el.findtext("relacion") or "").strip()
+    word = el.find("palabra")
+    if word is None:
+        word = el.find("relacion")
+    verb = (word.text or "").strip() if word is not None else ""
+    code = (word.get("codigo") or "").strip() if word is not None else ""
     note = " ".join((el.findtext("texto") or "").split())
-    entry = f"{verb} {rid}".strip()
+    entry = " ".join(p for p in (verb, f"[{code}]" if code else "", rid) if p)
     return f"{entry}: {note}" if note else entry
+
+
+# Which relation codes actually changed the act, as opposed to merely citing
+# it. Measured over 367 non-consolidated Sección I acts (2026-09-04): 21 codes
+# appear under <posteriores>, and only these change the words or whether they
+# apply. The ones left out — 331 SE DICTA EN RELACIÓN, 440 SE DICTA DE
+# CONFORMIDAD, 693 SE DICTA, 490 SE DESARROLLA, 300 SE PUBLICA, 402 SE
+# INTERPRETA — are acts that invoke this one without touching it, and naming
+# one as the last amendment tells a reader the text moved when it did not.
+#
+# 470 SE DECLARA is in: it is the Constitutional Court annulling a provision,
+# which changes what is in force without rewriting a word. So are the three
+# correction codes — a rectification changes the official text with legal
+# effect, which is why Portugal counts them too (fetcher/pt/amendments.py).
+#
+# The BOE publishes no vocabulary for this: /api/datos-auxiliares/relaciones
+# is a 404. So the list is measured, and a code outside it is simply not an
+# amendment as far as this is concerned — the whole relation still ships in
+# `references_subsequent`, which is never filtered.
+_AMENDING_CODES = frozenset(
+    {"201", "202", "203", "210", "245", "270", "401", "404", "406", "407", "408", "470"}
+)
+
+# BOE-A-2021-21788 -> (2021, 21788). The sequence is monotonic within a year.
+_BOE_SEQ = re.compile(r"^BOE-[A-Z]{1,6}-(\d{4})-(\d+)$")
+
+
+def last_amendment_of(referencias) -> str | None:
+    """The most recent act that changed this one, from the BOE's own analysis.
+
+    This is spec v0.3's ``last_amendment``, and it only means anything on a body
+    that does not change: on a consolidated norm the amendments *are* the
+    versions, so the value is parsed here and then never written — the emitter
+    skips the key whenever the state is point-in-time.
+
+    It is what makes the non-consolidated corpus (#66) honest. Those acts are
+    published as enacted and never gain a second commit, so nothing on the
+    commit path can name the act that superseded them; the BOE, however, ships
+    ``<posteriores>`` inside the same ``xml.php`` response as the text, for acts
+    that have no consolidated version at all. Measured over 367 of them: 127
+    carry a subsequent reference and 96 carry an amending one.
+
+    Ordered by identifier, never by document order. ``<posterior orden="">`` is
+    empty on every entry seen, and the order the BOE ships is newest-first in
+    only 106 of 127 acts — taking the first entry names the wrong act in 10 of
+    96 (10.4 %). The identifier carries the year and a sequence monotonic within
+    it, so ``(year, seq)`` is a total order needing no date parsing, no
+    ``<texto>`` prose, and no second request.
+    """
+    best: tuple[tuple[int, int], str] | None = None
+    for el in referencias.findall("posteriores/posterior"):
+        # Both element shapes, for the same reason `_reference` reads both: the
+        # diary puts the code on <palabra>, the consolidated API on <relacion>.
+        # And `is None`, never truthiness — a childless lxml element is falsy,
+        # so `find("palabra") or find("relacion")` silently drops every code.
+        word = el.find("palabra")
+        if word is None:
+            word = el.find("relacion")
+        if word is None or (word.get("codigo") or "").strip() not in _AMENDING_CODES:
+            continue
+        rid = (el.get("referencia") or el.findtext("id_norma") or "").strip()
+        match = _BOE_SEQ.match(rid)
+        if match is None:
+            continue
+        key = (int(match.group(1)), int(match.group(2)))
+        if best is None or key > best[0]:
+            best = (key, rid)
+    return best[1] if best else None
 
 
 def _parse_diario_xml(
     diario_xml: bytes,
-) -> tuple[list[str], str | None, list[tuple[str, str]]]:
+) -> tuple[list[str], str | None, list[tuple[str, str]], str | None]:
     """Extract subjects, pdf_url and cross-reference metadata from the
     /diario_boe/xml.php payload.
 
     Returns:
-        (subjects, pdf_url, extra_fields)
+        (subjects, pdf_url, extra_fields, last_amendment)
     """
     subjects: list[str] = []
     pdf_url: str | None = None
     extra: list[tuple[str, str]] = []
+    last_amendment: str | None = None
 
-    try:
-        root = etree.fromstring(diario_xml)
-    except Exception:
-        logger.warning("diario XML parse failed")
-        return subjects, pdf_url, extra
+    root = etree.fromstring(strip_control(decode_utf8(diario_xml)).encode("utf-8"))
+    updated = root.get("fecha_actualizacion")
+    if updated:
+        extra.append(("diary_updated_at", datetime.strptime(updated, "%Y%m%d%H%M%S").isoformat()))
 
     dm = root.find("metadatos")
     if dm is not None:
         url_pdf = _text_of(dm, "url_pdf")
         if url_pdf:
+            # Emitted once, as the core `pdf_url`. It used to ship twice under both
+            # spellings, identical in 12,298 of 12,299 files (#129).
             pdf_url = f"https://www.boe.es{url_pdf}" if url_pdf.startswith("/") else url_pdf
-            extra.append(("url_pdf", pdf_url))
         for name, key in (
-            ("url_epub", "url_epub"),
-            ("url_pdf_catalan", "url_pdf_catalan"),
-            ("url_pdf_euskera", "url_pdf_euskera"),
-            ("url_pdf_gallego", "url_pdf_gallego"),
-            ("url_pdf_valenciano", "url_pdf_valenciano"),
+            # ISO 639-1, not the Spanish exonym: a Belgian corpus emits url_pdf_nl /
+            # url_pdf_fr and a consumer written against es keeps working (#129).
+            ("url_pdf_catalan", "url_pdf_ca"),
+            ("url_pdf_euskera", "url_pdf_eu"),
+            ("url_pdf_gallego", "url_pdf_gl"),
+            ("url_pdf_valenciano", "url_pdf_va"),
             ("pagina_inicial", "page_start"),
             ("pagina_final", "page_end"),
             ("letra_imagen", "image_marker"),
             ("estatus_legislativo", "legislative_status"),
+            ("seccion", "section"),
+            ("subseccion", "subsection"),
+            ("suplemento_pagina_inicial", "supplement_page_start"),
+            ("suplemento_pagina_final", "supplement_page_end"),
+            ("suplemento_letra_imagen", "supplement_image_marker"),
         ):
             v = _text_of(dm, name)
             if v:
                 if name.startswith("url_") and v.startswith("/"):
                     v = f"https://www.boe.es{v}"
                 extra.append((key, v))
+        journal_code = _code_of(dm, "diario")
+        if journal_code:
+            extra.append(("official_journal_code", journal_code))
+        epub = dm.find("url_epub")
+        if epub is not None:
+            urls = [text.strip() for text in epub.itertext() if text.strip()]
+            if urls:
+                extra.append(("url_epub", " | ".join(urls)))
 
     analisis = root.find("analisis")
     if analisis is not None:
@@ -431,8 +571,27 @@ def _parse_diario_xml(
             alist = [a.text.strip() for a in alertas.findall("alerta") if a.text]
             if alist:
                 extra.append(("alerts", "; ".join(alist)))
+        for path, key in (
+            ("materias/materia", "subject_codes"),
+            ("alertas/alerta", "alert_codes"),
+            ("notas/nota", "notes"),
+        ):
+            entries = [
+                {"text": " ".join(el.itertext()).strip(), **el.attrib}
+                for el in analisis.findall(path)
+            ]
+            if entries:
+                extra.append((key, json.dumps(entries, ensure_ascii=False, separators=(",", ":"))))
         referencias = analisis.find("referencias")
         if referencias is not None:
+            order = {
+                el.get("referencia"): el.get("orden")
+                for el in referencias.xpath("anteriores/anterior | posteriores/posterior")
+                if el.get("referencia") and el.get("orden")
+            }
+            if order:
+                extra.append(("reference_order", json.dumps(order, ensure_ascii=False)))
+            last_amendment = last_amendment_of(referencias)
             ants = referencias.find("anteriores")
             if ants is not None:
                 refs = [_reference(a) for a in ants.findall("anterior")]
@@ -463,4 +622,35 @@ def _parse_diario_xml(
                     extra.append(("references_subsequent", " | ".join(refs)))
                     extra.append(("references_subsequent_count", str(len(refs))))
 
-    return subjects, pdf_url, extra
+    rdf = root.find("metadata-eli")
+    if rdf is not None:
+        # Retain the graph's subjects and typed values without embedding raw XML.
+        rdf_ns = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}"
+        graph = {}
+        for node in rdf.iter():
+            subject = node.get(rdf_ns + "about")
+            if not subject:
+                continue
+            properties = graph.setdefault(subject, {})
+            for prop in node:
+                if not isinstance(prop.tag, str):
+                    continue
+                name = etree.QName(prop).localname
+                values = properties.setdefault(name, [])
+                value = prop.get(rdf_ns + "resource") or (prop.text or "").strip()
+                if value:
+                    entry = {"value": value}
+                    if prop.get(rdf_ns + "datatype"):
+                        entry["datatype"] = prop.get(rdf_ns + "datatype")
+                    if entry not in values:
+                        values.append(entry)
+                for child in prop:
+                    if child.get(rdf_ns + "about"):
+                        entry = {"value": child.get(rdf_ns + "about")}
+                        if entry not in values:
+                            values.append(entry)
+        if graph:
+            extra.append(
+                ("eli_metadata", json.dumps(graph, ensure_ascii=False, separators=(",", ":")))
+            )
+    return subjects, pdf_url, extra, last_amendment

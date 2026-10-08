@@ -15,15 +15,17 @@ from click.testing import CliRunner
 
 from legalize.cli import cli
 
-BODY = '---\ntitle: "t"\nidentifier: "{id}"\ncountry: "pt"\n{state}{amend}---\n\n# t\n\n{text}\n'
+BODY = (
+    '---\ntitle: "t"\nidentifier: "{id}"\ncountry: "pt"\n{state}{amend}{refs}---\n\n# t\n\n{text}\n'
+)
 
 
-def _commit(repo, path, text, subject, law_id, source_id=None, state=""):
+def _commit(repo, path, text, subject, law_id, source_id=None, state="", refs=""):
     (repo / path).parent.mkdir(parents=True, exist_ok=True)
     # An as-enacted amendment leaves the body alone and moves the frontmatter,
     # which is the whole shape of that commit and what makes it a commit at all.
     amend = f'last_amendment: "{source_id}"\n' if source_id else ""
-    (repo / path).write_text(BODY.format(id=law_id, state=state, text=text, amend=amend))
+    (repo / path).write_text(BODY.format(id=law_id, state=state, text=text, amend=amend, refs=refs))
     trailers = f"\n\nNorm-Id: {law_id}"
     if source_id:
         trailers += f"\nDisposition: {source_id}\nSource-Id: {source_id}"
@@ -154,3 +156,62 @@ def test_a_law_that_is_only_amended_reports_no_second_section(repo, run):
     _commit(repo, "pt/A-1.md", "v1", "[reform] A", "A-1", "ACT-7")
 
     assert "Amends" not in run("A-1").output
+
+
+def test_a_law_the_source_never_consolidated_still_says_what_changed(repo, run):
+    """The history is one bootstrap line; the answer is in the frontmatter.
+
+    This is the whole non-consolidated corpus (#66): the body is the act as
+    published, no amendment ever produces a second commit for it, so a history
+    walk finds nothing to show. The publisher's own list of subsequent acts is
+    in the file, and printing it is the difference between "1 commit" and the
+    four acts that actually touched this law.
+    """
+    refs = (
+        'references_subsequent: "SE MODIFICA [270] BOE-A-2012-7445: el art. 4 | '
+        "SE DEROGA [210] BOE-A-2009-1: la disp. adic. 2 | "
+        'SE DICTA EN RELACION [331] BOE-A-2020-7311: sobre suspension hasta 2020"\n'
+    )
+    _commit(
+        repo,
+        "pt/A-1.md",
+        "v1",
+        "[bootstrap] A",
+        "A-1",
+        state='text_state: "as_enacted"\n',
+        refs=refs,
+    )
+    out = run("A-1").output
+    assert "3 act(s) not in this history" in out
+    assert "BOE-A-2012-7445" in out
+    # The sentence, not just the id: a suspension is written nowhere else.
+    assert "suspension" in out
+
+
+def test_nothing_is_printed_when_the_source_records_nothing(repo, run):
+    """An act nobody has touched must not grow an empty section."""
+    _commit(repo, "pt/A-1.md", "v1", "[bootstrap] A", "A-1", state='text_state: "as_enacted"\n')
+    assert "not in this history" not in run("A-1").output
+
+
+def test_an_act_the_history_already_showed_is_not_repeated(repo, run):
+    """A reform commit names its act; printing it again buries the ones the
+    history could not show."""
+    refs = 'references_subsequent: "SE MODIFICA [270] AMEND-9: el art. 4"\n'
+    _commit(repo, "pt/A-1.md", "v1", "[bootstrap] A", "A-1")
+    _commit(repo, "pt/A-1.md", "v2", "[reform] A", "A-1", "AMEND-9", refs=refs)
+    assert "not in this history" not in run("A-1").output
+
+
+def test_a_change_that_left_no_version_is_shown_on_a_consolidated_law(repo, run):
+    """The suspensions gap, and the reason this is not gated on as_enacted.
+
+    A Constitutional Court ruling changes what is in force and produces no
+    version, so it appears in no commit and no diff. The source records it, and
+    on a point-in-time law this is the only place it is visible.
+    """
+    refs = 'references_subsequent: "SE DECLARA [470] BOE-A-2024-27140: la inconstitucionalidad del art. 7"\n'
+    _commit(repo, "pt/A-1.md", "v1", "[bootstrap] A", "A-1", refs=refs)
+    out = run("A-1").output
+    assert "1 act(s) not in this history" in out
+    assert "BOE-A-2024-27140" in out

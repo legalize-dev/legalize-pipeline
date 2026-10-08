@@ -59,7 +59,9 @@ class TestBootstrapPipeline:
         xml_path = FIXTURES_DIR / "constitucion-sample.xml"
         bootstrap_from_local_xml(bootstrap_config, constitucion_metadata, xml_path)
 
-        md_path = Path(bootstrap_config.get_country("es").repo_path) / "es" / "BOE-A-1978-31229.md"
+        md_path = (
+            Path(bootstrap_config.get_country("es").repo_path) / "es" / "bb" / "BOE-A-1978-31229.md"
+        )
         assert md_path.exists()
         content = md_path.read_text(encoding="utf-8")
         assert "Constitución Española" in content
@@ -179,7 +181,7 @@ class TestFastImporter:
                 )
                 fi.commit(file_path, markdown, info)
 
-        md_path = Path(cc.repo_path) / "es" / "BOE-A-1978-31229.md"
+        md_path = Path(cc.repo_path) / "es" / "bb" / "BOE-A-1978-31229.md"
         assert md_path.exists()
         content = md_path.read_text(encoding="utf-8")
         assert "Constitución Española" in content
@@ -272,7 +274,7 @@ class TestFastImporter:
         count = commit_all_fast(bootstrap_config, "es")
         assert count == 4
 
-        md_path = Path(cc.repo_path) / "es" / "BOE-A-1978-31229.md"
+        md_path = Path(cc.repo_path) / "es" / "bb" / "BOE-A-1978-31229.md"
         assert md_path.exists()
 
     def test_seeds_from_existing_main_tip(self, bootstrap_config, constitucion_metadata):
@@ -343,4 +345,4 @@ class TestFastImporter:
 
         # The baseline file survives alongside the new norm file.
         assert (repo / "baseline.md").exists()
-        assert (repo / "es" / "BOE-A-1978-31229.md").exists()
+        assert (repo / "es" / "bb" / "BOE-A-1978-31229.md").exists()

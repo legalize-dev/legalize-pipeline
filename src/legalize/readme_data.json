@@ -841,14 +841,14 @@
         "Condiciones de reutilización / Aviso legal: https://www.boe.es/informacion/aviso_legal/index.php"
       ],
       "data_license": "Condiciones de reutilización del BOE — cita obligatoria de la fuente",
-      "scope": "Cubre legislación estatal española y normativa de las comunidades autónomas publicada en el BOE, en su versión consolidada (texto vigente con todas sus redacciones). Cada norma es un fichero Markdown y cada reforma es un commit de git con la fecha oficial de publicación. Las normas de ámbito estatal se ubican en el directorio es/ y las autonómicas en directorios por jurisdicción (es-pv/, es-ct/, etc.). Datos obtenidos de la API de datos abiertos del BOE.",
+      "scope": "Incluye el catálogo de legislación consolidada del BOE, sin corte de antigüedad, y disposiciones de la Sección I desde 2010 disponibles como texto original. Abarca normativa estatal y autonómica publicada por el BOE. Cada norma declara si su cuerpo es una versión histórica consolidada (point_in_time) o el texto original sin incorporar reformas posteriores (as_enacted). Las rutas por jurisdicción están declaradas en .legalize.yml.",
       "norm_types": [
         {
           "label": "Constitución",
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Norma suprema del ordenamiento (rango: constitucion).",
           "examples": [
-            "es/BOE-A-1978-31229.md"
+            "es/bb/BOE-A-1978-31229.md"
           ]
         },
         {
@@ -862,7 +862,7 @@
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Leyes ordinarias (rango: ley).",
           "examples": [
-            "es/BOE-A-2015-11430.md"
+            "es/70/BOE-A-2015-11430.md"
           ]
         },
         {
@@ -876,7 +876,7 @@
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Textos refundidos (rango: real_decreto_legislativo).",
           "examples": [
-            "es/BOE-A-1996-8930.md"
+            "es/d9/BOE-A-1996-8930.md"
           ]
         },
         {
@@ -893,13 +893,13 @@
         },
         {
           "label": "Normativa autonómica (foral/regional)",
-          "pattern": "es-XX/BOE-A-AAAA-N.md",
+          "pattern": "es-XX/XX/BOE-A-AAAA-N.md",
           "note": "Leyes y decretos de comunidades autónomas, ubicados en directorios por jurisdicción ELI (es-pv, es-ct, es-ga, etc.). Incluye rangos forales: ley foral, decreto legislativo, decreto-ley, decreto-ley foral, decreto foral legislativo.",
           "examples": []
         }
       ],
       "attribution": "> Fuente de los datos: Agencia Estatal Boletín Oficial del Estado (https://www.boe.es). Datos reutilizados conforme a las condiciones de reutilización del BOE (Resolución de 27 de junio de 2024). Este repositorio es una obra derivada basada en datos de la Agencia Estatal Boletín Oficial del Estado.",
-      "notes": "## Estructura de ficheros\n\nEstructura plana: un directorio por ámbito (es/ para el Estado; es-XX/ por comunidad autónoma según código ELI). El rango de la norma (constitución, ley orgánica, ley, real decreto, etc.) figura en el frontmatter YAML, nunca en la ruta del fichero.\n\n## Limitaciones\n\nLas imágenes del texto original se omiten (el proyecto no incorpora activos binarios). Se conserva el texto, las tablas, el formato enriquecido y los metadatos. El identificador del fichero es el ID oficial del BOE; un cambio de formato implicaría regenerar todo el historial de commits."
+      "notes": "## Estructura de ficheros\n\nUn directorio por ámbito (es/ para el Estado; es-XX/ por comunidad autónoma según código ELI), dividido en subdirectorios con los dos primeros caracteres del SHA-1 del identificador. El manifiesto .legalize.yml declara la ruta de cada norma. El rango figura en el frontmatter YAML.\n\n## Limitaciones\n\nTexto consolidado de carácter meramente informativo. El historial refleja las versiones proporcionadas por el BOE; puede no incluir redacciones anteriores que la fuente no exponga. El texto se transforma a Markdown; se conservan referencias a imágenes oficiales, sin copiar activos binarios. Las tablas anidadas se representan como HTML para preservar sus celdas. Las fechas de publicación y de entrada en vigor se distinguen: Source-Date fecha la publicación del acto, y last_updated la entrada en vigor de la redacción incluida. Si una publicación tiene varias fases de entrada en vigor, cada fase conserva su propio commit y Effective-Date. Cuando el BOE no declara la fecha de vigencia de un bloque, last_updated se omite y extra.effective_date_unknown_blocks identifica la incertidumbre. Los actos sin consolidación conservan su cuerpo original y registran las reformas conocidas sin inventar texto consolidado. Se excluyen actos judiciales, correcciones como documentos independientes y publicaciones dominadas por imágenes; las exclusiones se registran durante la descarga."
     },
     "eu": {
       "code": "eu",

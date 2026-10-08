@@ -49,6 +49,8 @@ def build_commit_info(
     }
     if reform.has_source_date:
         trailers["Source-Date"] = reform.date.isoformat()
+    if reform.effective_date is not None:
+        trailers["Effective-Date"] = reform.effective_date.isoformat()
 
     # The pipeline's own identity, never the ambient git config. These commits
     # get regenerated, and an author taken from whoever ran it makes every

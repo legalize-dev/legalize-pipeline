@@ -16,13 +16,19 @@ Refactored 2026-04-22 (research/RESEARCH-ES-v2.md):
 
 from __future__ import annotations
 
+import logging
+import re
+from dataclasses import replace
 from datetime import date
 from typing import Callable
 
-from legalize.countries import text_state_for
+from legalize.countries import escapes_legal_numbering, text_state_for
 from legalize.models import Block, NormMetadata, Paragraph, TextState
 from legalize.transformer.frontmatter import render_frontmatter
+from legalize.transformer.structure import count_structure
 from legalize.transformer.xml_parser import get_block_at_date
+
+logger = logging.getLogger(__name__)
 
 
 # ─────────────────────────────────────────────
@@ -33,7 +39,12 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     # --- structural headings (no pair) ---
     "libro_num": lambda t: f"# {t}\n",
     "parte_num": lambda t: f"# {t}\n",
+    "libro": lambda t: f"# {t}\n",
+    "libro_tit": lambda t: f"# {t}\n",
+    "parte": lambda t: f"# {t}\n",
+    "parte_tit": lambda t: f"# {t}\n",
     "titulo": lambda t: f"## {t}\n",
+    "capitulo": lambda t: f"### {t}\n",
     "titulo_tit": lambda t: f"## {t}\n",
     "capitulo_tit": lambda t: f"### {t}\n",
     "seccion": lambda t: f"#### {t}\n",
@@ -43,9 +54,12 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "articulo": lambda t: f"###### {t}\n",
     "anexo": lambda t: f"### {t}\n",
     "anexo_num": lambda t: f"## {t}\n",
+    "anexo_tit": lambda t: f"## {t}\n",
     "apendice": lambda t: f"### {t}\n",
     "apendice_num": lambda t: f"## {t}\n",
+    "apendice_tit": lambda t: f"## {t}\n",
     "disp_num": lambda t: f"## {t}\n",
+    "disp_tit": lambda t: f"## {t}\n",
     # --- legacy / pseudo-centred headings ---
     "centro_redonda": lambda t: f"### {t}\n",
     "centro_negrita": lambda t: f"# {t}\n",
@@ -55,12 +69,24 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     "cita_con_pleca": lambda t: f"> {t}\n",
     "cita_ley": lambda t: f"> {t}\n",
     "cita_art": lambda t: f"> {t}\n",
-    "sangrado": lambda t: f"    {t}\n",
-    "sangrado_2": lambda t: f"        {t}\n",
-    "sangrado_articulo": lambda t: f"    {t}\n",
-    # --- nota_pie: reform provenance — keep as quoted small text ---
+    "sangrado": lambda t: f"{t}\n",
+    "sangrado_2": lambda t: f"{t}\n",
+    "sangrado_articulo": lambda t: f"{t}\n",
+    # --- editorial notes: the BOE talking about the act, not the act ---
+    # Rendered as quoted small text so a reader can tell them from the law.
+    # `siempreSeVe` is the status banner ("Norma derogada, con efectos de…"),
+    # `textoCompleto` the consolidation's provenance ("Incluye las correcciones
+    # de errores publicadas en…"). Both were being published as plain
+    # paragraphs at the top of the body, where they read as the act's own
+    # opening words.
     "nota_pie": lambda t: f"> <small>{t}</small>\n",
     "nota_pie_2": lambda t: f"> <small>{t}</small>\n",
+    "siempreSeVe": lambda t: f"> <small>{t}</small>\n",
+    "textoCompleto": lambda t: f"> <small>{t}</small>\n",
+    # `publicado` marks content the BOE chose not to reproduce:
+    # "[ Omitido el “Formulario normalizado 1 - ES” (7 págs.) ]". A reader has
+    # to be able to tell that from a paragraph of the act.
+    "publicado": lambda t: f"> <small>{t}</small>\n",
     # --- signatories ---
     "firma_rey": lambda t: f"**{t}**\n",
     "firma_ministro": lambda t: f"**{t}**\n",
@@ -122,8 +148,36 @@ _PAIRED_CLASSES: dict[str, tuple[str, str]] = {
 }
 
 
-def render_paragraphs(paragraphs: list[Paragraph] | tuple[Paragraph, ...]) -> str:
-    """Convert a list of paragraphs to Markdown."""
+#: Where "this act declares nothing" stops being plausible. Measured on the
+#: published corpus: of the 73 files with no heading at all, the median holds
+#: 11 paragraphs and 26 hold 20 or more — and 9 of those 26 were losing real
+#: `capitulo` headings to an unmapped class.
+_STRUCTURELESS_PARAGRAPHS = 20
+
+#: What the sources send for a plain paragraph. They have no formatter because
+#: they need none, so they are not "unmapped" and must not be reported as such:
+#: they are 208 of the 246 unmapped-class reports over a 105-law sample, which
+#: is enough noise to bury the three that matter.
+_BODY_CLASSES = frozenset({"parrafo", "parrafo_2", "abs", ""})
+
+#: Reported once per process, not per paragraph: a run over a corpus hits the
+#: same unmapped class thousands of times and the point is the name, not the
+#: count.
+_UNMAPPED_SEEN: set[str] = set()
+
+# A body line CommonMark would read as an ordered-list item: "3. " or "3) ".
+_ORDERED_LIST_MARKER = re.compile(r"^(\d{1,9})([.)])(\s)")
+
+
+def render_paragraphs(
+    paragraphs: list[Paragraph] | tuple[Paragraph, ...],
+    escape_numbering: bool = False,
+) -> str:
+    """Convert a list of paragraphs to Markdown.
+
+    ``escape_numbering`` protects the law's own numbering from the renderer;
+    see ``countries.ESCAPES_LEGAL_NUMBERING`` for why it is per country.
+    """
     lines: list[str] = []
     plist = list(paragraphs)
     i = 0
@@ -153,13 +207,30 @@ def render_paragraphs(paragraphs: list[Paragraph] | tuple[Paragraph, ...]) -> st
                 lines.append(rendered)
                 lines.append("")
         else:
-            # Unknown class — default to plain paragraph
-            lines.append(text)
+            # Unknown class — default to plain paragraph, and say so once. A
+            # class nobody mapped is the quiet half of every structure defect
+            # in this corpus: `capitulo` was falling through to prose and took
+            # the five section headings of `BOE-A-2022-1453` with it, in a file
+            # of 510 paragraphs that reported no structure at all.
+            if css not in _BODY_CLASSES and css not in _UNMAPPED_SEEN:
+                _UNMAPPED_SEEN.add(css)
+                logger.warning("unmapped paragraph class %r — rendered as body text", css)
+            lines.append(_escape_numbering(text) if escape_numbering else text)
             lines.append("")
 
         i += 1
 
     return "\n".join(lines)
+
+
+def _escape_numbering(text: str) -> str:
+    """Keep "3. El Estado…" from being renumbered as list item 1.
+
+    Only the marker is escaped, so the character the source published is what
+    a reader sees. A paragraph the source itself sent as a list item never
+    reaches here — those carry their own class and their own formatter.
+    """
+    return _ORDERED_LIST_MARKER.sub(r"\1\\\2\3", text, count=1)
 
 
 def render_norm_at_date(
@@ -168,8 +239,30 @@ def render_norm_at_date(
     target_date: date,
     include_all: bool = False,
     source_id: str | None = None,
+    effective_date: date | None = None,
 ) -> str:
     """Generate the complete Markdown for a norm at a given point in time."""
+    if (
+        metadata.country == "es"
+        and metadata.text_state is TextState.POINT_IN_TIME
+        and source_id is not None
+    ):
+        if effective_date is not None:
+            target_date = max(target_date, effective_date)
+        # A published amendment can apply later; exclude versions not published yet.
+        blocks = [
+            replace(
+                block,
+                versions=tuple(v for v in block.versions if v.publication_date <= target_date),
+            )
+            for block in blocks
+        ]
+        if effective_date is None:
+            target_date = max(
+                (v.in_force_from for block in blocks for v in block.versions),
+                default=target_date,
+            )
+
     selected = []
     for block in blocks:
         if metadata.country == "eu":
@@ -186,18 +279,70 @@ def render_norm_at_date(
             )
         else:
             version = get_block_at_date(block, target_date)
+        if version is not None:
+            version = replace(
+                version,
+                paragraphs=tuple(
+                    p
+                    for p in version.paragraphs
+                    if p.expiry_date is None or target_date < p.expiry_date
+                ),
+            )
         selected.append(version)
-    if metadata.country == "eu":
-        if include_all and not any(selected):
-            selected = [
-                min(b.versions, key=lambda v: v.in_force_from) if b.versions else None
-                for b in blocks
-            ]
-        effective = [v.in_force_from for v in selected if v is not None]
-        if effective:
-            target_date = max(effective)
+
+    # ``include_all`` used to fill every unresolved block from its earliest
+    # *future* version, one block at a time, so a bootstrap commit dated 1985
+    # carried articles written in 2015: the LOPJ shipped with `Artículo 4 bis`
+    # on European Union law eight years before Spain joined the EEC. 2,553
+    # files and 20,523 headings in `es` alone (#106).
+    #
+    # The fallback is what keeps a norm whose versions all post-date its own
+    # enactment from rendering as an empty file — Austria's ABGB went from 12
+    # to 759 sections on it (9705ecb) — so it is kept, but only for that: when
+    # the whole render would otherwise be empty. Measured on `es`: 0 of 8,758.
+    if include_all and not any(selected):
+        selected = [
+            min(block.versions, key=lambda v: v.in_force_from) if block.versions else None
+            for block in blocks
+        ]
+
+    # The date the law reads as. The spec defines it as "the date this version
+    # took effect", which is a property of what ended up in the file, not of
+    # the day the run happened (#106).
+    in_force = [v.in_force_from for v in selected if v is not None]
+    structure = count_structure(
+        metadata.country, [p for v in selected if v is not None for p in v.paragraphs]
+    )
+    if structure is not None and structure.headings == 0:
+        # Not a gate. 73 of the 12,299 published files legitimately have no
+        # structure — a 1945 Orden, a Resolución that is prose — and refusing
+        # them would lose real law. But a long act with nothing declared is
+        # how the pre-2005 gazette XML fails: `BOE-A-1993-15903` has 482
+        # paragraphs, every one of them `parrafo`, and `Artículo 1.` as prose.
+        paragraphs = sum(len(v.paragraphs) for v in selected if v is not None)
+        if paragraphs >= _STRUCTURELESS_PARAGRAPHS:
+            logger.warning(
+                "%s: %d paragraphs and no declared structure", metadata.identifier, paragraphs
+            )
+
     parts: list[str] = []
-    parts.append(render_frontmatter(metadata, target_date))
+    version_date = max(in_force) if in_force else target_date
+    if metadata.country == "es" and metadata.text_state is TextState.POINT_IN_TIME:
+        undated = [
+            block.id
+            for block, version in zip(blocks, selected, strict=True)
+            if version is not None and version.effective_date is None
+        ]
+        if undated:
+            # SPEC requires an absent date, not publication substituted for unknown commencement.
+            metadata = replace(
+                metadata,
+                extra=metadata.extra + (("effective_date_unknown_blocks", ", ".join(undated)),),
+            )
+            version_date = None
+    if metadata.country == "es" and metadata.text_state is TextState.AS_ENACTED:
+        version_date = target_date
+    parts.append(render_frontmatter(metadata, version_date, structure))
 
     title = metadata.title.rstrip(". ").strip()
     parts.append(f"# {title}\n\n")
@@ -206,14 +351,13 @@ def render_norm_at_date(
     if notice:
         parts.append(f"{notice}\n")
 
-    for block, version in zip(blocks, selected, strict=True):
-        if version is None and include_all and metadata.country != "eu" and block.versions:
-            version = min(block.versions, key=lambda v: v.publication_date)
-
+    for version in selected:
         if version is None:
             continue
 
-        md = render_paragraphs(version.paragraphs)
+        md = render_paragraphs(
+            version.paragraphs, escape_numbering=escapes_legal_numbering(metadata.country)
+        )
         if md.strip():
             parts.append(md)
             if not md.endswith("\n\n"):

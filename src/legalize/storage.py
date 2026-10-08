@@ -235,6 +235,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             "position": i,
             "versions": [],
         }
+        if block.expiry_date:
+            article["expiry_date"] = block.expiry_date.isoformat()
 
         for version in block.versions:
             text = "\n\n".join(p.text for p in version.paragraphs)
@@ -243,12 +245,24 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
                 "source_id": version.norm_id,
                 "text": text,
             }
-            if version.effective_date and version.effective_date != version.publication_date:
+            # An explicit same-day commencement is different from an unknown date.
+            if version.effective_date:
                 version_dict["effective_date"] = version.effective_date.isoformat()
+            if version.superseded_before_commencement:
+                version_dict["superseded_before_commencement"] = True
             # Preserve CSS classes for lossless round-trip
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
                 version_dict["css_classes"] = css_classes
+            if any(p.expiry_date or "\n\n" in p.text for p in version.paragraphs):
+                version_dict["paragraphs"] = [
+                    {
+                        "css_class": p.css_class,
+                        "text": p.text,
+                        **({"expiry_date": p.expiry_date.isoformat()} if p.expiry_date else {}),
+                    }
+                    for p in version.paragraphs
+                ]
             article["versions"].append(version_dict)
 
         # current_text = latest version
@@ -287,6 +301,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             row["change_note"] = reform.change_note
         if not reform.has_source_date:
             row["has_source_date"] = False
+        if reform.effective_date is not None:
+            row["effective_date"] = reform.effective_date.isoformat()
         reforms.append(row)
 
     return {
@@ -349,7 +365,18 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
         for v in art["versions"]:
             paragraphs = []
             css_classes = v.get("css_classes")
-            if v["text"].strip():
+            if "paragraphs" in v:
+                paragraphs = [
+                    Paragraph(
+                        css_class=p["css_class"],
+                        text=p["text"],
+                        expiry_date=date.fromisoformat(p["expiry_date"])
+                        if p.get("expiry_date")
+                        else None,
+                    )
+                    for p in v["paragraphs"]
+                ]
+            elif v["text"].strip():
                 lines = [line.strip() for line in v["text"].split("\n\n") if line.strip()]
                 for i, line in enumerate(lines):
                     css = css_classes[i] if css_classes and i < len(css_classes) else "parrafo"
@@ -358,8 +385,11 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 Version(
                     norm_id=v["source_id"],
                     publication_date=date.fromisoformat(v["date"]),
-                    effective_date=date.fromisoformat(v.get("effective_date", v["date"])),
+                    effective_date=(
+                        date.fromisoformat(v["effective_date"]) if v.get("effective_date") else None
+                    ),
                     paragraphs=tuple(paragraphs),
+                    superseded_before_commencement=v.get("superseded_before_commencement", False),
                 )
             )
         blocks.append(
@@ -367,6 +397,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 id=art["block_id"],
                 block_type=art["block_type"],
                 title=art["title"],
+                expiry_date=(
+                    date.fromisoformat(art["expiry_date"]) if art.get("expiry_date") else None
+                ),
                 versions=tuple(versions),
             )
         )
@@ -391,6 +424,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 affected_blocks=affected,
                 change_note=r.get("change_note", ""),
                 has_source_date=r.get("has_source_date", True),
+                effective_date=(
+                    date.fromisoformat(r["effective_date"]) if r.get("effective_date") else None
+                ),
             )
         )
 

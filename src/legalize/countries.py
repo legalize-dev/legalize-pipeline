@@ -9,6 +9,8 @@ See adding-a-country/README.md for full walkthrough.
 
 from __future__ import annotations
 
+import re
+
 from typing import TYPE_CHECKING
 
 from legalize.models import TextState
@@ -48,6 +50,19 @@ TEXT_STATE: dict[str, TextState] = {
     # The country default is the majority; the parser overrides the consolidated
     # ones back to POINT_IN_TIME per norm.
     "pt": TextState.AS_ENACTED,
+    # The BOE consolidates 12,387 norms and publishes everything else as
+    # enacted — 78,908 acts of Sección I since 1979, counted by the source, so
+    # ~5x the consolidated catalogue. The country default is the majority and
+    # `fetcher/es/metadata.py` promotes the consolidated ones back per norm,
+    # the exact mirror of `pt`.
+    #
+    # Invisible in today's output: the key is only written when the state is
+    # not POINT_IN_TIME, so every consolidated file is byte-identical either
+    # way. The choice is about which way it fails. A broken promotion shows up
+    # as 12,387 files *gaining* a line; the other arrangement would publish
+    # `point_in_time` — the spec's strongest claim — over an unamended 1979
+    # text, in silence. Underclaiming is recoverable.
+    "es": TextState.AS_ENACTED,
     "se": TextState.CURRENT,  # SFS gives one current text + an amendment register
     "uy": TextState.CURRENT,  # IMPO: consolidated text, single bootstrap point
 }
@@ -70,6 +85,58 @@ VERSIONED_PUBLICATION_DATE: frozenset[str] = frozenset(
 def text_state_for(country_code: str) -> TextState:
     """Country default text state. Absent means POINT_IN_TIME (spec v0.3)."""
     return TEXT_STATE.get(country_code, TextState.POINT_IN_TIME)
+
+
+# Corpora that escape the law's own numbering so Markdown cannot claim it.
+#
+# Sources publish a numbered legal paragraph as plain text — the BOE has no
+# `<ol>` — so `3. El Estado…` reaches the file verbatim and every CommonMark
+# reader treats it as an ordered-list item, takes the first number of the run
+# as the start value and renumbers from there. Of the 391,038 runs `es`
+# published, 167,666 (42.9 %) did not start at 1 or were not consecutive, in
+# 9,396 of 12,299 files: `BOE-A-1882-6036` reads 10, 6, 7 in the source and
+# displays 1, 2, 3.
+#
+# The escape rewrites every numbered paragraph in a file, so a country joins
+# this set only when its corpus is re-emitted. Landing it on a daily instead
+# would make the next reform of a law carry a whole-file reformat in its diff,
+# which is what `diff_law` shows a reader. Measured share of files that move:
+# es 86.2 %, ie 14.7 %, ar 9.3 %, pt 4.4 %, se 1.0 %, uy 1.5 %.
+ESCAPES_LEGAL_NUMBERING: set[str] = {"es"}
+
+
+def escapes_legal_numbering(country_code: str) -> bool:
+    """Whether this corpus has been re-emitted with legal numbering escaped."""
+    return country_code in ESCAPES_LEGAL_NUMBERING
+
+
+# What the heading of an article looks like, per country. This is the one place
+# a language belongs — a regex for "Artículo" cannot live in `transformer/`
+# (CLAUDE.md), and a shared renderer has no business knowing the word.
+#
+# A country appears here once its own vocabulary has been measured against its
+# published corpus, and only then does the engine emit structure counts for it.
+# Guessing would be worse than the regex in `enrichment` that does the job
+# today: Latvia and Romania scored 95 % and 86 % on coverage alone and were
+# almost all false positives — regulation points and articles *cited from
+# another law*.
+#
+# Measured for `es` on 73,341 article-level headings across 2,500 published
+# files: 49,452 match (67.4 %). Everything it leaves out is a provision that is
+# not an article — "Disposición final segunda", "Primero." — which is exactly
+# the line between `article_count` and `provision_count`. The 710 headings that
+# open with a bare number are annex sections, and stay out on purpose.
+ARTICLE_HEADING: dict[str, re.Pattern[str]] = {
+    # `\b` goes inside the first alternative only: after "art." the boundary
+    # is between two non-word characters and never matches, which lost every
+    # abbreviated heading — `Art. 384 bis.` is how the LECrim writes them.
+    "es": re.compile(r"^\s*(?:art[íi]culos?\b|art\.)", re.IGNORECASE),
+}
+
+
+def article_heading_for(country_code: str) -> re.Pattern[str] | None:
+    """None means the engine does not count this country's articles yet."""
+    return ARTICLE_HEADING.get(country_code)
 
 
 REGISTRY: dict[str, dict[str, tuple[str, str]]] = {

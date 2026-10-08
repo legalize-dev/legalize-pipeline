@@ -178,6 +178,7 @@ LAYOUT: dict[str, str] = {
     # type holds 49 % of the corpus, which is the flat problem again.
     "pt": "{directory}/{year}/{identifier}.md",
     "eu": SHARDED,
+    "es": SHARDED,
 }
 
 

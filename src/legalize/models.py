@@ -46,9 +46,22 @@ class Rank(str):
     DECRETO = "decreto"
     ACUERDO = "acuerdo"
     REGLAMENTO = "reglamento"
+    # An act that amends another. The fourth amendment to the Constitution in
+    # history is one, and with no rank of its own it was being typed as the
+    # Constitution itself.
+    REFORMA = "reforma"
+    # Published in Sección I but not norms: the BOE gives each its own rank
+    # code, and mapping them is what keeps them from being guessed from a
+    # title.
+    CORRECCION = "correccion"
+    SENTENCIA = "sentencia"
+    AUTO = "auto"
+    PROVIDENCIA = "providencia"
+    NOTA_DIPLOMATICA = "nota_diplomatica"
 
     # Spain — autonomous communities (foral/regional equivalents)
     LEY_FORAL = "ley_foral"
+    DECRETO_FORAL = "decreto_foral"
     DECRETO_LEGISLATIVO = "decreto_legislativo"
     DECRETO_LEY_FORAL = "decreto_ley_foral"
     DECRETO_FORAL_LEGISLATIVO = "decreto_foral_legislativo"
@@ -113,12 +126,68 @@ class TextState(str, Enum):
 # ─────────────────────────────────────────────
 
 
+class ParagraphRole(str, Enum):
+    """What a paragraph *is*, in words no single source owns.
+
+    The shared renderer's contract used to be one country's stylesheet: 51 BOE
+    CSS class names lived in `transformer/markdown.py`, so 13 countries emitted
+    Spanish class names to get their own structure rendered — `ie` marking an
+    Irish section `articulo`, `nl` signing a Dutch minister with `firma_rey`,
+    which means "the King's signature line" (#128).
+
+    Written against a class string, "does this norm contain an article?"
+    becomes 34 near-copies. Written against a role it is one function every
+    country gets for free, which is what `article_count`, `provision_count`
+    and the empty-render gate are built on.
+    """
+
+    BOOK = "book"
+    PART = "part"
+    TITLE = "title"
+    CHAPTER = "chapter"
+    SECTION = "section"
+    SUBSECTION = "subsection"
+    ARTICLE = "article"
+    ANNEX = "annex"
+    APPENDIX = "appendix"
+    PREAMBLE = "preamble"
+    SIGNATURE = "signature"
+    QUOTE = "quote"
+    NOTE = "note"
+    TABLE = "table"
+    IMAGE = "image"
+    LIST_ITEM = "list_item"
+    BODY = "body"
+
+
+#: Roles that open a unit of the law — what "did this render produce a
+#: structure?" means, and what a heading level is assigned to.
+HEADING_ROLES = frozenset(
+    {
+        ParagraphRole.BOOK,
+        ParagraphRole.PART,
+        ParagraphRole.TITLE,
+        ParagraphRole.CHAPTER,
+        ParagraphRole.SECTION,
+        ParagraphRole.SUBSECTION,
+        ParagraphRole.ARTICLE,
+        ParagraphRole.ANNEX,
+        ParagraphRole.APPENDIX,
+    }
+)
+
+
 @dataclass(frozen=True)
 class Paragraph:
     """A paragraph within a block version."""
 
     css_class: str
     text: str
+    # Set by a parser that knows its own vocabulary. When it is not, the role
+    # is resolved from `css_class` through the shared table in `markdown.py`,
+    # which is the migration path out of #128 — no corpus moves either way.
+    role: ParagraphRole | None = None
+    expiry_date: date | None = None
 
 
 @dataclass(frozen=True)
@@ -127,12 +196,23 @@ class Version:
 
     norm_id: str
     publication_date: date
+    # None when the source does not say. It used to be filled with the
+    # publication date instead, which made "took effect on publication" and
+    # "we were not told" the same value and cost the distinction for every
+    # country (#106). Readers fall back with `effective_or_published`.
     effective_date: date | None
     paragraphs: tuple[Paragraph, ...]
+    superseded_before_commencement: bool = False
 
     @property
     def in_force_from(self) -> date:
-        """Use the declared applicability date, falling back to publication."""
+        """When this version started to apply — what a point-in-time read wants.
+
+        Falls back to the publication date, which is what every source that
+        does not declare a date in force effectively means. For Spain the two
+        differ on 88.6 % of norms (7,525 later, 233 retroactive), by more than
+        30 days on 808 of them.
+        """
         return self.effective_date or self.publication_date
 
 
@@ -144,6 +224,11 @@ class Block:
     block_type: str
     title: str
     versions: tuple[Version, ...]
+    # The date the source says this unit ceased to exist. Most sources
+    # materialise a repeal as one more version reading "(Derogado)"; when they
+    # do not, the block's last live text is all there is, and rendering it
+    # publishes repealed articles as current law (#106).
+    expiry_date: date | None = None
 
 
 # ─────────────────────────────────────────────
@@ -211,6 +296,8 @@ class Reform:
     # False for an undated source snapshot: date still selects its effective
     # text, but is not an official publication date (SPEC v0.4, Dates).
     has_source_date: bool = True
+    # A publication may introduce several successive versions of the same text.
+    effective_date: Optional[date] = None
 
 
 # ─────────────────────────────────────────────
