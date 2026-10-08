@@ -185,3 +185,77 @@ ISB provides only "as enacted" text. Revised Acts provides current consolidated 
 ### Daily update cadence
 
 Ireland enacts ~30-50 acts per year. New acts appear on ISB within days of enactment. The Oireachtas API `last_updated` parameter works for incremental discovery. A weekly or monthly update cycle is sufficient.
+
+## 0.7 Format-coverage gate
+
+> Required by `adding-a-country/step-0-research.md` for multi-format sources.
+
+### Format-coverage table
+
+Source: Oireachtas API `billCount` = **4,068** (queried 2026-08-30).
+
+| Format | Acts with ≥1 version | Unique (no other format covers them) | % of catalogue |
+|---|---|---|---|
+| XML enacted (ISB) | 4,068 | 0 | 100% |
+| HTML print enacted (ISB) | 4,068 | 0 | 100% |
+| Revised HTML consolidated (LRC) | ~560 | 0 (overlay on XML) | 14% |
+| Constitution (HTML, no XML) | 1 | 1 | 0.02% |
+
+- **XML and HTML** cover the same 4,068 acts — neither has unique laws.
+  XML is the primary format (richer structure); HTML is the fallback
+  (same content, less structured). Both parsers are implemented.
+- **Revised Acts** are not a separate format — they are consolidated
+  overlays on existing acts. Handled as a second commit per law (Phase 2).
+- **Constitution** is the only law with no XML. It uses the HTML parser
+  path (`/eli/cons/en/html`). At 0.02% of the catalogue, it could be
+  skipped under the <1% rule, but it's handled because it's one law
+  and the HTML parser already exists.
+
+### Licence
+
+Per §0.1: **CC-BY-4.0** (Oireachtas Open Data PSI Licence, implementing
+EU Directive 2019/1024) for ISB and the Oireachtas API.
+
+Revised Acts (revisedacts.lawreform.ie): published by the Law Reform
+Commission. **Licence not explicitly stated on the site; needs
+confirmation.** The LRC is a statutory body and the content derives from
+enacted legislation, but no formal open-data licence page was found.
+
+### Cross-format before/after check
+
+Test fixture: Environment (Miscellaneous Provisions) Act 2015
+(`tests/fixtures/ie/sample-environment-2015.xml` and
+`sample-environment-2015-print.html` — the same act in both formats).
+
+Evidence: `tests/test_parser_ie.py::test_xml_html_body_text_similarity`
+renders both formats through `ISBTextParser` and `render_paragraphs`,
+then computes `SequenceMatcher.ratio()`:
+
+```
+Body text similarity: >95%
+XML paragraphs:  ~172
+HTML paragraphs: ~178
+```
+
+The remaining <5% difference comes from:
+- HTML preamble text not present in XML
+- Minor whitespace normalization differences
+- Schedule/annex formatting variations
+
+A casual reader cannot tell which format the output came from.
+
+### Version count
+
+- **Enacted**: 4,068 acts, each with one enacted version
+- **Consolidated**: ~560 acts have a Revised Acts overlay (second version)
+- **Total versions**: 4,068 (enacted) + ~560 (consolidated) ≈ 4,628
+
+### Omitted sources — Statutory Instruments
+
+~35,000 Statutory Instruments (SIs), HTML only on ISB. **Not a passed
+gate — this is a known scope limit.** SIs are secondary legislation
+(ministerial orders, regulations) requiring a separate discovery flow
+(different API endpoint), a distinct parser, and significantly more
+storage. The engineering cost of adding them exceeds the immediate gain
+for the primary use case (statute text). Recorded here as a scope
+decision, not a format-coverage pass.
