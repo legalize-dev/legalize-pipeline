@@ -174,6 +174,21 @@ def test_inline_emphasis_cannot_join_legal_words():
     assert _cell_text(cell) == "A<sub>i</sub> = x y"
 
 
+def test_foral_decree_keeps_the_official_rank_and_jurisdiction():
+    import gzip
+    from pathlib import Path
+
+    norm = parse_diary(
+        gzip.decompress(
+            (Path(__file__).parent / "fixtures/es/diary-BOE-A-2015-3458.xml.gz").read_bytes()
+        ),
+        "BOE-A-2015-3458",
+    )
+    assert str(norm.metadata.rank) == "decreto_foral"
+    assert norm.metadata.jurisdiction == "es-nc"
+    assert dict(norm.metadata.extra)["rank_code"] == "1520"
+
+
 @pytest.mark.parametrize(
     "identifier,paragraphs",
     [

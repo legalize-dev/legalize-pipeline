@@ -61,6 +61,7 @@ class Rank(str):
 
     # Spain — autonomous communities (foral/regional equivalents)
     LEY_FORAL = "ley_foral"
+    DECRETO_FORAL = "decreto_foral"
     DECRETO_LEGISLATIVO = "decreto_legislativo"
     DECRETO_LEY_FORAL = "decreto_ley_foral"
     DECRETO_FORAL_LEGISLATIVO = "decreto_foral_legislativo"

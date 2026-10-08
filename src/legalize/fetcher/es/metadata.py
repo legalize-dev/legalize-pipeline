@@ -63,6 +63,7 @@ _RANK_TEXT_MAP: dict[str, Rank] = {
     "reglamento": Rank.REGLAMENTO,
     # Autonomous communities (foral/regional)
     "ley foral": Rank.LEY_FORAL,
+    "decreto foral": Rank.DECRETO_FORAL,
     "decreto legislativo": Rank.DECRETO_LEGISLATIVO,
     "decreto-ley": Rank.DECRETO_LEY,
     "decreto-ley foral": Rank.DECRETO_LEY_FORAL,
@@ -88,6 +89,7 @@ _RANK_CODE_MAP: dict[str, Rank] = {
     "1020": Rank.ACUERDO,
     # Autonomous communities (foral/regional)
     "1450": Rank.LEY_FORAL,
+    "1520": Rank.DECRETO_FORAL,
     "1470": Rank.DECRETO_LEGISLATIVO,
     "1500": Rank.DECRETO_LEY,
     "1325": Rank.DECRETO_LEY_FORAL,
