@@ -1,0 +1,60 @@
+{
+ "address": "WDU20250001701",
+ "announcementDate": "2025-12-02",
+ "changeDate": "2025-12-05T10:36:58",
+ "displayAddress": "Dz.U. 2025 poz. 1701",
+ "pos": 1701,
+ "promulgation": "2025-12-04",
+ "publisher": "DU",
+ "status": "obowiązujący",
+ "textHTML": false,
+ "textPDF": true,
+ "title": "Rozporządzenie Ministra Zdrowia z dnia 2 grudnia 2025 r. zmieniające rozporządzenie w sprawie szczegółowego zakresu zadań wojewódzkiego koordynatora ratownictwa medycznego",
+ "type": "Rozporządzenie",
+ "volume": 0,
+ "year": 2025,
+ "authorizedBody": [],
+ "directives": [],
+ "entryIntoForce": "2025-12-19",
+ "inForce": "IN_FORCE",
+ "keywords": [
+  "ratownictwo"
+ ],
+ "keywordsNames": [],
+ "obligated": [],
+ "previousTitle": [],
+ "prints": [],
+ "references": {
+  "Akty zmienione": [
+   {
+    "id": "DU/2018/1655",
+    "date": "2025-12-19"
+   }
+  ],
+  "Podstawa prawna": [
+   {
+    "id": "DU/2006/1410"
+   }
+  ],
+  "Podstawa prawna z art.": [
+   {
+    "id": "DU/2006/1410",
+    "art": "art. 29 ust. 10"
+   }
+  ]
+ },
+ "releasedBy": [
+  "MIN. ZDROWIA"
+ ],
+ "texts": [
+  {
+   "fileName": "D20251701.pdf",
+   "type": "O"
+  },
+  {
+   "fileName": "D20251701.pdf",
+   "type": "I"
+  }
+ ],
+ "ELI": "DU/2025/1701"
+}
