@@ -146,7 +146,7 @@ class NormattivaDiscovery(NormDiscovery):
             return
         path = Path(self._cache_dir) / "discovery_meta.json"
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(self._meta_cache, ensure_ascii=False))
+        path.write_text(json.dumps(self._meta_cache, ensure_ascii=False), encoding="utf-8")
         logger.info("Saved discovery metadata for %d acts", len(self._meta_cache))
 
     @staticmethod
@@ -154,5 +154,5 @@ class NormattivaDiscovery(NormDiscovery):
         """Load discovery metadata from disk (for client use)."""
         path = Path(cache_dir) / "discovery_meta.json"
         if path.exists():
-            return json.loads(path.read_text())
+            return json.loads(path.read_text(encoding="utf-8"))
         return {}

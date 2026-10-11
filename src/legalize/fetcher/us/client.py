@@ -190,7 +190,7 @@ class OLRCClient(HttpClient):
                 (rp for rp in RELEASE_POINTS if rp["tag"] == release_tag),
                 {"tag": release_tag},
             )
-            meta_path.write_text(json.dumps(rp_info, indent=2))
+            meta_path.write_text(json.dumps(rp_info, indent=2), encoding="utf-8")
 
         return rp_dir
 

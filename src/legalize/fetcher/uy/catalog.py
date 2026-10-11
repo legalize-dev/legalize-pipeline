@@ -145,7 +145,7 @@ def build_catalog(
     )
 
     norm_ids = [found[n] for n in sorted(found)]
-    out_path.write_text(json.dumps(norm_ids, indent=2))
+    out_path.write_text(json.dumps(norm_ids, indent=2), encoding="utf-8")
     log.info("Catalog written to %s (%d entries)", out_path, len(norm_ids))
     return norm_ids
 

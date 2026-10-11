@@ -92,7 +92,7 @@ def bootstrap(
         console.print("[yellow]No discovery_meta.json — run discovery first[/yellow]")
         console.print("  legalize fetch -c it --all --limit 0")
         return 0
-    discovery_meta = json.loads(meta_path.read_text())
+    discovery_meta = json.loads(meta_path.read_text(encoding="utf-8"))
 
     # Phase 1: Download and process multivigente ZIPs
     console.print("[bold]Phase 1: Bulk collection downloads (multivigente)[/bold]\n")
