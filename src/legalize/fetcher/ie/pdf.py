@@ -255,7 +255,7 @@ def _inside(char: dict, box: tuple) -> bool:
 def _table(page, table, number: int) -> str:
     """Recover ruled cells and paragraph-separated rows within open columns."""
     element = etree.Element("table")
-    for row in table.rows:
+    for row_index, row in enumerate(table.rows):
         cells = row.cells
         boxes = [box for box in cells if box is not None]
         if not boxes:
@@ -263,12 +263,23 @@ def _table(page, table, number: int) -> str:
         top, bottom = min(b[1] for b in boxes), max(b[3] for b in boxes)
         first = next(box for box in cells if box is not None)
         first_lines = page.crop(first).extract_text_lines(x_tolerance=0.75)
+        # Numbered column labels belong to one ruled header, even when they sit below wrapped titles.
+        numbered_header = (
+            row_index == 0
+            and first_lines
+            and first_lines[-1]["text"] == "(1)"
+            and all(
+                box is not None
+                and (page.crop(box).extract_text(x_tolerance=0.75) or "").endswith(f"({column})")
+                for column, box in enumerate(cells, 1)
+            )
+        )
         # Many statutory tables rule columns, but omit horizontal row borders.
         # A paragraph break in the first column then identifies each source row.
         cuts = [top]
         previous = None
         for line in first_lines:
-            if previous and line["top"] - previous["bottom"] > 4:
+            if not numbered_header and previous and line["top"] - previous["bottom"] > 4:
                 cuts.append(line["top"] - 0.5)
             previous = line
         cuts.append(bottom)

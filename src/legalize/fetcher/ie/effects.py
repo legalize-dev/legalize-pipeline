@@ -25,6 +25,65 @@ _EMPTY_EFFECTS_DIRECTORIES = {
     "IE-2013-act-51": "63507250171797902d74f24b7d53ee92b336a3a8573db57556558b181bd7dabf",
 }
 
+# Exact directory claims verified against the original enactments, not later amendments.
+# Evidence: tests/fixtures/ie/preexisting-rules-evidence.json.
+_PRE_EXISTING_RULES = {
+    ("IE-1978-act-2", "6/1957, s.42"): (
+        "S.28, limitation on recovery of cert. interest.*",
+        "The 1957 limitation refers to section 26 of the Agricultural Credit Act 1947. "
+        "Section 28 of the 1978 Act re-enacts that provision; its directory footnote "
+        "applies section 20(1) of the Interpretation Act 1937. This is inherited application.",
+        "https://www.irishstatutebook.ie/eli/1978/act/2/section/28/enacted/en/html",
+    ),
+    (
+        "IE-2011-act-19",
+        "Health (Amendment) Act 1986 (No. 10 of 1986), s. 2(1)",
+    ): (
+        "Application of Health Acts restricted",
+        "Section 1(4) includes sections 35 and 36 in the collectively cited Health Acts. "
+        "This is an earlier restriction applying to that family, not a later amendment.",
+        "https://www.irishstatutebook.ie/eli/2011/act/19/section/1/enacted/en/html",
+    ),
+    (
+        "IE-2011-act-19",
+        "Health Act 1970 (No. 1 of 1970), s. 53(2) as substituted by Health (Amendment) "
+        "Act 2005 (No. 3 of 2005), s. 4(a)",
+    ): (
+        "Application of Health Acts restricted",
+        "Section 1(4) includes sections 35 and 36 in the collectively cited Health Acts. "
+        "This is an earlier restriction applying to that family, not a later amendment.",
+        "https://www.irishstatutebook.ie/eli/2011/act/19/section/1/enacted/en/html",
+    ),
+    ("IE-2006-act-33", "Electoral Act 1992 (23/1992), s. 7"): (
+        'Terms "presidential elector" and "elector" construed',
+        "These are earlier definitions for the Presidential Elections and Referendum Acts. "
+        "Sections 20(4) and 20(6) of the 2006 Act join those collective citations.",
+        "https://www.irishstatutebook.ie/eli/2006/act/33/section/20/enacted/en/html",
+    ),
+    ("IE-2006-act-33", "Age of Majority Act 1985 (2/1985), s. 4"): (
+        "Time at which person attains a particular age",
+        "This is an earlier general rule for calculating age under statutory provisions, "
+        "including its electoral exceptions, not a later amendment of the 2006 Act.",
+        "https://www.irishstatutebook.ie/eli/1985/act/2/section/4/enacted/en/html",
+    ),
+    (
+        "IE-2014-act-4",
+        "Local Government Reform Act 2014 (No. 1 of 2014), ss. 1(22), 9(2),(3), 25(2)",
+    ): (
+        "References construed",
+        "These are previously enacted general construction rules for local authorities "
+        "and their functions in other enactments. Their later commencement is retained "
+        "as reported by the directory; it is not a new enactment amending this Act.",
+        "https://www.irishstatutebook.ie/eli/2014/act/1/enacted/en/html",
+    ),
+    ("IE-2018-act-11", "Data Protection Act 2018 (7/2018), ss. 1(3), 166"): (
+        "S. 24 references to processing construed",
+        "Section 166 is an earlier general construction rule for references to processing "
+        "in any enactment, not a later amendment of the Childcare Support Act 2018.",
+        "https://www.irishstatutebook.ie/eli/2018/act/7/section/166/enacted/en/html",
+    ),
+}
+
 # Order-series numbers differ from S.I. numbers; verified against the annual eISB indexes.
 _DUTY_ORDERS = {
     ("E.I.D.", "117", "1937"): "IE-1937-si-3",
@@ -992,6 +1051,18 @@ def fetch_effects(
             year, kind, number = _parse_norm_id(source_id)
             effect["source_url"] = f"{client._base_url}/eli/{year}/{kind}/{number}/enacted/en/html"
         effect["directory_url"] = directory_url
+        if (
+            (rule := _PRE_EXISTING_RULES.get((norm_id, effect["provision"])))
+            and effect["note"] == rule[0]
+            and date.fromisoformat(effect["publication_date"])
+            < parser.parse(enacted_data, norm_id).publication_date
+        ):
+            if editorial_notes is None:
+                raise ValueError(f"{norm_id}: pre-existing rule requires a provenance sink")
+            editorial_notes.append(
+                {**effect, "kind": "pre_existing_rule", "reason": rule[1], "basis_source": rule[2]}
+            )
+            continue
         collective_member = _collective_citation(effect["note"])
         collective_application = re.search(
             r"\bcollectively cited\b.*\bActs\b", effect["note"], re.I
