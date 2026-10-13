@@ -181,11 +181,17 @@ def test_undated_virtual_repeal_classification_does_not_invent_a_repeal_event():
     ]
 
 
-def test_expired_qualifier_stays_with_the_cited_act():
+def test_expired_qualifier_stays_with_the_outgoing_citation():
     raw = (FIXTURES / "sample-effects-secondary-1958-5.html").read_bytes()
-    effects = parse_effects(raw, "IE-1958-act-5")
-    assert effects[-1]["source_id"] == "IE-1956-act-20"
-    assert effects[-1]["provision"].endswith("; , expired.")
+    notes = []
+    assert parse_effects(raw, "IE-1958-act-5", editorial_notes=notes) == []
+    assert notes == [
+        {
+            "kind": "directory_classification",
+            "note": "Spent",
+            "provision": "Amended 20/1956 , expired.",
+        }
+    ]
 
 
 def test_part_headers_may_state_their_section_range():

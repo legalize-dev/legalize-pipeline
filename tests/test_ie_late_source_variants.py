@@ -195,7 +195,8 @@ def test_directory_rows_remain_resolvable_and_preserve_nonlegislative_notes(iden
     effects = parse_effects(raw, identifier, editorial_notes=notes)
     assert effects or notes or identifier == "IE-1990-act-29"
     if identifier in {"IE-1978-act-24", "IE-1982-act-25"}:
-        assert any(", expired 31 December 1992." in e["provision"] for e in effects)
+        assert not effects
+        assert any(", expired 31 December 1992." in n["provision"] for n in notes)
     if identifier == "IE-1986-act-9":
         assert any(
             e["source_id"] == "IE-2019-act-8" and "29(2A) inserted" in e["note"] for e in effects

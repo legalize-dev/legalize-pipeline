@@ -66,6 +66,79 @@ _COMPANIES_COMMENCEMENTS = {
 }
 
 
+# Exact directory citations verified against the enactments that inserted the provisions.
+# Evidence: tests/fixtures/ie/later-insertion-evidence.json.
+_LATER_INSERTIONS = {
+    ("IE-1958-act-4", "23/1935, s.1 (2) (b)"): (
+        "1965/act/23/section/1",
+        None,
+        None,
+    ),
+    ("IE-1977-act-12", "12/1950, s. 22A(1)(f)"): (
+        "2005/act/31/section/129",
+        None,
+        None,
+    ),
+    ("IE-1995-act-9", "25/1990, s. 101(6)(a) *"): (
+        "2002/act/18/section/3",
+        "7 November 2002",
+        "2002/si/502",
+    ),
+    ("IE-1995-act-11", "25/1990, s. 101(5)(a)"): (
+        "2002/act/18/section/3",
+        "7 November 2002",
+        "2002/si/502",
+    ),
+    ("IE-1995-act-11", "25/1990, s. 101(5)(b)"): (
+        "2002/act/18/section/3",
+        "7 November 2002",
+        "2002/si/502",
+    ),
+    ("IE-1995-act-11", "25/1990, s. 101(5)(c)"): (
+        "2002/act/18/section/3",
+        "7 November 2002",
+        "2002/si/502",
+    ),
+    ("IE-1997-act-39", "27/1988, s. 44A"): (
+        "2012/act/44/section/150",
+        None,
+        None,
+    ),
+    (
+        "IE-2012-act-9",
+        "Taxes Consolidation Act 1997 (39/1997), s. 959AF(4) (as inserted by the Finance Act 2017, s. 75, schedule 3(l))",
+    ): (
+        "2017/act/41/schedule/3",
+        None,
+        None,
+    ),
+    (
+        "IE-2013-act-18",
+        "Courts (Supplemental Provisions) Act 1961 (No. 39 of 1961), s. 46(9A)(h) (see also Financial Emergency Measures in the Public Interest Act 2015 (No. 39 of 2015), ss. 1(2), 11(1)(c))",
+    ): (
+        "2015/act/39/section/11",
+        "1 January 2017",
+        "2016/si/406",
+    ),
+    (
+        "IE-2002-act-9",
+        "37/2001, ss. 131, 131A, sch. 14A pt. 3 (see also 1/2014, ss. 1(22), 21(4), sch. 3)",
+    ): (
+        "2014/act/1/section/21",
+        "1 June 2014",
+        "2014/si/214",
+    ),
+    (
+        "IE-2003-act-15",
+        "37/2001, s. 131A(1)(a),(4), sch. 14A pt. 1 (see also 1/2014, ss. 1(22), 21(3),(4), sch. 3)",
+    ): (
+        "2014/act/1/section/21",
+        "1 June 2014",
+        "2014/si/214",
+    ),
+}
+
+
 def norm_id_from_url(url: str) -> str | None:
     """Resolve ELI and legacy citations without merging Act namespaces."""
     path = urlparse(url).path
@@ -584,9 +657,23 @@ def parse_effects(
             previous_note = ""
             continue
         if not ids and re.fullmatch(r"Spent\.?", note, re.I) and not any(texts[2:]):
+            outgoing = provision in {"Amended", "Extended duration of and amended"}
+            if outgoing:
+                if editorial_notes is None:
+                    raise ValueError(f"{norm_id}: spent classification requires a provenance sink")
+                # The continuation names the earlier Act this spent Act amended, not an incoming reform.
+                for following in cells_by_row[row_index + 1 :]:
+                    if len(following) != 2 or _text(following[0]):
+                        break
+                    provision = f"{provision} {_text(following[1])}".strip()
+                    following.clear()
             if editorial_notes is not None:
                 editorial_notes.append(
-                    {"note": note, **({"provision": provision} if provision else {})}
+                    {
+                        **({"kind": "directory_classification"} if outgoing else {}),
+                        "note": note,
+                        **({"provision": provision} if provision else {}),
+                    }
                 )
             previous_note = ""
             continue
@@ -682,6 +769,20 @@ def parse_effects(
                     "https://www.irishstatutebook.ie/eli/2014/si/103/made/en/html"
                 )
                 effect["effective_date"] = "2014-03-07"
+            if insertion := _LATER_INSERTIONS.get((norm_id, provision)):
+                path, commencement, order = insertion
+                source = f"https://www.irishstatutebook.ie/eli/{path}/enacted/en/html"
+                effect["directory_source_id"] = identifier
+                effect["source_id"] = norm_id_from_url(source)
+                effect["source_correction"] = source
+                if commencement:
+                    effect["directory_commencement"] = effect["commencement"]
+                    effect["directory_commencement_source"] = effect["commencement_source"]
+                    effect["commencement"] = commencement
+                    effect["commencement_source"] = (
+                        f"https://www.irishstatutebook.ie/eli/{order}/made/en/html"
+                    )
+                    effect["effective_date"] = source_date(commencement).isoformat()
             effects.append(effect)
             previous_effects.append(effect)
     if pending_reference:

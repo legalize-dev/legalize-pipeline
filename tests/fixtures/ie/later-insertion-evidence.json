@@ -1,0 +1,267 @@
+[
+  {
+    "identifier": "IE-1958-act-4",
+    "original_id": "IE-1935-act-23",
+    "provision": "23/1935, s.1 (2) (b)",
+    "amender": "IE-1965-act-23",
+    "source_path": "1965/act/23/section/1",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1958_4.html",
+      "file": "sample-effects-insertions-1958-4.html",
+      "sha256": "da2870afdb0297231106edc21bf16e39ef368a1d835b146be0a66aff930fb152"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/1965/act/23/section/1/enacted/en/html",
+      "file": "sample-proof-1965-act-23-section-1.html",
+      "sha256": "e50259fe4c6c193eb5b4c8aa9cdc54ada72ca98fc9bb7661cf70c91002803f6f",
+      "quote": "(b) in section 10, by"
+    },
+    "commencement": null,
+    "commencement_path": null
+  },
+  {
+    "identifier": "IE-1977-act-12",
+    "original_id": "IE-1950-act-12",
+    "provision": "12/1950, s. 22A(1)(f)",
+    "amender": "IE-2005-act-31",
+    "source_path": "2005/act/31/section/129",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1977_12.html",
+      "file": "sample-effects-insertions-1977-12.html",
+      "sha256": "e7dffe74737093bc78128f8ae5b348181302ca45305369b9acd28ae10bb20eb0"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2005/act/31/section/129/enacted/en/html",
+      "file": "sample-proof-2005-act-31-section-129.html",
+      "sha256": "37ce5b9401671de1fc92822c29f5bed137c14d7b3dc818b65c09ffb42e6db095",
+      "quote": "section 15 of the Misuse of Drugs Act 1977"
+    },
+    "commencement": null,
+    "commencement_path": null
+  },
+  {
+    "identifier": "IE-1995-act-9",
+    "original_id": "IE-1990-act-25",
+    "provision": "25/1990, s. 101(6)(a) *",
+    "amender": "IE-2002-act-18",
+    "source_path": "2002/act/18/section/3",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1995_9.html",
+      "file": "sample-effects-insertions-1995-9.html",
+      "sha256": "61718aa4fda985d36c410f981bd7da0bb72888a425274b2cf414e8fec4eb12a5"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/act/18/section/3/enacted/en/html",
+      "file": "sample-proof-2002-act-18-section-3.html",
+      "sha256": "c314f6f8b0588a96373930fc447391e4560800ef829812315d445edd992ee2eb",
+      "quote": "Section 3 (1) of the Stock Exchange Act, 1995"
+    },
+    "commencement": "7 November 2002",
+    "commencement_path": "2002/si/502",
+    "commencement_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/si/502/made/en/html",
+      "file": "sample-insertion-commencement-2002-si-502.html",
+      "sha256": "2d7ccb951312629229fdbf3e122fd4f92fc09de625682fa0ac115ae432705830"
+    }
+  },
+  {
+    "identifier": "IE-1995-act-11",
+    "original_id": "IE-1990-act-25",
+    "provision": "25/1990, s. 101(5)(a)",
+    "amender": "IE-2002-act-18",
+    "source_path": "2002/act/18/section/3",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1995_11.html",
+      "file": "sample-effects-insertions-1995-11.html",
+      "sha256": "cc27079f7fe26d2a3c7f9471d330e072579f76f4850c5be87267408a0fb018c7"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/act/18/section/3/enacted/en/html",
+      "file": "sample-proof-2002-act-18-section-3.html",
+      "sha256": "c314f6f8b0588a96373930fc447391e4560800ef829812315d445edd992ee2eb",
+      "quote": "The Investment Intermediaries Act, 1995 , is amended"
+    },
+    "commencement": "7 November 2002",
+    "commencement_path": "2002/si/502",
+    "commencement_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/si/502/made/en/html",
+      "file": "sample-insertion-commencement-2002-si-502.html",
+      "sha256": "2d7ccb951312629229fdbf3e122fd4f92fc09de625682fa0ac115ae432705830"
+    }
+  },
+  {
+    "identifier": "IE-1995-act-11",
+    "original_id": "IE-1990-act-25",
+    "provision": "25/1990, s. 101(5)(b)",
+    "amender": "IE-2002-act-18",
+    "source_path": "2002/act/18/section/3",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1995_11.html",
+      "file": "sample-effects-insertions-1995-11.html",
+      "sha256": "cc27079f7fe26d2a3c7f9471d330e072579f76f4850c5be87267408a0fb018c7"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/act/18/section/3/enacted/en/html",
+      "file": "sample-proof-2002-act-18-section-3.html",
+      "sha256": "c314f6f8b0588a96373930fc447391e4560800ef829812315d445edd992ee2eb",
+      "quote": "The Investment Intermediaries Act, 1995 , is amended"
+    },
+    "commencement": "7 November 2002",
+    "commencement_path": "2002/si/502",
+    "commencement_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/si/502/made/en/html",
+      "file": "sample-insertion-commencement-2002-si-502.html",
+      "sha256": "2d7ccb951312629229fdbf3e122fd4f92fc09de625682fa0ac115ae432705830"
+    }
+  },
+  {
+    "identifier": "IE-1995-act-11",
+    "original_id": "IE-1990-act-25",
+    "provision": "25/1990, s. 101(5)(c)",
+    "amender": "IE-2002-act-18",
+    "source_path": "2002/act/18/section/3",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1995_11.html",
+      "file": "sample-effects-insertions-1995-11.html",
+      "sha256": "cc27079f7fe26d2a3c7f9471d330e072579f76f4850c5be87267408a0fb018c7"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/act/18/section/3/enacted/en/html",
+      "file": "sample-proof-2002-act-18-section-3.html",
+      "sha256": "c314f6f8b0588a96373930fc447391e4560800ef829812315d445edd992ee2eb",
+      "quote": "The Investment Intermediaries Act, 1995 , is amended"
+    },
+    "commencement": "7 November 2002",
+    "commencement_path": "2002/si/502",
+    "commencement_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2002/si/502/made/en/html",
+      "file": "sample-insertion-commencement-2002-si-502.html",
+      "sha256": "2d7ccb951312629229fdbf3e122fd4f92fc09de625682fa0ac115ae432705830"
+    }
+  },
+  {
+    "identifier": "IE-1997-act-39",
+    "original_id": "IE-1988-act-27",
+    "provision": "27/1988, s. 44A",
+    "amender": "IE-2012-act-44",
+    "source_path": "2012/act/44/section/150",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1997_39.html",
+      "file": "sample-effects-insertions-1997-39.html.gz",
+      "sha256": "9c0ffd5cc4efbbdcd227be077de74da47c312c3b1931df71d4771b27d4abdd9e"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2012/act/44/section/150/enacted/en/html",
+      "file": "sample-proof-2012-act-44-section-150.html",
+      "sha256": "c840995cfe0dd1e5cceb035e13265507423c0dcf5b6d0fc48f7511d6875848f1",
+      "quote": "relevant provisions of the Taxes Consolidation Act 1997"
+    },
+    "commencement": null,
+    "commencement_path": null
+  },
+  {
+    "identifier": "IE-2012-act-9",
+    "original_id": "IE-1997-act-39",
+    "provision": "Taxes Consolidation Act 1997 (39/1997), s. 959AF(4) (as inserted by the Finance Act 2017, s. 75, schedule 3(l))",
+    "amender": "IE-2017-act-41",
+    "source_path": "2017/act/41/schedule/3",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2012_9.html",
+      "file": "sample-effects-insertions-2012-9.html",
+      "sha256": "522ede22d71bb01b7a3e86a739038c686a956c8ae4a821e4bd3dff4ba7677247"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2017/act/41/schedule/3/enacted/en/html",
+      "file": "sample-proof-2017-act-41-schedule-3.html",
+      "sha256": "6c304581a53a581f76c4166e4e7c783313d6f5c177dfbad434854705aa94779f",
+      "quote": "Notwithstanding section 129(4) of the Finance Act 2012"
+    },
+    "commencement": null,
+    "commencement_path": null
+  },
+  {
+    "identifier": "IE-2013-act-18",
+    "original_id": "IE-1961-act-39",
+    "provision": "Courts (Supplemental Provisions) Act 1961 (No. 39 of 1961), s. 46(9A)(h) (see also Financial Emergency Measures in the Public Interest Act 2015 (No. 39 of 2015), ss. 1(2), 11(1)(c))",
+    "amender": "IE-2015-act-39",
+    "source_path": "2015/act/39/section/11",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2013_18.html",
+      "file": "sample-effects-insertions-2013-18.html",
+      "sha256": "f9e6bef8aa616ee8db4165fc1f3a8c40e106f3368581a89441eef01b82d0ea47"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2015/act/39/section/11/enacted/en/html",
+      "file": "sample-proof-2015-act-39-section-11.html",
+      "sha256": "8df06c43bfa6d17bdebf3ef7bd8dd5ad8dd8361706ef7d93a13d3f293817fda9",
+      "quote": "Section 7 of the Financial Emergency Measures in the Public Interest Act 2013"
+    },
+    "commencement": "1 January 2017",
+    "commencement_path": "2016/si/406",
+    "commencement_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2016/si/406/made/en/html",
+      "file": "sample-insertion-commencement-2016-si-406.html",
+      "sha256": "45a225936b3e542fb57508cf8d3d16b83d41c404f18370868b3517da97088d9f"
+    }
+  },
+  {
+    "identifier": "IE-2002-act-9",
+    "original_id": "IE-2001-act-37",
+    "provision": "37/2001, ss. 131, 131A, sch. 14A pt. 3 (see also 1/2014, ss. 1(22), 21(4), sch. 3)",
+    "amender": "IE-2014-act-1",
+    "source_path": "2014/act/1/section/21",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2002_9.html",
+      "file": "sample-effects-insertions-2002-9.html",
+      "sha256": "27d9a4c040dacf522a992a117cb5a72ea8a4a5e8e4fec8d069dafb9c0fd13e20"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/1/section/21/enacted/en/html",
+      "file": "sample-proof-2014-act-1-section-21.html",
+      "sha256": "ce1223986baf132645fb4880926cb424b1c31c22fc1c056757bd000fa9ce1521",
+      "quote": "(4) The Principal Act is amended by inserting, after Schedule 14"
+    },
+    "commencement": "1 June 2014",
+    "commencement_path": "2014/si/214",
+    "commencement_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2014/si/214/made/en/html",
+      "file": "sample-insertion-commencement-2014-si-214.html",
+      "sha256": "7e69410874dd825eda9db8122194878dc27b4111899a805eb755e24e9c5d9bb1"
+    },
+    "schedule_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/1/schedule/3/enacted/en/html",
+      "file": "sample-proof-2014-act-1-schedule-3.html",
+      "sha256": "ba02747f7c450c384e7f1511e48ad961e9dfce281fe0a645b137b472257fca5f"
+    }
+  },
+  {
+    "identifier": "IE-2003-act-15",
+    "original_id": "IE-2001-act-37",
+    "provision": "37/2001, s. 131A(1)(a),(4), sch. 14A pt. 1 (see also 1/2014, ss. 1(22), 21(3),(4), sch. 3)",
+    "amender": "IE-2014-act-1",
+    "source_path": "2014/act/1/section/21",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2003_15.html",
+      "file": "sample-effects-insertions-2003-15.html",
+      "sha256": "ecbbb0a52d441041b2926b1f37273f14ce999f6c50b8ba871dd0accee46798dd"
+    },
+    "proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/1/section/21/enacted/en/html",
+      "file": "sample-proof-2014-act-1-section-21.html",
+      "sha256": "ce1223986baf132645fb4880926cb424b1c31c22fc1c056757bd000fa9ce1521",
+      "quote": "(3) The Principal Act is amended by inserting the following section after section 131"
+    },
+    "commencement": "1 June 2014",
+    "commencement_path": "2014/si/214",
+    "commencement_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2014/si/214/made/en/html",
+      "file": "sample-insertion-commencement-2014-si-214.html",
+      "sha256": "7e69410874dd825eda9db8122194878dc27b4111899a805eb755e24e9c5d9bb1"
+    },
+    "schedule_proof": {
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/1/schedule/3/enacted/en/html",
+      "file": "sample-proof-2014-act-1-schedule-3.html",
+      "sha256": "ba02747f7c450c384e7f1511e48ad961e9dfce281fe0a645b137b472257fca5f"
+    }
+  }
+]
