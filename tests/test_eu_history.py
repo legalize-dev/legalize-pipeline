@@ -324,6 +324,50 @@ def test_daily_real_source_ids_idempotence_and_retry(tmp_path, monkeypatch):
     assert state.last_summary_date == date(2016, 5, 4)
 
 
+def test_daily_publishes_completed_day_before_interruption(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+
+    from legalize.fetcher.eu import daily as daily_module
+    from legalize.state.store import StateStore
+
+    metadata = json.loads((FIXTURES / "32016R0679_metadata.json").read_text())
+    client = EURLexClient()
+    monkeypatch.setattr(EURLexClient, "create", lambda _: client)
+    monkeypatch.setattr(client, "get_metadata_sparql", lambda _: metadata)
+    monkeypatch.setattr(client, "_merge_list_facts", lambda *_: None)
+    raw = b"""<eurlex-multi-version celex="32016R0679">
+    <version type="original" source-id="32016R0679" effective-date="2016-05-04">
+    <html><body><p class="oj-ti-art">Article 1</p><p class="oj-normal">Original</p></body></html>
+    </version></eurlex-multi-version>"""
+    monkeypatch.setattr(client, "get_text", lambda *_, **__: raw)
+    days = [date(2026, 10, 12), date(2026, 10, 13)]
+
+    def discover(_, current_date):
+        if current_date == days[1]:
+            raise KeyboardInterrupt("CI deadline")
+        return ["32016R0679"]
+
+    monkeypatch.setattr(
+        daily_module.EURLexDiscovery, "create", lambda _: SimpleNamespace(discover_daily=discover)
+    )
+    monkeypatch.setattr(daily_module, "resolve_dates_to_process", lambda *_: days)
+    repo = Mock(refused=[])
+    monkeypatch.setattr(daily_module, "GitRepo", lambda *_: repo)
+    monkeypatch.setattr(daily_module, "commit_one", lambda *_: 1)
+    state_path = tmp_path / "state.json"
+    config = Config(
+        countries={"eu": CountryConfig(data_dir=str(tmp_path / "data"), state_path=str(state_path))}
+    )
+    config.git.push = True
+    with pytest.raises(KeyboardInterrupt, match="CI deadline"):
+        daily_module.daily(config)
+    repo.push.assert_called_once_with()
+    state = StateStore(state_path)
+    state.load()
+    assert state.last_summary_date == days[0]
+
+
 def test_entry_into_force_uses_annotated_ev_not_application():
     celex = "32017R0745"
     metadata = json.loads((FIXTURES / f"{celex}_metadata.json").read_text())
