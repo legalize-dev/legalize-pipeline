@@ -82,6 +82,13 @@ _PRE_EXISTING_RULES = {
         "in any enactment, not a later amendment of the Childcare Support Act 2018.",
         "https://www.irishstatutebook.ie/eli/2018/act/7/section/166/enacted/en/html",
     ),
+    ("IE-2005-act-26", "S.I. No. 188 of 1998, sch. A"): (
+        "S. 250 applied with modifications **",
+        "Schedule A originally applies section 212 of the 1993 Act, re-enacted as "
+        "section 250 of the 2005 Act. Sections 361(b) and 362(2) preserve the references "
+        "and instruments. The directory's separate S.I. 600/2011 amendment is retained.",
+        "https://www.irishstatutebook.ie/eli/2005/act/26/section/361/enacted/en/html",
+    ),
 }
 
 # Order-series numbers differ from S.I. numbers; verified against the annual eISB indexes.
@@ -126,8 +133,18 @@ _COMPANIES_COMMENCEMENTS = {
 
 
 # Exact directory citations verified against the actual affecting provisions.
-# Evidence: tests/fixtures/ie/{later-insertion,verified-year}-evidence.json.
+# Evidence: tests/fixtures/ie/{later-insertion,verified-year,later-host}-evidence.json.
 _VERIFIED_EFFECT_SOURCES = {
+    ("IE-1993-act-8", "28/1971, s. 17 and sch."): (
+        "2022/act/31/section/130",
+        None,
+        None,
+    ),
+    ("IE-2005-act-26", "S.I. No. 188 of 1998, sch. B"): (
+        "2012/si/448",
+        None,
+        None,
+    ),
     ("IE-1996-act-32", "S.I. No. 319 of 1996. art. 12(5)"): (
         "1998/si/319",
         None,
@@ -515,7 +532,7 @@ def parse_effects(
     footnotes = [
         _text(node)
         for node in doc.xpath('//*[@id="effects"]/following-sibling::*[not(self::table)]')
-        if re.match(r"^(?:Ss?\.[\d\s(),a-z-]+)?\*|^Ss?\.[\d\s(),a-z-]+:", _text(node), re.I)
+        if re.search(r"(?:^|\s)(?:Ss?\.[\d\s(),a-z-]+)?\*|^Ss?\.[\d\s(),a-z-]+:", _text(node), re.I)
     ]
     if not any(cells_by_row):
         if sha256(data).hexdigest() == _EMPTY_EFFECTS_DIRECTORIES.get(norm_id):
@@ -625,6 +642,14 @@ def parse_effects(
         ]
         if not ids and provision == "Order made under*" and len(matching_footnotes) == 1:
             ids, correction = _affecting_ids(cells[1], matching_footnotes[0], norm_id, note)
+        rent_amendment = (
+            norm_id == "IE-2005-act-26"
+            and provision == "S.I. No. 188 of 1998, sch. A"
+            and note == "S. 250 applied with modifications **"
+            and any("** See also S.I. No. 600 of 2011, reg. 7" in text for text in footnotes)
+        )
+        if rent_amendment:
+            ids.add("IE-2011-si-600")
         judicial = bool(
             re.search(
                 r"declared (?:unconstitutional|constitutional|invalid)|deemed incompatible with Art(?:icle|\.) \d+[.\d]* of the Constitution|not compatible with the Constitution",
@@ -808,6 +833,14 @@ def parse_effects(
             )
             if correction:
                 effect["source_correction"] = correction
+            if rent_amendment and identifier == "IE-2011-si-600":
+                effect["directory_source_id"] = "IE-1998-si-188"
+                effect["directory_footnotes"] = [
+                    text for text in footnotes if "** See also S.I. No. 600 of 2011, reg. 7" in text
+                ]
+                effect["source_correction"] = (
+                    "https://www.irishstatutebook.ie/eli/2011/si/600/made/en/html"
+                )
             if norm_id == "IE-1983-act-35" and correction and identifier == "IE-2008-act-1":
                 effect["commencement"] = "5 May 2008"
                 effect["commencement_source"] = (
