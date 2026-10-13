@@ -102,6 +102,69 @@ def test_unresolved_effective_date_is_omitted_instead_of_invented(tmp_path):
     assert "Source wording" in content
 
 
+@pytest.mark.parametrize("mode", ["single", "fast", "daily"])
+def test_delayed_reform_does_not_absorb_its_later_repeal(tmp_path, mode):
+    from legalize.committer.git_ops import GitRepo
+    from legalize.fetcher.es.daily import _commit_norm
+
+    norm = parsed("sample-constitution")
+    original = Version(
+        norm.metadata.identifier,
+        date(2026, 9, 30),
+        date(2026, 10, 1),
+        (Paragraph("parrafo", "Original wording"),),
+    )
+    amendment = Version(
+        "BOE-A-2026-20385",
+        date(2026, 10, 1),
+        date(2026, 10, 2),
+        (Paragraph("parrafo", "Amended wording"),),
+    )
+    repeal = Version(
+        "BOE-A-2026-20526",
+        date(2026, 10, 2),
+        date(2026, 10, 2),
+        (Paragraph("parrafo", "Restored wording"),),
+    )
+    blocks = (
+        Block("a10", "precepto", "Article 10", (original, amendment, repeal)),
+        Block(
+            "a2",
+            "precepto",
+            "Article 2",
+            (
+                replace(original, paragraphs=(Paragraph("parrafo", "Unrelated original"),)),
+                replace(repeal, paragraphs=(Paragraph("parrafo", "Unrelated restored"),)),
+            ),
+        ),
+    )
+    norm = replace(norm, blocks=blocks, reforms=tuple(extract_reforms(blocks)))
+    data, repo_path = tmp_path / "data", tmp_path / "repo"
+    save_structured_json(data, norm)
+    config = Config(countries={"es": CountryConfig(data_dir=str(data), repo_path=str(repo_path))})
+    repo = GitRepo(repo_path, "Legalize", "legalize@legalize.dev")
+    if mode == "daily":
+        repo.init()
+        assert _commit_norm(repo, norm, date(2026, 10, 3)) == 3
+    elif mode == "single":
+        assert commit_one(config, "es", norm.metadata.identifier) == 3
+    else:
+        assert commit_all_fast(config, "es") == 3
+
+    law = next((repo_path / "es").rglob("*.md")).relative_to(repo_path)
+    amendment_sha = repo._run(["log", "--format=%H", "--grep=^Source-Id: BOE-A-2026-20385$"])
+    repeal_sha = repo._run(["log", "--format=%H", "--grep=^Source-Id: BOE-A-2026-20526$"])
+    amended = repo._run(["show", f"{amendment_sha}:{law}"])
+    restored = repo._run(["show", f"{repeal_sha}:{law}"])
+    assert "Amended wording" in amended
+    assert "Unrelated original" in amended
+    assert "Restored wording" not in amended
+    assert "Unrelated restored" not in amended
+    assert "Restored wording" in restored and "Unrelated restored" in restored
+    assert "Amended wording" not in restored
+    assert 'last_updated: "2026-10-02"' in amended
+
+
 @pytest.mark.parametrize("committer", [commit_one, commit_all_fast])
 def test_staged_commencement_survives_storage_and_idempotent_commits(tmp_path, committer):
     norm = parsed("sample-constitution")
