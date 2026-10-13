@@ -98,6 +98,58 @@ _PRE_EXISTING_RULES = {
     ),
 }
 
+# Exact misfiled claims and host citations; see context-citations-evidence.json.
+_DIRECTORY_CONTEXT = {
+    (
+        "IE-1991-act-29",
+        "IE-1988-si-286",
+        "S. 5 form prescribed",
+        "S.I. No. 286 of 1988, reg. 4(1)",
+    ): (
+        "directory_citation_error",
+        "Regulation 4(1) prescribes a certificate under the Local Government "
+        "(Multi-Storey Buildings) Act 1988 (29/1988), not the B&I Line Act 1991. "
+        "The directory files this claim under the wrong Act.",
+        "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html",
+    ),
+    (
+        "IE-1992-act-29",
+        "IE-1988-si-286",
+        "S. 4(1) application modified",
+        "S.I. No. 286 of 1988, reg. 5",
+    ): (
+        "directory_citation_error",
+        "Regulation 5 concerns a certificate under the Local Government "
+        "(Multi-Storey Buildings) Act 1988 (29/1988), not the Censorship of Films "
+        "(Amendment) Act 1992. The directory files this claim under the wrong Act.",
+        "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html",
+    ),
+    (
+        "IE-1996-act-21",
+        "IE-1974-si-132",
+        "S. 26(1)(b) applied with modifications",
+        "S.I. No. 132 of 1974, reg. 2",
+    ): (
+        "directory_citation_error",
+        "Regulation 2 explicitly concerns section 26(1)(b) of the Housing Act "
+        "1966 (21/1966), not the An Bord Bia (Amendment) Act 1996. "
+        "The directory files this claim under the wrong Act.",
+        "https://www.irishstatutebook.ie/eli/1974/si/132/made/en/html",
+    ),
+    (
+        "IE-1981-act-16",
+        "IE-1975-si-307",
+        "S.37 (1), cesser. of applic. of.",
+        "S. I. No. 307 of 1975, par. 9 (2)",
+    ): (
+        "host_provision",
+        "The 1975 Order is the host of paragraph 9(2), inserted by section 37(1) "
+        "of the Finance Act 1981. The cessation comes from section 152(1) of the "
+        "Finance Act 1992, retained as a separate directory effect.",
+        "https://www.irishstatutebook.ie/eli/1992/act/9/section/152/enacted/en/html",
+    ),
+}
+
 # Order-series numbers differ from S.I. numbers; verified against the annual eISB indexes.
 _DUTY_ORDERS = {
     ("E.I.D.", "117", "1937"): "IE-1937-si-3",
@@ -1131,6 +1183,21 @@ def fetch_effects(
             year, kind, number = _parse_norm_id(source_id)
             effect["source_url"] = f"{client._base_url}/eli/{year}/{kind}/{number}/enacted/en/html"
         effect["directory_url"] = directory_url
+        if (
+            context := _DIRECTORY_CONTEXT.get(
+                (norm_id, source_id, effect["note"], effect["provision"])
+            )
+        ) and date.fromisoformat(effect["publication_date"]) < parser.parse(
+            enacted_data, norm_id
+        ).publication_date:
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: verified directory context requires a provenance sink"
+                )
+            editorial_notes.append(
+                {**effect, "kind": context[0], "reason": context[1], "basis_source": context[2]}
+            )
+            continue
         if (
             (rule := _PRE_EXISTING_RULES.get((norm_id, effect["provision"])))
             and effect["note"] == rule[0]
