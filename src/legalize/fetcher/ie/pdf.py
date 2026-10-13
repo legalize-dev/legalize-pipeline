@@ -132,8 +132,25 @@ _KNOWN_LABEL_DEFECTS = {
 }
 
 
+# Only these inspected appendices use the playbook's image-omission policy on whole pages.
+# Evidence: tests/fixtures/ie/pdf-scanned-appendices-evidence.json.
+_KNOWN_SCANNED_APPENDICES = {
+    "6035778c7c01464c51791f87d68449e72fee7427ec1f02b1717f8c2950185a04": (  # pragma: allowlist secret
+        frozenset(range(179, 185)) | frozenset(range(198, 208))
+    ),
+    "1fa4abf009589948ff0ce1889a62ae35e404fd9f55b46284e92293d323c3baea": frozenset({116, 117}),
+}
+
+
 def source_warning(data: bytes) -> str | None:
     """Return the verified limitation for an exact official PDF."""
+    if pages := _KNOWN_SCANNED_APPENDICES.get(sha256(data).hexdigest()):
+        return (
+            "This official consolidated PDF contains scanned legal forms or tables on physical "
+            f"PDF pages {', '.join(str(page) for page in sorted(pages))}. "
+            "Their images are marked [image omitted] in source order and counted, but their "
+            "contents are not transcribed. Consult the original PDF for these appendices."
+        )
     if defect := _KNOWN_LABEL_DEFECTS.get(sha256(data).hexdigest()):
         return defect["warning"]
     if sha256(data).hexdigest() in _KNOWN_SOURCE_OMISSIONS:
@@ -353,6 +370,7 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
     contents = False
     expected: set[str] = set()
     verified_cutoff = _KNOWN_CUTOFF_CONFLICTS.get(sha256(data).hexdigest())
+    scanned_appendices = _KNOWN_SCANNED_APPENDICES.get(sha256(data).hexdigest(), frozenset())
     with pdfplumber.open(io.BytesIO(data)) as pdf:
         for number, page in enumerate(pdf.pages):
             lines = page.extract_text_lines(x_tolerance=0.75)
@@ -417,9 +435,9 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
                 for image in page.images
                 if image["bottom"] > body_top and image["top"] < page.height - 36
             ]
-            if body_images and not active:
+            if body_images and not active and number + 1 not in scanned_appendices:
                 raise UnsupportedPDF(f"Image-only Revised Act PDF body page: {number + 1}")
-            if not active:
+            if not active and not body_images:
                 # A separator may contain only XEP's white page backgrounds and running headers.
                 if any(
                     shape["bottom"] > body_top

@@ -283,11 +283,34 @@ rows are a separate version denominator; rows are not necessarily unique texts.
 
 **Gate conclusion:** the inventory establishes that XML+HTML alone is inadequate
 for the requested history. Historical PDF is **required**, not a justified skip.
-There is no OCR-cost exception: the inspected archival PDFs have extractable text.
+The initial sample had extractable text. The later full-fetch inspection found
+scanned appendices in two exact snapshots; the bounded image-omission policy
+documented below preserves their surrounding text and explicitly discloses the gap.
 This completes the source inventory and format-support design needed to start
 implementation. The later implementation has now passed the representative sample
 and historical cross-format checks below; **full-corpus format coverage remains
 subject to download reconciliation and health checks**.
+
+### Scanned appendices found during full-fetch repair (2026-10-13)
+
+The original Mutual Assistance 2008 snapshot contains scanned certificate forms
+on physical PDF pages 179–184 and 198–207; ICAV 2015 contains a scanned accounts
+table on pages 116–117. These are substantive legal appendices, not decoration or
+blank separators. They remain subject to Step 1.7's existing binary-image policy:
+one `[image omitted]` marker per image in source order, per-source and aggregate
+`images_dropped` counts, and a snapshot-specific `source_warning` identifying the
+physical pages. The extracted text does not represent a transcription of those
+forms or the table; readers must consult the linked original PDF.
+
+Whole-page omission is permitted only for the exact inspected PDF digests and
+page numbers in `pdf._KNOWN_SCANNED_APPENDICES`. Unknown scanned pages still fail,
+as do missing numbered sections. The source files, page/image hashes and fixture
+page selections are recorded in
+[`pdf-scanned-appendices-evidence.json`](../tests/fixtures/ie/pdf-scanned-appendices-evidence.json).
+The ICAV fixture is complete; the Mutual Assistance fixture retains unchanged
+pages around a scanned form. Separate complete-source replay is required for the
+latter. No OCR or inferred text is introduced: this is the documented image gap,
+not a claim of complete appendix coverage or an exemption from archival PDF support.
 
 Required implementation/validation before publication:
 
