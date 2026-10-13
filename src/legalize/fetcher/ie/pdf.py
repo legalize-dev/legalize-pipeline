@@ -556,7 +556,9 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         i += 1
         quoted = quote_depth > 0
         if quote_depth or re.match(r"^(?:F\d+\[)?“", item.text):
-            quote_depth = max(0, quote_depth + item.text.count("“") - item.text.count("”"))
+            quote_depth = max(
+                0, quote_depth + item.text.count("“") - len(re.findall(r"”|’’(?=\W|$)", item.text))
+            )
         if isinstance(item, Paragraph):
             flush()
             paragraphs.append(item)

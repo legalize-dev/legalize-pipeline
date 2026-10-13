@@ -1,0 +1,41 @@
+[
+  {
+    "identifier": "IE-1954-act-18",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1954_18.html",
+    "source_sha256": "752c674a709d5b1e9856e4edf005f843d5ca95208878c3b7da6be78758e848c5",
+    "file": "sample-effects-invalid-citation-1954-18.html",
+    "fixture_sha256": "0ad47baefdc260a2e538f8955e2553865768653ad62b3ce097567f3f49797158",
+    "extraction": "Unchanged source rows, including the preceding scope row when needed",
+    "corroboration": {
+      "url": "https://www.irishstatutebook.ie/eli/2011/act/17/section/8/enacted/en/html",
+      "sha256": "16c4d33fe0d0ae272f4f2d6ab7fd819a46d07cc06c20d5a9184a0df8c2ffea7c",
+      "excerpt": "President of Circuit Court to temporarily designate Circuit Judge to perform functions of military judge in certain circumstances. 8.— The Courts of Justice Act 1947 is amended by inserting the following section after section 11: “President of Circuit Court to temporarily designate Circuit Judge to perform functions of military judge in certain circumstances. 11A.— (1) The President of the Circuit Court, may, following a request from the Minister for Defence under section 184LA of the Act of 1954, temporarily designate one, or more than one,Circuit Judge (whether such Circuit Judge is permanently, or temporarily, assigned to a circuit), with the consent of that Circuit Judge, to perform the functions of a military judge and ‘temporarily designated’ shall be construed accordingly. (2) A Circuit Judge who is permanently assigned to a circuit (in this section referred to as a ‘permanently assigned Circuit Judge’) may be temporarily designated under this section to perform the functions of a military judge and where such permanently assigned Circuit Judge is temporarily designated under this section, that temporary designation shall not terminate or affect that permanent assignment to "
+    }
+  },
+  {
+    "identifier": "IE-1990-act-27",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1990_27.html",
+    "source_sha256": "bc94bf66bc635138b629f518da1beb307595b146df12fa65a692fa3479ceab77",
+    "file": "sample-effects-invalid-citation-1990-27.html",
+    "fixture_sha256": "437629dbf36c320f1d3c87e3db1832e4985d0188899fa9a09ea15250e8e4c7cf",
+    "extraction": "Unchanged source rows, including the preceding scope row when needed",
+    "corroboration": {
+      "url": "https://www.irishstatutebook.ie/eli/2009/act/34/schedule/3/enacted/en/html",
+      "sha256": "0be7b882bbd5467a9ae747d8fa40826fe3a1e9cadc82361a5e1d96ddb0370743",
+      "excerpt": "PART 4 Amendments of Companies (Amendment) Act 1990 Section 234 . Item Provision amended Amendment 1 Section 2 After subsection (4), insert— “(5) The court shall not make an order under this section unless— (a) the court is satisfied that the company has no obligations in relation to a bank asset that has been transferred to the National Asset Management Agency or a NAMA group entity, or (b) if the company has any such obligation— (i) a copy of the petition has been served on that Agency, and (ii) the court has heard that Agency in relation to the making of the order. (6) In subsection (5) ‘bank asset’ and ‘NAMA group entity’ have the same respective meanings as in the National Asset Management Agency Act 2009.”. 2 Section 4 After subsection (6), insert— “(7) The court shall not make an order under this section unless— (a) the court is satisfied that the related company has no obligations in relation to a bank asset that has been transferred to the National Asset Management Agency or a NAMA group entity, or (b) if the related company has any such obligation— (i) a copy of the petition has been served on that Agency, and (ii) the court has heard that Agency in relation to the making of the order. (8) In subsection (7) ‘bank asset’ and ‘NAMA group entity’ have the same respective meanings as in the National Asset Management Agency Act 2009.”. "
+    }
+  },
+  {
+    "identifier": "IE-2006-act-16",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2006_16.html",
+    "source_sha256": "cbeaa9476e2ef142eb4674608e466ee9d0d98995184d5d89245baf967882eab2",
+    "file": "sample-effects-invalid-citation-2006-16.html",
+    "fixture_sha256": "9082ed461081735f6be67d3d2a5f80223a455c633a6ae302e5d7d296731f2335",
+    "extraction": "Unchanged source rows, including the preceding scope row when needed",
+    "corroboration": {
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/26/section/1/enacted/en/html",
+      "sha256": "a7c3861ca57ee284d543d08c6fc016b406b51c2a16d8585c5cc9e991cdb40c81",
+      "excerpt": "PART 1 Preliminary and General Short title, collective citation, construction and commencement 1. (1) This Act may be cited as the Employment Permits (Amendment) Act 2014. (2) The Employment Permits Acts 2003 to 2013 and this Act, other than Parts 4 and 5, may be cited together as the Employment Permits Acts 2003 to 2014. (3) The Employment Permits Acts 2003 to 2013 and this Act, other than Parts 4 and 5, shall be construed together as one. (4) This Act, other than Parts 4 and 5, shall come into operation on such day or days as the Minister may appoint by order or orders either generally or with reference to any particular purpose or provision and different days may be so appointed for different purposes or different provisions. (5) Parts 4 and 5 shall come into operation on such day or days as the Minister for Justice and Equality may appoint by order or orders either generally or with reference to any particular purpose or provision and different days may be so appointed for different purposes or different provisions."
+    }
+  }
+]

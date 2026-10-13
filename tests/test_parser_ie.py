@@ -1006,6 +1006,23 @@ def test_legal_layout_keeps_every_source_word_and_punctuation():
     assert formatted[-1].text == "- (b) substitute ‘text’ for ‘word’."
 
 
+def test_paired_apostrophe_delimiters_preserve_source_text_and_quote_boundaries():
+    from legalize.fetcher.ie.parser import _legal_format
+    from legalize.models import Paragraph
+
+    source = [
+        Paragraph("parrafo", "“dissolved body ’’ means a town council;"),
+        Paragraph("parrafo", "“(1) An inserted provision;"),
+        Paragraph("parrafo", "(2) A quoted continuation.’’,"),
+        Paragraph("parrafo", "This is outside the quotation."),
+    ]
+    formatted = _legal_format(source)
+    assert formatted[0] == source[0]
+    assert formatted[1].css_class == formatted[2].css_class == "legal_quote"
+    assert formatted[-1] == source[-1]
+    assert formatted[2].text.endswith(".’’,")
+
+
 @pytest.mark.parametrize(
     "fixture",
     [

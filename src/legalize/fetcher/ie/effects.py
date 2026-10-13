@@ -127,7 +127,8 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     # A provision inserted into an older Act derives from the named amending instrument.
     amenders = list(
         re.finditer(
-            r"\b(?:as\s+)?(?:inserted|substituted|amended|ins\.|subst\.)\s+by\s*",
+            r"\b(?:as\s+)?(?:inserted|substituted|amended|ins\.|subst\.)"
+            r"(?:\s+by\s*|\s+(?=\d+\s*/\s*\d{4}\b))",
             cell.text_content(),
             re.I,
         )
@@ -188,6 +189,19 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
         if match := re.search(r"\b(\d+) of (\d{4})(?=[,) ]|$)", provision):
             identifiers.add(f"IE-{match[2]}-act-{int(match[1])}")
     correction = None
+    if (
+        norm_id == "IE-1990-act-27"
+        and note == "S. 2(5) inserted"
+        and provision == "3434/2009, ss. 1(2), 1(3), 234, schedule 3, pt. 4, item 1"
+    ):
+        identifiers = {"IE-2009-act-34"}
+        correction = "https://www.irishstatutebook.ie/eli/2009/act/34/schedule/3/enacted/en/html"
+    if (
+        norm_id == "IE-2006-act-16"
+        and provision == "Employment Permits (Amendment) Act 2014 (26/2016), s. 1(2)"
+    ):
+        identifiers = {"IE-2014-act-26"}
+        correction = "https://www.irishstatutebook.ie/eli/2014/act/26/section/1/enacted/en/html"
     if norm_id == "IE-2015-act-9" and provision == "Adoption (Amendment) Act 2017, s. 2(2)":
         identifiers = {"IE-2017-act-19"}
         correction = "https://www.irishstatutebook.ie/eli/2017/act/19/section/2/enacted/en/html"

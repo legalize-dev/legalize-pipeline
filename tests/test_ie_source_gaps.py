@@ -50,6 +50,21 @@ def test_independent_gazette_notice_preserves_unknown_signature_and_original_bod
         ISBMetadataParser().parse(altered, "IE-2002-si-576")
 
 
+def test_wicklow_publication_notice_does_not_invent_the_blank_signature_day():
+    raw = (FIXTURES / "sample-ie-2002-si-248-gazette.html").read_bytes()
+    metadata = ISBMetadataParser().parse(raw, "IE-2002-si-248")
+    version = ISBTextParser().parse_text(raw)[0].versions[0]
+    assert metadata.publication_date == version.publication_date == date(2002, 8, 9)
+    extra = dict(metadata.extra)
+    assert extra["signature_date_unknown"] == "true"
+    assert extra["publication_date_basis"] == "gazette_notice"
+    assert extra["publication_date_source"].endswith("2002%2008%2009%20IO%20Issue.PDF#page=5")
+    assert "made_date" not in extra
+    assert any("this day of March, 2002" in p.text for p in version.paragraphs)
+    with pytest.raises(ValueError, match="different instrument"):
+        ISBMetadataParser().parse(raw, "IE-2002-si-249")
+
+
 def rows(identifier):
     raw = (FIXTURES / f"sample-effects-fourth-{identifier.removeprefix('IE-')}.html").read_bytes()
     notes = []

@@ -1,0 +1,14 @@
+{
+  "identifier": "IE-2014-act-1",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/1/act_new_plain.pdf?versionId=fDFc2xzIGWE0CDTmRpu5Ksa1TrsOoVti",
+  "sha256": "724b741be93237b0c9aa1db65de7e3ad5a171d04f9a69a1a155cf3935f00320a",
+  "error": "Revised Act PDF is missing sections listed in its contents: 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80",
+  "pages": [
+    1,
+    11,
+    33,
+    34
+  ],
+  "file": "archive-local-government-2020-quote-excerpt.pdf",
+  "fixture_sha256": "b2bfdc42f5364878d85f1727537b994c4041b5ceade5932b964c0bab40f78d0b"
+}

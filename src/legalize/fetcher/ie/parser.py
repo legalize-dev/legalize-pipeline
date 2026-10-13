@@ -346,9 +346,9 @@ def _legal_format(paragraphs: list[Paragraph]) -> list[Paragraph]:
             continue
         plain = re.sub(r"\*+", "", text)
         leading = re.sub(r"^F\d+\[", "", plain)
-        delta = plain.count("“") - plain.count("”")
+        delta = plain.count("“") - len(re.findall(r"”|’’(?=\W|$)", plain))
         complete_quote = (
-            leading.startswith("“") and bool(re.search(r"”[.,;:\s)\]]*(?:and|or)?$", plain))
+            leading.startswith("“") and bool(re.search(r"(?:”|’’)[.,;:\s)\]]*(?:and|or)?$", plain))
         ) or (leading.startswith('"') and bool(re.search(r'"[.,;:\s)\]]*(?:and|or)?$', plain)))
         oath = bool(re.match(r"I\b.{0,100}\b(?:swear|promise and declare)\b", plain, re.I))
         begins = leading.startswith("“") and (delta > 0 or complete_quote)
@@ -1365,6 +1365,12 @@ def _enactment_date(text: str) -> date | None:
 
 # Independently verified official copies fill dates omitted by these eISB transcriptions.
 _INSTRUMENT_DATE_EVIDENCE = {
+    ("248", "2002"): (
+        "2002-08-09",
+        "gazette_notice",
+        "https://www.irisoifigiuil.ie/archive/2002/august/2002%2008%2009%20IO%20Issue.PDF#page=5",
+        (),
+    ),
     ("575", "2002"): (
         "2002-12-17",
         "gazette_notice",

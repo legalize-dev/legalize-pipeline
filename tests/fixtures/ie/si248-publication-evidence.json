@@ -1,0 +1,17 @@
+{
+  "identifier": "IE-2002-si-248",
+  "file": "sample-ie-2002-si-248-gazette.html",
+  "source_url": "https://www.irishstatutebook.ie/eli/2002/si/248/made/en/html",
+  "source_sha256": "b7ea42cb2bbe2421d15a6e2a6ac9b317c333f2afac861e046042845558a10822",
+  "fixture_sha256": "0b52ec811e85dce6f6da7caa151c497469c69d90267cc01dd768f4e7fcb2627c",
+  "corroboration": {
+    "source_url": "https://www.irisoifigiuil.ie/archive/2002/august/2002%2008%2009%20IO%20Issue.PDF#page=5",
+    "source_sha256": "e48dfdf37007de2368d0e91d493f78471ee50ce854eaf68ebda9c4f38df1fce5",
+    "publication_date": "2002-08-09",
+    "signature_date": "unknown",
+    "pdf_page": 5,
+    "printed_page": 875,
+    "visually_verified": true,
+    "notice_identifies": "S.I. No. 248 of 2002, Taxes Consolidation Act, 1997 (Qualifying Urban Renewal Areas) (Wicklow) Order, 2002"
+  }
+}

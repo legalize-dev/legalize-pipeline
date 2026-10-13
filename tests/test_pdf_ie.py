@@ -594,3 +594,17 @@ def test_primary_labels_survive_annotation_spaces_and_gutter_overlap(name, numbe
     headings = [p.text for p in paragraphs if p.css_class == "articulo"]
     assert sum(h.startswith(f"{number}. **") for h in headings) == 1
     assert any(body in p.text for p in paragraphs)
+
+
+def test_paired_apostrophes_in_a_definition_do_not_swallow_following_sections():
+    paragraphs, cutoff = parse_revised_pdf(
+        (FIXTURES / "archive-local-government-2020-quote-excerpt.pdf").read_bytes()
+    )
+    assert cutoff == date(2020, 8, 26)
+    headings = [p.text for p in paragraphs if p.css_class == "articulo"]
+    for number in (23, 24, 25):
+        assert sum(h.startswith(f"{number}.") for h in headings) == 1
+    assert any(
+        "“dissolved body’’ means a town council" in p.text and p.css_class == "parrafo"
+        for p in paragraphs
+    )
