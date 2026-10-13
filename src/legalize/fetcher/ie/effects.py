@@ -186,6 +186,29 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
         if match := re.match(r"^(\d+) of (\d{4})(?:,|$)", provision):
             identifiers.add(f"IE-{match[2]}-act-{int(match[1])}")
     correction = None
+    if (
+        norm_id == "IE-1983-act-24"
+        and note == "Ss. 103, 104, 109, power to delegate functns. of Min."
+        and not provision
+    ):
+        identifiers.add("IE-1990-act-18")
+        correction = "https://www.irishstatutebook.ie/eli/1990/act/18/schedule/1/enacted/en/html"
+    if norm_id == "IE-1983-act-35" and note == "Repealed with saver for regs." and not provision:
+        identifiers.add("IE-2008-act-1")
+        correction = "https://www.irishstatutebook.ie/eli/2008/act/1/section/11/enacted/en/html"
+    if norm_id == "IE-2001-act-43" and note == "S. 8 repealed" and not provision:
+        identifiers.add("IE-2022-act-50")
+        correction = "https://www.irishstatutebook.ie/eli/2022/act/50/schedule/2/enacted/en/html"
+    if norm_id == "IE-2003-act-32" and provision == "49/21, ss. 2, 20(2)":
+        identifiers.add("IE-2021-act-49")
+        correction = "https://www.irishstatutebook.ie/eli/2021/act/49/section/20/enacted/en/html"
+    if (
+        norm_id == "IE-1998-act-16"
+        and provision
+        == "Financial Emergency Measures in the Public Interest Act 2009 (5.2009), s. 17(a)"
+    ):
+        identifiers.add("IE-2009-act-5")
+        correction = "https://www.irishstatutebook.ie/eli/2009/act/5/section/17/enacted/en/html"
     if re.fullmatch(
         r"Housing \(Miscellaneous Provisions\) Act 2014, s\. 19\((?:9|10)\)", provision
     ):
@@ -296,6 +319,9 @@ def parse_effects(
         if len(cells) not in (2, 4):
             raise ValueError(f"{norm_id}: unexpected effects row with {len(cells)} columns")
         texts = [_text(cell) for cell in cells]
+        if not any(texts):
+            previous_effects = []
+            continue
         note = texts[0] or previous_note
         provision = texts[1]
         ids, correction = _affecting_ids(cells[1], provision, norm_id, note)
@@ -336,7 +362,13 @@ def parse_effects(
         ]
         if not ids and provision == "Order made under*" and len(matching_footnotes) == 1:
             ids, correction = _affecting_ids(cells[1], matching_footnotes[0], norm_id, note)
-        judicial = bool(re.search(r"declared (?:unconstitutional|invalid)", note, re.I))
+        judicial = bool(
+            re.search(
+                r"declared (?:unconstitutional|invalid)|deemed incompatible with Article \d+[.\d]* of the Constitution",
+                note,
+                re.I,
+            )
+        )
         judicial = judicial and bool(re.search(r"\bv\.? .+(?:\[\d{4}\]|\(\d{4}\))", provision))
         judicial_footnotes = []
         section = re.match(r"S\.\s*(\d+[A-Z]?)", note)
@@ -354,9 +386,28 @@ def parse_effects(
                 continue
             judicial_footnotes.append(footnote)
         judicial = judicial or (
-            (not provision or re.search(r"declared (?:unconstitutional|invalid)", note, re.I))
+            (
+                not provision
+                or re.search(
+                    r"declared (?:unconstitutional|invalid)|deemed incompatible with Article \d+[.\d]* of the Constitution",
+                    note,
+                    re.I,
+                )
+            )
             and bool(judicial_footnotes)
         )
+        if (
+            not ids
+            and provision
+            == "Warning: this list may not be complete; it is currently being checked and will be updated as soon as possible."
+        ):
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: source coverage warning requires an editorial_notes destination"
+                )
+            editorial_notes.append({"kind": "source_coverage_warning", "note": provision})
+            previous_note = ""
+            continue
         if not ids and judicial:
             if editorial_notes is None:
                 raise ValueError(
@@ -391,7 +442,9 @@ def parse_effects(
             previous_note = ""
             continue
         if not ids and re.fullmatch(
-            r"Resolution of (?:Dáil|Seanad) Éireann: Debates Volume \d+ no\. \d+, .+", provision
+            r"Resolution of (?:Dáil|Seanad) Éireann: Debates (?:Volume|Vol\.) \d+ no\. \d+, .+",
+            provision,
+            re.I,
         ):
             if editorial_notes is None:
                 raise ValueError(
@@ -402,7 +455,14 @@ def parse_effects(
             )
             previous_note = note
             continue
-        if not ids and note == "Virt. Rep., Principal Act, Rep." and not provision:
+        if (
+            not ids
+            and (
+                note == "Virt. Rep., Principal Act, Rep."
+                or re.fullmatch(r"Ceased in accordance with s\. \d+", note)
+            )
+            and not provision
+        ):
             if editorial_notes is None:
                 raise ValueError(
                     f"{norm_id}: undated classification requires an editorial_notes destination"
@@ -415,6 +475,18 @@ def parse_effects(
                 editorial_notes.append(
                     {"note": note, **({"provision": provision} if provision else {})}
                 )
+            previous_note = ""
+            continue
+        if (
+            not ids
+            and note == "Registration Boards established by s. 26 or by regulation under s. 4"
+            and not provision
+        ):
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: directory context requires an editorial_notes destination"
+                )
+            editorial_notes.append({"kind": "directory_context", "note": note})
             previous_note = ""
             continue
         if not provision and not ids:
@@ -440,8 +512,8 @@ def parse_effects(
         if not ids:
             # These source rows describe this Act's own citation or operation provisions.
             if re.fullmatch(
-                r"(?:s\.|ss\.|sch\.|section|sections|schedule|part|art\.)\s*"
-                r"\d+[a-z]?(?:\([0-9a-z]+\))*(?:\s*[-,]\s*\([0-9a-z]+\))*\.?",
+                r"(?:s\.?|ss\.|sch\.|section|sections|schedule|part|art\.)\s*"
+                r"\d+[a-z]?(?:\([0-9a-z]+\))*(?:\s*[-,]\s*\([0-9a-z]+\))*(?:,\s*sch\.\s*\d+[a-z]?)?\.?",
                 provision,
                 re.I,
             ):
@@ -457,6 +529,12 @@ def parse_effects(
             )
             if correction:
                 effect["source_correction"] = correction
+            if norm_id == "IE-1983-act-35" and correction and identifier == "IE-2008-act-1":
+                effect["commencement"] = "5 May 2008"
+                effect["commencement_source"] = (
+                    "https://www.irishstatutebook.ie/eli/2008/si/126/made/en/html"
+                )
+                effect["effective_date"] = "2008-05-05"
             if provision == "Order made under*" and matching_footnotes:
                 effect["directory_footnotes"] = matching_footnotes
             if (

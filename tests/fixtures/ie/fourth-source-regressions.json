@@ -1,0 +1,169 @@
+[
+  {
+    "identifier": "IE-2007-si-139",
+    "file": "sample-ie-2007-si-139-fourth.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2007/si/139/made/en/html",
+    "source_sha256": "91b2f0d9b3fde614734b9c54e92552c1ed973d2d3aea69c6fe515f83b0d763f7",
+    "fixture_sha256": "263187c6744677136a272ab18c2cc7a5ebb272283f1fdf9eae7f0724dcf65ffc"
+  },
+  {
+    "identifier": "IE-2024-act-24",
+    "file": "sample-ie-2024-act-24-fourth.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/2024/act/24/enacted/en/xml",
+    "source_sha256": "f275e60d3b5516f12a126c4ec1130fbb25b706a1b3902cfddab6e4960f8f80c2",
+    "fixture_sha256": "7573ed27a5fab858ce104432b5e628289d51bf19ff98fda0aa25883b898582cf"
+  },
+  {
+    "identifier": "IE-2002-si-575",
+    "file": "sample-ie-2002-si-575-fourth.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2002/si/575/made/en/html",
+    "source_sha256": "33dfdc7170fcabb502a16fac1e18fc3d7134defd3f71bf4723df89594c20c9cd",
+    "fixture_sha256": "469d2379cc65ba04a1cbba4e79f6a1e35faa62c91f3f76bc1aec4f7faf097eb4",
+    "corroboration": {
+      "source_url": "https://www.irisoifigiuil.ie/archive/2002/december/2002%2012%2017%20IO%20Issue.PDF#page=3",
+      "source_sha256": "86bc7c728d43403622c5fa8573fab5b483c4e49c4b61e4e8af37fa3c4ff93f9f",
+      "basis": "gazette_publication_notice",
+      "publication_date": "2002-12-17",
+      "printed_page": 1297,
+      "pdf_page": 3,
+      "visually_verified": true,
+      "notice_identifies": "S.I. No. 575 of 2002, Criminal Justice (Legal Aid) (Amendment) Regulations 2002",
+      "signature_date": "unknown",
+      "notice_department_date": "2002-12-13",
+      "stated_effective_date": "2002-10-01"
+    }
+  },
+  {
+    "identifier": "IE-2003-si-689",
+    "file": "sample-ie-2003-si-689-fourth.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/689/made/en/html",
+    "source_sha256": "837ff8632685b159ef936dfe5f206cb5d80001ea2f44c179dd07cc8eb34d56eb",
+    "fixture_sha256": "3cd68d808a420fbf3fe33bc795ca23ecc3a6fc8f6fd44e2c0a36bdfe949bbca5"
+  },
+  {
+    "identifier": "IE-2002-si-174",
+    "file": "sample-ie-2002-si-174-fourth.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2002/si/174/made/en/html",
+    "source_sha256": "0a736953fcbea4b01b33ecdd2432823628bd80f2928818053659e27bab00311f",
+    "fixture_sha256": "609e11cafca83210210ea5e29868566e1897c80ab1588d36e052bc4b8c8ea327"
+  },
+  {
+    "identifier": "IE-2005-act-11",
+    "file": "sample-effects-fourth-2005-act-11.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2005_11.html",
+    "source_sha256": "093d3cfb8bb23ae50c228a5584f7dcfba41eab2be7963dbd0a6c4381d2d8bdf5",
+    "fixture_sha256": "3aa7d8974ecdf2c17a8702f52f045c52fa91f616b71d0f457392226da6d40187"
+  },
+  {
+    "identifier": "IE-2001-act-48",
+    "file": "sample-effects-fourth-2001-act-48.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2001_48.html",
+    "source_sha256": "3b756f0836d4b95a38db17d1882da437f612f5dbe76726f2a1eb6728d8ffeb23",
+    "fixture_sha256": "abf9382d25644c5e9362509f4d50c99e49e6ffe8ba076a665f1bdf4acd76cc64"
+  },
+  {
+    "identifier": "IE-2001-act-43",
+    "file": "sample-effects-fourth-2001-act-43.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2001_43.html",
+    "source_sha256": "c96a3774cf85027b4613c6d5728b45b0b3d8102d4ba61a60283606960cbfec24",
+    "fixture_sha256": "24afcb98ffbea6b2e5378e5740a61e9f290071d0771ab1ce5e0269112faccdd8"
+  },
+  {
+    "identifier": "IE-2003-act-25",
+    "file": "sample-effects-fourth-2003-act-25.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2003_25.html",
+    "source_sha256": "19f8af5cd4cf1987914ff2408f26754ca5ca56a1b8fc6beabfa162499785ae07",
+    "fixture_sha256": "6a3f9f5830ab5b4b27f7f723c9c60cb3ccfc3206e90b6260a343eb196b502404"
+  },
+  {
+    "identifier": "IE-1983-act-24",
+    "file": "sample-effects-fourth-1983-act-24.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1983_24.html",
+    "source_sha256": "f46f8cd8927835ce0a25ccf3d120e9630fda947667f6a88a68f603daa37da3e2",
+    "fixture_sha256": "4134a80ed3eb933ebefba6d22aee8f2048040cf3941e461aa009444968e44ca7"
+  },
+  {
+    "identifier": "IE-2001-act-25",
+    "file": "sample-effects-fourth-2001-act-25.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2001_25.html",
+    "source_sha256": "965ef7343a11dbe8339a05f4f658289d049ec936987d5c0279193939b1f6ae3f",
+    "fixture_sha256": "bf13e3d1d323e8ae705b6a1e8fe7389c1a996f93b5ee0e91d16ac73ba19fc247"
+  },
+  {
+    "identifier": "IE-1996-act-17",
+    "file": "sample-effects-fourth-1996-act-17.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1996_17.html",
+    "source_sha256": "cb139d8ab3d44775ba6ee90b36f6512247e1d5305189351826e5617b68fa1e01",
+    "fixture_sha256": "33cb673766269f45522e2a1f9381274a187a9b34a2b99cf662ec83ffc5dfc1df"
+  },
+  {
+    "identifier": "IE-1983-act-35",
+    "file": "sample-effects-fourth-1983-act-35.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1983_35.html",
+    "source_sha256": "fc025016798fe0ce5d90fcbdb0fe5d01b4501e47427d6df14bc1539e67fcbc00",
+    "fixture_sha256": "e8febd364f803ea7915ba613e8b4c929a5617593ea6ca58a0d81d21e4330eb9c"
+  },
+  {
+    "identifier": "IE-2005-act-27",
+    "file": "sample-effects-fourth-2005-act-27.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2005_27.html",
+    "source_sha256": "e6ae6f330682c647eafc0a397377ba89d5ec97ffdbc90a8e7363ed77e70b445b",
+    "fixture_sha256": "0e506b6aa1ade6a7f197666185173e844f8a0a35f109dfc69b02e832f6f01ee2"
+  },
+  {
+    "identifier": "IE-2003-act-32",
+    "file": "sample-effects-fourth-2003-act-32.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2003_32.html",
+    "source_sha256": "9b8310f2ab232fc0814fd0b2d0d90906877cb53574ca95434f35c6edec9758f7",
+    "fixture_sha256": "f15be36344f589b574fe5dd75a9d0a8b3d2faf4465d4c922b08bc6f19126d0e7"
+  },
+  {
+    "identifier": "IE-1998-act-16",
+    "file": "sample-effects-fourth-1998-act-16.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1998_16.html",
+    "source_sha256": "8ccc29039382e3a8c618536602cf4b0bc32d5aacd008ac31646cce450bec5dbf",
+    "fixture_sha256": "4e21588dc3e705f148fd440a2ca9c3a9668576d116d52024bcb7a3b1e4620ebb"
+  },
+  {
+    "file": "proof-fourth-social-welfare-2024-24.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2024/act/24/enacted/en/html",
+    "source_sha256": "5a0235fd95db75d0eb55d9f3d03918a07e9467b261752bdc954faa255db70309",
+    "fixture_sha256": "84217168eda2f81854cfe5fe0708c2ef398563cc877e20fcf1c41025ca1c8f81"
+  },
+  {
+    "file": "proof-fourth-postal-1990-sch1.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1990/act/18/schedule/1/enacted/en/html",
+    "source_sha256": "2f7ed40b0dc080a19f16ad3690f89cb9be2081ff5bdd7dc26857e084d940ac37",
+    "fixture_sha256": "90155600eaa946faaeff2205d40385818b54e7b5ec8df56cac56cc282d26fa94"
+  },
+  {
+    "file": "proof-fourth-exports-2008-print.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2008/act/1/enacted/en/print",
+    "source_sha256": "21322a0e2c2f7404304a665caf598a6f8e0553c1ef9bfe9650bd95e6f14e50b0",
+    "fixture_sha256": "37b0ba1168afa7cc797b6e28777cf6b52b689ca6d1d9ae12063570208d9d1d58"
+  },
+  {
+    "file": "proof-fourth-exports-2008-directory.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2008_1.html",
+    "source_sha256": "8fe5eaa1af6e8edafba4a7f821a7dbab5478ed8bccb31f8f7d5823c1128ac4b8",
+    "fixture_sha256": "ce15cb9207948fe36a0a82a34be0a975a49eb2a42c91b35218d0d211f611a1df"
+  },
+  {
+    "file": "proof-fourth-tailte-2022-sch2.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2022/act/50/schedule/2/enacted/en/html",
+    "source_sha256": "7f343d8d79ca7391861a5ef59ef7938be73672d853778d54efa64388476e5c1d",
+    "fixture_sha256": "549a5faf6cdeacffc58eb5e4d6e6ff2ad43961e8b9b0da928b088826053e3d73"
+  },
+  {
+    "file": "proof-fourth-official-languages-2021.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2021/act/49/section/20/enacted/en/html",
+    "source_sha256": "0013a79e099a9f59f95a791ad373a33ce2b3550b9019f513bad8e877363e509b",
+    "fixture_sha256": "42bda956e4021bbcb0b77a90e86bdcf5619e644705513abb67b22124f7524ae9"
+  },
+  {
+    "file": "proof-fourth-emergency-2009-s17.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2009/act/5/section/17/enacted/en/html",
+    "source_sha256": "3bce14e1b13425f9e67f3ae45e0b9b5ec770fa51dc837334422de707e0edb23b",
+    "fixture_sha256": "414b799c5a6a134e9a084f577f463c5822a25af4b882fbdfafebbb12d49ec5e4"
+  }
+]

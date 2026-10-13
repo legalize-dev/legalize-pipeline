@@ -459,6 +459,22 @@
     }
   },
   {
+    "identifier": "IE-2005-act-16",
+    "file": "sample-ie-2005-act-16-date-conflict.xml",
+    "raw_date": "20050719",
+    "expected_date": "2005-07-09",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2005/act/16/enacted/en/xml",
+    "xml_source_sha256": "a3eb797a171dbbdfe931787190ab7676448a7aee95ba7cc03b2671074e687f18",
+    "fixture_sha256": "0506f2cd828b1d97d0cd0e3697b17620cc1dda9b31862cc4565fca04882d6549",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2005/en.act.2005.0016.pdf",
+      "source_sha256": "1046b17ee5af01ee22d2afb3a9f760f77dad79235e39e50fec4ce1246c86b69c",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[9th July, 2005]"
+    }
+  },
+  {
     "identifier": "IE-2005-act-26",
     "file": "sample-ie-2005-act-26-date-conflict.xml",
     "raw_date": "20051017",
@@ -488,6 +504,54 @@
       "source_sha256": "06b542b7adce429b0d599643a746fffcdec9b8c8a8fb1fe8200940b821231792",
       "basis": "enacted_pdf",
       "date_excerpt": "[11th December, 2006]"
+    }
+  },
+  {
+    "identifier": "IE-2006-act-39",
+    "file": "sample-ie-2006-act-39-date-conflict.xml",
+    "raw_date": "2006",
+    "expected_date": "2006-12-23",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2006/act/39/enacted/en/xml",
+    "xml_source_sha256": "4ef2a24cdf5edabab3c4e1b56173e7ff2ed6cb12054b5c53cd0afefca8164eaa",
+    "fixture_sha256": "df872e719737048ed292c31b78c9fa6f66072c55af7f685949509971bfc72928",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2006/en.act.2006.0039.pdf",
+      "source_sha256": "3346025bb9770bc7847f2437ddaac22f0ec9b702aaf111ed2658ea78a5fb797c",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[23rd December, 2006]"
+    }
+  },
+  {
+    "identifier": "IE-2013-act-22",
+    "file": "sample-ie-2013-act-22-date-conflict.xml",
+    "raw_date": "20130604",
+    "expected_date": "2013-07-02",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2013/act/22/enacted/en/xml",
+    "xml_source_sha256": "6af404bf5a82f26fa11e58800d554dde58169fc69e77c069130db46f1593e13b",
+    "fixture_sha256": "0afee822c7dcf5db929d34c997439d5317681df7443ade87508a00e2a0f6dd2a",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/2013_22.html",
+      "source_sha256": "b548e26352697d4e46f9543ee1d70ae733d51c2ccec3bab9ed7be62d5bb9297b",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 2 July 2013 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-2013-act-27",
+    "file": "sample-ie-2013-act-27-date-conflict.xml",
+    "raw_date": "20130724",
+    "expected_date": "2013-07-22",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2013/act/27/enacted/en/xml",
+    "xml_source_sha256": "6aecbf9e1dd87fad90dff9d69703813f64fb420dd099ee579afaa8a4ad9a5d16",
+    "fixture_sha256": "6a31c9ee9307ed7eda118e7574bcad4e0e8e1cfa9a7697e5a1b597f1a92cf8e3",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2013/en.act.2013.0027.pdf",
+      "source_sha256": "5121a7510d0152f302b34493b2093904364ee39153d4762f68074da741382ad2",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[22nd July, 2013]"
     }
   },
   {
@@ -552,6 +616,22 @@
       "source_sha256": "f5f074afc42fde7c30714e7dbe76dbbf39efe536234a9dc132e2b3fcdef336d8",
       "basis": "enacted_pdf",
       "date_excerpt": "[11th July, 2019]"
+    }
+  },
+  {
+    "identifier": "IE-2021-act-44",
+    "file": "sample-ie-2021-act-44-date-conflict.xml",
+    "raw_date": "20211215",
+    "expected_date": "2021-12-18",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2021/act/44/enacted/en/xml",
+    "xml_source_sha256": "5857c8674e9bf8b042eed1c7c011bf4ee3dc000bc7e87283ef416c17b8358fc2",
+    "fixture_sha256": "79068b3959716bf8fb31bba8dafc599e5670ba0ee03b2650e3e101359094e8e6",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2021/en.act.2021.0044.pdf",
+      "source_sha256": "f8ddc54e5498098bdb352ed441bd5ea75c62f9b51679c9eb735a502a3af7d2fd",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[18th December, 2021]"
     }
   },
   {

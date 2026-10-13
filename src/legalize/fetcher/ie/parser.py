@@ -736,7 +736,7 @@ class ISBTextParser(TextParser):
         )
         source_text = _html_text(act)
         pub_date = (
-            (_gazette_date(source_text) or _made_date(source_text))
+            _instrument_date(source_text, doc.findtext(".//title") or "")
             if is_instrument
             else _enactment_date(source_text)
         ) or published_on
@@ -1268,12 +1268,17 @@ _XML_ENACTMENT_CORRECTIONS = {
     ("4", "1992"): ("19920308", "1992-03-18", "/isbc/1992_4.html"),
     ("5", "1996"): ("19960306", "1996-03-16", "/isbc/1996_5.html"),
     ("13", "2004"): ("20040005", "2004-05-05", "/pdf/2004/en.act.2004.0013.pdf"),
+    ("16", "2005"): ("20050719", "2005-07-09", "/pdf/2005/en.act.2005.0016.pdf"),
     ("26", "2005"): ("20051017", "2005-11-27", "/pdf/2005/en.act.2005.0026.pdf"),
     ("31", "2006"): ("2006", "2006-12-11", "/pdf/2006/en.act.2006.0031.pdf"),
+    ("39", "2006"): ("2006", "2006-12-23", "/pdf/2006/en.act.2006.0039.pdf"),
+    ("22", "2013"): ("20130604", "2013-07-02", "/isbc/2013_22.html"),
+    ("27", "2013"): ("20130724", "2013-07-22", "/pdf/2013/en.act.2013.0027.pdf"),
     ("5", "2013"): ("20130205", "2013-03-13", "/pdf/2013/en.act.2013.0005.pdf"),
     ("21", "2014"): ("20140726", "2014-07-28", "/pdf/2014/en.act.2014.0021.pdf"),
     ("5", "2015"): ("20141119", "2015-03-11", "/pdf/2015/en.act.2015.0005.pdf"),
     ("24", "2019"): ("20190724", "2019-07-11", "/pdf/2019/en.act.2019.0024.pdf"),
+    ("44", "2021"): ("20211215", "2021-12-18", "/pdf/2021/en.act.2021.0044.pdf"),
     ("46", "2021"): ("20211231", "2021-12-21", "/pdf/2021/en.act.2021.0046.pdf"),
 }
 
@@ -1330,6 +1335,28 @@ def _enactment_date(text: str) -> date | None:
     return _gazette_date(text) or _made_date(text)
 
 
+# The eISB copy leaves both signatures blank; the gazette notice supplies publication only.
+_INSTRUMENT_GAZETTE_NOTICES = {
+    ("575", "2002"): (
+        "2002-12-17",
+        "https://www.irisoifigiuil.ie/archive/2002/december/2002%2012%2017%20IO%20Issue.PDF#page=3",
+    ),
+}
+
+
+def _external_gazette_notice(title: str):
+    match = re.match(r"S\.\s*I\.\s*No\.\s*(\d+)/(\d{4})\b", title, re.I)
+    return _INSTRUMENT_GAZETTE_NOTICES.get(match.groups()) if match else None
+
+
+def _instrument_date(text: str, title: str) -> date | None:
+    if published := _gazette_date(text) or _made_date(text):
+        return published
+    if notice := _external_gazette_notice(title):
+        return date.fromisoformat(notice[0])
+    return None
+
+
 def _signature_dates(text: str) -> list[date]:
     """Read explicit signature and concurrence dates, never commencement clauses."""
     ordinals = (
@@ -1361,12 +1388,12 @@ def _signature_dates(text: str) -> list[date]:
         flags=re.I,
     ).replace("_", " ")
     matches = re.finditer(
-        r"(?:(?:GIVEN under|SEALED with).{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+(?:this|on)\s+|"
+        r"(?:(?:GIVEN under|SEALED with).{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+(?:this|on),?\s+|"
         r"PRESENT when the Common Seal.{0,180}?this\s+|GIVEN under the official of the Minister[^0-9]{0,180}?|"
         r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,\s*|"
-        r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|SIGNED[^0-9]{0,180}?\bthis\s+|DUBLIN\.\s+This\s+)"
+        r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|SIGNED[^0-9]{0,180}?\bthis\s+(?:the\s+)?|DUBLIN\.\s+This\s+)"
         r"(\d{1,2})\s*(?:st|nd|rd|th)?[.,]?(?:\s*(?:day\s*)?of)?\s*"
-        r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s+(\d{4})",
+        r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s+(?:day of\s+)?(\d{4})",
         text,
         re.I,
     )
@@ -1577,13 +1604,23 @@ class ISBMetadataParser(MetadataParser):
             if not any(number.startswith("P") for number, _ in printed_identities):
                 expected_printed = expected_identity
             source_identity = (meta.findtext("number", ""), meta.findtext("year", ""))
+            verified_printed = {
+                "IE-2017-act-14": ({("12", "2017"), ("14", "2017")}, "CRIMINAL JUSTICE ACT 2017"),
+                "IE-2024-act-24": (
+                    {("5", "2024"), ("24", "2024")},
+                    "SOCIAL WELFARE (MISCELLANEOUS PROVISIONS) ACT 2024",
+                ),
+            }.get(norm_id)
             corrected_printed_identity = (
-                norm_id == "IE-2017-act-14"
-                and source_identity == ("14", "2017")
-                and printed_identities == {("12", "2017"), ("14", "2017")}
-                and meta.findtext("title") == "CRIMINAL JUSTICE ACT 2017"
+                verified_printed
+                and source_identity == expected_identity
+                and printed_identities == verified_printed[0]
+                and meta.findtext("title") == verified_printed[1]
             )
             if corrected_printed_identity:
+                original_printed_numbers = ", ".join(
+                    sorted((n for n, _ in printed_identities), key=int)
+                )
                 printed_identities = {expected_printed}
             if (printed_identities and printed_identities != {expected_printed}) or (
                 source_identity != expected_identity and printed_identities != {expected_printed}
@@ -1597,10 +1634,10 @@ class ISBMetadataParser(MetadataParser):
             if corrected_printed_identity:
                 source_fields.extend(
                     (
-                        ("identity_source_printed_numbers", "12, 14"),
+                        ("identity_source_printed_numbers", original_printed_numbers),
                         (
                             "identity_correction_source",
-                            "https://www.irishstatutebook.ie/eli/2017/act/14/enacted/en/html",
+                            source_url,
                         ),
                     )
                 )
@@ -1653,7 +1690,7 @@ class ISBMetadataParser(MetadataParser):
                 raise ValueError(f"{norm_id}: ISB HTML has no act")
             source_text = _html_text(act)
             published = (
-                _gazette_date(source_text) or _made_date(source_text)
+                _instrument_date(source_text, title)
                 if "-si-" in norm_id
                 else _enactment_date(source_text)
             )
@@ -1668,7 +1705,18 @@ class ISBMetadataParser(MetadataParser):
                 extra += (("language", "ga"),)
                 source_url = source_url.replace("/en/", "/ga/")
             if "-si-" in norm_id:
-                basis = "gazette_notice" if _gazette_date(source_text) else "final_signature"
+                identity = re.match(r"S\.\s*I\.\s*No\.\s*(\d+)/(\d{4})\b", title, re.I)
+                if identity and norm_id != f"IE-{identity[2]}-si-{int(identity[1])}":
+                    raise ValueError(f"{norm_id}: source identifies a different instrument")
+                notice = _external_gazette_notice(title) if not _made_date(source_text) else None
+                basis = (
+                    "gazette_notice" if _gazette_date(source_text) or notice else "final_signature"
+                )
+                if notice:
+                    extra += (
+                        ("publication_date_source", notice[1]),
+                        ("signature_date_unknown", "true"),
+                    )
                 extra += (("publication_date_basis", basis),)
             elif published is not None:
                 extra += (
