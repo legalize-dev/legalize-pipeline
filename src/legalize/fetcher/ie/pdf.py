@@ -517,7 +517,11 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             # A schedule locator can wrap through a definition or subsection.
             # Inserted legislation can also have its own indented marginal
             # captions; they are quoted content, never primary section titles.
-            locator = re.match(r"^Sections?\s+\d", start.text, re.I) and not any(
+            locator = re.match(
+                r"^(?:F\d+\[)?(?:(?:Sub)?Sections?\s*(?:\d|l\b|\(\d)|Paragraph\s+\d)",
+                " ".join(line.text for line in group),
+                re.I,
+            ) and not any(
                 isinstance(line, _Line)
                 and line.page == start.page
                 and abs(line.top - start.top) < 6
@@ -538,7 +542,8 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 locator
                 or re.match(
                     r"^\[(?:New\b|(?:Cf\. )?\d{4}\b|R\.S\.C\.|Restates\b|Enlarges powers\b|"
-                    r"See \d{4}\b|Hague Conven|(?:cf\. )?Art\. \d+)",
+                    r"See \d{4}\b|Hague Conven|(?:cf\. )?Art\. \d+|"
+                    r"\[?[A-Z][A-Z(). ]{0,15} [12]\d{3}\b)",
                     start.text,
                     re.I,
                 )
