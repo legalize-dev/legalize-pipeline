@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import json
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 
 from legalize.committer.git_ops import GitRepo
@@ -34,31 +35,39 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     created = 0
     pushed = 0
     errors = []
+
+    def fetch(norm_id: str) -> ParsedNorm:
+        with EURLexClient.create(cc) as client:
+            metadata = client.get_metadata_sparql(norm_id)
+            client._merge_list_facts(norm_id, metadata)
+            meta_data = json.dumps(metadata).encode("utf-8")
+            data = client.get_text(norm_id, meta_data=meta_data)
+            return ParsedNorm(
+                metadata=meta_parser.parse(meta_data, norm_id),
+                blocks=tuple(text_parser.parse_text(data)),
+                reforms=tuple(text_parser.extract_reforms(data)),
+            )
+
     with EURLexClient.create(cc) as client:
         for current_date in dates:
             errors_before = len(errors)
             try:
                 ids = list(discovery.discover_daily(client, current_date))
-                for norm_id in ids:
-                    if dry_run:
+                if dry_run:
+                    for norm_id in ids:
                         logger.info("Would refresh %s", norm_id)
-                        continue
-                    try:
-                        metadata = client.get_metadata_sparql(norm_id)
-                        client._merge_list_facts(norm_id, metadata)
-                        meta_data = json.dumps(metadata).encode("utf-8")
-                        data = client.get_text(norm_id, meta_data=meta_data)
-                        norm = ParsedNorm(
-                            metadata=meta_parser.parse(meta_data, norm_id),
-                            blocks=tuple(text_parser.parse_text(data)),
-                            reforms=tuple(text_parser.extract_reforms(data)),
-                        )
-                        save_structured_json(cc.data_dir, norm)
-                        created += commit_one(config, "eu", norm.metadata.identifier)
-                        client.evict_cache(norm_id)
-                    except Exception as exc:
-                        logger.exception("Failed to refresh %s", norm_id)
-                        errors.append(f"{norm_id}: {exc}")
+                    continue
+                with ThreadPoolExecutor(max_workers=cc.max_workers or 1) as pool:
+                    futures = [(norm_id, pool.submit(fetch, norm_id)) for norm_id in ids]
+                    # Git writes stay serial and follow discovery order.
+                    for norm_id, future in futures:
+                        try:
+                            norm = future.result()
+                            save_structured_json(cc.data_dir, norm)
+                            created += commit_one(config, "eu", norm.metadata.identifier)
+                        except Exception as exc:
+                            logger.exception("Failed to refresh %s", norm_id)
+                            errors.append(f"{norm_id}: {exc}")
                 if len(errors) != errors_before:
                     break
                 if not dry_run:

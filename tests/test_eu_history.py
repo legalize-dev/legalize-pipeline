@@ -368,6 +368,68 @@ def test_daily_publishes_completed_day_before_interruption(tmp_path, monkeypatch
     assert state.last_summary_date == days[0]
 
 
+def test_daily_fetches_concurrently_and_commits_in_discovery_order(tmp_path, monkeypatch):
+    from threading import Barrier, Event, current_thread, main_thread
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+
+    from legalize.fetcher.eu import daily as daily_module
+
+    ids = ["32016R0679", "32017R0745"]
+    barrier = Barrier(2, timeout=2)
+    second_finished = Event()
+    clients = []
+    committed = []
+
+    def create(_):
+        client = EURLexClient()
+        clients.append(client)
+        return client
+
+    def get_text(_, norm_id, **kwargs):
+        barrier.wait()
+        if norm_id == ids[0]:
+            assert second_finished.wait(2)
+        else:
+            second_finished.set()
+        return f'''<eurlex-multi-version celex="{norm_id}">
+        <version type="original" source-id="{norm_id}" effective-date="2016-05-04">
+        <html><body><p>Original</p></body></html></version></eurlex-multi-version>'''.encode()
+
+    def commit(_, country, norm_id):
+        assert current_thread() is main_thread()
+        committed.append(norm_id)
+        return 1
+
+    monkeypatch.setattr(EURLexClient, "create", create)
+    monkeypatch.setattr(
+        EURLexClient,
+        "get_metadata_sparql",
+        lambda _, norm_id: json.loads((FIXTURES / f"{norm_id}_metadata.json").read_text()),
+    )
+    monkeypatch.setattr(EURLexClient, "_merge_list_facts", lambda *_: None)
+    monkeypatch.setattr(EURLexClient, "get_text", get_text)
+    monkeypatch.setattr(
+        daily_module.EURLexDiscovery,
+        "create",
+        lambda _: SimpleNamespace(discover_daily=lambda *_: ids),
+    )
+    monkeypatch.setattr(daily_module, "GitRepo", lambda *_: Mock(refused=[]))
+    monkeypatch.setattr(daily_module, "commit_one", commit)
+    config = Config(
+        countries={
+            "eu": CountryConfig(
+                max_workers=2,
+                data_dir=str(tmp_path / "data"),
+                state_path=str(tmp_path / "state.json"),
+            )
+        }
+    )
+    assert daily_module.daily(config, date(2026, 10, 12)) == 2
+    assert committed == ids
+    assert len(clients) == 3  # Discovery and one independent session per act.
+
+
 def test_entry_into_force_uses_annotated_ev_not_application():
     celex = "32017R0745"
     metadata = json.loads((FIXTURES / f"{celex}_metadata.json").read_text())
