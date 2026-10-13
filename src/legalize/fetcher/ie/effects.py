@@ -66,9 +66,29 @@ _COMPANIES_COMMENCEMENTS = {
 }
 
 
-# Exact directory citations verified against the enactments that inserted the provisions.
-# Evidence: tests/fixtures/ie/later-insertion-evidence.json.
-_LATER_INSERTIONS = {
+# Exact directory citations verified against the actual affecting provisions.
+# Evidence: tests/fixtures/ie/{later-insertion,verified-year}-evidence.json.
+_VERIFIED_EFFECT_SOURCES = {
+    ("IE-1996-act-32", "S.I. No. 319 of 1996. art. 12(5)"): (
+        "1998/si/319",
+        None,
+        None,
+    ),
+    ("IE-1993-act-27", "7/1993, s.22 (11) (c) (13)"): (
+        "1996/act/7/section/22",
+        None,
+        None,
+    ),
+    ("IE-2000-act-34", "S.I. No. 414 of 2000, reg. 5"): (
+        "2002/si/414",
+        "",  # The directory commencement belongs to an unrelated beef assurance order.
+        None,
+    ),
+    ("IE-1989-act-6", "7/1964, s 20(4)"): (
+        "1997/act/40/section/11",
+        None,
+        None,
+    ),
     ("IE-1958-act-4", "23/1935, s.1 (2) (b)"): (
         "1965/act/23/section/1",
         None,
@@ -769,20 +789,23 @@ def parse_effects(
                     "https://www.irishstatutebook.ie/eli/2014/si/103/made/en/html"
                 )
                 effect["effective_date"] = "2014-03-07"
-            if insertion := _LATER_INSERTIONS.get((norm_id, provision)):
-                path, commencement, order = insertion
-                source = f"https://www.irishstatutebook.ie/eli/{path}/enacted/en/html"
+            if verified_source := _VERIFIED_EFFECT_SOURCES.get((norm_id, provision)):
+                path, commencement, order = verified_source
+                state = "made" if "/si/" in path else "enacted"
+                source = f"https://www.irishstatutebook.ie/eli/{path}/{state}/en/html"
                 effect["directory_source_id"] = identifier
                 effect["source_id"] = norm_id_from_url(source)
                 effect["source_correction"] = source
-                if commencement:
+                if commencement is not None:
                     effect["directory_commencement"] = effect["commencement"]
                     effect["directory_commencement_source"] = effect["commencement_source"]
                     effect["commencement"] = commencement
                     effect["commencement_source"] = (
-                        f"https://www.irishstatutebook.ie/eli/{order}/made/en/html"
+                        f"https://www.irishstatutebook.ie/eli/{order}/made/en/html" if order else ""
                     )
-                    effect["effective_date"] = source_date(commencement).isoformat()
+                    effect["effective_date"] = (
+                        source_date(commencement).isoformat() if commencement else None
+                    )
             effects.append(effect)
             previous_effects.append(effect)
     if pending_reference:

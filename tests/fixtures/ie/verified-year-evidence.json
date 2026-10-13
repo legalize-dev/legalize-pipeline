@@ -1,0 +1,136 @@
+[
+  {
+    "identifier": "IE-1996-act-32",
+    "amender": "IE-1998-si-319",
+    "directory": {
+      "file": "sample-verified-year-directory-IE-1996-act-32.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1996_32.html",
+      "sha256": "68c30e417f32a074ae4d8c92c210bf671ba2bc3190ecbb57b93c98711dbb16af"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1996-si-319",
+        "note": "S. 14 applied with modificaitons",
+        "provision": "S.I. No. 319 of 1996. art. 12(5)",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1996-10-31",
+        "source_url": "https://www.irishstatutebook.ie/eli/1996/si/319/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1996_32.html"
+      }
+    ],
+    "proof": {
+      "file": "sample-verified-year-proof-IE-1998-si-319.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1998/si/319/made/en/html",
+      "sha256": "882121d4469fbc4eb70cee77108e78e7bf0abc6b39b5f101629c70180096a4d7"
+    }
+  },
+  {
+    "identifier": "IE-1993-act-27",
+    "amender": "IE-1996-act-7",
+    "directory": {
+      "file": "sample-verified-year-directory-IE-1993-act-27.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1993_27.html",
+      "sha256": "8918476a34f6a439ac2f247f8da37e8880948c37ad654a2d0f0251bc78150e59"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1993-act-7",
+        "note": "Sch. 3, pt. 1, rl. 1 (7), par. ins.",
+        "provision": "7/1993, s.22 (11) (c) (13)",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1993-04-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1993/act/7/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1993_27.html"
+      }
+    ],
+    "proof": {
+      "file": "sample-verified-year-proof-IE-1996-act-7.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1996/act/7/section/22/enacted/en/html",
+      "sha256": "568ed84ea7b786c8d06ced48696e0630cf9037fba6c89311a3f959847bde8ee0"
+    }
+  },
+  {
+    "identifier": "IE-2000-act-34",
+    "amender": "IE-2002-si-414",
+    "directory": {
+      "file": "sample-verified-year-directory-IE-2000-act-34.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/2000_34.html",
+      "sha256": "5db5693be3fd750a68709add449af4871ee78791fe39ed10ebf5fc16f6d46f07"
+    },
+    "relations": [
+      {
+        "source_id": "IE-2000-si-414",
+        "note": "S. 2(1)(c) bye-laws prescribed under",
+        "provision": "S.I. No. 414 of 2000, reg. 5",
+        "commencement": "14 December 2000",
+        "commencement_source": "National Beef Assurance Scheme Act, 2000 (Commencement) Order (No. 2) of 2000 (S.I. No. 414 of 2000)",
+        "effective_date": "2000-12-14",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2000-12-14",
+        "source_url": "https://www.irishstatutebook.ie/eli/2000/si/414/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2000_34.html"
+      }
+    ],
+    "proof": {
+      "file": "sample-verified-year-proof-IE-2002-si-414.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2002/si/414/made/en/html",
+      "sha256": "625366825d17c9349967c2c47bfeffa21348408806b98f04ee168d4dad8009f2"
+    }
+  },
+  {
+    "identifier": "IE-1989-act-6",
+    "amender": "IE-1997-act-40",
+    "directory": {
+      "file": "sample-verified-year-directory-IE-1989-act-6.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1989_6.html",
+      "sha256": "dc3996b5accb61becd5e31f589a150c822ff4db4038b0cf6f84ff221fd9e546d"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1964-act-7",
+        "note": "S. 5(2), applic. ext.",
+        "provision": "7/1964, s 20(4)",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1964-03-25",
+        "source_url": "https://www.irishstatutebook.ie/eli/1964/act/7/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1989_6.html"
+      },
+      {
+        "source_id": "IE-1964-act-7",
+        "note": "S. 6(2), applic. ext.",
+        "provision": "7/1964, s 20(4)",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1964-03-25",
+        "source_url": "https://www.irishstatutebook.ie/eli/1964/act/7/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1989_6.html"
+      }
+    ],
+    "proof": {
+      "file": "sample-verified-year-proof-IE-1997-act-40.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1997/act/40/section/11/enacted/en/html",
+      "sha256": "17f298363285d68116aa9e740da5d4efe5a19fb8b72281eda28518c6fc1ecd3c"
+    }
+  }
+]
