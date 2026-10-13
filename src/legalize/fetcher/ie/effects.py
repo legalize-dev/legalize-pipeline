@@ -188,6 +188,9 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
         if match := re.search(r"\b(\d+) of (\d{4})(?=[,) ]|$)", provision):
             identifiers.add(f"IE-{match[2]}-act-{int(match[1])}")
     correction = None
+    if norm_id == "IE-2015-act-9" and provision == "Adoption (Amendment) Act 2017, s. 2(2)":
+        identifiers = {"IE-2017-act-19"}
+        correction = "https://www.irishstatutebook.ie/eli/2017/act/19/section/2/enacted/en/html"
     if norm_id == "IE-2010-act-25" and provision.startswith("Road Traffic (No. 2) Act 2011 (v),"):
         identifiers = {"IE-2011-act-28"}
         correction = "https://www.irishstatutebook.ie/eli/2011/act/28/section/9/enacted/en/html"
@@ -335,6 +338,21 @@ def parse_effects(
             continue
         if len(cells) not in (2, 4):
             raise ValueError(f"{norm_id}: unexpected effects row with {len(cells)} columns")
+        if (
+            len(cells) == 2
+            and re.search(
+                r"\b(?:inserted|substituted|amended|ins\.|subst\.)\s+by\s*$", _text(cells[1]), re.I
+            )
+            and row_index + 1 < len(cells_by_row)
+        ):
+            following = cells_by_row[row_index + 1]
+            if len(following) == 2 and not _text(following[0]) and _text(following[1]):
+                # A source table can wrap the actual amender onto a second physical row.
+                continuation = deepcopy(following[1])
+                continuation.tag = "span"
+                continuation.text = " " + (continuation.text or "")
+                cells[1].append(continuation)
+                cells_by_row[row_index + 1] = []
         texts = [_text(cell) for cell in cells]
         if not any(texts):
             previous_effects = []
@@ -405,7 +423,7 @@ def parse_effects(
             ids, correction = _affecting_ids(cells[1], matching_footnotes[0], norm_id, note)
         judicial = bool(
             re.search(
-                r"declared (?:unconstitutional|invalid)|deemed incompatible with Article \d+[.\d]* of the Constitution",
+                r"declared (?:unconstitutional|constitutional|invalid)|deemed incompatible with Art(?:icle|\.) \d+[.\d]* of the Constitution|not compatible with the Constitution",
                 note,
                 re.I,
             )
@@ -430,7 +448,7 @@ def parse_effects(
             (
                 not provision
                 or re.search(
-                    r"declared (?:unconstitutional|invalid)|deemed incompatible with Article \d+[.\d]* of the Constitution",
+                    r"declared (?:unconstitutional|constitutional|invalid)|deemed incompatible with Art(?:icle|\.) \d+[.\d]* of the Constitution|not compatible with the Constitution",
                     note,
                     re.I,
                 )
@@ -455,6 +473,8 @@ def parse_effects(
                     f"{norm_id}: judicial source note requires an editorial_notes destination"
                 )
             entry = {"note": note, "provision": provision, "kind": "judicial_finding"}
+            if len(texts) == 4 and any(texts[2:]):
+                entry.update(directory_date=texts[2], directory_date_source=texts[3])
             if judicial_footnotes:
                 entry["footnotes"] = judicial_footnotes
             editorial_notes.append(entry)

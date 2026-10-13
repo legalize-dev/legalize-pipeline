@@ -603,6 +603,22 @@
     }
   },
   {
+    "identifier": "IE-2015-act-58",
+    "file": "sample-ie-2015-act-58-date-conflict.xml",
+    "raw_date": "20151221",
+    "expected_date": "2015-12-25",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2015/act/58/enacted/en/xml",
+    "xml_source_sha256": "060a90d0d0af0991e9f64ea7f43c72ce42332066d9ce60106b6deb497f5808a8",
+    "fixture_sha256": "e1d0ee8da49619078beb16f92c7131d91f4fae1ce638c65ed3117cc9e5c346f9",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2015/en.act.2015.0058.pdf",
+      "source_sha256": "36ca4feaff336e12dcf0d619796e2b92c33049854598e2f029cb4c98bb1877ab",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[25th December, 2015]"
+    }
+  },
+  {
     "identifier": "IE-2019-act-24",
     "file": "sample-ie-2019-act-24-date-conflict.xml",
     "raw_date": "20190724",
@@ -648,6 +664,22 @@
       "source_sha256": "a9adf8ef0290686136739a46a476ce79c643613ec8ee9b6200a0a0ef8b2dcda1",
       "basis": "enacted_pdf",
       "date_excerpt": "[21st December, 2021]"
+    }
+  },
+  {
+    "identifier": "IE-2023-act-23",
+    "file": "sample-ie-2023-act-23-date-conflict.xml",
+    "raw_date": "20230723",
+    "expected_date": "2023-07-17",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2023/act/23/enacted/en/xml",
+    "xml_source_sha256": "e4da8bd6657d1fa02ae7fbcbb9796d13539ff1a541ab3f211e36bf064d12e35c",
+    "fixture_sha256": "90eb1bbc13d30a4877d69eb6ed22800c220b9f6dbe78deeba63bc6d6fe0ce619",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2023/en.act.2023.0023.pdf",
+      "source_sha256": "25ac913290971d680a828724c12240924e99765a54ae913052f55249555f3a63",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[17th July, 2023]"
     }
   }
 ]
