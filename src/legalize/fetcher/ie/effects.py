@@ -397,7 +397,8 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
         re.finditer(
             r"\b(?:as\s+)?(?:inserted|substituted|amended|ins\.|subst\.)"
             r"(?:\s*\(\d{1,2}\.\d{1,2}\.\d{4}\))?"
-            r"(?:\s+by\s*|\s+(?=\d+\s*/\s*\d{4}\b))",
+            r"(?:\s+by\s*|\s+(?=\d+\s*/\s*\d{4}\b))"
+            r"(?!\s*(?:Directive\b|Regulation\s*\((?:EU|EC|EEC)\)))",
             cell.text_content(),
             re.I,
         )
