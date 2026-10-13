@@ -11,7 +11,7 @@ import time
 from contextlib import contextmanager, nullcontext
 from pathlib import Path
 from typing import TYPE_CHECKING
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urljoin, urlparse
 
 import requests
 
@@ -139,7 +139,23 @@ class ISBClient(HttpClient):
             return self._get(f"{self._base_url}/eli/cons/en/html")
         year, act_type, number = _parse_norm_id(norm_id)
         if act_type == "si":
-            return self._get(f"{self._base_url}/eli/{year}/si/{number}/made/en/html")
+            try:
+                return self._get(f"{self._base_url}/eli/{year}/si/{number}/made/en/html")
+            except requests.HTTPError as exc:
+                if exc.response is None or exc.response.status_code != 404:
+                    raise
+                from lxml import html
+                from legalize.fetcher.ie.effects import norm_id_from_url
+
+                index = html.fromstring(self._get(f"{self._base_url}/eli/{year}/si"))
+                alternatives = {
+                    urljoin(self._base_url, href)
+                    for href in index.xpath("//a/@href")
+                    if "/ga/" in href and norm_id_from_url(href) == norm_id
+                }
+                if len(alternatives) != 1:
+                    raise
+                return self._get(alternatives.pop())
         eli_path = f"{self._base_url}/eli/{year}/{act_type}/{number}/enacted/en"
         try:
             return self._get(f"{eli_path}/xml")

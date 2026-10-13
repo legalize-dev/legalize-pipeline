@@ -283,13 +283,14 @@ def test_source_spent_classification_is_separate_from_real_repeal():
     assert notes == [{"note": "Spent."}]
 
 
-def test_inserted_pensions_provision_uses_inserting_act_and_actual_commencement():
+@pytest.mark.parametrize("norm_id", ["IE-2002-act-28", "IE-1991-act-13"])
+def test_inserted_pensions_provision_uses_inserting_act_and_actual_commencement(norm_id):
     from pathlib import Path
 
     source = (
         Path(__file__).parent / "fixtures/ie/sample-effects-appropriation-2002.html"
     ).read_bytes()
-    effects = parse_effects(source, "IE-2002-act-28")
+    effects = parse_effects(source, norm_id)
     assert len(effects) == 2
     assert {effect["source_id"] for effect in effects} == {"IE-2013-act-20"}
     assert {effect["effective_date"] for effect in effects} == {"2014-03-07"}
@@ -301,8 +302,8 @@ def test_inserted_pensions_provision_uses_inserting_act_and_actual_commencement(
     assert first["source_correction"].endswith("/2013/act/20/section/26/enacted/en/html")
     assert first["commencement_source"].endswith("/2014/si/103/made/en/html")
     assert "publication_date" not in first
-    # The verified correction does not silently change another norm's history.
-    untouched = parse_effects(source, "IE-2002-act-29")
+    # Other provisions of the original Act retain their own identity.
+    untouched = parse_effects(source.replace(b">9</a>A", b">9</a>B"), norm_id)
     assert untouched[0]["source_id"] == "IE-1990-act-25"
 
 

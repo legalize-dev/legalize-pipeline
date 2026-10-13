@@ -30,6 +30,7 @@ _DUTY_ORDERS = {
     ("E.I.D.", "359", "1955"): "IE-1955-si-194",
     ("E.I.D.", "397", "1957"): "IE-1957-si-77",
     ("I.D.", "14", "1958"): "IE-1958-si-30",
+    ("I.D.", "19", "1958"): "IE-1958-si-39",
     ("I.D.", "128", "1962"): "IE-1962-si-163",
 }
 
@@ -125,7 +126,9 @@ def _effect(note: str, provision: str, source_id: str, commencement="", commence
 def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[str], str | None]:
     # A provision inserted into an older Act derives from the named amending instrument.
     amenders = list(
-        re.finditer(r"\bas\s+(?:inserted|substituted)\s+by\s+", cell.text_content(), re.I)
+        re.finditer(
+            r"\b(?:as\s+)?(?:inserted|substituted|amended|ins\.)\s+by\s+", cell.text_content(), re.I
+        )
     )
     if amenders:
         cell = deepcopy(cell)
@@ -143,7 +146,7 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     }
     # Some directory links incorrectly use act/pub for explicitly labelled instruments.
     instruments = re.findall(
-        r"S\.?\s*I[.,]?\s*(?:No\.?\s*)?(\d+),?\s*(?:(?:of\s+){1,2}|/)(\d{4})", provision, re.I
+        r"S\.?\s*I[.,]?\s*(?:Nol?\.?\s*)?(\d+),?\s*(?:(?:of\s+){1,2}|/)(\d{4})", provision, re.I
     )
     instruments += re.findall(r"E\.I\.D\. \(No\. S\.\s*I\. (\d+)\) O\., (\d{4})", provision)
     for number, year in instruments:
@@ -155,12 +158,48 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
         identifiers.add(_DUTY_ORDERS[citation])
     if "Constitution of Ireland 1937" in provision:
         identifiers.add(CONSTITUTION_ID)
+    # Explicit amender citations can disagree with links copied from the host Act.
+    amending_citations = (
+        {
+            f"IE-{year}-act-{int(number)}"
+            for number, year in re.findall(r"\b(\d+)\s*/\s*(\d{4})\b", provision)
+        }
+        if amenders and not instruments
+        else set()
+    )
+    if amending_citations:
+        identifiers = {
+            linked
+            for citation in amending_citations
+            for linked in (
+                {
+                    identifier
+                    for identifier in identifiers
+                    if identifier.replace("-act-P", "-act-").replace("-act-C", "-act-") == citation
+                }
+                or {citation}
+            )
+        }
     if not identifiers:
         for number, year in re.findall(r"\b(\d+)\s*/\s*(\d{4})\b", provision):
             identifiers.add(f"IE-{year}-act-{int(number)}")
         if match := re.match(r"^(\d+) of (\d{4})(?:,|$)", provision):
             identifiers.add(f"IE-{match[2]}-act-{int(match[1])}")
     correction = None
+    if re.fullmatch(
+        r"Housing \(Miscellaneous Provisions\) Act 2014, s\. 19\((?:9|10)\)", provision
+    ):
+        identifiers = {"IE-2014-act-21"}
+        correction = "https://www.irishstatutebook.ie/eli/2014/act/21/section/19/enacted/en/html"
+    if norm_id == "IE-1990-act-20" and note == "S. 3(5A) inserted" and not provision:
+        identifiers.add("IE-2005-act-11")
+        correction = "https://www.irishstatutebook.ie/eli/2005/act/11/section/57/enacted/en/html"
+    if norm_id == "IE-1979-act-27" and provision == "3/199, s. 76":
+        identifiers.add("IE-1998-act-3")
+        correction = "https://www.irishstatutebook.ie/eli/1998/act/3/section/76/enacted/en/html"
+    if norm_id == "IE-1967-act-21" and note == "Sch., para. 5(c)(ii) substituted" and not provision:
+        identifiers.add("IE-2023-act-8")
+        correction = "https://www.irishstatutebook.ie/eli/2023/act/8/section/32/enacted/en/html"
     if norm_id == "IE-1942-act-22" and provision == "20/13, ss. 1(5), 26":
         identifiers.add("IE-2013-act-20")
         correction = "https://www.irishstatutebook.ie/eli/2013/act/20/section/26/enacted/en/html"
@@ -250,7 +289,7 @@ def parse_effects(
     previous_note = ""
     scope = ""
     pending_reference = False
-    for cells in cells_by_row:
+    for row_index, cells in enumerate(cells_by_row):
         if not cells:
             previous_effects = []
             continue
@@ -276,7 +315,7 @@ def parse_effects(
             and not any(texts[2:])
             and previous_effects
             and re.fullmatch(
-                r"(?:but see|see also) ss?\. [\d(), .-]+|And see (?:regs|oo)\. under|, expired\.",
+                r"(?:but see|see also) ss?\. [\d(), .-]+|And see (?:regs|oo)\. under|, expired(?: \d{1,2} \w+ \d{4})?\.",
                 provision,
                 re.I,
             )
@@ -289,7 +328,11 @@ def parse_effects(
         matching_footnotes = [
             footnote
             for footnote in footnotes
-            if marker and re.search(r"\*+", footnote)[0] == marker[0]
+            if marker
+            and (
+                re.search(r"\*+", footnote)[0] == marker[0]
+                or re.sub(r"[ *.]", "", note) == re.sub(r"[ *.]", "", footnote.split(":", 1)[0])
+            )
         ]
         if not ids and provision == "Order made under*" and len(matching_footnotes) == 1:
             ids, correction = _affecting_ids(cells[1], matching_footnotes[0], norm_id, note)
@@ -298,10 +341,16 @@ def parse_effects(
         judicial_footnotes = []
         section = re.match(r"S\.\s*(\d+[A-Z]?)", note)
         for footnote in matching_footnotes:
-            if not re.search(r"invalid|inconsistent|not compatible", footnote, re.I):
+            if not re.search(
+                r"invalid|inconsistent|not compatible|repugnant to the Constitution", footnote, re.I
+            ):
                 continue
-            scope_match = re.match(r"Ss?\.\s*([^:]+):", footnote.lstrip("* "), re.I)
-            if scope_match and section and not re.search(rf"\b{section[1]}\b", scope_match[1]):
+            scope_matches = re.findall(r"Ss?\.\s*([^:]+):", footnote.lstrip("* "), re.I)
+            if (
+                scope_matches
+                and section
+                and not any(re.search(rf"\b{section[1]}\b", scope) for scope in scope_matches)
+            ):
                 continue
             judicial_footnotes.append(footnote)
         judicial = judicial or (
@@ -341,6 +390,18 @@ def parse_effects(
             )
             previous_note = ""
             continue
+        if not ids and re.fullmatch(
+            r"Resolution of (?:Dáil|Seanad) Éireann: Debates Volume \d+ no\. \d+, .+", provision
+        ):
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: parliamentary resolution requires an editorial_notes destination"
+                )
+            editorial_notes.append(
+                {"kind": "parliamentary_resolution", "note": note, "provision": provision}
+            )
+            previous_note = note
+            continue
         if not ids and note == "Virt. Rep., Principal Act, Rep." and not provision:
             if editorial_notes is None:
                 raise ValueError(
@@ -357,7 +418,14 @@ def parse_effects(
             previous_note = ""
             continue
         if not provision and not ids:
-            if not note or re.fullmatch(r"Not affected\.?", note, re.I):
+            if row_index + 1 < len(cells_by_row) and not any(texts[2:]):
+                following = cells_by_row[row_index + 1]
+                if len(following) in (2, 4) and not _text(following[0]):
+                    next_ids, _ = _affecting_ids(following[1], _text(following[1]), norm_id, note)
+                    if next_ids:
+                        previous_note = note
+                        continue
+            if not note or re.fullmatch(r"Not affected\.?|None", note, re.I):
                 continue
             if re.fullmatch(
                 r"References construed|(?:\w+ )?Schedule(?: \w+)?|Parts? (?:[IVX]+[A-Z]?|\d+[A-Z]?)(?:, (?:[IVX]+[A-Z]?|\d+[A-Z]?))*(?: Chapter \d+[A-Z]?)?(?: \(ss?\. [\dA-Z, -]+\))?",
@@ -373,7 +441,7 @@ def parse_effects(
             # These source rows describe this Act's own citation or operation provisions.
             if re.fullmatch(
                 r"(?:s\.|ss\.|sch\.|section|sections|schedule|part|art\.)\s*"
-                r"\d+[a-z]?(?:\([0-9a-z]+\))*\.?",
+                r"\d+[a-z]?(?:\([0-9a-z]+\))*(?:\s*[-,]\s*\([0-9a-z]+\))*\.?",
                 provision,
                 re.I,
             ):
@@ -406,11 +474,8 @@ def parse_effects(
                 effect["commencement"], effect["commencement_source"] = commencement_fix[:2]
                 effect["effective_date"] = source_date(effect["commencement"]).isoformat()
                 effect["source_correction"] = effect["commencement_source"]
-            if (
-                norm_id == "IE-2002-act-28"
-                and identifier == "IE-1990-act-25"
-                and note == "Schedule, constr. refs. “Pensions Board”"
-                and provision == "25/1990, s. 9A"
+            if identifier == "IE-1990-act-25" and re.fullmatch(
+                r"(?:Pensions Act 1990 \()?25/1990\)?, s\. 9A(?: \(see.*)?", provision
             ):
                 # Section 9A was inserted in 2013, with operation fixed by S.I. 103/2014.
                 effect["directory_source_id"] = identifier

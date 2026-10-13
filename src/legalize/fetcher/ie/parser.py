@@ -731,7 +731,9 @@ class ISBTextParser(TextParser):
             if doc.xpath('.//a[@id="article1" or @name="article1"]'):
                 return self._parse_constitution_html(data)
             raise ValueError("ISB HTML has no legislative body")
-        is_instrument = bool(re.match(r"S\.\s*I\.", doc.findtext(".//title") or "", re.I))
+        is_instrument = bool(
+            re.match(r"(?:S\.\s*I\.|I\.\s*R\.)", doc.findtext(".//title") or "", re.I)
+        )
         source_text = _html_text(act)
         pub_date = (
             (_gazette_date(source_text) or _made_date(source_text))
@@ -770,6 +772,8 @@ class ISBTextParser(TextParser):
             ):
                 continue
             match = re.match(r"\^?(\d+|\*+)\s+(.+)", _html_inline_text(node))
+            if not match:
+                match = re.match(r"\*\*Note \((\d+)\):\*\* (.+)", _html_inline_text(node))
             if not match:
                 raise ValueError("Malformed ISB HTML footnote definition")
             marker, body_text = match.groups()
@@ -1167,6 +1171,8 @@ def _html_inline_text(
                 if marker.startswith("*") and parts[-1].rstrip().endswith(marker):
                     parts[-1] = parts[-1].rstrip()[: -len(marker)] + f"[^{number}]"
                 text = ""
+                if re.search(rf"Note \({re.escape(marker)}\)\*\*\s*$", "".join(parts)):
+                    text = f"[^{number}]"
             elif tag == "br":
                 text = " "
             elif tag == "img":
@@ -1261,10 +1267,14 @@ _XML_ENACTMENT_CORRECTIONS = {
     ("7", "1979"): ("19790310", "1979-03-20", "/eli/1979/act/7/enacted/en/html"),
     ("4", "1992"): ("19920308", "1992-03-18", "/isbc/1992_4.html"),
     ("5", "1996"): ("19960306", "1996-03-16", "/isbc/1996_5.html"),
+    ("13", "2004"): ("20040005", "2004-05-05", "/pdf/2004/en.act.2004.0013.pdf"),
     ("26", "2005"): ("20051017", "2005-11-27", "/pdf/2005/en.act.2005.0026.pdf"),
+    ("31", "2006"): ("2006", "2006-12-11", "/pdf/2006/en.act.2006.0031.pdf"),
+    ("5", "2013"): ("20130205", "2013-03-13", "/pdf/2013/en.act.2013.0005.pdf"),
     ("21", "2014"): ("20140726", "2014-07-28", "/pdf/2014/en.act.2014.0021.pdf"),
     ("5", "2015"): ("20141119", "2015-03-11", "/pdf/2015/en.act.2015.0005.pdf"),
     ("24", "2019"): ("20190724", "2019-07-11", "/pdf/2019/en.act.2019.0024.pdf"),
+    ("46", "2021"): ("20211231", "2021-12-21", "/pdf/2021/en.act.2021.0046.pdf"),
 }
 
 
@@ -1296,7 +1306,7 @@ def _xml_enactment_date(root) -> date | None:
     if not raw:
         return None
     front = root.find("frontmatter")
-    if re.fullmatch(r"\d{7,9}", raw) and front is not None:
+    if (re.fullmatch(r"\d{7,9}", raw) or _xml_date_correction(root)) and front is not None:
         printed = _enactment_date("".join(front.itertext()))
         if printed is not None:
             if not any(
@@ -1351,15 +1361,31 @@ def _signature_dates(text: str) -> list[date]:
         flags=re.I,
     ).replace("_", " ")
     matches = re.finditer(
-        r"(?:(?:GIVEN under|SEALED with).{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+this\s+|"
+        r"(?:(?:GIVEN under|SEALED with).{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+(?:this|on)\s+|"
+        r"PRESENT when the Common Seal.{0,180}?this\s+|GIVEN under the official of the Minister[^0-9]{0,180}?|"
+        r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,\s*|"
         r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|SIGNED[^0-9]{0,180}?\bthis\s+|DUBLIN\.\s+This\s+)"
-        r"(\d{1,2})(?:st|nd|rd|th)?\.?(?:\s*day\s*of)?\s*"
+        r"(\d{1,2})\s*(?:st|nd|rd|th)?[.,]?(?:\s*(?:day\s*)?of)?\s*"
         r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s+(\d{4})",
         text,
         re.I,
     )
+    irish_matches = re.finditer(
+        r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,?\s+an\s+(\d{1,2})ú?\s+lá seo de\s+(\w+),?\s+(\d{4})",
+        text,
+        re.I,
+    )
+    reversed_matches = re.finditer(
+        r"Social Welfare this (\d{1,2})(?:st|nd|rd|th)? day of (\w+), (\d{4})\. "
+        r"BRENDAN CORISH, Minister for Social Welfare\. GIVEN under the Official Seal of the Minister for",
+        text,
+        re.I,
+    )
     return sorted(
-        {_parse_date_from_parts(int(match[1]), match[2], int(match[3])) for match in matches}
+        {
+            _parse_date_from_parts(int(match[1]), match[2], int(match[3]))
+            for match in [*matches, *irish_matches, *reversed_matches]
+        }
     )
 
 
@@ -1385,6 +1411,7 @@ def _parse_date_from_parts(day: int, month_str: str, year: int) -> date:
         "november": 11,
         "december": 12,
         "decembe": 12,  # The enacted 2017 Act 33 XML truncates December.
+        "feabhra": 2,
     }
     months.update({name[:3]: value for name, value in list(months.items())})
     month = months.get(month_str.lower())
@@ -1537,6 +1564,7 @@ class ISBMetadataParser(MetadataParser):
         """Use an ISB document when the parliamentary catalogue has no matching Act."""
         from lxml import html as lxml_html
 
+        source_url = _source_url(norm_id)
         if _is_xml_source(data):
             root = etree.fromstring(data)
             meta = root.find("metadata")
@@ -1549,6 +1577,14 @@ class ISBMetadataParser(MetadataParser):
             if not any(number.startswith("P") for number, _ in printed_identities):
                 expected_printed = expected_identity
             source_identity = (meta.findtext("number", ""), meta.findtext("year", ""))
+            corrected_printed_identity = (
+                norm_id == "IE-2017-act-14"
+                and source_identity == ("14", "2017")
+                and printed_identities == {("12", "2017"), ("14", "2017")}
+                and meta.findtext("title") == "CRIMINAL JUSTICE ACT 2017"
+            )
+            if corrected_printed_identity:
+                printed_identities = {expected_printed}
             if (printed_identities and printed_identities != {expected_printed}) or (
                 source_identity != expected_identity and printed_identities != {expected_printed}
             ):
@@ -1558,6 +1594,16 @@ class ISBMetadataParser(MetadataParser):
             raw_date = meta.findtext("dateofenactment", "")
             published = _xml_enactment_date(root)
             source_fields = []
+            if corrected_printed_identity:
+                source_fields.extend(
+                    (
+                        ("identity_source_printed_numbers", "12, 14"),
+                        (
+                            "identity_correction_source",
+                            "https://www.irishstatutebook.ie/eli/2017/act/14/enacted/en/html",
+                        ),
+                    )
+                )
             if source_identity != expected_identity:
                 source_fields.extend(
                     (
@@ -1584,7 +1630,7 @@ class ISBMetadataParser(MetadataParser):
             basis = "isb_enactment_date"
             if (
                 published
-                and re.fullmatch(r"\d{7,9}", raw_date)
+                and re.fullmatch(r"\d{4}|\d{7,9}", raw_date)
                 and raw_date != published.strftime("%Y%m%d")
             ):
                 source_fields.append(("enactment_date_source_value", raw_date))
@@ -1615,6 +1661,12 @@ class ISBMetadataParser(MetadataParser):
                 ("official_number", norm_id.rsplit("-", 1)[1]),
                 ("year", norm_id.split("-")[1]),
             )
+            if re.match(r"I\.\s*R\.\s*Uimh\.", title):
+                identity = re.search(r"(\d+)/(\d{4})", title)
+                if not identity or norm_id != f"IE-{identity[2]}-si-{identity[1]}":
+                    raise ValueError(f"{norm_id}: Irish source identifies a different instrument")
+                extra += (("language", "ga"),)
+                source_url = source_url.replace("/en/", "/ga/")
             if "-si-" in norm_id:
                 basis = "gazette_notice" if _gazette_date(source_text) else "final_signature"
                 extra += (("publication_date_basis", basis),)
@@ -1641,7 +1693,7 @@ class ISBMetadataParser(MetadataParser):
             publication_date=published,
             status=NormStatus.IN_FORCE,
             department="",
-            source=_source_url(norm_id),
+            source=source_url,
             extra=extra,
         )
 
