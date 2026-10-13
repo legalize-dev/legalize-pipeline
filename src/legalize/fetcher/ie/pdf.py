@@ -28,7 +28,7 @@ from legalize.fetcher._text import strip_control
 from legalize.fetcher.ie.parser import _legal_format, _quote_delta
 from legalize.models import Paragraph
 
-_SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*\.")
+_SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*(?:\.|(?=\(1\)))")
 _DIVISION = re.compile(
     r"^(?:(?:F\d+)?\[)?(?:(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH) )?"
     r"(PART|CHAPTER|SCHEDULE)\s*(?:[\dIVXLCDM]+[A-Z]*)?$",
@@ -81,6 +81,16 @@ _KNOWN_CUTOFF_CONFLICTS = {
     ),
 }
 
+# The contents and title identify section 14; the body omits only its number.
+# Evidence: tests/fixtures/ie/pdf-incomplete-headings-evidence.json.
+_KNOWN_UNNUMBERED_SECTIONS = {
+    "c450d687d0be72849490e9e429c2b3e3152a12b5186955aa0252783864c5359f": (  # pragma: allowlist secret
+        "14",
+        "Amendment of Bail Act 1997",
+        "The Schedule to the Bail Act 1997 is amended by the insertion of the following",
+    ),
+}
+
 
 def source_warning(data: bytes) -> str | None:
     """Return the verified limitation for an exact official PDF."""
@@ -97,6 +107,13 @@ def source_warning(data: bytes) -> str | None:
             f"and the LRC catalogue state {cover}, while internal headings state {older}. "
             f"This snapshot uses {cover}, following the cover and catalogue. "
             "Check the official source before relying on its revision date."
+        )
+    if missing_label := _KNOWN_UNNUMBERED_SECTIONS.get(sha256(data).hexdigest()):
+        number, title, _ = missing_label
+        return (
+            f"This official consolidated PDF omits section {number}'s number from its body. "
+            f"The section boundary is identified by its contents entry and matching title, '{title}'. "
+            "The source body text is preserved without inserting a number into it."
         )
     return None
 
@@ -197,18 +214,17 @@ def _section_match(line: _Line, *, allow_plain: bool = False):
     if match is None:
         return None
     chars = sorted(line.chars, key=lambda char: char["x0"])
-    prefix = "".join(char["text"] for char in chars).split(".", 1)[0]
-    number = re.search(r"(\d+[A-Z]*)$", prefix)
+    number = _SECTION.match("".join(char["text"] for char in chars))
     if number is None:
         return None
     offset = 0
     for char in chars:
-        if number.start() <= offset < number.end() and (
+        if number.start(1) <= offset < number.end(1) and (
             "Italic" in char["fontname"] or (not allow_plain and "Bold" not in char["fontname"])
         ):
             return None
         offset += len(char["text"])
-        if offset >= number.end():
+        if offset >= number.end(1):
             break
     return match
 
@@ -296,7 +312,7 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
                     and any(text.startswith("This Revised Act presents the text") for text in plain)
                 )
                 and plain
-                and re.match(r"Number \d+ of \d{4}", plain[0])
+                and re.match(r"Number\s*\d+\s*of\s*\d{4}\b", plain[0])
             ):
                 break
             start = 0
@@ -423,6 +439,7 @@ def parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
 def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     """Extract the actual dated legal text, preserving marginal section titles."""
     events, updated, expected = _read(data)
+    missing_label = _KNOWN_UNNUMBERED_SECTIONS.get(sha256(data).hexdigest())
     footnotes = []
     body_events = []
     previous_note = None
@@ -709,6 +726,15 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             previous = None
             continue
         match = _section_match(item, allow_plain=marginal and abs(item.x0 - primary_x) < 10)
+        if (
+            match is None
+            and missing_label
+            and pending_title
+            and re.sub(r"\*+", "", pending) == missing_label[1]
+            and text == missing_label[2]
+            and missing_label[0] in expected
+        ):
+            match = _SECTION.match(f"{missing_label[0]}.")
         caption = (
             next(
                 (
@@ -741,7 +767,14 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 and abs(item.x0 - primary_x) < 10
                 and item.top - previous.bottom < 25
             )
-            primary = primary and (marginal_title or title_above)
+            # A missing caption does not erase an aligned bold label listed in the contents.
+            uncaptioned_label = (
+                match
+                and match[1] in expected
+                and abs(item.x0 - primary_x) < 2
+                and _section_match(item)
+            )
+            primary = primary and (marginal_title or title_above or uncaptioned_label)
         else:
             # Source labels can shift by two paragraph indents beneath an aligned title.
             indented_label = (
