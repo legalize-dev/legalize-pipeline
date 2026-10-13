@@ -398,13 +398,15 @@ countries:
     repo_path: "../countries/ie"
     data_dir: "../countries/data-ie"
     cache_dir: ".cache"
-    max_workers: 8
+    # Local source benchmark: 4 workers at 1 request/second each; archived
+    # PDF parsing is serialized to bound simultaneous glyph collections.
+    max_workers: 4
     source:
       isb_base_url: "https://www.irishstatutebook.ie"
       api_base_url: "https://api.oireachtas.ie"
-      request_timeout: 30
+      request_timeout: 45
       max_retries: 3
-      requests_per_second: 5.0
+      requests_per_second: 1.0
 
   ua:
     repo_path: "../countries/ua"

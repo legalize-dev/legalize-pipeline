@@ -16,7 +16,9 @@ Refactored 2026-04-22 (research/RESEARCH-ES-v2.md):
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import date
+import re
 from typing import Callable
 
 from legalize.countries import text_state_for
@@ -68,6 +70,7 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     # --- synthetic classes emitted by the XML parser ---
     "image": lambda t: f"{t}\n",
     "list_item": lambda t: f"{t}\n",
+    "legal_quote": lambda t: f"{t}\n",
     "pre": lambda t: f"```\n{t}\n```\n",
     # --- generic fallbacks used by non-ES parsers (kept for back-compat) ---
     "h1": lambda t: f"# {t}\n",
@@ -150,6 +153,15 @@ def render_paragraphs(paragraphs: list[Paragraph] | tuple[Paragraph, ...]) -> st
         if formatter is not None:
             rendered = formatter(text).rstrip("\n")
             if rendered:
+                # Explicit legal quote fragments share a CommonMark container.
+                # An unquoted blank line closes it and turns later nested list
+                # entries into code blocks. Other countries' quote classes keep
+                # their existing byte-for-byte rendering.
+                if css == "legal_quote" and i and plist[i - 1].css_class == "legal_quote":
+                    previous = re.match(r"^([ \t]*>)(?: |$)", lines[-2].splitlines()[-1])
+                    current = re.match(r"^([ \t]*>)(?: |$)", rendered)
+                    if previous and current and previous[1] == current[1]:
+                        lines[-1] = current[1]
                 lines.append(rendered)
                 lines.append("")
         else:
@@ -172,9 +184,29 @@ def render_norm_at_date(
     """Generate the complete Markdown for a norm at a given point in time."""
     selected = []
     for block in blocks:
-        if metadata.country == "eu":
-            applicable = [v for v in block.versions if v.in_force_from <= target_date]
-            version = max(applicable, key=lambda v: v.in_force_from) if applicable else None
+        if metadata.country in {"eu", "ie"}:
+            applicable = [
+                v
+                for v in block.versions
+                if v.in_force_from <= target_date
+                and not (
+                    metadata.country == "ie"
+                    and source_id is not None
+                    and v.norm_id.startswith("revised-")
+                    and v.in_force_from == target_date
+                )
+            ]
+            version = (
+                max(
+                    applicable,
+                    key=lambda v: (
+                        v.in_force_from,
+                        metadata.country == "ie" and v.norm_id != metadata.identifier,
+                    ),
+                )
+                if applicable
+                else None
+            )
             version = next(
                 (
                     v
@@ -187,6 +219,31 @@ def render_norm_at_date(
         else:
             version = get_block_at_date(block, target_date)
         selected.append(version)
+    states = {v.text_state for v in selected if v is not None and v.text_state is not None}
+    sources = {v.source for v in selected if v is not None and v.source}
+    if len(states) > 1 or len(sources) > 1:
+        raise ValueError(
+            f"{metadata.identifier}: selected blocks disagree on their source or text state"
+        )
+    if states or sources:
+        metadata = replace(
+            metadata,
+            text_state=next(iter(states), metadata.text_state),
+            source=next(iter(sources), metadata.source),
+        )
+    warnings = list(
+        dict.fromkeys(v.source_warning for v in selected if v is not None and v.source_warning)
+    )
+    if warnings or metadata.country == "ie":
+        extra = dict(metadata.extra)
+        # A source defect belongs to its snapshot, not every version of the law.
+        extra.pop("source_warning", None)
+        if warnings:
+            extra["source_warning"] = " ".join(warnings)
+        metadata = replace(metadata, extra=tuple(extra.items()))
+    if metadata.country == "ie" and metadata.text_state is TextState.POINT_IN_TIME:
+        # A later effect does not turn an archived body into a newer consolidation.
+        target_date = max(v.in_force_from for v in selected if v is not None)
     if metadata.country == "eu":
         if include_all and not any(selected):
             selected = [
@@ -205,6 +262,8 @@ def render_norm_at_date(
     notice = _NOTICES.get(metadata.text_state or text_state_for(metadata.country))
     if notice:
         parts.append(f"{notice}\n")
+    if source_warning := dict(metadata.extra).get("source_warning"):
+        parts.append(f"> **Incomplete source:** {source_warning}\n\n")
 
     for block, version in zip(blocks, selected, strict=True):
         if version is None and include_all and metadata.country != "eu" and block.versions:

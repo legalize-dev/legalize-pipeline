@@ -1,0 +1,342 @@
+{
+  "digital-services-2026": {
+    "pdf": "archive-digital-services-2026.pdf",
+    "html": "archive-digital-services-2026.html",
+    "cutoff": "2026-01-01",
+    "pdf_paragraphs": 1311,
+    "html_paragraphs": 1309,
+    "pdf_words": 29903,
+    "html_words": 29875,
+    "missing_word_counts": {
+      "regulation": 4,
+      "intermediary": 1,
+      "paragraph": 1,
+      "investigation": 1,
+      "contravention": 3,
+      "administrative": 2,
+      "representative": 1,
+      "notification": 1,
+      "application": 1,
+      "attributable": 1,
+      "references": 1,
+      "appropriate": 2,
+      "communications": 1
+    },
+    "extra_word_counts": {
+      "2022": 1,
+      "1": 2,
+      "regu": 4,
+      "lation": 4,
+      "investig": 1,
+      "ation": 2,
+      "10": 1,
+      "interme": 1,
+      "diary": 1,
+      "repres": 1,
+      "entative": 1,
+      "contra": 2,
+      "vention": 2,
+      "refer": 1,
+      "attribut": 1,
+      "able": 1,
+      "27": 1,
+      "applic": 1,
+      "adminis": 1,
+      "trative": 1,
+      "noti": 1,
+      "fication": 1,
+      "appropri": 1,
+      "ate": 1,
+      "ences": 1,
+      "para": 1,
+      "graph": 1,
+      "admin": 1,
+      "istrative": 1,
+      "p": 1,
+      "appro": 1,
+      "priate": 1,
+      "contraven": 1,
+      "tion": 1,
+      "commu": 1,
+      "nications": 1,
+      "oj": 1,
+      "l277": 1
+    },
+    "differences": [
+      {
+        "kind": "replace",
+        "pdf": "regu lation",
+        "html": "regulation",
+        "before": "a failure to comply with the digital services",
+        "after": "and ii by the insertion of the following",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "investig ation",
+        "html": "investigation",
+        "before": "it is no longer required for such prevention",
+        "after": "detection or prosecution and d by the insertion",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "interme diary",
+        "html": "intermediary",
+        "before": "with the limitations placed on the liability of",
+        "after": "service providers by articles 4 to 6 of",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "repres entative",
+        "html": "representative",
+        "before": "which article 13 1 applies and whose legal",
+        "after": "designated under that article resides or is established",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "regu lation",
+        "html": "regulation",
+        "before": "in this part as it has in that",
+        "after": "3 unless the context otherwise requires a reference",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "contra vention",
+        "html": "contravention",
+        "before": "given under subsection 1 in relation to a",
+        "after": "that is an infringement of the digital services",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "attribut able",
+        "html": "attributable",
+        "before": "consent or connivance of or to have been",
+        "after": "to any neglect on the part of a",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "applic ation",
+        "html": "application",
+        "before": "on appeal under section 139zx or on summary",
+        "after": "under section 139zy as those sections apply in",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "contra vention",
+        "html": "contravention",
+        "before": "article 51 to put an end to the",
+        "after": "have been exhausted and d the contravention is",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "adminis trative",
+        "html": "administrative",
+        "before": "a commitment agreement may be liable to an",
+        "after": "financial sanction in accordance with this part 41",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "regu lation",
+        "html": "regulation",
+        "before": "in this part as it has in that",
+        "after": "3 unless the context otherwise requires a reference",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "noti fication",
+        "html": "notification",
+        "before": "operation 14 days from the date of the",
+        "after": "under section 188 191 or 194 investigation of",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "appropri ate",
+        "html": "appropriate",
+        "before": "respect of the complaint as the commission considers",
+        "after": "5 the commission shall notify the complainant and",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "refer ences",
+        "html": "references",
+        "before": "subsection 7 b this part applies as if",
+        "after": "to the final report on the investigation were",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "para graph",
+        "html": "paragraph",
+        "before": "period or further period referred to in that",
+        "after": "or if applicable the period specified in any",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "admin istrative",
+        "html": "administrative",
+        "before": "following matters in determining the amount of the",
+        "after": "financial sanction imposed under section 62 a the",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "appro priate",
+        "html": "appropriate",
+        "before": "section 66 3 is received appeal to the",
+        "after": "court against the decision 2 the appropriate court",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "contraven tion",
+        "html": "contravention",
+        "before": "73 to a provider in respect of a",
+        "after": "and it appears to the commission that a",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "regu lation",
+        "html": "regulation",
+        "before": "involved shall not contravene article 84 of the",
+        "after": "2 a person who without reasonable excuse contravenes",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "replace",
+        "pdf": "commu nications",
+        "html": "communications",
+        "before": "participate in the hearing by means of electronic",
+        "after": "technology permitting real time transmission and real time",
+        "cause": "PDF has a visible hyphen at a physical line end; it is retained rather than guessing whether it is discretionary."
+      },
+      {
+        "kind": "delete",
+        "pdf": "1 oj l277 27 10 2022 p 1",
+        "html": "",
+        "before": "in ordinary language by the conducting authority footnotes",
+        "after": "2 oj l277 27 10 2022 p 1",
+        "cause": "The first legal footnote exists in PDF but is absent from the HTML source."
+      }
+    ]
+  },
+  "valuation-2024": {
+    "pdf": "archive-valuation-2024.pdf",
+    "html": "archive-valuation-2024.html",
+    "cutoff": "2024-10-18",
+    "pdf_paragraphs": 1012,
+    "html_paragraphs": 1017,
+    "pdf_words": 28788,
+    "html_words": 28789,
+    "missing_word_counts": {
+      "of": 1,
+      "32": 1
+    },
+    "extra_word_counts": {
+      "32of": 1
+    },
+    "differences": [
+      {
+        "kind": "replace",
+        "pdf": "32of",
+        "html": "32 of",
+        "before": "was operative immediately before the commencement of section",
+        "after": "the valuation amendment act 2015 continue to have",
+        "cause": "The PDF source has no word gap between 32 and of: glyph gap 0.483pt, normal inter-letter gap 0.500pt. The HTML source separates them. No letters or digits are omitted; source spacing is preserved."
+      },
+      {
+        "kind": "insert",
+        "pdf": "",
+        "html": "schedule 1",
+        "before": "any other person for the time being prescribed",
+        "after": "section 8 schedule 1 enactments repealed session and",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "delete",
+        "pdf": "schedule 1",
+        "html": "",
+        "before": "person for the time being prescribed section 8",
+        "after": "enactments repealed session and chapter or number and",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "insert",
+        "pdf": "",
+        "html": "schedule 2",
+        "before": "1997 national cultural institutions act 1997 section 64",
+        "after": "section 12 schedule 2 the valuation tribunal 1",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "delete",
+        "pdf": "schedule 2",
+        "html": "",
+        "before": "cultural institutions act 1997 section 64 section 12",
+        "after": "the valuation tribunal 1 1 the tribunal shall",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "insert",
+        "pdf": "",
+        "html": "schedule 3",
+        "before": "is living separately and apart from the person",
+        "after": "section 14 schedule 3 relevant property 1 property",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "delete",
+        "pdf": "schedule 3",
+        "html": "",
+        "before": "separately and apart from the person section 14",
+        "after": "relevant property 1 property of whatever estate or",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "insert",
+        "pdf": "",
+        "html": "schedule 4",
+        "before": "rateable occupation by the owner of the property",
+        "after": "section 15 schedule 4 relevant property not rateable",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "delete",
+        "pdf": "schedule 4",
+        "html": "",
+        "before": "by the owner of the property section 15",
+        "after": "relevant property not rateable 1 agricultural land 2",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "delete",
+        "pdf": "section 51",
+        "html": "",
+        "before": "for the purpose of making a private profit",
+        "after": "f132 schedule 5 plant referred to in section",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      },
+      {
+        "kind": "insert",
+        "pdf": "",
+        "html": "section 51",
+        "before": "a private profit section 51 f132 schedule 5",
+        "after": "plant referred to in section 51 1 a",
+        "cause": "PDF prints the marginal Section N locator above the schedule title; HTML places it after the title. Both texts are retained."
+      }
+    ]
+  }
+}

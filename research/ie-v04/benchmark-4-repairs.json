@@ -1,0 +1,15 @@
+{
+  "purpose": "Targeted verification of failures from benchmark-4; not a throughput comparison",
+  "parser_revision": "539a0b5f68fc0bd07f9bead84d9be99cd72b26e452220a71923c1da7c8b59118",
+  "peak_rss_mib": 4203.9,
+  "workers": 4,
+  "requests_per_second_per_worker": 1.0,
+  "seconds": 698.07,
+  "laws": 3,
+  "successful": 2,
+  "failed": [
+    "IE-2014-act-38"
+  ],
+  "http_calls": 356,
+  "errors": []
+}

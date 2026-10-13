@@ -1,0 +1,778 @@
+--- PDF2021
++++ HTML2023
+@@ -1,4 +1,4 @@
+-AN ACT TO ENTITLE FEMALE EMPLOYEES, AND IN CERTAIN CIRCUMSTANCES MALE EMPLOYEES, TO EMPLOYMENT LEAVE FOR THE PURPOSE OF CHILD ADOPTION, TO EXTEND TO THEM THE PROTECTION AGAINST UNFAIR DISMISSAL CONFERRED BY THE UNFAIR DISMISSALS ACT, 1977, AND TO PROVIDE FOR CONNECTED MATTERS. [15*th March*, 1995]
++AN ACT TO ENTITLE FEMALE EMPLOYEES, AND IN CERTAIN CIRCUMSTANCES MALE EMPLOYEES, TO EMPLOYMENT LEAVE FOR THE PURPOSE OF CHILD ADOPTION, TO EXTEND TO THEM THE PROTECTION AGAINST UNFAIR DISMISSAL CONFERRED BY THE [UNFAIR DISMISSALS ACT, 1977](http://www.irishstatutebook.ie/eli/1977/act/10/enacted/en/html), AND TO PROVIDE FOR CONNECTED MATTERS. [15*th March*, 1995]
+ 
+ BE IT ENACTED BY THE OIREACHTAS AS FOLLOWS:
+ 
+@@ -16,29 +16,29 @@
+ 
+ F1["accredited body" means a body of persons whose name is entered in the register of accredited bodies maintained under Part 13 of the Adoption Act 2010;]
+ 
+-“the Act of 1967” means the Redundancy Payments Act, 1967;
+-
+-“the Act of 1977” means the Unfair Dismissals Act, 1977;
++“the Act of 1967” means the [Redundancy Payments Act, 1967](http://www.irishstatutebook.ie/eli/1967/act/21/enacted/en/html);
++
++“the Act of 1977” means the [Unfair Dismissals Act, 1977](http://www.irishstatutebook.ie/eli/1977/act/10/enacted/en/html);
+ 
+ F2["Act of 2010" means the Civil Partnership and Certain Rights and Obligations of Cohabitants Act 2010;]
+ 
+-F1["adoption order" means an adoption order within the meaning of section 3 (1) of the Adoption Act 2010;]
++F1["adoption order" means an adoption order within the meaning of [section 3](#3-orders-and-regulations) (1) of the Adoption Act 2010;]
+ 
+ F3["adoptive leave" has, subject to *subsection (2A)*, the meaning assigned to it by *section 6(1)* or, as the case may be, *section 9(1)*;]
+ 
+ F3["additional adoptive leave" has, subject to *subsection (2A)*, the meaning assigned to it by *section 8(1)* or, as the case may be, *section 10(1)*;]
+ 
+-F4[...]
+-
+-F4[...]
++F4[…]
++
++F4[…]
+ 
+ “adopting parent” means F5[qualifying adopter or surviving parent];
+ 
+-“associated employer” shall be construed in accordance with *section 19 (3)*;
+-
+-F1["Authority" has the meaning assigned to it by section 3 (1) of the Adoption Act 2010;]
+-
+-“certificate of placement” has the meaning assigned to it by *section 13*;
++“associated employer” shall be construed in accordance with *[section 19](#19-right-to-suitable-alternative-employment-in-certain-circumstances-on-return-to-work) (3)*;
++
++F1["Authority" has the meaning assigned to it by [section 3](#3-orders-and-regulations) (1) of the Adoption Act 2010;]
++
++“certificate of placement” has the meaning assigned to it by *[section 13](#13-certificate-of-placement-to-be-issued)*;
+ 
+ F2["civil partner" shall be construed in accordance with section 3 of the Act of 2010;]
+ 
+@@ -50,7 +50,7 @@
+ 
+ - (*a*) a contract of service or apprenticeship, or
+ 
+-- (*b*) any other contract whereby an individual agrees with a person, who is carrying on the business of an employment agency within the meaning of the Employment Agency Act, 1971, and is acting in the course of that business, to do or perform personally any work or service for another person (whether or not that other person is a party to the contract),
++- (*b*) any other contract whereby an individual agrees with a person, who is carrying on the business of an employment agency within the meaning of the [Employment Agency Act, 1971](http://www.irishstatutebook.ie/eli/1971/act/27/enacted/en/html), and is acting in the course of that business, to do or perform personally any work or service for another person (whether or not that other person is a party to the contract),
+ 
+ whether the contract is express or implied and if express, whether it is oral or in writing;
+ 
+@@ -64,15 +64,15 @@
+ 
+ - (*c*) in the case of a foreign adoption, where the child has not previously been placed in the care of the adopting parent, the day on which the child has been so placed following the adoption;
+ 
+-F4[...]
+-
+-“employee”, subject to *subsection (2)*, means (except in *Part IV*) a person who has entered into or works under (or, where the employment has ceased, entered into or worked under) a contract of employment;
++F4[…]
++
++“employee”, subject to *subsection (2)*, means (except in *[Part IV](#part-iv-amendment-or-application-of-other-enactments)*) a person who has entered into or works under (or, where the employment has ceased, entered into or worked under) a contract of employment;
+ 
+ “employer”, subject to *subsection (2)*, means, in relation to an employee, the person with whom the employee has entered into, or for whom the employee works under (or, where the employment has ceased, entered into or worked under) a contract of employment;
+ 
+-F6["foreign adoption" means an intercountry adoption effected outside the State within the meaning of section 3(1) of the Adoption Act 2010;]
+-
+-“health board” means a health board established pursuant to the Health Act, 1970;
++F6["foreign adoption" means an intercountry adoption effected outside the State within the meaning of [section 3](#3-orders-and-regulations)(1) of the Adoption Act 2010;]
++
++“health board” means a health board established pursuant to the [Health Act, 1970](http://www.irishstatutebook.ie/eli/1970/act/1/enacted/en/html);
+ 
+ “the Minister” means the F5[Minister for Children, Equality, Disability, Integration and Youth;]
+ 
+@@ -94,11 +94,11 @@
+ 
+ - (*b*) in any other case, an employee, who is not a surviving parent in relation to the child, in whose care a child has been placed or is to be placed with a view to the making of an adoption order, or to the effecting of a foreign adoption or following any such adoption;]
+ 
+-F10[...]
+-
+-F4[...]
+-
+-“the successor” has the meaning assigned to it by *section 18*;
++F10[…]
++
++F4[…]
++
++“the successor” has the meaning assigned to it by *[section 18](#18-f55general-right-to-return-to-work-after-adoptive-leave-or-additional-adoptive-leave)*;
+ 
+ F2["surviving parent" means an employee in whose care a child has been placed or is to be placed with a view to the making of an adoption order, or to the effecting of a foreign adoption or following any such adoption, where his or her spouse, civil partner or cohabitant, as the case may be, was the qualifying adopter in relation to the child and the qualifying adopter concerned has died;]
+ 
+@@ -106,9 +106,9 @@
+ 
+ - (2) For the purposes of this Act—
+ 
+-    - (*a*) a person holding office under, or in the service of, the State (including a member of the Garda Síochána or the Defence Forces) or otherwise as a civil servant, within the meaning of the Civil Service Regulation Act, 1956, shall be deemed to be an employee employed by the State or Government, as the case may be, under a contract of service;
+-
+-    - (*b*) an officer or servant of a local authority, for the purposes of the Local Government Act, 1941, a harbour authority, a health board or F11[a member of staff of an education and training board] shall be deemed to be an employee employed by the authority F11[or board], as the case may be, under a contract of service; and
++    - (*a*) a person holding office under, or in the service of, the State (including a member of the Garda Síochána or the Defence Forces) or otherwise as a civil servant, within the meaning of the [Civil Service Regulation Act, 1956](http://www.irishstatutebook.ie/eli/1956/act/46/enacted/en/html), shall be deemed to be an employee employed by the State or Government, as the case may be, under a contract of service;
++
++    - (*b*) an officer or servant of a local authority, for the purposes of the [Local Government Act, 1941](http://www.irishstatutebook.ie/eli/1941/act/23/enacted/en/html), a harbour authority, a health board or F11[a member of staff of an education and training board] shall be deemed to be an employee employed by the authority F11[or board], as the case may be, under a contract of service; and
+ 
+     - (*c*) in relation to an employee whose contract of employment falls (or, where the employment has ceased, fell) within *paragraph (b)* of the definition of “contract of employment” in *subsection (1)*, the person who is liable to pay F12[his or her] wages shall be deemed to be F12[his or her] employer.
+ 
+@@ -134,7 +134,7 @@
+ 
+ - (4) Before making an order or regulation under this Act, the Minister shall consult such organisations or other bodies of persons representative of employers and such organisations or other bodies of persons representative of trades unions or bodies analogous to trades unions as the Minister considers appropriate.
+ 
+-- (5) *Subsections (1)* to *(4)* do not apply to an order under *section 1 (2)*.
++- (5) *Subsections (1)* to *(4)* do not apply to an order under *[section 1](#1-short-title-and-commencement) (2)*.
+ 
+ - (6) Every regulation made under this Act shall be laid before each House of the Oireachtas as soon as practicable after it is made and, if a resolution annulling the regulation is passed by either such House within the next 21 days on which the House has sat after the regulation is laid before it, the regulation shall be annulled accordingly, but without prejudice to the validity of anything previously done under the regulation.
+ 
+@@ -168,7 +168,7 @@
+ 
+ ###### 6A. **F21[Restrictions on entitlement to adoptive leave**
+ 
+-**6A**....]
++**6A**.— ...]
+ 
+ ###### 7. **Notification of employer.**
+ 
+@@ -186,135 +186,135 @@
+ 
+     - (*b*) having, as soon as is reasonably practicable, caused F22[his or her] employer to be notified in writing of the expected day of placement, and
+ 
+-    - F23[(*c*) (i) having caused F22[his or her] employer to be supplied with a copy of an applicable "declaration of eligibility and suitability" (within the meaning of section 3 (1) of the Adoption Act 2010) before the expected day of placement, if not already supplied, and]
+-
+-        - (ii) causing her employer to be supplied with particulars in writing of the placement as soon as is reasonably practicable after the day of placement.
+-
+-- (3) A notification under this section may be revoked by a further notification in writing by or on behalf of F22[the qualifying adopter] to her employer.
++    - F23[(*c*) (i) having caused F22[his or her] employer to be supplied with a copy of an applicable "declaration of eligibility and suitability" (within the meaning of [section 3](#3-orders-and-regulations) (1) of the Adoption Act 2010) before the expected day of placement, if not already supplied, and]
++
++        - (ii) causing F24[his or] her employer to be supplied with particulars in writing of the placement as soon as is reasonably practicable after the day of placement.
++
++- (3) A notification under this section may be revoked by a further notification in writing by or on behalf of F22[the qualifying adopter] to F24[his or] her employer.
+ 
+ - (4) Where the day of placement is postponed, commencement of the period of adoptive leave shall also be postponed subject to F22[the qualifying adopter] causing F22[his or her] employer to be notified of the expected new day of placement as soon as is reasonably practicable.
+ 
+ ###### 8. **Entitlement of employed adopting mother (or sole male adopter) to additional adoptive leave.**
+ 
+-**8.**—(1) F24[(*a*) Subject to this Part, F25[a qualifying adopter] who is entitled to, F26[or is on, adoptive leave or transferred paternity leave] shall, on request, be entitled to further leave (to be known as "additional adoptive leave") from the employee’s employment.
+-
+-- (*b*) The additional adoptive leave F27[or, where applicable, any period of transferred paternity leave] shall commence immediately after the adoptive leave and be for a maximum period of 8 weeks.
++**8.**—(1) F25[(*a*) Subject to this Part, F26[a qualifying adopter] who is entitled to, F27[or is on, adoptive leave or transferred paternity leave] shall, on request, be entitled to further leave (to be known as "additional adoptive leave") from the employee’s employment.
++
++- (*b*) The additional adoptive leave F28[or, where applicable, any period of transferred paternity leave] shall commence immediately after the adoptive leave and be for a maximum period of 8 weeks.
+ 
+ - (*c*) The maximum period may be extended by order made by the Minister.]
+ 
+-- (2) Entitlement to additional adoptive leave, in a situation other than one to which *subsection (5)* applies, shall be subject to F25[a qualifying adopter] having caused F25[his or her] employer to be notified in writing of F25[his or her] intention to take such leave.
+-
+-- (3) Notification under *subsection (2)* shall be given either at the same time as the relevant notification under *section 7 (1) (a)* or *(2) (a)* or not later than 4 weeks before the date which would have been the expected date of F25[his or her] return to work if the F25[the qualifying adopter] had not taken the F28[additional adoptive leave or, where the F25[the qualifying adopter] takes transferred paternity leave, the date on which the additional adoptive leave is, under *subsection (1)(b)*, to commence.]
+-
+-- (4) A notification under *subsection (2)* may be revoked by a further notification in writing by or on behalf of F25[the qualifying adopter] to F25[his or her] employer not later than 4 weeks before the date which would have been the expected date of F25[his or her] return to work if F25[the qualifying adopter] had not taken the additional adoptive leave.
+-
+-- (5) In the case of a foreign adoption, where F25[the qualifying adopter] requires a period of additional adoptive leave before the day of placement, for the purposes of familiarisation with the child who is to be adopted, some or all of the additional adoptive leave may be taken before the day of placement.
+-
+-- (6) Entitlement to additional adoptive leave under *subsection (5)* shall be subject to F25[the qualifying adopter]—
+-
+-    - (*a*) having caused F25[his or her] employer to be notified in writing not later than 4 weeks before the date on which F25[he or she] intends to take such leave, of the intended date of commencement of such additional adoptive leave, and
+-
+-    - F29[(*b*) having caused F25[his or her] employer to be supplied with a copy of an applicable instrument, prepared by or on behalf of the Central Authority of the state of the adoption, that is equivalent to a "declaration of eligibility and suitability" (within the meaning of section 3 (1) of the Adoption Act 2010).]
+-
+-- (7) A notification under *subsection (6) (a)* may be revoked by a further notification in writing by or on behalf of F25[the qualifying adopter] to F25[his or her] employer.
++- (2) Entitlement to additional adoptive leave, in a situation other than one to which *subsection (5)* applies, shall be subject to F26[a qualifying adopter] having caused F26[his or her] employer to be notified in writing of F26[his or her] intention to take such leave.
++
++- (3) Notification under *subsection (2)* shall be given either at the same time as the relevant notification under *[section 7](#7-notification-of-employer) (1) (a)* or *(2) (a)* or not later than 4 weeks before the date which would have been the expected date of F26[his or her] return to work if the F26[the qualifying adopter] had not taken the F29[additional adoptive leave or, where the F26[the qualifying adopter] takes transferred paternity leave, the date on which the additional adoptive leave is, under *subsection (1)(b)*, to commence.]
++
++- (4) A notification under *subsection (2)* may be revoked by a further notification in writing by or on behalf of F26[the qualifying adopter] to F26[his or her] employer not later than 4 weeks before the date which would have been the expected date of F26[his or her] return to work if F26[the qualifying adopter] had not taken the additional adoptive leave.
++
++- (5) In the case of a foreign adoption, where F26[the qualifying adopter] requires a period of additional adoptive leave before the day of placement, for the purposes of familiarisation with the child who is to be adopted, some or all of the additional adoptive leave may be taken before the day of placement.
++
++- (6) Entitlement to additional adoptive leave under *subsection (5)* shall be subject to F26[the qualifying adopter]—
++
++    - (*a*) having caused F26[his or her] employer to be notified in writing not later than 4 weeks before the date on which F26[he or she] intends to take such leave, of the intended date of commencement of such additional adoptive leave, and
++
++    - F30[(*b*) having caused F26[his or her] employer to be supplied with a copy of an applicable instrument, prepared by or on behalf of the Central Authority of the state of the adoption, that is equivalent to a "declaration of eligibility and suitability" (within the meaning of [section 3](#3-orders-and-regulations) (1) of the Adoption Act 2010).]
++
++- (7) A notification under *subsection (6) (a)* may be revoked by a further notification in writing by or on behalf of F26[the qualifying adopter] to F26[his or her] employer.
+ 
+ - (8) A period of additional adoptive leave under *subsection (5)* shall expire immediately before the day of placement.
+ 
+ ###### 9. **Entitlement of adopting father to adoptive leave in certain circumstances.**
+ 
+-**9.**—F30[(1) (*a*) Where F31[a qualifying adopter] dies, F31[the surviving parent] shall be entitled to leave (to be known as "adoptive leave") from F31[his or her] employment.
++**9.**—F31[(1) (*a*) Where F32[a qualifying adopter] dies, F32[the surviving parent] shall be entitled to leave (to be known as "adoptive leave") from F32[his or her] employment.
+ 
+ - (*b*) The adoptive leave shall be for a period of—
+ 
+-    - (i) in case F31[the qualifying adopter] dies on or after the day of placement, 16 weeks less the period between the date of placement and the date of F31[his or her] death, or
++    - (i) in case F32[the qualifying adopter] dies on or after the day of placement, 16 weeks less the period between the date of placement and the date of F32[his or her] death, or
+ 
+     - (ii) in any other case, 16 weeks.
+ 
+ - (*c*) The period may be extended by order made by the Minister with the consent of the Minister for Social and Family Affairs and the Minister for Finance.]
+ 
+-- (2) Entitlement to a period of leave under *subsection (1)* shall be subject to F31[the surviving parent]—
+-
+-    - (*a*) (i) having, as soon as is reasonably practicable before the commencement of the leave, caused F31[his or her] employer to be notified in writing of F31[his or her] intention to take such leave, or
+-
+-        - (ii) in a case where F31[the qualifying adopter] died after the day of placement, causing F31[his or her] employer to be notified in writing of F31[his or her] intention to take such leave no later than the day on which F31[he or she] commences the leave,
++- (2) Entitlement to a period of leave under *subsection (1)* shall be subject to F32[the surviving parent]—
++
++    - (*a*) (i) having, as soon as is reasonably practicable before the commencement of the leave, caused F32[his or her] employer to be notified in writing of F32[his or her] intention to take such leave, or
++
++        - (ii) in a case where F32[the qualifying adopter] died after the day of placement, causing F32[his or her] employer to be notified in writing of F32[his or her] intention to take such leave no later than the day on which F32[he or she] commences the leave,
+ 
+           and
+ 
+-    - (*b*) having, as soon as is reasonably practicable, caused F31[his or her] employer to be notified in writing of the day or expected day of placement, as may be appropriate, and
+-
+-    - (*c*) (i) in the case of an adoption other than a foreign adoption, causing F31[his or her] employer to be supplied with the certificate of placement as soon as is reasonably practicable but not later than 4 weeks after the day of placement or 4 weeks after the commencement of the leave whichever is the later, or
++    - (*b*) having, as soon as is reasonably practicable, caused F32[his or her] employer to be notified in writing of the day or expected day of placement, as may be appropriate, and
++
++    - (*c*) (i) in the case of an adoption other than a foreign adoption, causing F32[his or her] employer to be supplied with the certificate of placement as soon as is reasonably practicable but not later than 4 weeks after the day of placement or 4 weeks after the commencement of the leave whichever is the later, or
+ 
+         - (ii) in the case of a foreign adoption,
+ 
+-            - F32[(I) causing F31[his or her] employer to be supplied with a copy of an applicable instrument, prepared by or on behalf of the Central Authority of the state of the adoption, that is equivalent to a "declaration of eligibility and suitability" (within the meaning of section 3 (1) of the Adoption Act 2010) as soon as reasonably practicable but not later than 4 weeks after the commencement of the leave, and]
+-
+-            - (II) causing F31[his or her] employer to be supplied with particulars in writing of placement as soon as is reasonably practicable,
++            - F33[(I) causing F32[his or her] employer to be supplied with a copy of an applicable instrument, prepared by or on behalf of the Central Authority of the state of the adoption, that is equivalent to a "declaration of eligibility and suitability" (within the meaning of [section 3](#3-orders-and-regulations) (1) of the Adoption Act 2010) as soon as reasonably practicable but not later than 4 weeks after the commencement of the leave, and]
++
++            - (II) causing F32[his or her] employer to be supplied with particulars in writing of placement as soon as is reasonably practicable,
+ 
+               and
+ 
+-    - (*d*) causing, if requested, F31[his or her] employer to be supplied with a copy of the death certificate made in respect of the deceased F31[qualifying adopter] as soon as is reasonably practicable.
+-
+-- F33[(3) The period of adoptive leave referred to in *subsection (1)* shall commence on the latest of the following:
+-
+-    - (*a*) within 7 days of the death of F31[the qualifying adopter],
+-
+-    - (*b*) the F34[day of placement,]
+-
+-    - (*c*) where, on the date of the death of F31[the qualifying adopter], F31[the surviving parent] is on paternity leave, immediately after the end of F34[the paternity leave, or**]]**
+-
+-    - F35[(*d*) where, on the date of the death of F31[the qualifying adopter], the adopting father is on parent’s leave, immediately after the end of the parent’s leave.]
+-
+-- (4) A notification under this section may be revoked by a further notification in writing by or on behalf of F31[the surviving parent] to F31[his or her] employer.
+-
+-- (5) Where the day of placement is postponed, commencement of the period of adoptive leave shall also be postponed subject to F31[the surviving parent] causing F31[his or her] employer to be notified of the expected new day of placement as soon as is reasonably practicable.
++    - (*d*) causing, if requested, F32[his or her] employer to be supplied with a copy of the death certificate made in respect of the deceased F32[qualifying adopter] as soon as is reasonably practicable.
++
++- F34[(3) The period of adoptive leave referred to in *subsection (1)* shall commence on the latest of the following:
++
++    - (*a*) within 7 days of the death of F32[the qualifying adopter],
++
++    - (*b*) the F35[day of placement,]
++
++    - (*c*) where, on the date of the death of F32[the qualifying adopter], F32[the surviving parent] is on paternity leave, immediately after the end of F35[the paternity leave, or]]
++
++    - F36[(*d*) where, on the date of the death of F32[the qualifying adopter], the F37[surviving parent] is on parent’s leave, immediately after the end of the parent’s leave.]
++
++- (4) A notification under this section may be revoked by a further notification in writing by or on behalf of F32[the surviving parent] to F32[his or her] employer.
++
++- (5) Where the day of placement is postponed, commencement of the period of adoptive leave shall also be postponed subject to F32[the surviving parent] causing F32[his or her] employer to be notified of the expected new day of placement as soon as is reasonably practicable.
+ 
+ ###### 10. **Entitlement of adopting father to additional adoptive leave in certain circumstances.**
+ 
+-**10.**—F36[(1)(*a*) An employed F37[surviving parent] who is entitled to, or is on, adoptive leave on the death of F37[the qualifying adopter] shall, on request, be entitled to further leave (to be known as "additional adoptive leave") from F37[his or her] employment.
++**10.**—F38[(1)(*a*) An employed F39[surviving parent] who is entitled to, or is on, adoptive leave on the death of F39[the qualifying adopter] shall, on request, be entitled to further leave (to be known as "additional adoptive leave") from F39[his or her] employment.
+ 
+ - (*b*) The additional adoptive leave shall be for a period of—
+ 
+-    - (i) in case F37[the qualifying adopter] dies on or after the expiration of 16 weeks from the day of placement, 8 weeks less the period between the date of that expiration and the date of F37[his or her] death, or
++    - (i) in case F39[the qualifying adopter] dies on or after the expiration of 16 weeks from the day of placement, 8 weeks less the period between the date of that expiration and the date of F39[his or her] death, or
+ 
+     - (ii) in any other case, 8 weeks.
+ 
+ - (*c*) The period of additional adoptive leave may be extended by order made by the Minister.]
+ 
+-- (2) Entitlement to a period of leave under *subsection (1)* shall be subject to F37[a surviving parent] complying with *section 9 (2)* as adapted by *subsection (3)*.
+-
+-- (3) For the purposes of this section, references in *section 9 (2)* to adoptive leave shall be construed as including references to additional adoptive leave and references therein to *subsection (1)* of that section shall be construed as including references to *subsection (1)* of this section.
+-
+-- (4) Where F37[a surviving parent] has already complied with the provisions of *section 9 (2) (b), (c)* and *(d)*, it shall not be necessary for F37[him or her] to comply with those provisions as adapted by *subsection (3)* in order to satisfy the requirements of *subsection (2)*.
+-
+-- F38[(5) The period of additional adoptive leave referred to in *subsection (1)* shall commence—
+-
+-    - (*a*) within 7 days of the death of F37[the qualifying adopter],
+-
+-    - (*b*) where, on the date of the death of F37[the qualifying adopter], F37[the surviving parent] is on paternity leave, immediately after the end of the paternity leave, or
+-
+-    - (*c*) where F37[the surviving parent] was on adoptive leave, on the day immediately following the end of such leave.]
+-
+-- (6) A notification under this section may be revoked by a further notification in writing by or on behalf of F37[the surviving parent] to F37[his or her] employer.
++- (2) Entitlement to a period of leave under *subsection (1)* shall be subject to F39[a surviving parent] complying with *[section 9](#9-entitlement-of-adopting-father-to-adoptive-leave-in-certain-circumstances) (2)* as adapted by *subsection (3)*.
++
++- (3) For the purposes of this section, references in *[section 9](#9-entitlement-of-adopting-father-to-adoptive-leave-in-certain-circumstances) (2)* to adoptive leave shall be construed as including references to additional adoptive leave and references therein to *subsection (1)* of that section shall be construed as including references to *subsection (1)* of this section.
++
++- (4) Where F39[a surviving parent] has already complied with the provisions of *[section 9](#9-entitlement-of-adopting-father-to-adoptive-leave-in-certain-circumstances) (2) (b), (c)* and *(d)*, it shall not be necessary for F39[him or her] to comply with those provisions as adapted by *subsection (3)* in order to satisfy the requirements of *subsection (2)*.
++
++- F40[(5) The period of additional adoptive leave referred to in *subsection (1)* shall commence—
++
++    - (*a*) within 7 days of the death of F39[the qualifying adopter],
++
++    - (*b*) where, on the date of the death of F39[the qualifying adopter], F39[the surviving parent] is on paternity leave, immediately after the end of the paternity leave, or
++
++    - (*c*) where F39[the surviving parent] was on adoptive leave, on the day immediately following the end of such leave.]
++
++- (6) A notification under this section may be revoked by a further notification in writing by or on behalf of F39[the surviving parent] to F39[his or her] employer.
+ 
+ ###### 11. **Entitlement of adopting father to additional adoptive leave before day of placement in certain circumstances.**
+ 
+-**11.**—(1) In the case of a foreign adoption, where F39[the qualifying adopter] dies and F39[the surviving parent] requires a period of additional adoptive leave before the day of placement, for the purposes of familiarisation with the child who is to be adopted, some or all of the additional adoptive leave under *section 10* may be taken immediately before the day of placement.
+-
+-- (2) Entitlement to a period of leave under *subsection (1)* shall be subject to F39[the surviving parent]—
+-
+-    - (*a*) having, as soon as is reasonably practicable, caused F39[his or her] employer to be notified in writing of F39[his or her] intention to take such additional adoptive leave before the day of placement, and
+-
+-    - F40[(*b*) causing F39[his or her] employer to be supplied with a copy of an applicable instrument, prepared by or on behalf of the Central Authority of the state of the adoption, that is equivalent to a "declaration of eligibility and suitability" (within the meaning of section 3 (1) of the Adoption Act 2010) as soon as reasonably practicable but not later than 4 weeks after the commencement of the leave, and]
+-
+-    - (*c*) causing, if requested, F39[his or her] employer to be supplied with a copy of the death certificate made in respect of the deceased F39[qualifying adopter] as soon as is reasonably practicable.
+-
+-- (3) The period of additional adoptive leave referred to in *subsection (1)* shall commence as soon as is reasonably practicable after the death of F39[the qualifying adopter].
+-
+-- (4) A notification under this section may be revoked by a further notification in writing by or on behalf of F39[the surviving parent] to F39[his or her] employer.
+-
+-- (5) Where the expected day of placement is postponed, commencement of the period of additional adoptive leave under this section shall also be postponed subject to F39[the surviving parent] causing F39[his or her] employer to be notified of the expected new day of placement as soon as is reasonably practicable.
+-
+-###### 11A. **F41[Time off to attend certain pre-adoption classes and meetings.**
++**11.**—(1) In the case of a foreign adoption, where F41[the qualifying adopter] dies and F41[the surviving parent] requires a period of additional adoptive leave before the day of placement, for the purposes of familiarisation with the child who is to be adopted, some or all of the additional adoptive leave under *[section 10](#10-entitlement-of-adopting-father-to-additional-adoptive-leave-in-certain-circumstances)* may be taken immediately before the day of placement.
++
++- (2) Entitlement to a period of leave under *subsection (1)* shall be subject to F41[the surviving parent]—
++
++    - (*a*) having, as soon as is reasonably practicable, caused F41[his or her] employer to be notified in writing of F41[his or her] intention to take such additional adoptive leave before the day of placement, and
++
++    - F42[(*b*) causing F41[his or her] employer to be supplied with a copy of an applicable instrument, prepared by or on behalf of the Central Authority of the state of the adoption, that is equivalent to a "declaration of eligibility and suitability" (within the meaning of [section 3](#3-orders-and-regulations) (1) of the Adoption Act 2010) as soon as reasonably practicable but not later than 4 weeks after the commencement of the leave, and]
++
++    - (*c*) causing, if requested, F41[his or her] employer to be supplied with a copy of the death certificate made in respect of the deceased F41[qualifying adopter] as soon as is reasonably practicable.
++
++- (3) The period of additional adoptive leave referred to in *subsection (1)* shall commence as soon as is reasonably practicable after the death of F41[the qualifying adopter].
++
++- (4) A notification under this section may be revoked by a further notification in writing by or on behalf of F41[the surviving parent] to F41[his or her] employer.
++
++- (5) Where the expected day of placement is postponed, commencement of the period of additional adoptive leave under this section shall also be postponed subject to F41[the surviving parent] causing F41[his or her] employer to be notified of the expected new day of placement as soon as is reasonably practicable.
++
++###### 11A. **F43[Time off to attend certain pre-adoption classes and meetings.**
+ 
+ **11A.**—(1) Subject to *subsections (2)* and *(3)*, an employee shall be entitled to time off from work, without loss of pay, to attend any pre-adoption classes and meetings which the employee is obliged to attend.
+ 
+@@ -322,7 +322,7 @@
+ 
+     - (*a*) to a member of the Defence Forces who is—
+ 
+-        - (i) on active service within the meaning of section 5 of the Defence Act 1954 or deemed to be on active service within the meaning of section 4(1) of the Defence (Amendment)(No. 2) Act 1960,
++        - (i) on active service within the meaning of [section 5 of the Defence Act 1954](http://www.irishstatutebook.ie/eli/1954/act/18/section/5/enacted/en/html) or deemed to be on active service within the meaning of section 4(1) of the Defence (Amendment)(No. 2) Act 1960,
+ 
+         - (ii) engaged in operational duties at sea,
+ 
+@@ -351,7 +351,7 @@
+ 
+ - (4) References in this section to pre-adoption classes and meetings are references to such classes and meetings held within the State.]
+ 
+-###### 11B. **F42[Termination of additional adoptive leave on sickness of adopting parent.**
++###### 11B. **F44[Termination of additional adoptive leave on sickness of adopting parent.**
+ 
+ **11B.**—(1) An adopting parent ("the employee")—
+ 
+@@ -375,7 +375,7 @@
+ 
+     - (*b*) the employee shall cease to be entitled to any leave not by then taken.]
+ 
+-###### 11C. **F43[Postponement of leave on hospitalisation of child.**
++###### 11C. **F45[Postponement of leave on hospitalisation of child.**
+ 
+ **11C.**—(1) If—
+ 
+@@ -418,7 +418,7 @@
+ 
+ - (7) The employer may require the employee to supply evidence of the child’s hospitalisation and discharge from hospital.]
+ 
+-###### 11D. **F44[Absence from work owing to sickness while leave postponed.**
++###### 11D. **F46[Absence from work owing to sickness while leave postponed.**
+ 
+ **11D.**—(1) Where—
+ 
+@@ -436,13 +436,13 @@
+ 
+ ###### 12. **Placements of less than fourteen weeks duration.**
+ 
+-**12.**—F45[(1) Where the placement of a child with an adopting parent terminates before the expiration of the period of leave from the employment to which the adopting parent is entitled under this Part (other than as a result of the death of the child), the adopting parent shall notify the employer in writing (or cause the employer to be so notified) of the date of termination as soon as reasonably practicable but not later than 7 days after that date.]
+-
+-- (2) On receipt by F46[his or her] employer of a notification under *subsection (1)*, the adopting parent shall be required to return to work on such date as is convenient to F46[his or her] employer but not later than the date on which the notified period of adoptive leave or, as the case may be, the notified period of additional adoptive leave expires.
+-
+-- (3) In the case of a foreign adoption, where an adopting parent takes additional adoptive leave before the day of placement and no placement takes place, F46[he or she] shall return to work on the day on which the notified period of such leave expires, at the latest, and shall cause F46[his or her] employer to be notified of the intended date of F46[his or her] return to work as soon as is reasonably practicable.
+-
+-- (4) In a case to which *subsection (2)* relates an employer shall give the adopting parent one week’s notice of the day on which F46[he or she] is required to return to work.
++**12.**—F47[(1) Where the placement of a child with an adopting parent terminates before the expiration of the period of leave from the employment to which the adopting parent is entitled under this Part (other than as a result of the death of the child), the adopting parent shall notify the employer in writing (or cause the employer to be so notified) of the date of termination as soon as reasonably practicable but not later than 7 days after that date.]
++
++- (2) On receipt by F48[his or her] employer of a notification under *subsection (1)*, the adopting parent shall be required to return to work on such date as is convenient to F48[his or her] employer but not later than the date on which the notified period of adoptive leave or, as the case may be, the notified period of additional adoptive leave expires.
++
++- (3) In the case of a foreign adoption, where an adopting parent takes additional adoptive leave before the day of placement and no placement takes place, F48[he or she] shall return to work on the day on which the notified period of such leave expires, at the latest, and shall cause F48[his or her] employer to be notified of the intended date of F48[his or her] return to work as soon as is reasonably practicable.
++
++- (4) In a case to which *subsection (2)* relates an employer shall give the adopting parent one week’s notice of the day on which F48[he or she] is required to return to work.
+ 
+ - (5) Where, in the opinion of a rights commissioner or the Tribunal, there are reasonable grounds for an adopting parent’s failure to give a notice under this section or for an adopting parent giving it otherwise than within the time limits specified thereunder, the rights commissioner or Tribunal, as the case may be, shall extend the time for service of the said notice.
+ 
+@@ -450,13 +450,13 @@
+ 
+ ###### 13. **Certificate of placement to be issued.**
+ 
+-**13.**—(1) An adopting parent shall, if F47[he or she] so requests, be issued with a certificate (“the certificate of placement”) by—
++**13.**—(1) An adopting parent shall, if F49[he or she] so requests, be issued with a certificate (“the certificate of placement”) by—
+ 
+ - (*a*) the health board which arranges the placing of the child with the adopting parent, or
+ 
+-- (*b*) the F48[accredited body] which arranges the placing of the child with the adopting parent.
+-
+-- (2) The certificate of placement referred to in *subsection (1)* shall be issued, no later than 7 days from the date of receipt of the request, by the health board or F48[accredited body], as may be appropriate.
++- (*b*) the F50[accredited body] which arranges the placing of the child with the adopting parent.
++
++- (2) The certificate of placement referred to in *subsection (1)* shall be issued, no later than 7 days from the date of receipt of the request, by the health board or F50[accredited body], as may be appropriate.
+ 
+ - (3) The certificate of placement referred to in *subsection (1)* shall state the following—
+ 
+@@ -472,11 +472,11 @@
+ 
+ - (4) The certificate of placement when being issued in accordance with *subsection (1) (a)* may be issued on behalf of the health board by its chief executive officer.
+ 
+-- (5) In *subsection (4)* “chief executive officer” includes a person acting as deputy chief executive officer in accordance with section 13 of the Health Act, 1970.
+-
+-- (6) Where the placing of the child with the adopting parent or parents was arranged otherwise than by a health board or F48[accredited body] and an application for an adoption order has been received by F48[the Authority] from an adopting parent or parents, F48[the Authority] shall, on receipt of a request from an adopting parent for a certificate (“the certificate of placement”), issue the adopting parent with a certificate of placement.
+-
+-- (7) The certificate of placement referred to in *subsection (6)* shall be issued, no later than 7 days from the date of receipt of the request, by F48[the Authority].
++- (5) In *subsection (4)* “chief executive officer” includes a person acting as deputy chief executive officer in accordance with [section 13](http://www.irishstatutebook.ie/eli/1970/act/1/section/13/enacted/en/html) of the [Health Act, 1970](http://www.irishstatutebook.ie/eli/1970/act/1/enacted/en/html).
++
++- (6) Where the placing of the child with the adopting parent or parents was arranged otherwise than by a health board or F50[accredited body] and an application for an adoption order has been received by F50[the Authority] from an adopting parent or parents, F50[the Authority] shall, on receipt of a request from an adopting parent for a certificate (“the certificate of placement”), issue the adopting parent with a certificate of placement.
++
++- (7) The certificate of placement referred to in *subsection (6)* shall be issued, no later than 7 days from the date of receipt of the request, by F50[the Authority].
+ 
+ - (8) The certificate of placement referred to in *subsection (6)* shall state the following—
+ 
+@@ -490,15 +490,15 @@
+ 
+     - (*e*) the name and address of the adopting parent or parents,
+ 
+-and shall be signed by an officer of F48[the Authority] authorised to issue such a certificate in that behalf.
++and shall be signed by an officer of F50[the Authority] authorised to issue such a certificate in that behalf.
+ 
+ ###### 14. **Evidence as to certificate of placement.**
+ 
+-**14.**—The certificate of placement or a copy thereof certified by the body which issued the certificate of placement to be a true copy shall, unless the contrary is proved, be evidence of the matters referred to therein in any proceedings arising out of or relating to the exercise or attempted exercise by an adopting parent of F49[his or her] rights under this Act.
++**14.**—The certificate of placement or a copy thereof certified by the body which issued the certificate of placement to be a true copy shall, unless the contrary is proved, be evidence of the matters referred to therein in any proceedings arising out of or relating to the exercise or attempted exercise by an adopting parent of F51[his or her] rights under this Act.
+ 
+ ## PART III Provisions Relating to Employment Contracts
+ 
+-###### 15. **F50[Preservation or suspension of certain rights, etc., while on adoptive leave.**
++###### 15. **F52[Preservation or suspension of certain rights, etc., while on adoptive leave.**
+ 
+ **15.**—(1) While absent from work on adoptive leave, an employee—
+ 
+@@ -534,7 +534,7 @@
+ 
+ - (8) The Minister may by regulations prescribe a period or periods of training in relation to which *subsection (6)* shall not apply.]
+ 
+-###### 16. **F51[Voidance of certain purported terminations of employment, etc.**
++###### 16. **F53[Voidance of certain purported terminations of employment, etc.**
+ 
+ **16.**—Each of the following shall be void:
+ 
+@@ -552,7 +552,7 @@
+ 
+ and expiring after the absence.]
+ 
+-###### 17. **F52[Extension of certain notices of termination of employment and certain suspensions.**
++###### 17. **F54[Extension of certain notices of termination of employment and certain suspensions.**
+ 
+ **17.**—(1) This section applies to—
+ 
+@@ -566,7 +566,7 @@
+ 
+ - (3) References in *subsection (1)* to a period of leave under this Act include references to a period of time off from work while attending pre-adoption classes or meetings in accordance with *section 11A*.]
+ 
+-###### 18. **F53[General right to return to work after adoptive leave or additional adoptive leave.**
++###### 18. **F55[General right to return to work after adoptive leave or additional adoptive leave.**
+ 
+ **18.**—(1) An adopting parent ("the employee") who is absent from work while on adoptive leave or additional adoptive leave shall be entitled to return to work—
+ 
+@@ -592,13 +592,13 @@
+ 
+ ###### 19. **Right to suitable alternative employment in certain circumstances on return to work.**
+ 
+-**19.**—(1) Where an adopting parent is entitled to return to work under *section 18* but it is not reasonably practicable for F54[his or her] employer or the successor to permit her to return to work in accordance with that section, she shall be entitled to be offered by F54[his or her] employer, the successor or an associated employer suitable alternative employment in accordance with a new contract of employment.
++**19.**—(1) Where an adopting parent is entitled to return to work under *[section 18](#18-f55general-right-to-return-to-work-after-adoptive-leave-or-additional-adoptive-leave)* but it is not reasonably practicable for F56[his or her] employer or the successor to permit F57[him or] her to return to work in accordance with that section, F57[he or] she shall be entitled to be offered by F56[his or her] employer, the successor or an associated employer suitable alternative employment in accordance with a new contract of employment.
+ 
+ - (2) The following provisions shall apply to a new contract of employment under this section—
+ 
+-    - (*a*) the work required to be done under it shall be of a kind which is suitable in relation to the employee concerned and appropriate for F54[him or her] to do, and
+-
+-    - F55[(*b*) the terms or conditions of the contract—
++    - (*a*) the work required to be done under it shall be of a kind which is suitable in relation to the employee concerned and appropriate for F56[him or her] to do, and
++
++    - F58[(*b*) the terms or conditions of the contract—
+ 
+         - (i) relating to the place where the work under it is required to be done, the capacity in which the employee concerned is to be employed and any other terms or conditions of employment are not less favourable to the employee than those of the employee’s contract of employment immediately before the absence from work on adoptive leave or additional adoptive leave, and
+ 
+@@ -608,7 +608,7 @@
+ 
+ ###### 20. **Notification of intention to return to work.**
+ 
+-**20.**—F56[(1) An employee who is entitled to, or is on, adoptive leave or additional adoptive leave shall cause the employer (or, if aware of a change of ownership of the undertaking concerned, the successor) to be notified in writing of the employee’s intention to return to work and of the date on which the employee expects to do so—
++**20.**—F59[(1) An employee who is entitled to, or is on, adoptive leave or additional adoptive leave shall cause the employer (or, if aware of a change of ownership of the undertaking concerned, the successor) to be notified in writing of the employee’s intention to return to work and of the date on which the employee expects to do so—
+ 
+ - (*a*) where the leave is for a period of 4 weeks or less, at the same time as the employee notifies the employer of intention to take the leave,
+ 
+@@ -630,11 +630,11 @@
+ 
+ - (3) In the absence of reasonable grounds, failure to give notice under *subsection (1)* or the giving of it otherwise than in the time limits specified thereunder are matters that may be taken into account by a rights commissioner, the Tribunal or Circuit Court in determining the adopting parent’s rights under the Act of 1977, this Act or any other relevant enactment so far as the remedies of reinstatement, re-engagement or compensation are concerned.
+ 
+-- (4) F57[...]
++- (4) F60[…]
+ 
+ ###### 21. **Postponement of return to work.**
+ 
+-**21.**—Where, because of an interruption or cessation of work at F58[his or her] place of employment, existing on the date specified in a notification given under *section 12 (3)* or *20* or on the date on which an adopting parent is required to return to work under *section 12 (2)*, as the case may be, it is unreasonable to expect an adopting parent to return to work on such date, F58[he or she] may return to work instead when work resumes at the place of employment after the interruption or cessation, or as soon as is reasonably practicable after such resumption.
++**21.**—Where, because of an interruption or cessation of work at F61[his or her] place of employment, existing on the date specified in a notification given under *[section 12](#12-placements-of-less-than-fourteen-weeks-duration) (3)* or *[20](#20-notification-of-intention-to-return-to-work)* or on the date on which an adopting parent is required to return to work under *[section 12](#12-placements-of-less-than-fourteen-weeks-duration) (2)*, as the case may be, it is unreasonable to expect an adopting parent to return to work on such date, F61[he or she] may return to work instead when work resumes at the place of employment after the interruption or cessation, or as soon as is reasonably practicable after such resumption.
+ 
+ ## PART IV Amendment or Application of Other Enactments
+ 
+@@ -644,13 +644,13 @@
+ 
+ **22.**—Section 1 of the Act of 1977 is hereby amended by the insertion after “In this Act—” and before “contract of employment” of the following:
+ 
+-> “‘adopting parent’ means an employee who is an employed adopting mother, an adopting father or sole male adopter within the meaning of *section 2 (1)* of the *Adoptive Leave Act, 1995*;”.
++> “‘adopting parent’ means an employee who is an employed adopting mother, an adopting father or sole male adopter within the meaning of *[section 2](#2-interpretation) (1)* of the *Adoptive Leave Act, 1995*;”.
+ 
+ ###### 23. **Amendment of section 2 (2) of Act of 1977.**
+ 
+-**23.**—Section 2 (2) of the Act of 1977 (which specifies dismissals in relation to which that Act does not apply) is hereby amended by the insertion after paragraph (*c*) (inserted by the Maternity Protection Act, 1994) of the following:
+-
+-- F59[(*d*) dismissal where—
++**23.**—Section 2 (2) of the Act of 1977 (which specifies dismissals in relation to which that Act does not apply) is hereby amended by the insertion after paragraph (*c*) (inserted by the [Maternity Protection Act, 1994](http://www.irishstatutebook.ie/eli/1994/act/34/enacted/en/html)) of the following:
++
++- F62[(*d*) dismissal where—
+ 
+ - (i) the employee’s employer at the commencement of the employment informs the employee in writing that the employment will terminate on the return to work with that employer of an adopting parent who is absent from work in accordance with the Adoptive Leave Acts 1995 and 2005 during a period of adoptive leave or additional adoptive leave or a period of time off from work while attending certain pre-adoption classes or meetings, and
+ 
+@@ -658,21 +658,21 @@
+ 
+ ###### 24. **Amendment of section 6 (2) of Act of 1977.**
+ 
+-**24.**—Section 6 (2) of the Act of 1977 (which specifies the matters which cause a dismissal resulting from any of those matters to be an unfair dismissal) is hereby amended by the insertion after paragraph (*g*) (inserted by the Maternity Protection Act, 1994) of the following paragraph:
+-
+-- F60[(*h*) the exercise or contemplated exercise by an adoptive parent of the parent’s right under the Adoptive Leave Acts 1995 and 2005 to adoptive leave or additional adoptive leave or a period of time off to attend certain pre-adoption classes or meetings.]
++**24.**—Section 6 (2) of the Act of 1977 (which specifies the matters which cause a dismissal resulting from any of those matters to be an unfair dismissal) is hereby amended by the insertion after paragraph (*g*) (inserted by the [Maternity Protection Act, 1994](http://www.irishstatutebook.ie/eli/1994/act/34/enacted/en/html)) of the following paragraph:
++
++- F63[(*h*) the exercise or contemplated exercise by an adoptive parent of the parent’s right under the Adoptive Leave Acts 1995 and 2005 to adoptive leave or additional adoptive leave or a period of time off to attend certain pre-adoption classes or meetings.]
+ 
+ ###### 25. **Amendment of section 6 of Act of 1977.**
+ 
+-**25.**—Section 6 of the Act of 1977 is hereby amended by the substitution of the following subsection for subsection (2A) (inserted by the Maternity Protection Act, 1994):
+-
+-> - “(2A) Sections 3 and 4 of this Act do not apply to a case falling within paragraph (*f*), (*g*) or (*h*) of subsection (2) of this section and, for the purposes of those paragraphs, ‘employee’ and ‘adopting parent’ include a person who would otherwise be excluded from this Act by paragraph (*a*), (*c*), (*f*) or (*g*) of section 2 (1) of this Act.”.
++**25.**—Section 6 of the Act of 1977 is hereby amended by the substitution of the following subsection for subsection (2A) (inserted by the [Maternity Protection Act, 1994](http://www.irishstatutebook.ie/eli/1994/act/34/enacted/en/html)):
++
++> - “(2A) [Sections 3](#3-orders-and-regulations) and [4](#4-voidance-or-modification-of-certain-provisions-in-agreements) of this Act do not apply to a case falling within paragraph (*f*), (*g*) or (*h*) of subsection (2) of this section and, for the purposes of those paragraphs, ‘employee’ and ‘adopting parent’ include a person who would otherwise be excluded from this Act by paragraph (*a*), (*c*), (*f*) or (*g*) of [section 2](#2-interpretation) (1) of this Act.”.
+ 
+ ###### 26. **Adopting parent not permitted to return to work.**
+ 
+-**26.**—(1) This section applies to an adopting parent within the meaning of section 1 of the Act of 1977 as amended by *section 22* who, having complied with *section 20*, is entitled to return to work but is not permitted to do so by F61[his or her] employer, the successor or an associated employer.
+-
+-- (2) For the purposes of the Act of 1977 an adopting parent shall be deemed to have been dismissed on the date specified in the relevant notification under *section 20 (1)*, and the dismissal shall be deemed to be an unfair dismissal unless, having regard to all the circumstances, there were substantial grounds justifying the dismissal.
++**26.**—(1) This section applies to an adopting parent within the meaning of section 1 of the Act of 1977 as amended by *[section 22](#22-amendment-of-section-1-of-act-of-1977)* who, having complied with *[section 20](#20-notification-of-intention-to-return-to-work)*, is entitled to return to work but is not permitted to do so by F64[his or her] employer, the successor or an associated employer.
++
++- (2) For the purposes of the Act of 1977 an adopting parent shall be deemed to have been dismissed on the date specified in the relevant notification under *[section 20](#20-notification-of-intention-to-return-to-work) (1)*, and the dismissal shall be deemed to be an unfair dismissal unless, having regard to all the circumstances, there were substantial grounds justifying the dismissal.
+ 
+ *Redundancy Payments Act, 1967*
+ 
+@@ -680,13 +680,13 @@
+ 
+ **27.**—Section 2 of the Act of 1967 is hereby amended by the insertion after the definition of “the Act of 1952” and before “business” of the following:
+ 
+-‘“adopting parent’ means an employee who is an employed adopting mother, an adopting father or sole male adopter within the meaning of *section 2 (1)* of the *Adoptive Leave Act, 1995*;”.
+-
+-###### 28. **F62[Amendment of Schedule 3 to Redundancy Payments Act 1967.**
+-
+-**28.**—Schedule 3 to the Redundancy Payments Act 1967 is amended—
+-
+-- (*a*) in paragraph 5 (absences from work which do not breach continuity of employment) (substituted by section 12(*a*) of the Redundancy Payments Act 2003), by substituting the following subparagraph for subparagraph (*b*):
++‘“adopting parent’ means an employee who is an employed adopting mother, an adopting father or sole male adopter within the meaning of *[section 2](#2-interpretation) (1)* of the *Adoptive Leave Act, 1995*;”.
++
++###### 28. **F65[Amendment of Schedule 3 to Redundancy Payments Act 1967.**
++
++**28.**—Schedule 3 to [the Redundancy Payments Act 1967](http://www.irishstatutebook.ie/eli/1967/act/21/enacted/en/html) is amended—
++
++- (*a*) in paragraph 5 (absences from work which do not breach continuity of employment) (substituted by section 12(*a*) of [the Redundancy Payments Act 2003](http://www.irishstatutebook.ie/eli/2003/act/14/enacted/en/html)), by substituting the following subparagraph for subparagraph (*b*):
+ 
+ ‘(*b*) a period during which, in accordance with the Adoptive Leave Acts 1995 and 2005, an adopting parent was absent from work while on adoptive leave or additional adoptive leave or while attending certain pre-adoption classes or meetings,’,
+ 
+@@ -698,17 +698,17 @@
+ 
+ ###### 29. **Adopting parent not permitted to return to work.**
+ 
+-**29.**—(1) This section applies to an adopting parent within the meaning of section 2 of the Act of 1967 as amended by *section 27* who, having complied with *section 20*, is entitled to return to work but is not permitted to do so by F63[his or her] employer, the successor or an associated employer.
+-
+-- (2) For the purposes of the Act of 1967, an adopting parent shall be deemed to have been dismissed by reason of redundancy, the date of dismissal being deemed to be the date specified in the relevant notification under *section 20 (1)*.
++**29.**—(1) This section applies to an adopting parent within the meaning of section 2 of the Act of 1967 as amended by *[section 27](#27-amendment-of-section-2-of-act-of-1967)* who, having complied with *[section 20](#20-notification-of-intention-to-return-to-work)*, is entitled to return to work but is not permitted to do so by F66[his or her] employer, the successor or an associated employer.
++
++- (2) For the purposes of the Act of 1967, an adopting parent shall be deemed to have been dismissed by reason of redundancy, the date of dismissal being deemed to be the date specified in the relevant notification under *[section 20](#20-notification-of-intention-to-return-to-work) (1)*.
+ 
+ *Minimum Notice and Terms of Employment Act, 1973*
+ 
+ ###### 30. **Adopting parent not permitted to return to work.**
+ 
+-**30.**—(1) This section applies to an adopting parent who, having complied with *section 20 (1)*, is entitled to return to work but is not permitted to do so by F64[his or her] employer, the successor or an associated employer and who is an employee to whom the Acts referred to in *subsection (2)* apply.
+-
+-- (2) For the purposes of the Minimum Notice and Terms of Employment Acts, 1973 to 1991, the contract of employment of an adopting parent to whom this section applies shall be deemed to have been terminated on the date specified in the relevant notification under *section 20 (1)*.
++**30.**—(1) This section applies to an adopting parent who, having complied with *[section 20](#20-notification-of-intention-to-return-to-work) (1)*, is entitled to return to work but is not permitted to do so by F67[his or her] employer, the successor or an associated employer and who is an employee to whom the Acts referred to in *subsection (2)* apply.
++
++- (2) For the purposes of the Minimum Notice and Terms of Employment Acts, 1973 to 1991, the contract of employment of an adopting parent to whom this section applies shall be deemed to have been terminated on the date specified in the relevant notification under *[section 20](#20-notification-of-intention-to-return-to-work) (1)*.
+ 
+ ## PART V Disputes Relating to Entitlement
+ 
+@@ -720,19 +720,19 @@
+ 
+ **32.**—(1) This Part does not apply to an adopting parent who is in employment as a member of the Defence Forces.
+ 
+-- F65[(2) This Part does not apply to—
++- F68[(2) This Part does not apply to—
+ 
+     - (*a*) a dispute in relation to a dismissal, including a dismissal within the meaning of the Act of 1977, or the termination of a contract of employment,
+ 
+     - (*b*) a claim under Part IV of the Act of 1967 as extended by *section 29*.]
+ 
+-(3)F66[...]
++(3)F69[…]
+ 
+ - (4) The Minister may make regulations for the purposes of this Part.
+ 
+-###### 33. **F67[Decision under section 41 or section 44 of Workplace Relations Act 2015.**
+-
+-**33.** (1) A decision of an adjudication officer under section 41 of the Workplace Relations Act 2015 in relation to a dispute between an adopting parent and the relevant employer relating to the adopting parent’s entitlements under this Act or any matter in connection with such entitlements may include—
++###### 33. **F70[Decision under section 41 or section 44 of Workplace Relations Act 2015.**
++
++**33.**— (1) A decision of an adjudication officer under section 41 of the Workplace Relations Act 2015 in relation to a dispute between an adopting parent and the relevant employer relating to the adopting parent’s entitlements under this Act or any matter in connection with such entitlements may include—
+ 
+ - (*a*) such directions to the parties to the complaint as the adjudication officer considers necessary or expedient for the resolution of the matter, and
+ 
+@@ -748,43 +748,43 @@
+ 
+ ###### 34. **Referral of disputes to rights commissioner.**
+ 
+-**34.** F68[...]
++**34.**— F71[…]
+ 
+ ###### 35. **Appeal from decision of rights commissioner.**
+ 
+-**35.**F69[...]
++**35.**—F72[…]
+ 
+ ###### 36. **Appeal to High Court on point of law.**
+ 
+-**36.**F70[...]
++**36.**—F73[…]
+ 
+ ###### 37. **Service of documents.**
+ 
+-**37.**F71[...]
++**37.**—F74[…]
+ 
+ ###### 38. **Provisions relating to winding up and bankruptcy.**
+ 
+-**38.**F72[...]
++**38.**—F75[…]
+ 
+ ###### 39. **Enforcement of decision of rights commissioner and determination of Tribunal.**
+ 
+-**39.**F73[...]
++**39.**—F76[…]
+ 
+ ###### 40. **Extension of Protection of Employees (Employers’ Insolvency) Act, 1984.**
+ 
+-**40.**F74[...]
++**40.**—F77[…]
+ 
+ ## PART VI Miscellaneous and Transitional Provisions
+ 
+ ###### 41. **Alternative notification procedure.**
+ 
+-**41.**—(1) Where an adopting parent commences employment within a period of 6 weeks before the day of placement F75[he or she] shall, as soon as is reasonably practicable but not later than the day on which F75[he or she] commences adoptive leave, cause F75[his or her] employer to be notified in writing of F75[his or her] intention to take adoptive leave, and where such notification is given, the provisions of *section 7 (1) (a), 7 (2) (a)* or *9 (2) (a) (i)*, as the case may be, shall not apply in respect of that period of leave.
+-
+-- (2) Where an adopting parent commences employment within a period of 6 weeks before the day of placement and wishes to take a period of additional adoptive leave before the day of placement under *section 8 (5)* or *section 11*, as the case may be, the adopting parent shall, as soon as is reasonably practicable, but no later than the day on which F75[he or she] commences such leave, cause F75[his or her] employer to be notified in writing of F75[his or her] intention to take additional adoptive leave before the day of placement, and when such notification is given the provisions of *section 8 (6) (a) or 11 (2) (a)*, as the case may be, shall not apply in respect of that period of leave.
+-
+-- (3) Where a child is to be placed with an adopting parent within the period of 6 weeks beginning on the commencement of this Act, the adopting parent shall, as soon as is reasonably practicable but not later than the day of placement, cause F75[his or her] employer to be notified in writing of F75[his or her] intention to take adoptive leave, and where such notification is given, the provisions of *section 7 (1) (a), 7 (2) (a) or 9 (2) (a) (i)*, as the case may be, shall not apply in respect of that period of leave.
+-
+-- (4) Where a child is to be placed with an adopting parent within the period of 6 weeks beginning on the commencement of this Act and the adopting parent wishes to take a period of additional adoptive leave before the day of placement under *section 8 (5)* or *section 11*, as the case may be, the adopting parent shall, as soon as is reasonably practicable, but no later than the day on which F75[he or she] commences such leave, cause F75[his or her] employer to be notified in writing of F75[his or her] intention to take additional adoptive leave before the day of placement, and when such notification is given the provisions of *section 8 (6) (a)* or *11 (2) (a)*, as the case may be, shall not apply in respect of that period of leave.
++**41.**—(1) Where an adopting parent commences employment within a period of 6 weeks before the day of placement F78[he or she] shall, as soon as is reasonably practicable but not later than the day on which F78[he or she] commences adoptive leave, cause F78[his or her] employer to be notified in writing of F78[his or her] intention to take adoptive leave, and where such notification is given, the provisions of *[section 7](#7-notification-of-employer) (1) (a), [7](#7-notification-of-employer) (2) (a)* or *[9](#9-entitlement-of-adopting-father-to-adoptive-leave-in-certain-circumstances) (2) (a) (i)*, as the case may be, shall not apply in respect of that period of leave.
++
++- (2) Where an adopting parent commences employment within a period of 6 weeks before the day of placement and wishes to take a period of additional adoptive leave before the day of placement under *[section 8](#8-entitlement-of-employed-adopting-mother-or-sole-male-adopter-to-additional-adoptive-leave) (5)* or *[section 11](#11-entitlement-of-adopting-father-to-additional-adoptive-leave-before-day-of-placement-in-certain-circumstances)*, as the case may be, the adopting parent shall, as soon as is reasonably practicable, but no later than the day on which F78[he or she] commences such leave, cause F78[his or her] employer to be notified in writing of F78[his or her] intention to take additional adoptive leave before the day of placement, and when such notification is given the provisions of *[section 8](#8-entitlement-of-employed-adopting-mother-or-sole-male-adopter-to-additional-adoptive-leave) (6) (a) or [11](#11-entitlement-of-adopting-father-to-additional-adoptive-leave-before-day-of-placement-in-certain-circumstances) (2) (a)*, as the case may be, shall not apply in respect of that period of leave.
++
++- (3) Where a child is to be placed with an adopting parent within the period of 6 weeks beginning on the commencement of this Act, the adopting parent shall, as soon as is reasonably practicable but not later than the day of placement, cause F78[his or her] employer to be notified in writing of F78[his or her] intention to take adoptive leave, and where such notification is given, the provisions of *[section 7](#7-notification-of-employer) (1) (a), [7](#7-notification-of-employer) (2) (a) or [9](#9-entitlement-of-adopting-father-to-adoptive-leave-in-certain-circumstances) (2) (a) (i)*, as the case may be, shall not apply in respect of that period of leave.
++
++- (4) Where a child is to be placed with an adopting parent within the period of 6 weeks beginning on the commencement of this Act and the adopting parent wishes to take a period of additional adoptive leave before the day of placement under *[section 8](#8-entitlement-of-employed-adopting-mother-or-sole-male-adopter-to-additional-adoptive-leave) (5)* or *[section 11](#11-entitlement-of-adopting-father-to-additional-adoptive-leave-before-day-of-placement-in-certain-circumstances)*, as the case may be, the adopting parent shall, as soon as is reasonably practicable, but no later than the day on which F78[he or she] commences such leave, cause F78[his or her] employer to be notified in writing of F78[his or her] intention to take additional adoptive leave before the day of placement, and when such notification is given the provisions of *[section 8](#8-entitlement-of-employed-adopting-mother-or-sole-male-adopter-to-additional-adoptive-leave) (6) (a)* or *[11](#11-entitlement-of-adopting-father-to-additional-adoptive-leave-before-day-of-placement-in-certain-circumstances) (2) (a)*, as the case may be, shall not apply in respect of that period of leave.
+ 
+ - (5) An employer, who receives a notification under this section within 2 weeks of the notified day of commencement of the leave, may require the adopting parent to delay commencement of the leave, in respect of which the notification was given, for up to 2 weeks from the day on which the notification was received.
+ 
+@@ -796,47 +796,47 @@
+ 
+ - (*b*) the adopting father shall, in circumstances where the adopting mother dies after the commencement of this Act, be entitled to leave for a period of 10 weeks less a period equivalent to the period beginning on the day of placement and ending on the date of the adopting mother’s death.
+ 
+-- (2) The adopting parent shall commence a period of leave referred to in *subsection (1) (a)* within the period of 7 days beginning on the date of commencement of this Act and shall, as soon as is reasonably practicable but not later than the day on which the leave is commenced, cause her employer to be notified in writing of her intention to take such leave.
++- (2) The adopting parent shall commence a period of leave referred to in *subsection (1) (a)* within the period of 7 days beginning on the date of commencement of this Act and shall, as soon as is reasonably practicable but not later than the day on which the leave is commenced, cause F79[his or] her employer to be notified in writing of F79[his or] her intention to take such leave.
+ 
+ - (3) The adopting father shall commence a period of leave referred to in *subsection (1) (b)* within the period of 7 days beginning on the date of the death of the adopting mother and shall, as soon as is reasonably practicable but not later than the day on which the leave is commenced, cause his employer to be notified in writing of his intention to take such leave.
+ 
+ - (4)
+-    - (*a*) In the case of an adoption other than a foreign adoption, entitlement to leave under *subsection (1) (a)* shall be subject to an adopting parent causing her employer to be supplied with the certificate of placement as soon as is reasonably practicable but not later than 4 weeks after the commencement of the leave.
++    - (*a*) In the case of an adoption other than a foreign adoption, entitlement to leave under *subsection (1) (a)* shall be subject to an adopting parent causing F79[his or] her employer to be supplied with the certificate of placement as soon as is reasonably practicable but not later than 4 weeks after the commencement of the leave.
+ 
+     - (*b*) In the case of a foreign adoption, entitlement to leave under *subsection (1) (a)* shall be subject to an adopting parent—
+ 
+-        - (i) causing her employer to be supplied with a copy of the declaration made pursuant to section 5 (1) (iii) (II) of the Adoption Act, 1991, before the commencement of the leave, and
+-
+-        - (ii) causing her employer to be supplied with particulars in writing of the placement as soon as reasonably practicable.
+-
+-- (5) *Paragraphs (b), (c) and (d)* of *section 9 (2)* shall apply in respect of an adopting father taking leave under *subsection (1) (b)*.
++        - (i) causing F79[his or] her employer to be supplied with a copy of the declaration made pursuant to [section 5](http://www.irishstatutebook.ie/eli/1991/act/14/section/5/enacted/en/html) (1) (iii) (II) of the [Adoption Act, 1991](http://www.irishstatutebook.ie/eli/1991/act/14/enacted/en/html), before the commencement of the leave, and
++
++        - (ii) causing F79[his or] her employer to be supplied with particulars in writing of the placement as soon as reasonably practicable.
++
++- (5) *Paragraphs (b), (c) and (d)* of *[section 9](#9-entitlement-of-adopting-father-to-adoptive-leave-in-certain-circumstances) (2)* shall apply in respect of an adopting father taking leave under *subsection (1) (b)*.
+ 
+ - (6) An employer who receives a notification under this section may require the adopting parent to delay commencement of the leave, in respect of which the notification was given, for up to 2 weeks from the notified day of commencement of the leave.
+ 
+ ###### 43. **Right to additional adoptive leave where child placed before commencement of Act.**
+ 
+-**43.**—(1) Where an adopting parent takes leave under *section 42* she shall be entitled, if she so requests, to additional adoptive leave for a period of 4 weeks.
+-
+-- (2) The adopting parent shall commence a period of leave referred to in *subsection (1)* immediately upon the expiration of the period of adoptive leave under *section 42* and shall cause her employer to be notified in writing of her intention to take such leave—
+-
+-    - (*a*) at the same time as the notification of her intention to take leave under *section 42 (2)* is given, or
+-
+-    - (*b*) not later than 4 weeks before the date on which she intends to take the leave,
++**43.**—(1) Where an adopting parent takes leave under *[section 42](#42-right-to-adoptive-leave-where-child-placed-before-commencement-of-act)* F80[he or] she shall be entitled, if F80[he or] she so requests, to additional adoptive leave for a period of 4 weeks.
++
++- (2) The adopting parent shall commence a period of leave referred to in *subsection (1)* immediately upon the expiration of the period of adoptive leave under *[section 42](#42-right-to-adoptive-leave-where-child-placed-before-commencement-of-act)* and shall cause F80[his or] her employer to be notified in writing of F80[his or] her intention to take such leave—
++
++    - (*a*) at the same time as the notification of F80[his or] her intention to take leave under *[section 42](#42-right-to-adoptive-leave-where-child-placed-before-commencement-of-act) (2)* is given, or
++
++    - (*b*) not later than 4 weeks before the date on which F80[he or] she intends to take the leave,
+ 
+ whichever is the later.
+ 
+ ###### 44. **Notification of intention to return to work in respect of leave taken under sections 42 and 43.**
+ 
+-**44.**—(1) An adopting parent who has been on adoptive leave under *section 42* or additional adoptive leave under *section 43* shall cause her employer (or, where she is aware of a change of ownership of the undertaking concerned, the successor) to be notified in writing of her intention to return to work and of the date on which she expects to return to work—
+-
+-- (*a*) at the same time that she causes her employer to be notified of her intention to take leave under either of those sections, or
+-
+-- (*b*) not later than 4 weeks before the date on which she expects to return to work,
++**44.**—(1) An adopting parent who has been on adoptive leave under *[section 42](#42-right-to-adoptive-leave-where-child-placed-before-commencement-of-act)* or additional adoptive leave under *[section 43](#43-right-to-additional-adoptive-leave-where-child-placed-before-commencement-of-act)* shall cause F81[his or] her employer (or, whereF81[he or] she is aware of a change of ownership of the undertaking concerned, the successor) to be notified in writing of F81[his or] her intention to return to work and of the date on which F81[he or] she expects to return to work—
++
++- (*a*) at the same time that F81[he or] she causes F81[his or] her employer to be notified of F81[his or] her intention to take leave under either of those sections, or
++
++- (*b*) not later than 4 weeks before the date on which F81[he or] she expects to return to work,
+ 
+ whichever is the later.
+ 
+-- (2) *Subsections (2)* and *(3)* of *section 20* shall apply to an adopting parent taking leave under *sections 42* and *43* and the references in those subsections to *subsection (1)* shall be construed as including a reference to *subsection (1)* of this section.
+-
+-###### 45. **F76[Revocation.**
+-
+-**45.**—The Adoptive Leave Act 1995 (Extension of Periods of Leave) Order 2001 (S.I. No. 30 of 2001), so far as unrevoked, and the Adoptive Leave Act 1995 (Extension of Periods of Leave) Order 2004 (S.I. No. 667 of 2004) are revoked.]
++- (2) *Subsections (2)* and *(3)* of *[section 20](#20-notification-of-intention-to-return-to-work)* shall apply to an adopting parent taking leave under *[sections 42](#42-right-to-adoptive-leave-where-child-placed-before-commencement-of-act)* and *[43](#43-right-to-additional-adoptive-leave-where-child-placed-before-commencement-of-act)* and the references in those subsections to *subsection (1)* shall be construed as including a reference to *subsection (1)* of this section.
++
++###### 45. **F82[Revocation.**
++
++**45.**—The Adoptive Leave Act 1995 (Extension of Periods of Leave) Order 2001 ([S.I. No. 30 of 2001](http://www.irishstatutebook.ie/eli/2001/act/30/made/en/print)), so far as unrevoked, and the Adoptive Leave Act 1995 (Extension of Periods of Leave) Order 2004 ([S.I. No. 667 of 2004](http://www.irishstatutebook.ie/eli/2004/act/667/made/en/print)) are revoked.]

@@ -54,6 +54,7 @@ METADATA_FIELDS = {
 }
 
 REFORM_FIELDS = {
+    "status": "persisted",
     "has_source_date": "persisted",
     "date": "persisted",
     "norm_id": "persisted",
@@ -90,6 +91,9 @@ def _norm() -> ParsedNorm:
         publication_date=date(1994, 1, 22),
         effective_date=date(1994, 1, 22),
         paragraphs=(Paragraph(css_class="parrafo", text="Texto."),),
+        text_state=TextState.POINT_IN_TIME,
+        source="https://example.test/revised/1994-01-22",
+        source_warning="The official snapshot omits a section listed in its contents.",
     )
     block = Block(id="texto", block_type="texto", title="Artigo 1.º", versions=(version,))
     reform = Reform(
@@ -98,6 +102,7 @@ def _norm() -> ParsedNorm:
         affected_blocks=("texto",),
         change_note="Alterada a redacção do artº 34º e aditado o art. 56º-A",
         has_source_date=False,
+        status=NormStatus.PARTIALLY_REPEALED,
     )
     return ParsedNorm(metadata=metadata, blocks=(block,), reforms=(reform,))
 
@@ -118,6 +123,11 @@ class TestNoFieldIsUnaccountedFor:
 
 
 class TestEveryPersistedFieldComesBack:
+    def test_version_survives(self, tmp_path):
+        original = _norm()
+        back = load_norma_from_json(save_structured_json(tmp_path, original))
+        assert back.blocks == original.blocks
+
     def test_metadata_survives(self, tmp_path):
         original = _norm()
         back = load_norma_from_json(save_structured_json(tmp_path, original))

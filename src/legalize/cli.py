@@ -714,6 +714,16 @@ def _normalised(value) -> str:
     return text
 
 
+def _health_date(value) -> date | None:
+    """Accept only the complete ISO legal date, never a malformed date prefix."""
+    text = str(value)
+    try:
+        parsed = date.fromisoformat(text)
+    except ValueError:
+        return None
+    return parsed if parsed.isoformat() == text else None
+
+
 def _published_values(path) -> set:
     """Every value a published file states, hashed to keep the corpus in memory."""
     front = _read_frontmatter(path)
@@ -1034,27 +1044,57 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
 
     # ── 6. Anomalous commit dates ──
     console.print(f"\n  Sampling {sample} recent commits for date anomalies...")
-    log_out = _git("log", f"-{sample}", "--format=%H %aI", "--reverse").stdout.strip()
+    log_out = _git(
+        "log", f"-{sample}", "--format=%H%x00%aI%x00%(trailers:only,unfold)%x00", "--reverse"
+    ).stdout
 
     epoch_count = 0
     future_count = 0
     far_future = []
     today = date.today()
+    publication_dates: dict[str, date | None] = {}
 
-    for line in log_out.splitlines():
-        if not line.strip():
-            continue
-        parts = line.split(" ", 1)
-        if len(parts) < 2:
-            continue
-        sha, date_str = parts
+    fields = log_out.split("\0")
+    for offset in range(0, len(fields) - 2, 3):
+        sha, date_str, trailer_text = fields[offset : offset + 3]
+        sha = sha.strip()
         try:
             commit_date = date.fromisoformat(date_str[:10])
         except ValueError:
             continue
 
         if commit_date.year == 1970:
-            epoch_count += 1
+            # Git recognises the final trailer block; a prose mention of a
+            # Source-Date elsewhere in the message is not date evidence.
+            trailers: dict[str, list[str]] = {}
+            for line in trailer_text.splitlines():
+                key, sep, value = line.partition(":")
+                if sep:
+                    trailers.setdefault(key.lower(), []).append(value.strip())
+            source_dates = trailers.get("source-date")
+            legal_date = None
+            if source_dates is not None:
+                if len(source_dates) == 1:
+                    legal_date = _health_date(source_dates[0])
+            else:
+                # An undated snapshot uses the norm's original publication
+                # date (§Dates). Read that norm's YAML once, not every historic
+                # body. A malformed present trailer must never use this fallback.
+                norm_ids = trailers.get("norm-id", [])
+                source_ids = trailers.get("source-id", [])
+                if len(norm_ids) == len(source_ids) == 1 and source_ids[0]:
+                    norm_id = norm_ids[0]
+                    if norm_id not in publication_dates:
+                        paths = stems.get(norm_id, [])
+                        front = _read_frontmatter(paths[0]) if len(paths) == 1 else None
+                        publication_dates[norm_id] = (
+                            _health_date(front.get("publication_date"))
+                            if front and front.get("identifier") == norm_id
+                            else None
+                        )
+                    legal_date = publication_dates[norm_id]
+            if legal_date is None or max(legal_date, date(1970, 1, 2)) != commit_date:
+                epoch_count += 1
         elif commit_date > today and commit_date.year > today.year + 1:
             far_future.append((sha[:10], commit_date.isoformat()))
         elif commit_date > today:

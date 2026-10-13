@@ -129,6 +129,10 @@ class Version:
     publication_date: date
     effective_date: date | None
     paragraphs: tuple[Paragraph, ...]
+    # A source can switch from an enactment to dated consolidated snapshots.
+    text_state: TextState | None = None
+    source: str | None = None
+    source_warning: str | None = None
 
     @property
     def in_force_from(self) -> date:
@@ -211,6 +215,7 @@ class Reform:
     # False for an undated source snapshot: date still selects its effective
     # text, but is not an official publication date (SPEC v0.4, Dates).
     has_source_date: bool = True
+    status: NormStatus | None = None
 
 
 # ─────────────────────────────────────────────

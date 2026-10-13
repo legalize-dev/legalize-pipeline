@@ -1,20 +1,22 @@
-"""Irish Statute Book (ISB) + Oireachtas API HTTP client.
-
-Text source (XML): https://www.irishstatutebook.ie/eli/{year}/act/{number}/enacted/en/xml
-Text source (HTML fallback): https://www.irishstatutebook.ie/eli/{year}/act/{number}/enacted/en/print
-Metadata source: https://api.oireachtas.ie/v1/legislation
-Revised Acts: https://revisedacts.lawreform.ie/eli/{year}/act/{number}/revised/en/html
-"""
+"""Cached eISB text, Oireachtas metadata and LRC history downloads."""
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
+import re
+import threading
+import time
+from contextlib import contextmanager, nullcontext
+from pathlib import Path
 from typing import TYPE_CHECKING
+from urllib.parse import parse_qs, urlparse
 
 import requests
 
 from legalize.fetcher.base import HttpClient
+from legalize.fetcher.cache import FileCache
 
 if TYPE_CHECKING:
     from legalize.config import CountryConfig
@@ -24,51 +26,58 @@ logger = logging.getLogger(__name__)
 _ISB_BASE = "https://www.irishstatutebook.ie"
 _OIREACHTAS_API = "https://api.oireachtas.ie"
 _REVISED_ACTS_BASE = "https://revisedacts.lawreform.ie"
+CONSTITUTION_ID = "IE-1937-constitution"
+_refresh_cutoff: float | None = None
+_refresh_locks: dict[str, threading.Lock] = {}
+_refresh_locks_guard = threading.Lock()
+
+
+@contextmanager
+def refresh_sources():
+    """Refresh mutable URLs once per run, across short-lived clients and worker threads."""
+    global _refresh_cutoff
+    previous = _refresh_cutoff
+    _refresh_cutoff = previous if previous is not None else time.time()
+    if previous is None:
+        _refresh_locks.clear()
+    try:
+        yield
+    finally:
+        _refresh_cutoff = previous
+        if previous is None:
+            _refresh_locks.clear()
 
 
 def _parse_norm_id(norm_id: str) -> tuple[int, str, str]:
-    """Parse norm_id into (year, act_type, number).
-
-    Formats:
-    - IE-2024-act-1  → (2024, "act", "1")
-    - IE-2015-act-C34 → (2015, "ca", "34")  (Constitutional Amendment)
-    - IE-2023-act-P1  → (2023, "prv", "1")  (Private Act)
-    - IE-1937-constitution → (1937, "cons", "1")  (Constitution)
-    """
-    parts = norm_id.split("-")
-    # IE-2024-act-1 → ["IE", "2024", "act", "1"]
-    year = int(parts[1])
-
-    # Constitution: IE-1937-constitution
-    if len(parts) == 3 and parts[2] == "constitution":
-        return year, "cons", "1"
-
-    raw_num = parts[3]
-
-    if raw_num.startswith("C"):
-        return year, "ca", raw_num[1:]
-    if raw_num.startswith("P"):
-        return year, "prv", raw_num[1:]
-    return year, "act", raw_num
+    """Return the source year, ELI type and unprefixed number."""
+    match = re.fullmatch(r"IE-(\d{4})-(act|si)-([CP]?)([1-9]\d*)", norm_id)
+    if match is None:
+        raise ValueError(f"Invalid Irish Act identifier: {norm_id}")
+    year, kind, prefix, number = match.groups()
+    if kind == "si":
+        if prefix:
+            raise ValueError(f"Invalid Irish instrument identifier: {norm_id}")
+        return int(year), "si", number
+    return int(year), {"": "act", "C": "ca", "P": "prv"}[prefix], number
 
 
 class ISBClient(HttpClient):
-    """HTTP client for Irish legislation.
+    """Download official source bytes with persistent, URL-keyed caching."""
 
-    Two endpoints:
-    - ISB: XML text of Acts (irishstatutebook.ie)
-    - Oireachtas API: JSON metadata catalog (api.oireachtas.ie)
-    """
+    # Public eISB catalogue URLs intermittently return 403 and then succeed unchanged.
+    _retry_status_codes = HttpClient._retry_status_codes + (403,)
 
     @classmethod
     def create(cls, country_config: CountryConfig) -> ISBClient:
         source = country_config.source or {}
+        cache_dir = Path(country_config.data_dir or country_config.cache_dir) / "raw"
         return cls(
             isb_base=source.get("isb_base_url", _ISB_BASE),
             api_base=source.get("api_base_url", _OIREACHTAS_API),
-            requests_per_second=source.get("requests_per_second", 2.0),
-            request_timeout=source.get("request_timeout", 30),
-            max_retries=source.get("max_retries", 3),
+            requests_per_second=float(source.get("requests_per_second", 2.0)),
+            request_timeout=int(source.get("request_timeout", 30)),
+            max_retries=int(source.get("max_retries", 3)),
+            cache=FileCache(cache_dir),
         )
 
     def __init__(
@@ -78,6 +87,7 @@ class ISBClient(HttpClient):
         requests_per_second: float = 2.0,
         request_timeout: int = 30,
         max_retries: int = 3,
+        cache: FileCache | None = None,
     ) -> None:
         super().__init__(
             base_url=isb_base,
@@ -86,73 +96,104 @@ class ISBClient(HttpClient):
             max_retries=max_retries,
         )
         self._api_base = api_base.rstrip("/")
-
-    def get_text(self, norm_id: str) -> bytes:
-        """Fetch the Act text from ISB.
-
-        Tries XML first (/enacted/en/xml). If 404, falls back to
-        the print HTML view (/enacted/en/print). Most acts have XML
-        available; the fallback is rare.
-
-        Special case: Constitution (IE-1937-constitution) only exists
-        as HTML at /eli/cons/en/html — no XML endpoint.
-
-        Supports act types: act, ca (constitutional amendment),
-        prv (private), cons (constitution).
-        """
-        year, act_type, number = _parse_norm_id(norm_id)
-
-        # Constitution: only available as HTML
-        if act_type == "cons":
-            return self._get(f"{self._base_url}/eli/cons/en/html")
-
-        eli_path = f"{self._base_url}/eli/{year}/{act_type}/{number}/enacted/en"
-
-        # Try XML first (available for most acts)
-        try:
-            return self._get(f"{eli_path}/xml")
-        except requests.HTTPError as e:
-            if e.response is not None and e.response.status_code == 404:
-                logger.debug("No XML for %s, falling back to HTML print view", norm_id)
-            else:
-                raise
-
-        # Fallback to HTML print view
-        return self._get(f"{eli_path}/print")
-
-    def get_metadata(self, norm_id: str) -> bytes:
-        """Fetch Act metadata from Oireachtas API.
-
-        URL: /v1/legislation?act_year={year}&act_no={number}&limit=1
-        Returns the raw JSON response bytes.
-
-        Constitution (cons type) is not in the API — return empty
-        JSON to avoid a wasted round-trip. The parser handles
-        Constitution metadata directly.
-        """
-        year, act_type, number = _parse_norm_id(norm_id)
-
-        # Constitution is not in the Oireachtas API
-        if act_type == "cons":
-            return b'{"results": [], "head": {}}'
-
-        url = f"{self._api_base}/v1/legislation"
-        return self._get(
-            url,
-            params={
-                "act_year": str(year),
-                "act_no": str(number),
-                "limit": "1",
-                "lang": "en",
-            },
+        self._cache = cache
+        self._archive_cache = (
+            FileCache(cache._dir, ttl_hours=24 * 365 * 100) if cache is not None else None
         )
 
-    def get_legislation_page(self, *, skip: int = 0, limit: int = 50, **params: str) -> dict:
-        """Fetch a page of legislation from the Oireachtas API.
+    def _get(self, url: str, *, bypass_cache: bool = False, **kwargs) -> bytes:
+        key = requests.Request("GET", url, params=kwargs.get("params")).prepare().url
+        assert key is not None
+        parsed = urlparse(key)
+        version_ids = parse_qs(parsed.query, keep_blank_values=True).get("versionId", [])
+        # S3's null version can be overwritten when bucket versioning is suspended.
+        immutable = parsed.hostname == "rev-acts.s3.eu-west-1.amazonaws.com" and (
+            len(version_ids) == 1 and version_ids[0] not in ("", "null")
+        )
+        cache = self._archive_cache if immutable else self._cache
+        with _refresh_locks_guard:
+            lock = (
+                _refresh_locks.setdefault(key, threading.Lock())
+                if cache is not None
+                else nullcontext()
+            )
+        with lock:
+            if cache is not None and not bypass_cache:
+                entry = cache.get(key)
+                if entry is not None and (
+                    immutable or _refresh_cutoff is None or entry.timestamp >= _refresh_cutoff
+                ):
+                    return entry.content
+            data = super()._get(url, **kwargs)
+            if cache is not None:
+                cache.put(key, data, {})
+            return data
 
-        Used by discovery to paginate through the full catalog.
-        """
-        url = f"{self._api_base}/v1/legislation"
+    def get_act_index(self, year: int, *, refresh: bool = False) -> bytes:
+        """Return the public/private/constitutional Act catalogue for one year."""
+        return self._get(f"{self._base_url}/eli/{year}/act", bypass_cache=refresh)
+
+    def get_enacted_text(self, norm_id: str) -> bytes:
+        """Return source XML, falling back to complete print HTML on 404."""
+        if norm_id == CONSTITUTION_ID:
+            return self._get(f"{self._base_url}/eli/cons/en/html")
+        year, act_type, number = _parse_norm_id(norm_id)
+        if act_type == "si":
+            return self._get(f"{self._base_url}/eli/{year}/si/{number}/made/en/html")
+        eli_path = f"{self._base_url}/eli/{year}/{act_type}/{number}/enacted/en"
+        try:
+            return self._get(f"{eli_path}/xml")
+        except requests.HTTPError as exc:
+            if exc.response is None or exc.response.status_code != 404:
+                raise
+        return self._get(f"{eli_path}/print")
+
+    def get_text(self, norm_id: str, meta_data: bytes | None = None) -> bytes:
+        """Bundle authentic source versions and amendment history."""
+        from legalize.fetcher.ie.history import fetch_text
+
+        return fetch_text(self, norm_id, meta_data)
+
+    def get_metadata(self, norm_id: str) -> bytes:
+        """Use enacted-source metadata, enriched only by matching parliamentary records."""
+        from legalize.fetcher.ie.parser import ISBMetadataParser
+
+        if norm_id == CONSTITUTION_ID:
+            return self.get_enacted_text(norm_id)
+        year, act_type, _ = _parse_norm_id(norm_id)
+        if act_type == "si":
+            return self.get_enacted_text(norm_id)
+        enacted = self.get_enacted_text(norm_id)
+        try:
+            data = self._get(
+                f"{self._api_base}/v1/legislation",
+                params={
+                    "act_year": str(year),
+                    "act_no": norm_id.rsplit("-", 1)[1],
+                    "bill_status": "Enacted",
+                    "limit": "1",
+                    "lang": "en",
+                },
+            )
+            envelope = json.dumps(
+                {
+                    "legalize_ie_metadata": 1,
+                    "enacted": base64.b64encode(enacted).decode("ascii"),
+                    "parliament": json.loads(data),
+                },
+                ensure_ascii=False,
+            ).encode("utf-8")
+            ISBMetadataParser().parse(envelope, norm_id)
+            return envelope
+        except ValueError:
+            logger.info("No matching API metadata for %s; using enacted source", norm_id)
+        except requests.HTTPError as exc:
+            if exc.response is None or exc.response.status_code != 404:
+                raise
+        return enacted
+
+    def get_legislation_page(self, *, skip: int = 0, limit: int = 50, **params: str) -> dict:
+        """Fetch supplementary enacted-Act metadata from the parliamentary API."""
         query = {
             "bill_status": "Enacted",
             "skip": str(skip),
@@ -160,29 +201,25 @@ class ISBClient(HttpClient):
             "lang": "en",
             **params,
         }
-        data = self._get(url, params=query)
+        data = self._get(
+            f"{self._api_base}/v1/legislation",
+            params=query,
+            bypass_cache="last_updated" in params,
+        )
         return json.loads(data)
 
     def get_updated_since(
         self, since_date: str, *, skip: int = 0, limit: int = 50, **params: str
     ) -> dict:
-        """Fetch legislation updated since a date (for daily discovery).
-
-        since_date: ISO date string, e.g. '2026-04-01'.
-        """
         return self.get_legislation_page(skip=skip, limit=limit, last_updated=since_date, **params)
 
     def get_revised_text(self, norm_id: str) -> bytes | None:
-        """Fetch consolidated text from Revised Acts (revisedacts.lawreform.ie).
-
-        Returns HTML bytes if the act has a revised version, None if 404.
-        Only ~560 acts have revised versions.
-        """
+        """Return the latest LRC HTML, preserving non-404 source failures."""
         year, act_type, number = _parse_norm_id(norm_id)
         url = f"{_REVISED_ACTS_BASE}/eli/{year}/{act_type}/{number}/revised/en/html"
         try:
             return self._get(url)
-        except requests.HTTPError as e:
-            if e.response is not None and e.response.status_code == 404:
+        except requests.HTTPError as exc:
+            if exc.response is not None and exc.response.status_code == 404:
                 return None
             raise

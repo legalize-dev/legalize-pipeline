@@ -245,6 +245,17 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             }
             if version.effective_date and version.effective_date != version.publication_date:
                 version_dict["effective_date"] = version.effective_date.isoformat()
+            if version.text_state is not None:
+                version_dict["text_state"] = version.text_state.value
+            if version.source:
+                version_dict["source"] = version.source
+            if version.source_warning:
+                version_dict["source_warning"] = version.source_warning
+            if norm.metadata.country == "ie":
+                version_dict["paragraphs"] = [
+                    {"css_class": paragraph.css_class, "text": paragraph.text}
+                    for paragraph in version.paragraphs
+                ]
             # Preserve CSS classes for lossless round-trip
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
@@ -255,7 +266,7 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
         if block.versions:
             last = (
                 block.versions[-1]
-                if norm.metadata.country == "eu"
+                if norm.metadata.country in {"eu", "ie"}
                 else max(block.versions, key=lambda v: v.publication_date)
             )
             article["current_text"] = "\n\n".join(p.text for p in last.paragraphs)
@@ -287,6 +298,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             row["change_note"] = reform.change_note
         if not reform.has_source_date:
             row["has_source_date"] = False
+        if reform.status is not None:
+            row["status"] = reform.status.value
         reforms.append(row)
 
     return {
@@ -349,7 +362,12 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
         for v in art["versions"]:
             paragraphs = []
             css_classes = v.get("css_classes")
-            if v["text"].strip():
+            if "paragraphs" in v:
+                paragraphs = [
+                    Paragraph(css_class=paragraph["css_class"], text=paragraph["text"])
+                    for paragraph in v["paragraphs"]
+                ]
+            elif v["text"].strip():
                 lines = [line.strip() for line in v["text"].split("\n\n") if line.strip()]
                 for i, line in enumerate(lines):
                     css = css_classes[i] if css_classes and i < len(css_classes) else "parrafo"
@@ -360,6 +378,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                     publication_date=date.fromisoformat(v["date"]),
                     effective_date=date.fromisoformat(v.get("effective_date", v["date"])),
                     paragraphs=tuple(paragraphs),
+                    text_state=TextState(v["text_state"]) if v.get("text_state") else None,
+                    source=v.get("source"),
+                    source_warning=v.get("source_warning"),
                 )
             )
         blocks.append(
@@ -391,6 +412,7 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 affected_blocks=affected,
                 change_note=r.get("change_note", ""),
                 has_source_date=r.get("has_source_date", True),
+                status=NormStatus(r["status"]) if r.get("status") else None,
             )
         )
 

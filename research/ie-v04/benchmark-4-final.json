@@ -1,0 +1,14 @@
+{
+  "parser_revision": "3080f6b9830555b76b30287641b5a542c485af926f6563f1fdd65c38ccec450f",
+  "peak_rss_mib": 4368.9,
+  "workers": 4,
+  "requests_per_second_per_worker": 1.0,
+  "seconds": 1477.6,
+  "laws": 50,
+  "successful": 49,
+  "failed": [
+    "IE-2014-act-38"
+  ],
+  "http_calls": 835,
+  "errors": []
+}

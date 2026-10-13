@@ -44,6 +44,7 @@ TEXT_STATE: dict[str, TextState] = {
     "dk": TextState.AS_ENACTED,  # Retsinformation: each act is its own document
     "eu": TextState.AS_ENACTED,  # Individual consolidated acts override this default.
     "gr": TextState.AS_ENACTED,  # each FEK A' issue is an atomic act
+    "ie": TextState.AS_ENACTED,  # LRC snapshots and the Constitution override per version.
     # DRE consolidates 5,561 diplomas and publishes the other 159,000 as enacted.
     # The country default is the majority; the parser overrides the consolidated
     # ones back to POINT_IN_TIME per norm.
