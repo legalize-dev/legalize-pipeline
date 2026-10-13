@@ -969,7 +969,11 @@ def fetch_effects(
             year, kind, number = _parse_norm_id(source_id)
             effect["source_url"] = f"{client._base_url}/eli/{year}/{kind}/{number}/enacted/en/html"
         effect["directory_url"] = directory_url
-        if _collective_citation(effect["note"]):
+        collective_member = _collective_citation(effect["note"])
+        collective_application = re.search(
+            r"\bcollectively cited\b.*\bActs\b", effect["note"], re.I
+        )
+        if collective_member or collective_application:
             original_date = parser.parse(enacted_data, norm_id).publication_date
             if date.fromisoformat(effect["publication_date"]) < original_date:
                 if editorial_notes is None:
@@ -979,8 +983,17 @@ def fetch_effects(
                 editorial_notes.append(
                     {
                         **effect,
-                        "kind": "collective_citation",
-                        "reason": "An earlier member of the collectively cited Acts is context, not a later amendment.",
+                        "kind": (
+                            "collective_citation"
+                            if collective_member
+                            else "pre_existing_collective_application"
+                        ),
+                        "reason": (
+                            "An earlier member of the collectively cited Acts is context, not a later amendment."
+                            if collective_member
+                            else "An earlier rule applying to the collectively cited Acts is context, "
+                            "not a later amendment of this Act."
+                        ),
                     }
                 )
                 continue
