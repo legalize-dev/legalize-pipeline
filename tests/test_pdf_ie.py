@@ -470,3 +470,44 @@ def test_overlapping_marginal_captions_preserve_complete_titles_and_sections():
     assert (
         "1554. (1) A person shall not disclose, except in accordance with law, information" in text
     )
+
+
+def test_indented_primary_labels_keep_their_aligned_titles():
+    paragraphs, cutoff = parse_revised_pdf(
+        (FIXTURES / "archive-companies-2023-indent-excerpt.pdf").read_bytes()
+    )
+    assert cutoff == date(2023, 1, 1)
+    headings = [p.text for p in paragraphs if p.css_class == "articulo"]
+    assert headings.count("890A. **F505[Collection of certain data by Registrar**") == 1
+    assert (
+        headings.count(
+            "934. **Investigation of possible breaches of standards of prescribed accountancy bodies**"
+        )
+        == 1
+    )
+    text = re.sub(r"\*+", "", "\n".join(p.text for p in paragraphs))
+    assert "890A. (1) The Registrar shall collect and aggregate, on an annual basis" in text
+    assert "F563[934. (1) In this section—" in text
+    assert "[^3]:" in text
+
+
+def test_indented_quoted_titles_do_not_become_primary_sections(monkeypatch):
+    import legalize.fetcher.ie.pdf as parser
+
+    data = (FIXTURES / "archive-companies-2023-indent-excerpt.pdf").read_bytes()
+    events, cutoff, expected = parser._read(data)
+    quoted_titles = {
+        "F505[Collection of certain data by Registrar",
+        "Investigation of possible breaches of standards of prescribed accountancy",
+        "bodies",
+    }
+    for index, event in enumerate(events):
+        if isinstance(event, parser._Line) and event.text in quoted_titles:
+            events[index] = parser._Line(
+                [{**c, "x0": c["x0"] + 13.32, "x1": c["x1"] + 13.32} for c in event.chars],
+                event.page,
+                event.links,
+            )
+    monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected | {"890A", "934"}))
+    with pytest.raises(UnsupportedPDF, match="missing sections listed in its contents: 890A, 934"):
+        parse_revised_pdf(data)

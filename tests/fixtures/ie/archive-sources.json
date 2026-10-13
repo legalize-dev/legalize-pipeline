@@ -130,5 +130,19 @@
       1060
     ],
     "transformation": "Unchanged source pages extracted with PDFium. Caption-overlap geometry regression excerpt containing all nineteen affected section openings, not a complete Act and not eligible for the full-source hash exception."
+  },
+  {
+    "file": "archive-companies-2023-indent-excerpt.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_new_plain.pdf?versionId=iXfHd3elTG28CfNMMtML8_1DCdc.hoYY",
+    "sha256": "586c6c6a42619edad9faea97a004512b2921c4725b9ef9db37e9cad9017ff7ab",
+    "retrieved": "2026-10-13",
+    "source_sha256": "0036bebadc54facc2648125c062f675e0d0a0267ea9b002007162fabc2d710c7",
+    "source_pages": [
+      1,
+      80,
+      769,
+      807
+    ],
+    "transformation": "Unchanged source pages extracted with PDFium. Cover, first sections and indented primary labels 890A and 934; an incomplete geometry regression excerpt, not a complete legal snapshot."
   }
 ]

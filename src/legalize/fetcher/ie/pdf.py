@@ -558,7 +558,17 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             )
             primary = primary and (marginal_title or title_above)
         else:
-            primary = primary and abs(item.x0 - primary_x) < 2
+            # Some primary labels use one paragraph indent beneath an aligned title.
+            indented_label = (
+                previous is not None
+                and previous.page == item.page
+                and pending_title
+                and pending
+                and abs(previous.x0 - primary_x) < 2
+                and 0 < item.x0 - primary_x < 15
+                and item.top - previous.bottom < 25
+            )
+            primary = primary and (abs(item.x0 - primary_x) < 2 or indented_label)
         if primary:
             number = match[1]
             if number in seen:
