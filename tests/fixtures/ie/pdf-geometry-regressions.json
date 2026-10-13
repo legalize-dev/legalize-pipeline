@@ -1,0 +1,84 @@
+[
+  {
+    "identifier": "IE-2019-act-35",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2019/35/act_new_plain.pdf?versionId=ZDtcS0QRN9ftDQEpgGcEFH.qcyawA5PH",
+    "sha256": "af20a79a3b798fd46ede0747ac0eccdfce3fff2f0b3295db2dbd1f29bc5b8248",
+    "error": "Revised Act PDF is missing sections listed in its contents: 1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 2, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 3, 30, 31, 32, 33, 34, 35, 36, 37, 38, 4, 5, 6, 7, 8, 9",
+    "pages": [
+      1,
+      5,
+      6
+    ],
+    "file": "archive-parents-2021-geometry-excerpt.pdf",
+    "fixture_sha256": "955d55ffacebe4aafdc6ac70025987ef77cf1405b375d85ef9741678e49cc29a"
+  },
+  {
+    "identifier": "IE-2018-act-6",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/6/act_new_plain.pdf?versionId=VI30PKE8Araz7plnUtgATJnkR0qmyaPy",
+    "sha256": "7a766903be34a9171734345646908364813f8484519662847b194af60463008c",
+    "error": "Revised Act PDF is missing sections listed in its contents: 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 2, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 3, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 4, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 50, 51, 52, 53, 54, 55, 56, 6, 7, 8, 9",
+    "pages": [
+      1,
+      5,
+      8,
+      21,
+      34,
+      39,
+      40
+    ],
+    "file": "archive-domestic-2021-geometry-excerpt.pdf",
+    "fixture_sha256": "09bc22f0502901428b05223ff394888c6a1d3c46822e788e6e4757f2c4a0f9d3"
+  },
+  {
+    "identifier": "IE-2014-act-23",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/23/act_plain.pdf?versionId=null",
+    "sha256": "f0a6cfce2028be0aa77aa87b3fa777fda6defbf7c360fffbbd89e3831edcd9d4",
+    "error": "Duplicate primary section 10 in Revised Act PDF",
+    "pages": [
+      1,
+      11,
+      20
+    ],
+    "file": "archive-treasury-2018-geometry-excerpt.pdf",
+    "fixture_sha256": "6d2631012a0af72a59732523aa9fa416acb46c9d428d2195188c890042b1f22e"
+  },
+  {
+    "identifier": "IE-1952-act-29",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1952/29/act_plain.pdf?versionId=YhQef4Z6O.UW2OcjISwu3aSj0GPrlmwz",
+    "sha256": "3fc9c42f9864bdddab583fc0378cfdc9060d9cae96ef0c6559314cb2a44d3c3e",
+    "error": "Revised Act PDF is missing sections listed in its contents: 10",
+    "pages": [
+      1,
+      8,
+      11
+    ],
+    "file": "archive-merchant-1952-geometry-excerpt.pdf",
+    "fixture_sha256": "c41cdb14b7b8d932c6d7d6ddaf97957e55d90564704d4d5b3ae51d53a196b613"
+  },
+  {
+    "identifier": "IE-1967-act-12",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1967/12/act_plain.pdf?versionId=null",
+    "sha256": "cd8916c7e382534d253f81142e194cf79e4d08ec53676c9beb2d31018554152b",
+    "error": "Revised Act PDF is missing sections listed in its contents: 34",
+    "pages": [
+      1,
+      8,
+      22
+    ],
+    "file": "archive-criminal-1967-geometry-excerpt.pdf",
+    "fixture_sha256": "9f40c23d6765cb6341446e64bc50f5991fa21055c3e6ee08cf138736a6768aef"
+  },
+  {
+    "identifier": "IE-1977-act-7",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1977/7/act_plain.pdf?versionId=null",
+    "sha256": "e71c0b9f3c840b6500070e233d1b11882aa34b897d7797a2a00d34d9c8538676",
+    "error": "Revised Act PDF is missing sections listed in its contents: 9",
+    "pages": [
+      1,
+      7,
+      10
+    ],
+    "file": "archive-employment-1977-geometry-excerpt.pdf",
+    "fixture_sha256": "5b128767e25a024e4033f18e7a9f5341480b01caab0edef5a5c317f129b99d8b"
+  }
+]

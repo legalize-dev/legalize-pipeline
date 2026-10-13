@@ -511,3 +511,86 @@ def test_indented_quoted_titles_do_not_become_primary_sections(monkeypatch):
     monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected | {"890A", "934"}))
     with pytest.raises(UnsupportedPDF, match="missing sections listed in its contents: 890A, 934"):
         parse_revised_pdf(data)
+
+
+def test_shifted_marginal_column_preserves_the_entire_caption():
+    paragraphs, cutoff = parse_revised_pdf(
+        (FIXTURES / "archive-parents-2021-geometry-excerpt.pdf").read_bytes()
+    )
+    assert cutoff == date(2021, 4, 1)
+    assert [p.text for p in paragraphs if p.css_class == "articulo"] == [
+        "1. **Short title and commencement**",
+        "2. **Interpretation**",
+    ]
+    assert any("This Act may be cited as the Parent" in p.text for p in paragraphs)
+    assert not any(p.text.startswith("t ") for p in paragraphs)
+
+
+def test_hanging_title_continuations_keep_indented_primary_labels():
+    paragraphs, cutoff = parse_revised_pdf(
+        (FIXTURES / "archive-domestic-2021-geometry-excerpt.pdf").read_bytes()
+    )
+    assert cutoff == date(2021, 2, 10)
+    headings = [p.text for p in paragraphs if p.css_class == "articulo"]
+    assert "1. **Short title and commencement**" in headings
+    assert (
+        "5. **Factors or circumstances to which court shall have regard in determining "
+        "applications for specified orders**" in headings
+    )
+    for number in (14, 40, 51, 52):
+        assert sum(h.startswith(f"{number}.") for h in headings) == 1
+    assert any(
+        "Nothing in subsection (2) shall be construed as limiting" in re.sub(r"\*+", "", p.text)
+        for p in paragraphs
+    )
+
+
+def test_inserted_section_ten_remains_quoted_under_the_actual_section_thirteen():
+    paragraphs, cutoff = parse_revised_pdf(
+        (FIXTURES / "archive-treasury-2018-geometry-excerpt.pdf").read_bytes()
+    )
+    assert cutoff == date(2018, 12, 17)
+    assert [re.match(r"\d+", p.text)[0] for p in paragraphs if p.css_class == "articulo"] == [
+        "1",
+        "2",
+        "13",
+        "14",
+    ]
+    assert any("13. **Disqualification of members of staff**" == p.text for p in paragraphs)
+    assert any(
+        p.css_class == "legal_quote" and "10." in p.text and "House of the Oireachtas" in p.text
+        for p in paragraphs
+    )
+
+
+def test_primary_marginal_caption_closes_a_source_quote_with_a_missing_delimiter(monkeypatch):
+    from legalize.fetcher.ie import pdf as parser
+    from legalize.models import Paragraph
+
+    raw = (FIXTURES / "archive-parents-2021-geometry-excerpt.pdf").read_bytes()
+    events, cutoff, expected = parser._read(raw)
+    index = next(i for i, e in enumerate(events) if "Interpretation 2." in e.text)
+    events.insert(
+        index, Paragraph("parrafo", "“A source definition without its closing delimiter;")
+    )
+    monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected | {"1", "2"}))
+    paragraphs, _ = parser.parse_revised_pdf(raw)
+    assert "2. **Interpretation**" in [p.text for p in paragraphs if p.css_class == "articulo"]
+
+
+@pytest.mark.parametrize(
+    ("name", "number", "body"),
+    [
+        ("merchant-1952", "10", "The Minister may make rules"),
+        ("criminal-1967", "34", "Where a person tried on indictment is acquitted"),
+        ("employment-1977", "9", "Where an employer proposes to create collective redundancies"),
+    ],
+)
+def test_primary_labels_survive_annotation_spaces_and_gutter_overlap(name, number, body):
+    paragraphs, cutoff = parse_revised_pdf(
+        (FIXTURES / f"archive-{name}-geometry-excerpt.pdf").read_bytes()
+    )
+    assert cutoff is not None
+    headings = [p.text for p in paragraphs if p.css_class == "articulo"]
+    assert sum(h.startswith(f"{number}. **") for h in headings) == 1
+    assert any(body in p.text for p in paragraphs)

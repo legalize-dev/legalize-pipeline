@@ -28,7 +28,7 @@ from legalize.fetcher._text import strip_control
 from legalize.fetcher.ie.parser import _legal_format
 from legalize.models import Paragraph
 
-_SECTION = re.compile(r"^(?:(?:F\d+)?\[)?(\d+[A-Z]*)\s*\.")
+_SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*\.")
 _DIVISION = re.compile(r"^(?:(?:F\d+)?\[)?(PART|CHAPTER|SCHEDULE)\s*(?:[\dIVXLCDM]+[A-Z]*)?$", re.I)
 _DATE = re.compile(r"Updated to\s+(\d{1,2})\s+(\w+)\s+(\d{4})", re.I)
 _MONTHS = (
@@ -398,17 +398,58 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     )
     if first is None:
         raise UnsupportedPDF("Revised Act PDF has no first section")
-    marginal = any(c["x0"] < 100 for c in first.chars)
+    first_label = None
+    for char in first.chars:
+        if char["text"] != "1" or "Bold" not in char["fontname"]:
+            continue
+        candidate = _Line(
+            [c for c in first.chars if c["x0"] >= char["x0"]], first.page, first.links
+        )
+        if (match := _section_match(candidate)) and match[1] == "1":
+            first_label = candidate
+            break
+    if first_label is None:
+        raise UnsupportedPDF("Revised Act PDF has no bold first section label")
+    marginal = first.x0 < first_label.x0 - 30
+    margin_edge = first_label.x0 - 8.74
+    first_index = events.index(first)
+    first_title = events[first_index - 1] if first_index else None
+    title_x = (
+        first_title.x0
+        if isinstance(first_title, _Line)
+        and first_title.page == first.page
+        and first.top - first_title.bottom < 25
+        and sum("Bold" in c["fontname"] for c in first_title.chars) / len(first_title.chars) > 0.8
+        else first_label.x0
+    )
     lines: list[_Line | Paragraph] = []
     margins: list[_Line] = []
     for event in events:
-        if not isinstance(event, _Line) or not marginal or event.x0 >= 100:
+        if not isinstance(event, _Line) or not marginal or event.x0 >= first_label.x0 - 52.64:
             lines.append(event)
             continue
-        # Marginal captions occupy the column before x=144; some use body-size
-        # type. Smaller marginal glyphs can hang slightly into the gutter.
-        side = [c for c in event.chars if c["x0"] < 144 or (c["x0"] < 148 and c["size"] < 9.5)]
+        # XEP's caption column moves with the body margin; smaller glyphs can hang into the gutter.
+        side = [
+            c
+            for c in event.chars
+            if c["x0"] < margin_edge or (c["x0"] < margin_edge + 4 and c["size"] < 9.5)
+        ]
         body = [c for c in event.chars if c not in side]
+        caption_rows = {
+            (round(c["top"], 2), round(c["bottom"], 2))
+            for c in event.chars
+            if c["x0"] < first_label.x0 - 52.64
+        }
+        recovered_body = [
+            c
+            for c in event.chars
+            if (round(c["top"], 2), round(c["bottom"], 2)) not in caption_rows
+        ]
+        if recovered_body:
+            recovered = _Line(recovered_body, event.page, event.links)
+            if abs(recovered.x0 - first_label.x0) < 27 and _section_match(recovered):
+                body = recovered_body
+                side = [c for c in event.chars if c not in body]
         if side and body and _section_match(_Line(body, event.page, event.links)) is None:
             # Some XEP captions overlap the opening number horizontally. Their
             # glyph baselines remain distinct (even when the font sizes match).
@@ -419,9 +460,16 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 c for c in body if (round(c["top"], 2), round(c["bottom"], 2)) in caption_rows
             ]
             candidate = [c for c in body if c not in overflow]
-            if candidate:
+            if (
+                overflow
+                and all(c["x0"] < first_label.x0 for c in overflow)
+                and (not candidate or min(c["x0"] for c in candidate) >= first_label.x0 - 10)
+            ):
+                side.extend(overflow)
+                body = candidate
+            elif candidate:
                 recovered = _Line(candidate, event.page, event.links)
-                if abs(recovered.x0 - 152.6) < 10 and _section_match(recovered):
+                if abs(recovered.x0 - first_label.x0) < 10 and _section_match(recovered):
                     side.extend(overflow)
                     body = candidate
         if side:
@@ -432,7 +480,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         if body:
             lines.append(_Line(body, event.page, event.links))
     if marginal:
-        margin_x = min(c["x0"] for c in first.chars if c["x0"] < 100)
+        margin_x = first.x0
         preserved = []
         i = 0
         while i < len(margins):
@@ -458,7 +506,15 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             )
             # Companies captions indent their first line by 8.64pt. A quoted
             # marginal column is displaced by 25.92pt (Credit Union Act 2012).
-            if locator or min(line.x0 for line in group) > margin_x + 12:
+            aligned_label = any(
+                isinstance(line, _Line)
+                and line.page == start.page
+                and abs(line.top - start.top) < 4
+                and abs(line.x0 - first_label.x0) < 2
+                and _section_match(line)
+                for line in lines
+            )
+            if locator or (min(line.x0 for line in group) > margin_x + 12 and not aligned_label):
                 text = ""
                 for line in group:
                     text = _join(text, _inline(line))
@@ -479,11 +535,13 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     paragraphs: list[Paragraph] = []
     pending = ""
     pending_title = False
+    pending_x = None
     previous: _Line | None = None
     seen: set[str] = set()
     schedule = False
-    primary_x = 152.6 if marginal else first.x0
+    primary_x = first_label.x0
     division_center = None
+    quote_depth = 0
 
     def flush():
         nonlocal pending, pending_title
@@ -496,13 +554,16 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     while i < len(lines):
         item = lines[i]
         i += 1
+        quoted = quote_depth > 0
+        if quote_depth or re.match(r"^(?:F\d+\[)?“", item.text):
+            quote_depth = max(0, quote_depth + item.text.count("“") - item.text.count("”"))
         if isinstance(item, Paragraph):
             flush()
             paragraphs.append(item)
             previous = None
             continue
         text = item.text
-        division = _DIVISION.fullmatch(text)
+        division = _DIVISION.fullmatch(text) if not quoted else None
         if division and division[1].upper() == "CHAPTER" and division_center is not None:
             if item.text.isupper() and abs((item.x0 + item.x1) / 2 - division_center) > 15:
                 division = None
@@ -541,10 +602,13 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             previous = None
             continue
         match = _section_match(item)
-        primary = match and not schedule
         marginal_title = marginal and any(
             m.page == item.page and abs(m.top - item.top) < 4 for m in margins
         )
+        # A primary marginal caption ends a preceding quote even when the source omits its delimiter.
+        if match and marginal_title:
+            quote_depth = 0
+        primary = match and not schedule and (not quoted or marginal_title)
         if marginal:
             # A compound opening label can hang farther right. Some otherwise
             # marginal PDFs also put individual bold titles above the text.
@@ -564,8 +628,9 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 and previous.page == item.page
                 and pending_title
                 and pending
-                and abs(previous.x0 - primary_x) < 2
-                and 0 < item.x0 - primary_x < 15
+                and pending_x is not None
+                and abs(pending_x - title_x) < 2
+                and 0 <= item.x0 - title_x < 15
                 and item.top - previous.bottom < 25
             )
             primary = primary and (abs(item.x0 - primary_x) < 2 or indented_label)
@@ -612,6 +677,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             flush()
         if not pending:
             pending_title = sum("Bold" in c["fontname"] for c in item.chars) / len(item.chars) > 0.8
+            pending_x = item.x0
         pending = _join(pending, _inline(item))
         previous = item
     flush()
