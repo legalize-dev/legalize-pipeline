@@ -247,17 +247,23 @@ def render_norm_at_date(
         and metadata.text_state is TextState.POINT_IN_TIME
         and source_id is not None
     ):
-        # Freeze publication before advancing to commencement, which may include a later repeal.
+        publication_date = target_date
+        if effective_date is not None:
+            target_date = max(target_date, effective_date)
+        # Keep earlier effective stages, but leave later same-day publications to their own event.
         blocks = [
             replace(
                 block,
-                versions=tuple(v for v in block.versions if v.publication_date <= target_date),
+                versions=tuple(
+                    v
+                    for v in block.versions
+                    if v.publication_date <= publication_date
+                    or max(v.in_force_from, v.publication_date) < target_date
+                ),
             )
             for block in blocks
         ]
-        if effective_date is not None:
-            target_date = max(target_date, effective_date)
-        else:
+        if effective_date is None:
             target_date = max(
                 (v.in_force_from for block in blocks for v in block.versions),
                 default=target_date,

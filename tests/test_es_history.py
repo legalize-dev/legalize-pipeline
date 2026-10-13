@@ -212,3 +212,26 @@ def test_staged_commencement_survives_storage_and_idempotent_commits(tmp_path, c
         assert f"\n{expected}\n" in content
         assert f"Effective-Date: {effective}" in message
         assert f"Source-Date: {'2020-01-01' if expected == 'First' else '2021-01-01'}" in message
+
+
+def test_delayed_stage_retains_intervening_effective_reforms():
+    norm = parsed("sample-constitution")
+    deferred = Version(
+        "early", date(2020, 1, 1), date(2022, 1, 1), (Paragraph("parrafo", "Deferred stage"),)
+    )
+    intervening = Version(
+        "later", date(2021, 1, 1), date(2021, 1, 2), (Paragraph("parrafo", "Already effective"),)
+    )
+    blocks = (
+        Block("a1", "precepto", "Article 1", (deferred,)),
+        Block("a2", "precepto", "Article 2", (intervening,)),
+    )
+    content = render_norm_at_date(
+        norm.metadata,
+        blocks,
+        deferred.publication_date,
+        source_id=deferred.norm_id,
+        effective_date=deferred.effective_date,
+    )
+    assert "Deferred stage" in content
+    assert "Already effective" in content

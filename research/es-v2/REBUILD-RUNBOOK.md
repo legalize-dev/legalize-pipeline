@@ -25,11 +25,12 @@ source events without a body change. Unknown commencement remains unknown: omit
 `last_updated` when selected blocks lack the source date and record their IDs in
 `extra.effective_date_unknown_blocks`. Never substitute publication for it.
 
-Historical event rendering freezes the available versions at the event's
-publication date before selecting its commencement stage. A repeal published
-later must not replace an amendment in that amendment's own commit, even when
-both take effect on the same day. Preserve the later repeal event, including
-when it had an empty diff before a historical repair.
+Historical events follow commencement-stage order, with publication breaking
+ties. Retain intervening reforms that already took effect before a delayed
+stage; do not pull a later publication into an earlier event on the same stage
+date. A repeal published later must not replace an amendment in that amendment's
+own commit when both take effect on the same day. Preserve the later repeal
+event, including when it had an empty diff before a historical repair.
 
 The source-fidelity tests use fresh fixtures under `tests/fixtures/es/`. The
 five-law independent review and a local rehearsal must pass before the full
