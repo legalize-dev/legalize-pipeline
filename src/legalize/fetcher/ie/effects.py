@@ -127,7 +127,9 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     # A provision inserted into an older Act derives from the named amending instrument.
     amenders = list(
         re.finditer(
-            r"\b(?:as\s+)?(?:inserted|substituted|amended|ins\.)\s+by\s+", cell.text_content(), re.I
+            r"\b(?:as\s+)?(?:inserted|substituted|amended|ins\.|subst\.)\s+by\s*",
+            cell.text_content(),
+            re.I,
         )
     )
     if amenders:
@@ -183,9 +185,20 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     if not identifiers:
         for number, year in re.findall(r"\b(\d+)\s*/\s*(\d{4})\b", provision):
             identifiers.add(f"IE-{year}-act-{int(number)}")
-        if match := re.match(r"^(\d+) of (\d{4})(?:,|$)", provision):
+        if match := re.search(r"\b(\d+) of (\d{4})(?=[,) ]|$)", provision):
             identifiers.add(f"IE-{match[2]}-act-{int(match[1])}")
     correction = None
+    if norm_id == "IE-2010-act-25" and provision.startswith("Road Traffic (No. 2) Act 2011 (v),"):
+        identifiers = {"IE-2011-act-28"}
+        correction = "https://www.irishstatutebook.ie/eli/2011/act/28/section/9/enacted/en/html"
+    if provision == "Financial Services and Pensions Ombudsman Act 2017, s. 29(2)":
+        identifiers = {"IE-2017-act-22"}
+        correction = "https://www.irishstatutebook.ie/eli/2017/act/22/section/29/enacted/en/html"
+    if norm_id == "IE-2006-act-26" and provision.startswith(
+        "Criminal Justice (Suspended Sentences of Imprisonment) Act 2017 (4/2014),"
+    ):
+        identifiers = {"IE-2017-act-4"}
+        correction = "https://www.irishstatutebook.ie/eli/2017/act/4/section/3/enacted/en/html"
     if (
         norm_id == "IE-1983-act-24"
         and note == "Ss. 103, 104, 109, power to delegate functns. of Min."
@@ -294,6 +307,10 @@ def _effect_cells(doc, norm_id: str) -> list[list]:
     return rows
 
 
+def _collective_citation(note: str) -> bool:
+    return bool(re.match(r"^(?:Act included in |Collectively cited with ).+ Acts?\b", note))
+
+
 def parse_effects(
     data: bytes, norm_id: str, *, editorial_notes: list[dict] | None = None
 ) -> list[dict]:
@@ -303,7 +320,7 @@ def parse_effects(
     footnotes = [
         _text(node)
         for node in doc.xpath('//*[@id="effects"]/following-sibling::*[not(self::table)]')
-        if re.match(r"^(?:Ss?\.[\d\s(),a-z-]+)?\*", _text(node), re.I)
+        if re.match(r"^(?:Ss?\.[\d\s(),a-z-]+)?\*|^Ss?\.[\d\s(),a-z-]+:", _text(node), re.I)
     ]
     if not any(cells_by_row):
         raise ValueError(f"{norm_id}: effects table has no source rows")
@@ -325,6 +342,20 @@ def parse_effects(
         note = texts[0] or previous_note
         provision = texts[1]
         ids, correction = _affecting_ids(cells[1], provision, norm_id, note)
+        if (
+            not ids
+            and _collective_citation(note)
+            and (not provision or re.search(r"\b(?:Geo\.|Vict\.|Edw\.)", provision))
+        ):
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: collective citation requires an editorial_notes destination"
+                )
+            editorial_notes.append(
+                {"kind": "collective_citation", "note": note, "provision": provision}
+            )
+            previous_note = note
+            continue
         if pending_reference:
             if not ids or texts[0]:
                 raise ValueError(f"{norm_id}: See also has no following source citation")
@@ -354,10 +385,20 @@ def parse_effects(
         matching_footnotes = [
             footnote
             for footnote in footnotes
-            if marker
-            and (
-                re.search(r"\*+", footnote)[0] == marker[0]
+            if (
+                (
+                    marker
+                    and (footnote_marker := re.search(r"\*+", footnote))
+                    and footnote_marker[0] == marker[0]
+                )
                 or re.sub(r"[ *.]", "", note) == re.sub(r"[ *.]", "", footnote.split(":", 1)[0])
+                or (
+                    marker
+                    and ":" in footnote
+                    and (scoped := re.fullmatch(r"S\.\s*(\d+)\((\d+)\)\*+", note))
+                    and re.match(rf"^S\.\s*{scoped[1]}\(", footnote)
+                    and f"({scoped[2]})" in footnote.split(":", 1)[0]
+                )
             )
         ]
         if not ids and provision == "Order made under*" and len(matching_footnotes) == 1:
@@ -442,7 +483,7 @@ def parse_effects(
             previous_note = ""
             continue
         if not ids and re.fullmatch(
-            r"Resolution of (?:Dáil|Seanad) Éireann: Debates (?:Volume|Vol\.) \d+ no\. \d+, .+",
+            r"Resolution of (?:D[aá]il|Seanad) [EÉ]ireann: (?:Debates )?(?:Volume|Vol\.) \d+,? no\.? \d+, .+",
             provision,
             re.I,
         ):
@@ -553,7 +594,8 @@ def parse_effects(
                 effect["effective_date"] = source_date(effect["commencement"]).isoformat()
                 effect["source_correction"] = effect["commencement_source"]
             if identifier == "IE-1990-act-25" and re.fullmatch(
-                r"(?:Pensions Act 1990 \()?25/1990\)?, s\. 9A(?: \(see.*)?", provision
+                r"(?:Pensions Act 1990 \()?(?:25/1990|No\. 25 of 1990)\)?, s\. 9A(?:\s*\(see.*)?",
+                provision,
             ):
                 # Section 9A was inserted in 2013, with operation fixed by S.I. 103/2014.
                 effect["directory_source_id"] = identifier
@@ -736,6 +778,21 @@ def fetch_effects(
             year, kind, number = _parse_norm_id(source_id)
             effect["source_url"] = f"{client._base_url}/eli/{year}/{kind}/{number}/enacted/en/html"
         effect["directory_url"] = directory_url
+        if _collective_citation(effect["note"]):
+            original_date = parser.parse(enacted_data, norm_id).publication_date
+            if date.fromisoformat(effect["publication_date"]) < original_date:
+                if editorial_notes is None:
+                    raise ValueError(
+                        f"{norm_id}: earlier collective citation requires a provenance sink"
+                    )
+                editorial_notes.append(
+                    {
+                        **effect,
+                        "kind": "collective_citation",
+                        "reason": "An earlier member of the collectively cited Acts is context, not a later amendment.",
+                    }
+                )
+                continue
         if (
             continuity_note
             and effect["note"] == "Excl. provns. ext. to Customs-free Airport. *"

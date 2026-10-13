@@ -775,8 +775,23 @@ class ISBTextParser(TextParser):
             if not match:
                 match = re.match(r"\*\*Note \((\d+)\):\*\* (.+)", _html_inline_text(node))
             if not match:
+                match = re.match(r"\((\d+)\)\s+(.+)", _html_inline_text(node))
+                if match:
+                    # A trailing schedule footnote continues through its indented bullet paragraphs.
+                    for sibling in node.itersiblings():
+                        if sibling.tag != "p" or not _html_text(sibling).startswith("—"):
+                            break
+                        footnote_nodes.add(sibling)
+                elif node.find(".//sup") is not None:
+                    match = re.match(r"\^?(\d+)([^\d\s].+)", _html_inline_text(node))
+            if not match:
                 raise ValueError("Malformed ISB HTML footnote definition")
             marker, body_text = match.groups()
+            if _html_inline_text(node).startswith(f"({marker})"):
+                for sibling in node.itersiblings():
+                    if sibling not in footnote_nodes:
+                        break
+                    body_text += " " + _html_inline_text(sibling)
             number = marker if marker.isdigit() else f"star{len(marker)}"
             names = [
                 anchor.get("name", anchor.get("id", ""))
@@ -798,7 +813,16 @@ class ISBTextParser(TextParser):
             for anchor in node.iter("a"):
                 name = anchor.get("name", anchor.get("id", ""))
                 if re.fullmatch(r"fn_\d+", name):
-                    ctx.footnote_anchors[f"ret_{name}"] = (number, marker)
+                    source_marker = marker
+                    if (
+                        re.match(r"S\.I\. No\. 497/2003\b", doc.findtext(".//title") or "")
+                        and name == "fn_5"
+                        and marker == "6"
+                        and body_text == "O.J. L 141/27 of 11/6/1993"
+                    ):
+                        # This source's sixth explicit return anchor is mislabelled "1".
+                        source_marker = "1"
+                    ctx.footnote_anchors[f"ret_{name}"] = (number, source_marker)
             definitions[number] = body_text
             footnote_nodes.add(node)
         ctx.footnotes.extend(definitions.items())
@@ -1170,6 +1194,8 @@ def _html_inline_text(
                 # return anchor instead of using a superscript element.
                 if marker.startswith("*") and parts[-1].rstrip().endswith(marker):
                     parts[-1] = parts[-1].rstrip()[: -len(marker)] + f"[^{number}]"
+                elif marker.isdigit() and parts[-1].rstrip().endswith(f"({marker})"):
+                    parts[-1] = parts[-1].rstrip()[: -len(marker) - 2] + f"[^{number}]"
                 text = ""
                 if re.search(rf"Note \({re.escape(marker)}\)\*\*\s*$", "".join(parts)):
                     text = f"[^{number}]"
@@ -1335,25 +1361,39 @@ def _enactment_date(text: str) -> date | None:
     return _gazette_date(text) or _made_date(text)
 
 
-# The eISB copy leaves both signatures blank; the gazette notice supplies publication only.
-_INSTRUMENT_GAZETTE_NOTICES = {
+# Independently verified official copies fill dates omitted by these eISB transcriptions.
+_INSTRUMENT_DATE_EVIDENCE = {
     ("575", "2002"): (
         "2002-12-17",
+        "gazette_notice",
         "https://www.irisoifigiuil.ie/archive/2002/december/2002%2012%2017%20IO%20Issue.PDF#page=3",
+        (),
+    ),
+    ("79", "2003"): (
+        "2003-02-28",
+        "final_signature",
+        "https://www.comreg.ie/media/2024/12/SI-79-of-2003-Govt-Publications.pdf#page=20",
+        ("2003-02-18", "2003-02-28"),
+    ),
+    ("497", "2003"): (
+        "2003-11-07",
+        "gazette_notice",
+        "https://www.irisoifigiuil.ie/archive/2003/november/2003%2011%2007%20IO%20Issue.PDF#page=2",
+        ("2003-10-21",),
     ),
 }
 
 
-def _external_gazette_notice(title: str):
+def _instrument_date_evidence(title: str):
     match = re.match(r"S\.\s*I\.\s*No\.\s*(\d+)/(\d{4})\b", title, re.I)
-    return _INSTRUMENT_GAZETTE_NOTICES.get(match.groups()) if match else None
+    return _INSTRUMENT_DATE_EVIDENCE.get(match.groups()) if match else None
 
 
 def _instrument_date(text: str, title: str) -> date | None:
     if published := _gazette_date(text) or _made_date(text):
         return published
-    if notice := _external_gazette_notice(title):
-        return date.fromisoformat(notice[0])
+    if evidence := _instrument_date_evidence(title):
+        return date.fromisoformat(evidence[0])
     return None
 
 
@@ -1392,7 +1432,7 @@ def _signature_dates(text: str) -> list[date]:
         r"PRESENT when the Common Seal.{0,180}?this\s+|GIVEN under the official of the Minister[^0-9]{0,180}?|"
         r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,\s*|"
         r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|SIGNED[^0-9]{0,180}?\bthis\s+(?:the\s+)?|DUBLIN\.\s+This\s+)"
-        r"(\d{1,2})\s*(?:st|nd|rd|th)?[.,]?(?:\s*(?:day\s*)?of)?\s*"
+        r"(\d{1,2})\s*(?:st|nd|rd|th|h)?[.,]?(?:\s*(?:day\s*)?of)?\s*"
         r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s+(?:day of\s+)?(\d{4})",
         text,
         re.I,
@@ -1428,6 +1468,7 @@ def _parse_date_from_parts(day: int, month_str: str, year: int) -> date:
         "january": 1,
         "february": 2,
         "march": 3,
+        "marcg": 3,  # The enacted 2021 Act 3 XML mistypes March.
         "april": 4,
         "may": 5,
         "june": 6,
@@ -1605,10 +1646,20 @@ class ISBMetadataParser(MetadataParser):
                 expected_printed = expected_identity
             source_identity = (meta.findtext("number", ""), meta.findtext("year", ""))
             verified_printed = {
-                "IE-2017-act-14": ({("12", "2017"), ("14", "2017")}, "CRIMINAL JUSTICE ACT 2017"),
+                "IE-2017-act-14": (
+                    {("12", "2017"), ("14", "2017")},
+                    "CRIMINAL JUSTICE ACT 2017",
+                    source_url,
+                ),
+                "IE-2022-act-38": (
+                    {("38", "2022"), ("39", "2022")},
+                    "Credit Guarantee (Amendment) Act 2022",
+                    "https://www.irishstatutebook.ie/pdf/2022/en.act.2022.0038.pdf",
+                ),
                 "IE-2024-act-24": (
                     {("5", "2024"), ("24", "2024")},
                     "SOCIAL WELFARE (MISCELLANEOUS PROVISIONS) ACT 2024",
+                    source_url,
                 ),
             }.get(norm_id)
             corrected_printed_identity = (
@@ -1637,7 +1688,7 @@ class ISBMetadataParser(MetadataParser):
                         ("identity_source_printed_numbers", original_printed_numbers),
                         (
                             "identity_correction_source",
-                            source_url,
+                            verified_printed[2],
                         ),
                     )
                 )
@@ -1708,15 +1759,15 @@ class ISBMetadataParser(MetadataParser):
                 identity = re.match(r"S\.\s*I\.\s*No\.\s*(\d+)/(\d{4})\b", title, re.I)
                 if identity and norm_id != f"IE-{identity[2]}-si-{int(identity[1])}":
                     raise ValueError(f"{norm_id}: source identifies a different instrument")
-                notice = _external_gazette_notice(title) if not _made_date(source_text) else None
-                basis = (
-                    "gazette_notice" if _gazette_date(source_text) or notice else "final_signature"
-                )
-                if notice:
-                    extra += (
-                        ("publication_date_source", notice[1]),
-                        ("signature_date_unknown", "true"),
-                    )
+                evidence = _instrument_date_evidence(title) if not _made_date(source_text) else None
+                basis = "gazette_notice" if _gazette_date(source_text) else "final_signature"
+                if evidence:
+                    basis = "gazette_notice" if _gazette_date(source_text) else evidence[1]
+                    extra += (("publication_date_source", evidence[2]),)
+                    if evidence[3]:
+                        extra += (("signature_date_source", evidence[2]),)
+                    else:
+                        extra += (("signature_date_unknown", "true"),)
                 extra += (("publication_date_basis", basis),)
             elif published is not None:
                 extra += (
@@ -1724,6 +1775,8 @@ class ISBMetadataParser(MetadataParser):
                     ("publication_date_basis", "isb_enactment_date"),
                 )
             signature_dates = _signature_dates(source_text)
+            if "-si-" in norm_id and not signature_dates and evidence:
+                signature_dates = [date.fromisoformat(value) for value in evidence[3]]
             if signature_dates:
                 extra += (("made_date", signature_dates[-1].isoformat()),)
                 if len(signature_dates) > 1:
