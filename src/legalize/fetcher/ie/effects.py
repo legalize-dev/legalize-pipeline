@@ -860,7 +860,8 @@ def fetch_effects(
     """Fetch source effects and attach actual affecting-instrument publication dates."""
     from legalize.fetcher.ie.parser import ISBMetadataParser, _is_xml_source
 
-    continuity_note = None
+    continuity_notes = {}
+    continuity_section = None
     if norm_id == CONSTITUTION_ID:
         effects = constitution_effects(enacted_data)
         directory_url = f"{client._base_url}/eli/cons/en/html"
@@ -897,23 +898,40 @@ def fetch_effects(
                 directory_data = client._get(directory_url)
             elif ranges:
                 raise ValueError(f"{norm_id}: ambiguous instrument directory range")
-        if norm_id == "IE-1966-act-6":
-            note = (
-                "*Excl. provns. ext. to Customs-free Airport. : "
-                "See s. 20 (1), Interpretation Act, 1937."
-            )
-            continuation = (
+        continuity = {
+            "IE-1966-act-6": (
+                "9",
                 "Any document referring to any repealed enactment shall be construed "
-                "as referring to this Act or the corresponding provision of this Act."
-            )
+                "as referring to this Act or the corresponding provision of this Act.",
+            ),
+            "IE-1958-act-11": (
+                "10",
+                "any document referring to any enactment repealed by subsection (1) "
+                "of this section shall, unless the contrary intention appears, be construed "
+                "as referring to the corresponding enactment of this Act.",
+            ),
+            "IE-1980-act-10": (
+                "11",
+                "The Landlord and Tenant (Amendment) Act, 1971, shall have effect as if "
+                "the references to provisions of the Act of 1958 were to the corresponding "
+                "provisions of this Act.",
+            ),
+        }.get(norm_id)
+        if continuity:
+            continuity_section, continuation = continuity
             enacted_doc = html.fromstring(enacted_data)
-            provision = enacted_doc.xpath('//*[@id="SEC9"]')
-            if (
-                note in _text(html.fromstring(directory_data))
-                and len(provision) == 1
-                and continuation in _text(provision[0])
-            ):
-                continuity_note = note
+            provision = enacted_doc.xpath(f'//*[@id="SEC{continuity_section}"]')
+            if len(provision) == 1 and continuation in _text(provision[0]):
+                for node in html.fromstring(directory_data).xpath(
+                    '//*[@id="effects"]/following-sibling::*[not(self::table)]'
+                ):
+                    note = _text(node)
+                    label, _, basis = note.partition(":")
+                    if basis.strip() in {
+                        "See s. 20 (1), Interpretation Act, 1937.",
+                        "See Interpretation Act, 1937, s. 20 (1).",
+                    }:
+                        continuity_notes[re.sub(r"[ *]", "", label)] = note
         source_notes = []
         effects = parse_effects(directory_data, norm_id, editorial_notes=source_notes)
         if editorial_notes is not None:
@@ -966,14 +984,22 @@ def fetch_effects(
                     }
                 )
                 continue
-        if (
-            continuity_note
-            and effect["note"] == "Excl. provns. ext. to Customs-free Airport. *"
-            and (source_id, effect["provision"])
-            in {
+        continuity_note = None
+        if continuity_notes:
+            if norm_id == "IE-1980-act-10":
+                continuity_note = continuity_notes.get(re.sub(r"[ *]", "", effect["provision"]))
+            elif effect["note"] == "Excl. provns. ext. to Customs-free Airport. *" and (
+                source_id,
+                effect["provision"],
+            ) in {
                 ("IE-1947-si-115", "S.R. & O. No. 115 of 1947"),
                 ("IE-1951-si-60", "S.R. & O. No. 60 of 1951"),
-            }
+            }:
+                continuity_note = continuity_notes.get(re.sub(r"[ *]", "", effect["note"]))
+        if (
+            continuity_note
+            and date.fromisoformat(effect["publication_date"])
+            < parser.parse(enacted_data, norm_id).publication_date
         ):
             if editorial_notes is None:
                 raise ValueError(f"{norm_id}: inherited application requires a provenance sink")
@@ -991,7 +1017,8 @@ def fetch_effects(
                             "https://www.irishstatutebook.ie/eli/1937/act/38/section/20/enacted/en/html"
                         ),
                         "re_enactment_source": (
-                            "https://www.irishstatutebook.ie/eli/1966/act/6/section/9/enacted/en/html"
+                            f"{client._base_url}/eli/{year}/{kind}/{number}/"
+                            f"section/{continuity_section}/enacted/en/html"
                         ),
                     },
                 }
