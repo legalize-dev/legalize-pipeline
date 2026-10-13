@@ -1,0 +1,23 @@
+[
+  {
+    "identifier": "IE-2004-act-3",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2004/3/act_new_plain.pdf?versionId=hBjqfrYx9EPtNntpKC9DF5H4PQvI3BtX",
+    "sha256": "69987fceb7c4fbd8d7b5209f0f80bdee32739d2a0cbe1a61f62a4dd7826766c1",
+    "file": "archive-ie-2004-act-3-label-defect.pdf.gz",
+    "reviewed_page": 46
+  },
+  {
+    "identifier": "IE-2005-act-20",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/20/act_plain.pdf?versionId=null",
+    "sha256": "3f40f0dd15295f18d710fa9f397d6cd8664095a5947fe377e1de803de8f670db",
+    "file": "archive-ie-2005-act-20-label-defect.pdf.gz",
+    "reviewed_page": 7
+  },
+  {
+    "identifier": "IE-2013-act-15",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=SR6AVfOPtCSElQbme69BeTuLAHGM8gvM",
+    "sha256": "dbb963cf87485993227c9213345323a3d20a35e886e443db2fb413d252c6c7ff",
+    "file": "archive-ie-2013-act-15-label-defect.pdf.gz",
+    "reviewed_page": 54
+  }
+]

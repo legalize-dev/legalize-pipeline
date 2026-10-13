@@ -81,19 +81,61 @@ _KNOWN_CUTOFF_CONFLICTS = {
     ),
 }
 
-# The contents and title identify section 14; the body omits only its number.
-# Evidence: tests/fixtures/ie/pdf-incomplete-headings-evidence.json.
+# The contents and title identify each section; the body omits only its number.
+# Evidence: pdf-incomplete-headings-evidence.json and pdf-label-defects-evidence.json fixtures.
 _KNOWN_UNNUMBERED_SECTIONS = {
     "c450d687d0be72849490e9e429c2b3e3152a12b5186955aa0252783864c5359f": (  # pragma: allowlist secret
         "14",
         "Amendment of Bail Act 1997",
         "The Schedule to the Bail Act 1997 is amended by the insertion of the following",
     ),
+    "dbb963cf87485993227c9213345323a3d20a35e886e443db2fb413d252c6c7ff": (  # pragma: allowlist secret
+        "71M",
+        "F50[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+}
+
+# Preserve verified source numbering defects verbatim, with visible warnings and exact counts.
+# Evidence: tests/fixtures/ie/pdf-label-defects-evidence.json.
+_KNOWN_LABEL_DEFECTS = {
+    "69987fceb7c4fbd8d7b5209f0f80bdee32739d2a0cbe1a61f62a4dd7826766c1": {  # pragma: allowlist secret
+        "duplicates": {"30M": 2},
+        "missing": frozenset(),
+        "warning": (
+            "This official Civil Registration Act 2004 PDF repeats section number 30M under "
+            "two Part 3C headings, for stillbirths and surrogacy. Both entries and their labels "
+            "are preserved as printed. A reference to section 30M alone is ambiguous in this source."
+        ),
+    },
+    "3f40f0dd15295f18d710fa9f397d6cd8664095a5947fe377e1de803de8f670db": {  # pragma: allowlist secret
+        "duplicates": {},
+        "missing": frozenset({"33E"}),
+        "warning": (
+            "This official Garda Síochána Act 2005 consolidated PDF is incomplete: section 33E "
+            "is listed as repealed in its contents but absent from the body. Its text has not "
+            "been reconstructed. Check the original legislation for its text and repeal history."
+        ),
+    },
+    "dbb963cf87485993227c9213345323a3d20a35e886e443db2fb413d252c6c7ff": {  # pragma: allowlist secret
+        "duplicates": {"69": 2},
+        "missing": frozenset({"70"}),
+        "warning": (
+            "This official Animal Health and Welfare Act 2013 PDF prints section number 69 twice. "
+            "The second entry, 'Regulations in relation to animal marts', is numbered 70 in the "
+            "contents. Both body entries and their printed labels are preserved without "
+            "renumbering. Section 71M's body omits its number; its boundary is identified by the "
+            "contents and matching title without inserting a number into its body text. "
+            "Check the official legislation before relying on these section numbers."
+        ),
+    },
 }
 
 
 def source_warning(data: bytes) -> str | None:
     """Return the verified limitation for an exact official PDF."""
+    if defect := _KNOWN_LABEL_DEFECTS.get(sha256(data).hexdigest()):
+        return defect["warning"]
     if sha256(data).hexdigest() in _KNOWN_SOURCE_OMISSIONS:
         return (
             "This official Companies Act 2014 consolidated PDF is incomplete: section 1384A "
@@ -451,6 +493,8 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     """Extract the actual dated legal text, preserving marginal section titles."""
     events, updated, expected = _read(data)
     missing_label = _KNOWN_UNNUMBERED_SECTIONS.get(sha256(data).hexdigest())
+    label_defect = _KNOWN_LABEL_DEFECTS.get(sha256(data).hexdigest(), {})
+    allowed_duplicates = label_defect.get("duplicates", {})
     footnotes = []
     body_events = []
     previous_note = None
@@ -655,7 +699,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     pending_title = False
     pending_x = None
     previous: _Line | None = None
-    seen: set[str] = set()
+    seen: Counter[str] = Counter()
     schedule = False
     schedule_start = None
     primary_x = first_label.x0
@@ -737,15 +781,6 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             previous = None
             continue
         match = _section_match(item, allow_plain=marginal and abs(item.x0 - primary_x) < 10)
-        if (
-            match is None
-            and missing_label
-            and pending_title
-            and re.sub(r"\*+", "", pending) == missing_label[1]
-            and text == missing_label[2]
-            and missing_label[0] in expected
-        ):
-            match = _SECTION.match(f"{missing_label[0]}.")
         caption = (
             next(
                 (
@@ -759,9 +794,21 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 ),
                 [],
             )
-            if match and not schedule
+            if (match or missing_label) and not schedule
             else []
         )
+        if (
+            match is None
+            and missing_label
+            and text == missing_label[2]
+            and missing_label[0] in expected
+            and (
+                pending_title
+                and re.sub(r"\*+", "", pending) == missing_label[1]
+                or " ".join(_inline(m, emphasis=False) for m in caption) == missing_label[1]
+            )
+        ):
+            match = _SECTION.match(f"{missing_label[0]}.")
         marginal_title = bool(caption)
         # A primary marginal caption ends a preceding quote even when the source omits its delimiter.
         if match and marginal_title:
@@ -805,9 +852,9 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             primary = primary and (abs(item.x0 - primary_x) < 2 or indented_label)
         if primary:
             number = match[1]
-            if number in seen:
+            if seen[number] >= allowed_duplicates.get(number, 1):
                 raise UnsupportedPDF(f"Duplicate primary section {number} in Revised Act PDF")
-            seen.add(number)
+            seen[number] += 1
             title = ""
             if marginal_title:
                 # Wrapped caption lines cannot become headings for quoted or numbered body text.
@@ -854,11 +901,16 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         pending = _join(pending, _inline(item))
         previous = item
     flush()
-    missing = expected - seen
-    if missing and missing != _KNOWN_SOURCE_OMISSIONS.get(sha256(data).hexdigest()):
+    missing = expected - seen.keys()
+    allowed_missing = label_defect.get(
+        "missing", _KNOWN_SOURCE_OMISSIONS.get(sha256(data).hexdigest())
+    )
+    if missing and missing != allowed_missing:
         raise UnsupportedPDF(
             f"Revised Act PDF is missing sections listed in its contents: {', '.join(sorted(missing))}"
         )
+    if any(seen[number] != count for number, count in allowed_duplicates.items()):
+        raise UnsupportedPDF("Verified duplicate section entries were not fully preserved")
     if not seen:
         raise UnsupportedPDF("Revised Act PDF has no legal sections")
     if margins:
