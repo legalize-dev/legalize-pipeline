@@ -430,15 +430,25 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     )
     lines: list[_Line | Paragraph] = []
     margins: list[_Line] = []
+    captions: list[list[_Line]] = []
     for event in events:
         if not isinstance(event, _Line) or not marginal or event.x0 >= first_label.x0 - 52.64:
             lines.append(event)
             continue
         # XEP's caption column moves with the body margin; smaller glyphs can hang into the gutter.
+        caption_fonts = {
+            (round(c["top"], 2), round(c["bottom"], 2), c["fontname"])
+            for c in event.chars
+            if c["x0"] < first_label.x0 - 52.64
+        }
         side = [
             c
             for c in event.chars
-            if c["x0"] < margin_edge or (c["x0"] < margin_edge + 4 and c["size"] < 9.5)
+            if (c["x0"] < margin_edge or (c["x0"] < margin_edge + 4 and c["size"] < 9.5))
+            and (
+                not all("Bold" in font for _, _, font in caption_fonts)
+                or (round(c["top"], 2), round(c["bottom"], 2), c["fontname"]) in caption_fonts
+            )
         ]
         body = [c for c in event.chars if c not in side]
         caption_rows = {
@@ -461,14 +471,18 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             # glyph baselines remain distinct (even when the font sizes match).
             # Extend a caption only when this recovers a bold primary label at
             # the body column; all recovered glyphs remain in the source title.
-            caption_rows = {(round(c["top"], 2), round(c["bottom"], 2)) for c in side}
+            caption_rows = {
+                (round(c["top"], 2), round(c["bottom"], 2), c["fontname"]) for c in side
+            }
             overflow = [
-                c for c in body if (round(c["top"], 2), round(c["bottom"], 2)) in caption_rows
+                c
+                for c in body
+                if (round(c["top"], 2), round(c["bottom"], 2), c["fontname"]) in caption_rows
             ]
             candidate = [c for c in body if c not in overflow]
             if (
                 overflow
-                and all(c["x0"] < first_label.x0 for c in overflow)
+                and all(c["x0"] < first_label.x0 + 10 for c in overflow)
                 and (not candidate or min(c["x0"] for c in candidate) >= first_label.x0 - 10)
             ):
                 side.extend(overflow)
@@ -523,6 +537,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             if (
                 locator
                 or re.match(r"^\[(?:New\b|Cf\. \d{4}\b|\d{4}\b|R\.S\.C\.)", start.text)
+                or re.match(r"^S\.R\. & O\. No\. \d+", start.text)
                 or (min(line.x0 for line in group) > margin_x + 12 and not aligned_label)
             ):
                 text = ""
@@ -540,6 +555,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 lines.insert(position, Paragraph("parrafo", text))
             else:
                 preserved.extend(group)
+                captions.append(group)
         margins = preserved
 
     paragraphs: list[Paragraph] = []
@@ -631,9 +647,19 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             previous = None
             continue
         match = _section_match(item, allow_plain=marginal and abs(item.x0 - primary_x) < 10)
-        marginal_title = marginal and any(
-            m.page == item.page and abs(m.top - item.top) < 6 for m in margins
+        caption = (
+            next(
+                (
+                    group
+                    for group in captions
+                    if group[0].page == item.page and abs(group[0].top - item.top) < 6
+                ),
+                [],
+            )
+            if match and not schedule
+            else []
         )
+        marginal_title = bool(caption)
         # A primary marginal caption ends a preceding quote even when the source omits its delimiter.
         if match and marginal_title:
             quote_depth = 0
@@ -671,23 +697,10 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             seen.add(number)
             title = ""
             if marginal_title:
-                selected = [m for m in margins if m.page == item.page and item.top - 6 <= m.top]
-                # Stop before a following section's marginal heading.
-                next_section = next(
-                    (
-                        n
-                        for n in lines[i:]
-                        if isinstance(n, _Line)
-                        and n.page == item.page
-                        and _section_match(n, allow_plain=True)
-                    ),
-                    None,
-                )
-                if next_section:
-                    selected = [m for m in selected if m.top < next_section.top - 6]
-                if selected and abs(selected[0].top - item.top) < 6:
-                    title = " ".join(_inline(m, emphasis=False) for m in selected)
-                    margins = [m for m in margins if m not in selected]
+                # Wrapped caption lines cannot become headings for quoted or numbered body text.
+                title = " ".join(_inline(m, emphasis=False) for m in caption)
+                margins = [m for m in margins if m not in caption]
+                captions.remove(caption)
             else:
                 # The preceding bold title was buffered as a paragraph.
                 if previous and previous.page == item.page and pending_title and pending:

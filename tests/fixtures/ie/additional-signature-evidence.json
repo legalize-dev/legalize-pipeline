@@ -1,0 +1,192 @@
+[
+  {
+    "identifier": "IE-2003-si-681",
+    "source_url": "https://www.irishstatutebook.ie/2003/ga/si/0681.html",
+    "source_sha256": "96487deea19d377e8e64bcccde80acb284291218e9a64c43fcd50848934bd8f2",
+    "file": "sample-signature-2003-681.html",
+    "fixture_sha256": "cff279d9043fbd60aece9f37c50aae3383366b870a2e5cb0372056dee4276695",
+    "expected_date": "2003-12-10",
+    "signature_dates": [
+      "2003-12-08",
+      "2003-12-10"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1936-si-211",
+    "source_url": "https://www.irishstatutebook.ie/eli/1936/si/211/made/en/html",
+    "source_sha256": "1251933d6b434b48f6ab8917d623b3d45ac12f07edd9b3d3dc00b545a0cc8bd4",
+    "file": "sample-signature-1936-211.html",
+    "fixture_sha256": "247d1dab25665b5046a188090463074441d56ce3dcaa6b1c218d6a95267d28c3",
+    "expected_date": "1936-07-28",
+    "signature_dates": [
+      "1936-07-28"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1990-si-328",
+    "source_url": "https://www.irishstatutebook.ie/1990/ga/si/0328.html",
+    "source_sha256": "965b68cef31e951c41d658b616bb436639182a87aace3c07e45d32feb8a301c9",
+    "file": "sample-signature-1990-328.html",
+    "fixture_sha256": "f2de46b5a3cb6d93b821428e6fec2b21056293271838033503a537d996155440",
+    "expected_date": "1990-12-21",
+    "signature_dates": [
+      "1990-12-21"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-2003-si-12",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/12/made/en/html",
+    "source_sha256": "49dc21c90a83e303b5fe00a459ef8e7df8bb36f4a3d77c5932513506a4e3fa50",
+    "file": "sample-signature-2003-12.html",
+    "fixture_sha256": "e32e95b8288ba5fe28d1197c6fbab368cf964639a136bb115b50880df655ff2f",
+    "expected_date": "2003-01-23",
+    "signature_dates": [
+      "2003-01-23"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1997-si-479",
+    "source_url": "https://www.irishstatutebook.ie/eli/1997/si/479/made/en/html",
+    "source_sha256": "eaac98e8b6fb229c7563fbd32786b979b34d387865a6d6252dd662c67aeb0747",
+    "file": "sample-signature-1997-479.html",
+    "fixture_sha256": "b4814c21dd963e206d06bd94608fd4c2126a1cf4c1e800dc9d7ea998d91323c3",
+    "expected_date": "1997-12-03",
+    "signature_dates": [
+      "1997-11-28",
+      "1997-12-03"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1954-si-161",
+    "source_url": "https://www.irishstatutebook.ie/eli/1954/si/161/made/en/html",
+    "source_sha256": "e481c16ac239e49b562c7f11904351bd6e3104598aecbf416a951a7b3300206b",
+    "file": "sample-signature-1954-161.html",
+    "fixture_sha256": "468d0f364bf23c9ba84e404501386a73f308c8034fe22eee925f6a96ffe6fb03",
+    "expected_date": "1954-07-31",
+    "signature_dates": [
+      "1954-07-31"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1981-si-404",
+    "source_url": "https://www.irishstatutebook.ie/eli/1981/si/404/made/en/html",
+    "source_sha256": "ef09870345713a939be54b51bd991eb1cd9e72a83f3921c5b3816f925738b58d",
+    "file": "sample-signature-1981-404.html",
+    "fixture_sha256": "1a66023a9eed674d926787bb5fd02f8b9c3819d91f304015856e001bbf5ba4c5",
+    "expected_date": "1981-11-24",
+    "signature_dates": [
+      "1981-11-24"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-2000-si-24",
+    "source_url": "https://www.irishstatutebook.ie/eli/2000/si/24/made/en/html",
+    "source_sha256": "b6be9b6025db6c8caa6f40de83b0ff37a5baf2f713c2329e2755a46d255bf413",
+    "file": "sample-signature-2000-24.html",
+    "fixture_sha256": "34dea5b661d8da9aa14b8f5bb5073427fdb647512ed191ff277ea6430de179be",
+    "expected_date": "2000-01-28",
+    "signature_dates": [
+      "2000-01-28"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1997-si-63",
+    "source_url": "https://www.irishstatutebook.ie/eli/1997/si/63/made/en/html",
+    "source_sha256": "08bee5016973ee8f7d81e57a5b2296f163e840623a8e0bdbad753d526e8c363f",
+    "file": "sample-signature-1997-63.html",
+    "fixture_sha256": "030da3941ecc6d6120c137ece3c92b7f0fc58d6d6156a08c5a6be9b89aff8a5e",
+    "expected_date": "1997-02-03",
+    "signature_dates": [
+      "1997-02-03"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-2005-si-73",
+    "source_url": "https://www.irishstatutebook.ie/eli/2005/si/73/made/en/html",
+    "source_sha256": "c7e84a71b66112d3a4386cf4949010b7dd5d66cc706e0e7efe596f9b2a4dce39",
+    "file": "sample-signature-2005-73.html",
+    "fixture_sha256": "0067e27b1d3417e0bf0fc34821ae9253cadda7412834591bb997af1a59b4a8ad",
+    "expected_date": "2005-02-17",
+    "signature_dates": [
+      "2005-02-17"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1998-si-517",
+    "source_url": "https://www.irishstatutebook.ie/eli/1998/si/517/made/en/html",
+    "source_sha256": "13532de2c23b35c99fd44a2d37b44b96311ae536572ea97bd229fbc0b2c4118d",
+    "file": "sample-signature-1998-517.html",
+    "fixture_sha256": "31e4f15984a7e5481fda6b0c04fd73524cc918d8d805d743d54273cbcb8f7960",
+    "expected_date": "1998-12-22",
+    "signature_dates": [
+      "1998-12-22"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-1997-si-393",
+    "source_url": "https://www.irishstatutebook.ie/eli/1997/si/393/made/en/html",
+    "source_sha256": "08895881c7a429b72854d1016585e171da4ecfeef9236ae09c68f4d86e41c710",
+    "file": "sample-signature-1997-393.html",
+    "fixture_sha256": "3fda5003b5f2271e27be6c693c74c5cc14a9c756d5b248a951450e2d596cee1d",
+    "expected_date": "1997-09-30",
+    "signature_dates": [
+      "1997-09-30"
+    ],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  },
+  {
+    "identifier": "IE-2002-si-345",
+    "source_url": "https://www.irishstatutebook.ie/eli/2002/si/345/made/en/html",
+    "source_sha256": "6c1c5f172912bdeaaba0419537891e2736df59a66bac8109ca2b5de310b33c5d",
+    "file": "sample-signature-2002-345.html",
+    "fixture_sha256": "5a6c7bc4023de015942c248ef3caa970964bf065ba9a6bfb615ce12699b4eea8",
+    "expected_date": "2002-07-19",
+    "signature_dates": [],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted",
+    "corroboration": {
+      "identifier": "IE-2002-si-345",
+      "publication_date": "2002-07-19",
+      "url": "https://www.irisoifigiuil.ie/archive/2002/july/2002%2007%2019%20IO%20Issue.PDF#page=9",
+      "page": 9,
+      "sha256": "62bbadabe5e00b0c2c899a6e79e5ed9b3bf5388853253fa27cbdfa2f1273c75f"
+    }
+  },
+  {
+    "identifier": "IE-2001-si-580",
+    "source_url": "https://www.irishstatutebook.ie/eli/2001/si/580/made/en/html",
+    "source_sha256": "03812091e9b31b685eddfe5493c01c904931cbe75646257b911d40bfde693b1d",
+    "file": "sample-signature-2001-580.html",
+    "fixture_sha256": "572b314fd0a55269f376fbbc61b00b8183a5b8ec7f54b542333ff459f8151b9a",
+    "expected_date": "2002-01-29",
+    "signature_dates": [],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted",
+    "corroboration": {
+      "identifier": "IE-2001-si-580",
+      "publication_date": "2002-01-29",
+      "url": "https://www.irisoifigiuil.ie/archive/2002/january/2002%2001%2029%20IO%20Issue.PDF#page=1",
+      "page": 1,
+      "sha256": "62e02bad29ce665fd465b17a893b3ef3ef7341b5c835a9ac69c826e0efbeec4c"
+    }
+  },
+  {
+    "identifier": "IE-1998-si-568",
+    "source_url": "https://www.irishstatutebook.ie/eli/1998/si/568/made/en/html",
+    "source_sha256": "04df738914bbf96970cf50a1c0324245ca097cf92b84543dfb8e4ba97182ebb3",
+    "file": "sample-signature-1998-568.html",
+    "fixture_sha256": "31c2deab78ff4b6dc7807e312c3179a8ef60cfa2dc798e8804332e0a321b24b6",
+    "expected_date": null,
+    "signature_dates": [],
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+  }
+]

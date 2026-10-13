@@ -1,6 +1,8 @@
 """Later catalogue entries retain source dates, references and editorial findings."""
 
+import json
 from datetime import date
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
@@ -9,6 +11,53 @@ from legalize.fetcher.ie.effects import parse_effects
 from legalize.fetcher.ie.parser import ISBMetadataParser, ISBTextParser, _signature_dates
 
 FIXTURES = Path(__file__).parent / "fixtures/ie"
+
+
+@pytest.mark.parametrize(
+    "evidence",
+    json.loads((FIXTURES / "additional-signature-evidence.json").read_text()),
+    ids=lambda evidence: evidence["identifier"],
+)
+def test_verified_signature_blocks_keep_metadata_and_body_dates_aligned(evidence):
+    raw = (FIXTURES / evidence["file"]).read_bytes()
+    assert sha256(raw).hexdigest() == evidence["fixture_sha256"]
+    if evidence["expected_date"] is None:
+        with pytest.raises(ValueError, match="lacks its title or enactment date"):
+            ISBMetadataParser().parse(raw, evidence["identifier"])
+        with pytest.raises(ValueError, match="date"):
+            ISBTextParser().parse_text(raw)
+        return
+    metadata = ISBMetadataParser().parse(raw, evidence["identifier"])
+    version = ISBTextParser().parse_text(raw)[0].versions[0]
+    expected = date.fromisoformat(evidence["expected_date"])
+    assert metadata.publication_date == version.publication_date == expected
+    extra = dict(metadata.extra)
+    signatures = evidence["signature_dates"]
+    if signatures:
+        assert extra["made_date"] == signatures[-1]
+        if len(signatures) > 1:
+            assert json.loads(extra["signature_dates"]) == signatures
+        assert extra["publication_date_basis"] == "final_signature"
+    else:
+        assert extra["signature_date_unknown"] == "true"
+        assert extra["publication_date_basis"] == "gazette_notice"
+        assert extra["publication_date_source"] == evidence["corroboration"]["url"]
+        assert "made_date" not in extra
+    if "/ga/" in evidence["source_url"]:
+        assert extra["language"] == "ga"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "a Deed dated the 17th day of February 1965",
+        "an Order made 23 January 2003",
+        "The commencement date is 17/02/2005.",
+        "The certificate was given 23 January 2003.",
+    ],
+)
+def test_referenced_dates_are_not_signature_blocks(text):
+    assert _signature_dates(text) == []
 
 
 @pytest.mark.parametrize(

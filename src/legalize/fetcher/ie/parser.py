@@ -1365,6 +1365,12 @@ def _enactment_date(text: str) -> date | None:
 
 # Independently verified official copies fill dates omitted by these eISB transcriptions.
 _INSTRUMENT_DATE_EVIDENCE = {
+    ("580", "2001"): (
+        "2002-01-29",
+        "gazette_notice",
+        "https://www.irisoifigiuil.ie/archive/2002/january/2002%2001%2029%20IO%20Issue.PDF#page=1",
+        (),
+    ),
     ("248", "2002"): (
         "2002-08-09",
         "gazette_notice",
@@ -1375,6 +1381,12 @@ _INSTRUMENT_DATE_EVIDENCE = {
         "2002-12-17",
         "gazette_notice",
         "https://www.irisoifigiuil.ie/archive/2002/december/2002%2012%2017%20IO%20Issue.PDF#page=3",
+        (),
+    ),
+    ("345", "2002"): (
+        "2002-07-19",
+        "gazette_notice",
+        "https://www.irisoifigiuil.ie/archive/2002/july/2002%2007%2019%20IO%20Issue.PDF#page=9",
         (),
     ),
     ("79", "2003"): (
@@ -1436,17 +1448,25 @@ def _signature_dates(text: str) -> list[date]:
         flags=re.I,
     ).replace("_", " ")
     matches = re.finditer(
-        r"(?:(?:GIVEN under|SEALED with).{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+(?:this|on),?\s+|"
-        r"PRESENT when the Common Seal.{0,180}?this\s+|GIVEN under the official of the Minister[^0-9]{0,180}?|"
+        r"(?:(?:GI{1,2}VEN(?: at Dublin)? under|SEALED with).{0,180}?\b(?:Sea[l1]|hand)\b[^0-9]{0,180}?|"
+        r"GIVEN\s+(?:this|on),?\s+|(?-i:GIVEN)\s+|"
+        r"PRESENT when the Common Seal.{0,180}?(?:this|on the)\s+|GIVEN under the official of the Minister[^0-9]{0,180}?|"
         r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,\s*|"
-        r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|SIGNED[^0-9]{0,180}?\bthis\s+(?:the\s+)?|DUBLIN\.\s+This\s+)"
-        r"(\d{1,2})\s*(?:st|nd|rd|th|h)?[.,]?(?:\s*(?:day\s*)?of)?\s*"
-        r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s+(?:day of\s+)?(\d{4})",
+        r"(?-i:Dated|DATED)\s*,?\s*(?:(?:this|the)\s+)?|(?-i:Made|MADE)\s+|"
+        r"SIGNED[^0-9]{0,180}?\bthis\s+(?:the\s+)?|DUBLIN\s*[:.]\s+This\s+)"
+        r'(\d{1,2})\s*(?:st|nd|rd|th|h)?[.,"]?(?:\s*day)?(?:\s*of)?\s*'
+        r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s*(?:day of\s+)?(\d{4})",
         text,
         re.I,
     )
     irish_matches = re.finditer(
-        r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,?\s+an\s+(\d{1,2})ú?\s+lá seo de\s+(\w+),?\s+(\d{4})",
+        r"ARNA THABHAIRT.{0,180}?Sh(?:éa|eá)la Oifigiúil(?:\s+an Aire Airgeadais)?[,]?\s*(?:an\s+)?"
+        r"(\d{1,2})ú?\s+lá seo de\s+(\w+),?\s*(\d{4})",
+        text,
+        re.I,
+    )
+    numeric_matches = re.finditer(
+        r"GIVEN under.{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?(\d{1,2})/(\d{1,2})/(\d{4})",
         text,
         re.I,
     )
@@ -1459,7 +1479,7 @@ def _signature_dates(text: str) -> list[date]:
     return sorted(
         {
             _parse_date_from_parts(int(match[1]), match[2], int(match[3]))
-            for match in [*matches, *irish_matches, *reversed_matches]
+            for match in [*matches, *irish_matches, *numeric_matches, *reversed_matches]
         }
     )
 
@@ -1488,6 +1508,9 @@ def _parse_date_from_parts(day: int, month_str: str, year: int) -> date:
         "december": 12,
         "decembe": 12,  # The enacted 2017 Act 33 XML truncates December.
         "feabhra": 2,
+        "mheitheamh": 6,
+        "nollaig": 12,
+        "sept": 9,
     }
     months.update({name[:3]: value for name, value in list(months.items())})
     month = months.get(month_str.lower())

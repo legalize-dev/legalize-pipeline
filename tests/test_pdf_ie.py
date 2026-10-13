@@ -530,6 +530,40 @@ def test_authentic_captioned_labels_preserve_their_titles(name, heading):
     assert [p.text for p in paragraphs if p.css_class == "articulo"].count(heading) == 1
     if name == "extradition-1965-plain":
         assert any(p.css_class == "articulo" and p.text.startswith("44A. ") for p in paragraphs)
+        assert any(
+            p.css_class == "parrafo" and p.text == "S.R. & O. No. 431 of 1947." for p in paragraphs
+        )
+
+
+@pytest.mark.parametrize(
+    ("name", "heading", "quoted_number"),
+    [
+        (
+            "forensic-2014-captions",
+            "103. **Destruction of fingerprints, palm prints and photographs**",
+            "8",
+        ),
+        (
+            "tenancies-2019-captions",
+            "1. **Short title, collective citation, construction and commencement**",
+            "24BA",
+        ),
+    ],
+)
+def test_wrapped_marginal_titles_keep_all_glyphs_without_promoting_quoted_labels(
+    name, heading, quoted_number
+):
+    paragraphs, _ = parse_revised_pdf((FIXTURES / f"archive-{name}-excerpt.pdf").read_bytes())
+    headings = [p.text for p in paragraphs if p.css_class == "articulo"]
+    assert headings.count(heading) == 1
+    assert not any(p.startswith(f"{quoted_number}.") for p in headings)
+    text = re.sub(r"\*+", "", "\n".join(p.text for p in paragraphs))
+    assert "commencement" in next(h for h in headings if h.startswith("1."))
+    if name == "forensic-2014-captions":
+        assert "for section 8:" in text
+        assert "8. (1) A fingerprint, palm print or photograph of a person" in text
+    else:
+        assert "to 2019 and shall be construed together as one." in text
 
 
 def test_schedule_captions_keep_their_source_order_without_becoming_act_sections():
