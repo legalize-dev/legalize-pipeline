@@ -513,6 +513,56 @@ def test_indented_quoted_titles_do_not_become_primary_sections(monkeypatch):
         parse_revised_pdf(data)
 
 
+@pytest.mark.parametrize(
+    ("name", "heading"),
+    [
+        ("extradition-1965-plain", "4. **Laying of orders before Houses of Oireachtas.**"),
+        ("industrial-1969-baseline", "2. **Membership of the Court.**"),
+        ("customs-2015-page-title", "12A. **F3[Customs control at customs ports**"),
+        ("online-2022-label", "2. **Definitions**"),
+        ("offenders-2001-first-label", "1. **Short title and commencement.**"),
+        ("road-2006-first-label", "1. **Obligation to provide specimen following arrest, etc.**"),
+        ("information-2017-first-label", "1. **Interpretation**"),
+    ],
+)
+def test_authentic_captioned_labels_preserve_their_titles(name, heading):
+    paragraphs, _ = parse_revised_pdf((FIXTURES / f"archive-{name}-excerpt.pdf").read_bytes())
+    assert [p.text for p in paragraphs if p.css_class == "articulo"].count(heading) == 1
+    if name == "extradition-1965-plain":
+        assert any(p.css_class == "articulo" and p.text.startswith("44A. ") for p in paragraphs)
+
+
+def test_schedule_captions_keep_their_source_order_without_becoming_act_sections():
+    paragraphs, _ = parse_revised_pdf(
+        (FIXTURES / "archive-maintenance-1994-schedule-excerpt.pdf").read_bytes()
+    )
+    assert [p.text.split(".", 1)[0] for p in paragraphs if p.css_class == "articulo"] == [
+        "1",
+        "2",
+        "3",
+    ]
+    text = "\n".join(p.text for p in paragraphs).upper()
+    assert text.index("FIRST SCHEDULE") < text.index("PREAMBLE") < text.index("LANGUAGE")
+    assert text.index("LANGUAGE") < text.index("SECOND SCHEDULE")
+
+
+def test_historical_marginal_notes_are_preserved_as_separate_source_text():
+    paragraphs, _ = parse_revised_pdf(
+        (FIXTURES / "archive-succession-1965-notes-excerpt.pdf").read_bytes()
+    )
+    notes = [p for p in paragraphs if p.text.startswith("[New")]
+    assert len(notes) == 6
+    assert all(p.css_class == "parrafo" for p in notes)
+    assert any("estates adminis-tered out of court" in p.text for p in notes)
+    headings = [p.text for p in paragraphs if p.css_class == "articulo"]
+    assert sum(h.startswith("1. ") for h in headings) == 1
+    assert "78. **Signing and witnessing will.**" in headings
+    assert any(
+        p.css_class == "parrafo" and p.text.startswith("1. It shall be signed at the foot")
+        for p in paragraphs
+    )
+
+
 def test_shifted_marginal_column_preserves_the_entire_caption():
     paragraphs, cutoff = parse_revised_pdf(
         (FIXTURES / "archive-parents-2021-geometry-excerpt.pdf").read_bytes()

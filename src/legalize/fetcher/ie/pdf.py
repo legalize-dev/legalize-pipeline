@@ -29,7 +29,11 @@ from legalize.fetcher.ie.parser import _legal_format
 from legalize.models import Paragraph
 
 _SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*\.")
-_DIVISION = re.compile(r"^(?:(?:F\d+)?\[)?(PART|CHAPTER|SCHEDULE)\s*(?:[\dIVXLCDM]+[A-Z]*)?$", re.I)
+_DIVISION = re.compile(
+    r"^(?:(?:F\d+)?\[)?(?:(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH) )?"
+    r"(PART|CHAPTER|SCHEDULE)\s*(?:[\dIVXLCDM]+[A-Z]*)?$",
+    re.I,
+)
 _DATE = re.compile(r"Updated to\s+(\d{1,2})\s+(\w+)\s+(\d{4})", re.I)
 _MONTHS = (
     "january february march april may june july august september october november december"
@@ -154,8 +158,8 @@ def _inline(line: _Line, *, emphasis: bool = True) -> str:
     return "".join(result).strip()
 
 
-def _section_match(line: _Line):
-    """A primary label is bold; an italic citation can also wrap as ``366.``."""
+def _section_match(line: _Line, *, allow_plain: bool = False):
+    """Captioned labels can be plain; an italic citation can also wrap as ``366.``."""
     match = _SECTION.match(line.text)
     if match is None:
         return None
@@ -166,7 +170,9 @@ def _section_match(line: _Line):
         return None
     offset = 0
     for char in chars:
-        if number.start() <= offset < number.end() and "Bold" not in char["fontname"]:
+        if number.start() <= offset < number.end() and (
+            "Italic" in char["fontname"] or (not allow_plain and "Bold" not in char["fontname"])
+        ):
             return None
         offset += len(char["text"])
         if offset >= number.end():
@@ -392,7 +398,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         (
             event
             for event in events
-            if isinstance(event, _Line) and re.search(r"\b1\.[—\s]", event.text)
+            if isinstance(event, _Line) and re.search(r"\b1\.(?=[—\s(\[]|F\d+\[)", event.text)
         ),
         None,
     )
@@ -400,16 +406,16 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         raise UnsupportedPDF("Revised Act PDF has no first section")
     first_label = None
     for char in first.chars:
-        if char["text"] != "1" or "Bold" not in char["fontname"]:
+        if char["text"] != "1" or "Italic" in char["fontname"]:
             continue
         candidate = _Line(
             [c for c in first.chars if c["x0"] >= char["x0"]], first.page, first.links
         )
-        if (match := _section_match(candidate)) and match[1] == "1":
+        if (match := _section_match(candidate, allow_plain=True)) and match[1] == "1":
             first_label = candidate
             break
     if first_label is None:
-        raise UnsupportedPDF("Revised Act PDF has no bold first section label")
+        raise UnsupportedPDF("Revised Act PDF has no first section label")
     marginal = first.x0 < first_label.x0 - 30
     margin_edge = first_label.x0 - 8.74
     first_index = events.index(first)
@@ -500,7 +506,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             locator = re.match(r"^Sections?\s+\d", start.text, re.I) and not any(
                 isinstance(line, _Line)
                 and line.page == start.page
-                and abs(line.top - start.top) < 4
+                and abs(line.top - start.top) < 6
                 and _section_match(line)
                 for line in lines
             )
@@ -509,12 +515,16 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             aligned_label = any(
                 isinstance(line, _Line)
                 and line.page == start.page
-                and abs(line.top - start.top) < 4
+                and abs(line.top - start.top) < 6
                 and abs(line.x0 - first_label.x0) < 2
                 and _section_match(line)
                 for line in lines
             )
-            if locator or (min(line.x0 for line in group) > margin_x + 12 and not aligned_label):
+            if (
+                locator
+                or re.match(r"^\[(?:New\b|Cf\. \d{4}\b|\d{4}\b|R\.S\.C\.)", start.text)
+                or (min(line.x0 for line in group) > margin_x + 12 and not aligned_label)
+            ):
                 text = ""
                 for line in group:
                     text = _join(text, _inline(line))
@@ -539,6 +549,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     previous: _Line | None = None
     seen: set[str] = set()
     schedule = False
+    schedule_start = None
     primary_x = first_label.x0
     division_center = None
     quote_depth = 0
@@ -564,6 +575,20 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             paragraphs.append(item)
             previous = None
             continue
+        if schedule:
+            # Schedule captions describe their own clauses, never primary Act sections.
+            remaining = [m for m in margins if (m.page, m.top) >= schedule_start]
+            while remaining and (remaining[0].page, remaining[0].top) <= (item.page, item.top + 6):
+                group = [remaining.pop(0)]
+                while (
+                    remaining
+                    and remaining[0].page == group[-1].page
+                    and -2 < remaining[0].top - group[-1].bottom < 4
+                ):
+                    group.append(remaining.pop(0))
+                margins = [m for m in margins if m not in group]
+                flush()
+                paragraphs.append(Paragraph("parrafo", " ".join(_inline(m) for m in group)))
         text = item.text
         division = _DIVISION.fullmatch(text) if not quoted else None
         if division and division[1].upper() == "CHAPTER" and division_center is not None:
@@ -573,7 +598,9 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             flush()
             kind = division[1].upper()
             division_center = (item.x0 + item.x1) / 2
-            schedule = schedule or kind == "SCHEDULE"
+            if kind == "SCHEDULE" and not schedule:
+                schedule = True
+                schedule_start = (item.page, item.top)
             heading = _inline(item, emphasis=False)
             # A division title is centered and may wrap, or begin on the next
             # page. A later centered paragraph is a subheading, not its title.
@@ -603,9 +630,9 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             )
             previous = None
             continue
-        match = _section_match(item)
+        match = _section_match(item, allow_plain=marginal and abs(item.x0 - primary_x) < 10)
         marginal_title = marginal and any(
-            m.page == item.page and abs(m.top - item.top) < 4 for m in margins
+            m.page == item.page and abs(m.top - item.top) < 6 for m in margins
         )
         # A primary marginal caption ends a preceding quote even when the source omits its delimiter.
         if match and marginal_title:
@@ -624,7 +651,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             )
             primary = primary and (marginal_title or title_above)
         else:
-            # Some primary labels use one paragraph indent beneath an aligned title.
+            # Source labels can shift by two paragraph indents beneath an aligned title.
             indented_label = (
                 previous is not None
                 and previous.page == item.page
@@ -632,7 +659,8 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 and pending
                 and pending_x is not None
                 and abs(pending_x - title_x) < 2
-                and 0 <= item.x0 - title_x < 15
+                and abs(item.x0 - title_x) < 27
+                and (not expected or match and match[1] in expected)
                 and item.top - previous.bottom < 25
             )
             primary = primary and (abs(item.x0 - primary_x) < 2 or indented_label)
@@ -643,19 +671,21 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             seen.add(number)
             title = ""
             if marginal_title:
-                selected = [m for m in margins if m.page == item.page and item.top - 4 <= m.top]
+                selected = [m for m in margins if m.page == item.page and item.top - 6 <= m.top]
                 # Stop before a following section's marginal heading.
                 next_section = next(
                     (
                         n
                         for n in lines[i:]
-                        if isinstance(n, _Line) and n.page == item.page and _section_match(n)
+                        if isinstance(n, _Line)
+                        and n.page == item.page
+                        and _section_match(n, allow_plain=True)
                     ),
                     None,
                 )
                 if next_section:
-                    selected = [m for m in selected if m.top < next_section.top - 4]
-                if selected and abs(selected[0].top - item.top) < 4:
+                    selected = [m for m in selected if m.top < next_section.top - 6]
+                if selected and abs(selected[0].top - item.top) < 6:
                     title = " ".join(_inline(m, emphasis=False) for m in selected)
                     margins = [m for m in margins if m not in selected]
             else:
@@ -672,7 +702,11 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             or (previous.page == item.page and item.top - previous.bottom > 5)
             or (
                 previous.page != item.page
-                and (re.match(r"^(?:F\d+\[)?[“\"(]", text) or previous.x1 < 515)
+                and (
+                    re.match(r"^(?:F\d+\[)?[“\"(]", text)
+                    or previous.x1 < 515
+                    or sum("Bold" in c["fontname"] for c in item.chars) / len(item.chars) > 0.8
+                )
             )
         )
         if new_paragraph:
