@@ -65,6 +65,68 @@ def test_wicklow_publication_notice_does_not_invent_the_blank_signature_day():
         ISBMetadataParser().parse(raw, "IE-2002-si-249")
 
 
+@pytest.mark.parametrize("identifier", ["IE-1976-act-23", "IE-2013-act-51"])
+def test_verified_empty_directories_preserve_the_coverage_gap(identifier):
+    suffix = identifier.removeprefix("IE-").replace("-act-", "-")
+    raw = (FIXTURES / f"sample-effects-eleventh-{suffix}.html").read_bytes()
+    notes = []
+    assert parse_effects(raw, identifier, editorial_notes=notes) == []
+    assert len(notes) == 1
+    assert notes[0]["kind"] == "source_coverage_warning"
+    assert "does not establish" in notes[0]["note"]
+    with pytest.raises(ValueError, match="requires a provenance sink"):
+        parse_effects(raw, identifier)
+    with pytest.raises(ValueError, match="no source rows"):
+        parse_effects(raw + b" ", identifier, editorial_notes=[])
+
+
+@pytest.mark.parametrize(
+    ("identifier", "source_id", "count"),
+    [("IE-1923-act-15", "IE-1924-act-42", 1), ("IE-2005-act-11", "IE-2015-act-61", 3)],
+)
+def test_verified_directory_year_transpositions_preserve_the_printed_claim(
+    identifier, source_id, count
+):
+    suffix = identifier.removeprefix("IE-").replace("-act-", "-")
+    raw = (FIXTURES / f"sample-effects-eleventh-{suffix}.html").read_bytes()
+    effects = parse_effects(raw, identifier)
+    corrected = [e for e in effects if e["source_id"] == source_id]
+    assert len(corrected) == count
+    for effect in corrected:
+        assert "/1942" in effect["provision"] or "61/2005" in effect["provision"]
+        assert effect["source_correction"].endswith(
+            "/1924/act/42/section/2/enacted/en/html"
+            if source_id == "IE-1924-act-42"
+            else "/2015/act/61/section/1/enacted/en/html"
+        )
+
+
+def test_comma_punctuation_keeps_a_statutory_instrument_out_of_the_act_namespace():
+    raw = (FIXTURES / "sample-effects-eleventh-2000-30.html").read_bytes()
+    effects = parse_effects(raw, "IE-2000-act-30")
+    assert sum(e["source_id"] == "IE-1993-si-419" for e in effects) == 2
+    assert not any(e["source_id"] == "IE-1993-act-419" for e in effects)
+    assert all("S,I, No. 419 of 1993" in e["provision"] for e in effects)
+
+
+def test_parenthetical_commencement_does_not_hide_the_actual_amending_instrument():
+    raw = (FIXTURES / "sample-effects-eleventh-2015-16.html").read_bytes()
+    effects = parse_effects(raw, "IE-2015-act-16")
+    effect = next(e for e in effects if e["provision"].startswith("Redundancy Payments Act 1967"))
+    assert effect["source_id"] == "IE-2015-act-22"
+    assert effect["effective_date"] == "2015-10-01"
+    assert effect["note"] == "S. 44 applied with modifications"
+
+
+def test_verified_december_typo_does_not_change_the_official_body():
+    raw = (FIXTURES / "sample-signature-2019-685.html").read_bytes()
+    metadata = ISBMetadataParser().parse(raw, "IE-2019-si-685")
+    version = ISBTextParser().parse_text(raw)[0].versions[0]
+    assert metadata.publication_date == version.publication_date == date(2020, 1, 3)
+    assert dict(metadata.extra)["made_date"] == "2019-12-20"
+    assert any("Dated this 20 day of Dcember 2019" in p.text for p in version.paragraphs)
+
+
 def rows(identifier):
     raw = (FIXTURES / f"sample-effects-fourth-{identifier.removeprefix('IE-')}.html").read_bytes()
     notes = []

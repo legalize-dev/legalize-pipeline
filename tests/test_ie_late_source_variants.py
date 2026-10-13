@@ -63,6 +63,35 @@ def test_referenced_dates_are_not_signature_blocks(text):
 @pytest.mark.parametrize(
     ("identifier", "expected"),
     [
+        ("IE-1988-si-372", "1988-12-12"),
+        ("IE-1993-si-212", "1993-07-19"),
+        ("IE-2005-si-642", "2005-10-12"),
+        ("IE-1982-si-49", "1982-03-12"),
+    ],
+)
+def test_signature_prefix_and_abbreviated_month_punctuation(identifier, expected):
+    _, year, _, number = identifier.split("-")
+    raw = (FIXTURES / f"sample-signature-{year}-{number}.html").read_bytes()
+    metadata = ISBMetadataParser().parse(raw, identifier)
+    version = ISBTextParser().parse_text(raw)[0].versions[0]
+    assert metadata.publication_date == version.publication_date == date.fromisoformat(expected)
+    if identifier == "IE-2005-si-642":
+        assert json.loads(dict(metadata.extra)["signature_dates"]) == [
+            "2005-10-06",
+            "2005-10-12",
+        ]
+
+
+@pytest.mark.parametrize("month", ["Meitheamh", "Mheitheamh"])
+def test_irish_june_signature_keeps_both_inflected_month_forms(month):
+    assert _signature_dates(
+        f"ARNA THABHAIRT faoi mo Shéala Oifigiúil an 25 lá seo de {month} 1987."
+    ) == [date(1987, 6, 25)]
+
+
+@pytest.mark.parametrize(
+    ("identifier", "expected"),
+    [
         ("IE-1974-si-94", "1974-04-01"),
         ("IE-1997-si-375", "1997-09-10"),
         ("IE-1998-si-549", "1998-12-30"),

@@ -119,7 +119,13 @@ def test_unaccented_parliamentary_resolutions_remain_source_notes():
 
 
 @pytest.mark.parametrize(
-    "phrase", ["Act included in collectively cited Example Acts", "Act included in Example Acts"]
+    "phrase",
+    [
+        "Act included in collectively cited Example Acts",
+        "Act included in Example Acts",
+        "Act, Part 5 (ss. 57-63) included in collectively cited Example Acts",
+        "Collective citation Example Acts 1967 to 2008",
+    ],
 )
 def test_earlier_collective_member_is_context_but_later_member_retains_its_reform(phrase):
     def enacted(year):

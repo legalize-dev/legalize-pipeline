@@ -597,6 +597,33 @@ def test_historical_marginal_notes_are_preserved_as_separate_source_text():
     )
 
 
+@pytest.mark.parametrize(
+    ("name", "notes"),
+    [
+        (
+            "extradition-1965-treaty-notes",
+            ["[Art. 1]", "[Art. 2]", "[cf. Art. 6.2]", "[Art. 14]"],
+        ),
+        (
+            "succession-1965-reference-notes",
+            [
+                "[Restates existing law relating to right to follow property; as to real estate, "
+                "see 1830 (c. 47) 1839 (c. 60) and 1848 (c. 87)]",
+                "[Enlarges powers conferred by 1893 (c. 53) s. 21]",
+                "[See 1695 (c. 6) ss. 2, 3]",
+                "[Hague Conven-tion, Art. 4]",
+                "S.I. No. 251 of 1956.",
+            ],
+        ),
+    ],
+)
+def test_standalone_treaty_and_historical_references_are_not_merged_into_titles(name, notes):
+    paragraphs, _ = parse_revised_pdf((FIXTURES / f"archive-{name}-excerpt.pdf").read_bytes())
+    for note in notes:
+        assert any(p.css_class == "parrafo" and p.text == note for p in paragraphs)
+        assert not any(note in p.text for p in paragraphs if p.css_class == "articulo")
+
+
 def test_shifted_marginal_column_preserves_the_entire_caption():
     paragraphs, cutoff = parse_revised_pdf(
         (FIXTURES / "archive-parents-2021-geometry-excerpt.pdf").read_bytes()

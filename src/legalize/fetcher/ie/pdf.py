@@ -536,8 +536,13 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             )
             if (
                 locator
-                or re.match(r"^\[(?:New\b|Cf\. \d{4}\b|\d{4}\b|R\.S\.C\.)", start.text)
-                or re.match(r"^S\.R\. & O\. No\. \d+", start.text)
+                or re.match(
+                    r"^\[(?:New\b|(?:Cf\. )?\d{4}\b|R\.S\.C\.|Restates\b|Enlarges powers\b|"
+                    r"See \d{4}\b|Hague Conven|(?:cf\. )?Art\. \d+)",
+                    start.text,
+                    re.I,
+                )
+                or re.match(r"^(?:S\.R\. & O\.|S\.I\.) No\. \d+", start.text)
                 or (min(line.x0 for line in group) > margin_x + 12 and not aligned_label)
             ):
                 text = ""

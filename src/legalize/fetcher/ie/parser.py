@@ -1448,14 +1448,14 @@ def _signature_dates(text: str) -> list[date]:
         flags=re.I,
     ).replace("_", " ")
     matches = re.finditer(
-        r"(?:(?:GI{1,2}VEN(?: at Dublin)? under|SEALED with).{0,180}?\b(?:Sea[l1]|hand)\b[^0-9]{0,180}?|"
+        r"(?:(?:GI{1,2}VEN?,?(?: at Dublin)? (?:under|by)|SEALED with).{0,180}?\b(?:Sea[l1]|hand)\b[^0-9]{0,180}?|"
         r"GIVEN\s+(?:this|on),?\s+|(?-i:GIVEN)\s+|"
         r"PRESENT when the Common Seal.{0,180}?(?:this|on the)\s+|GIVEN under the official of the Minister[^0-9]{0,180}?|"
         r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,\s*|"
         r"(?-i:Dated|DATED)\s*,?\s*(?:(?:this|the)\s+)?|(?-i:Made|MADE)\s+|"
         r"SIGNED[^0-9]{0,180}?\bthis\s+(?:the\s+)?|DUBLIN\s*[:.]\s+This\s+)"
         r'(\d{1,2})\s*(?:st|nd|rd|th|h)?[.,"]?(?:\s*day)?(?:\s*of)?\s*'
-        r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s*(?:day of\s+)?(\d{4})",
+        r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[,.]*\s*(?:day of\s+)?(\d{4})",
         text,
         re.I,
     )
@@ -1507,8 +1507,10 @@ def _parse_date_from_parts(day: int, month_str: str, year: int) -> date:
         "november": 11,
         "december": 12,
         "decembe": 12,  # The enacted 2017 Act 33 XML truncates December.
+        "dcember": 12,  # S.I. 685/2019 HTML typo; the official PDF confirms December.
         "feabhra": 2,
         "mheitheamh": 6,
+        "meitheamh": 6,
         "nollaig": 12,
         "sept": 9,
     }

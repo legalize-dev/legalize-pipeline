@@ -6,6 +6,7 @@ import logging
 import re
 from copy import deepcopy
 from datetime import date
+from hashlib import sha256
 from typing import TYPE_CHECKING
 from urllib.parse import urljoin, urlparse
 
@@ -17,6 +18,12 @@ if TYPE_CHECKING:
     from legalize.fetcher.ie.client import ISBClient
 
 logger = logging.getLogger(__name__)
+
+# Complete official pages with empty effects tables; retain a coverage warning for these bytes.
+_EMPTY_EFFECTS_DIRECTORIES = {
+    "IE-1976-act-23": "23a7ef9449bbebd6828f176ce38e891f349133f4969fa6e5ee81d4c21705562b",
+    "IE-2013-act-51": "63507250171797902d74f24b7d53ee92b336a3a8573db57556558b181bd7dabf",
+}
 
 # Order-series numbers differ from S.I. numbers; verified against the annual eISB indexes.
 _DUTY_ORDERS = {
@@ -128,6 +135,7 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     amenders = list(
         re.finditer(
             r"\b(?:as\s+)?(?:inserted|substituted|amended|ins\.|subst\.)"
+            r"(?:\s*\(\d{1,2}\.\d{1,2}\.\d{4}\))?"
             r"(?:\s+by\s*|\s+(?=\d+\s*/\s*\d{4}\b))",
             cell.text_content(),
             re.I,
@@ -149,7 +157,7 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     }
     # Some directory links incorrectly use act/pub for explicitly labelled instruments.
     instruments = re.findall(
-        r"S\.?\s*I[.,]?\s*(?:Nol?\.?\s*)?(\d+),?\s*(?:(?:of\s+){1,2}|/)(\d{4})", provision, re.I
+        r"S[.,]?\s*I[.,]?\s*(?:Nol?\.?\s*)?(\d+),?\s*(?:(?:of\s+){1,2}|/)(\d{4})", provision, re.I
     )
     instruments += re.findall(r"E\.I\.D\. \(No\. S\.\s*I\. (\d+)\) O\., (\d{4})", provision)
     for number, year in instruments:
@@ -189,6 +197,18 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
         if match := re.search(r"\b(\d+) of (\d{4})(?=[,) ]|$)", provision):
             identifiers.add(f"IE-{match[2]}-act-{int(match[1])}")
     correction = None
+    if (
+        norm_id == "IE-1923-act-15"
+        and note == "S. 13 application restricted"
+        and provision == "42/1942, s. 2"
+    ):
+        identifiers = {"IE-1924-act-42"}
+        correction = "https://www.irishstatutebook.ie/eli/1924/act/42/section/2/enacted/en/html"
+    if norm_id == "IE-2005-act-11" and re.fullmatch(
+        r"Harbours Act 2015 \(61/2005\), s\. 1\([234]\)", provision
+    ):
+        identifiers = {"IE-2015-act-61"}
+        correction = "https://www.irishstatutebook.ie/eli/2015/act/61/section/1/enacted/en/html"
     if (
         norm_id == "IE-1990-act-27"
         and note == "S. 2(5) inserted"
@@ -325,7 +345,13 @@ def _effect_cells(doc, norm_id: str) -> list[list]:
 
 
 def _collective_citation(note: str) -> bool:
-    return bool(re.match(r"^(?:Act included in |Collectively cited with ).+ Acts?\b", note))
+    return bool(
+        re.match(
+            r"^(?:Act(?:, Part \d+ \(ss\. [\d-]+\))? included in |"
+            r"Collectively cited with |Collective citation ).+ Acts?\b",
+            note,
+        )
+    )
 
 
 def parse_effects(
@@ -340,6 +366,18 @@ def parse_effects(
         if re.match(r"^(?:Ss?\.[\d\s(),a-z-]+)?\*|^Ss?\.[\d\s(),a-z-]+:", _text(node), re.I)
     ]
     if not any(cells_by_row):
+        if sha256(data).hexdigest() == _EMPTY_EFFECTS_DIRECTORIES.get(norm_id):
+            if editorial_notes is None:
+                raise ValueError(f"{norm_id}: empty effects table requires a provenance sink")
+            editorial_notes.append(
+                {
+                    "kind": "source_coverage_warning",
+                    "note": "The official Legislation Directory has an empty effects table; "
+                    "this does not establish that the Act has never been amended.",
+                    "source_sha256": sha256(data).hexdigest(),
+                }
+            )
+            return []
         raise ValueError(f"{norm_id}: effects table has no source rows")
     effects = []
     previous_effects = []
