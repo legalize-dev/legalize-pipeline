@@ -32,6 +32,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     text_parser = EURLexTextParser()
     meta_parser = EURLexMetadataParser()
     created = 0
+    pushed = 0
     errors = []
     with EURLexClient.create(cc) as client:
         for current_date in dates:
@@ -61,11 +62,21 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                 if len(errors) != errors_before:
                     break
                 if not dry_run:
-                    state.last_summary_date = current_date
+                    if config.git.push and created > pushed:
+                        repo.push()
+                        pushed = created
+                    state.finish_day(current_date, errors)
+                    state.save()
             except Exception as exc:
-                logger.exception("Failed to discover %s", current_date)
+                logger.exception("Failed to complete %s", current_date)
                 errors.append(f"{current_date}: {exc}")
                 break
     return finalize_daily(
-        repo, state, dates, created, errors, dry_run=dry_run, push=config.git.push
+        repo,
+        state,
+        dates,
+        created,
+        errors,
+        dry_run=dry_run,
+        push=config.git.push and created > pushed,
     )
