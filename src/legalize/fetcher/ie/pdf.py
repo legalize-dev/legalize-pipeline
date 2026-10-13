@@ -56,14 +56,47 @@ _KNOWN_SOURCE_OMISSIONS = {
     )
 }
 
+# Exact original PDFs whose cover and LRC catalogue agree, but internal headings retain older dates.
+# Evidence: tests/fixtures/ie/pdf-conflicting-cutoffs-evidence.json.
+_KNOWN_CUTOFF_CONFLICTS = {
+    "3b4981e780e5873409b7820577f0cbcef10e69fed313c526379af9e2557abee8": (  # pragma: allowlist secret
+        date(2018, 10, 1),
+        date(2017, 11, 22),
+    ),
+    "0d7d721b32e0dcaa879d7aa0a5d4aa5611e7be50a1f26777f4f7045a30afe237": (  # pragma: allowlist secret
+        date(2024, 5, 22),
+        date(2024, 2, 23),
+    ),
+    "e2d91d53fc254a5053b4ec26b6ec3d184202707c49f5b1b525a6e260e77213a1": (  # pragma: allowlist secret
+        date(2024, 12, 17),
+        date(2024, 9, 23),
+    ),
+    "c872335450cb627400c0a81f3847fe8d1a686446ae7c9033a5d2c29d97e853d3": (  # pragma: allowlist secret
+        date(2023, 3, 8),
+        date(2021, 9, 28),
+    ),
+    "3470a02b341db79ad2bab7405b500de47224c0e3076cb6961f93a2841027a24e": (  # pragma: allowlist secret
+        date(2024, 8, 31),
+        date(2023, 5, 3),
+    ),
+}
+
 
 def source_warning(data: bytes) -> str | None:
-    """Return the verified limitation for an exact incomplete official PDF."""
+    """Return the verified limitation for an exact official PDF."""
     if sha256(data).hexdigest() in _KNOWN_SOURCE_OMISSIONS:
         return (
             "This official Companies Act 2014 consolidated PDF is incomplete: section 1384A "
             "is listed in its contents but absent from the body. Its text has not been "
             "reconstructed. Check the original amending legislation before relying on this snapshot."
+        )
+    if conflict := _KNOWN_CUTOFF_CONFLICTS.get(sha256(data).hexdigest()):
+        cover, older = conflict
+        return (
+            "This official consolidated PDF has conflicting revision dates: its front cover "
+            f"and the LRC catalogue state {cover}, while internal headings state {older}. "
+            f"This snapshot uses {cover}, following the cover and catalogue. "
+            "Check the official source before relying on its revision date."
         )
     return None
 
@@ -250,6 +283,7 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
     started = False
     contents = False
     expected: set[str] = set()
+    verified_cutoff = _KNOWN_CUTOFF_CONFLICTS.get(sha256(data).hexdigest())
     with pdfplumber.open(io.BytesIO(data)) as pdf:
         for number, page in enumerate(pdf.pages):
             lines = page.extract_text_lines(x_tolerance=0.75)
@@ -273,8 +307,11 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
                         except ValueError as exc:
                             raise UnsupportedPDF("Invalid Revised Act PDF cover date") from exc
                         if updated and found != updated:
-                            raise UnsupportedPDF("Conflicting Revised Act PDF cover dates")
-                        updated = found
+                            if not verified_cutoff or {updated, found} != set(verified_cutoff):
+                                raise UnsupportedPDF("Conflicting Revised Act PDF cover dates")
+                            updated = verified_cutoff[0]
+                        else:
+                            updated = found
                     if re.match(r"^(?:F\d+\[)?AN ACT\b", text, re.I):
                         start = i
                         started = True
