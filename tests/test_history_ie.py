@@ -336,6 +336,18 @@ def test_missing_publication_date_is_not_replaced_by_commencement():
         history.extract_reforms(raw)
 
 
+@pytest.mark.parametrize("published", [None, "2000-01-01"])
+def test_invalid_effect_dates_fail_before_parsing_source_bodies(monkeypatch, published):
+    from legalize.fetcher.ie.parser import ISBTextParser
+
+    def unexpected_parse(*args, **kwargs):
+        pytest.fail("Invalid effect dates must fail before expensive source extraction")
+
+    monkeypatch.setattr(ISBTextParser, "parse_text", unexpected_parse)
+    with pytest.raises(ValueError, match="no unique publication date|predates the original"):
+        history._parse(envelope(effects=[effect(publication_date=published)]))
+
+
 def test_pending_repeal_does_not_repeal_current_law():
     from legalize.models import NormStatus
 

@@ -227,6 +227,27 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
     paragraphs = None
     versions = []
     reforms = [Reform(metadata.publication_date, norm_id, ("full-text",))]
+    grouped = defaultdict(list)
+    for effect in envelope["effects"]:
+        grouped[effect["source_id"]].append(effect)
+    for identifier, effects in grouped.items():
+        if identifier == norm_id:
+            continue
+        dates = {effect.get("publication_date") for effect in effects}
+        if len(dates) != 1 or None in dates:
+            raise ValueError(f"{norm_id}: no unique publication date for {identifier}")
+        published = date.fromisoformat(next(iter(dates)))
+        if published < metadata.publication_date:
+            raise ValueError(f"{norm_id}: effect {identifier} predates the original publication")
+        notes = []
+        for effect in effects:
+            note = f"{effect['note']} — {effect['provision']}"
+            if effect.get("commencement") or effect.get("commencement_source"):
+                note += f"; commencement: {effect.get('commencement', '')} {effect.get('commencement_source', '')}".rstrip()
+            if note not in notes:
+                notes.append(note)
+        reforms.append(Reform(published, identifier, (), change_note="; ".join(notes)))
+
     snapshot_bodies = {}
     image_counts = {}
     for record in envelope["versions"]:
@@ -336,27 +357,6 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
                 source_warning=warning,
             )
         )
-
-    grouped = defaultdict(list)
-    for effect in envelope["effects"]:
-        grouped[effect["source_id"]].append(effect)
-    for identifier, effects in grouped.items():
-        if identifier == norm_id:
-            continue
-        dates = {effect.get("publication_date") for effect in effects}
-        if len(dates) != 1 or None in dates:
-            raise ValueError(f"{norm_id}: no unique publication date for {identifier}")
-        published = date.fromisoformat(next(iter(dates)))
-        if published < metadata.publication_date:
-            raise ValueError(f"{norm_id}: effect {identifier} predates the original publication")
-        notes = []
-        for effect in effects:
-            note = f"{effect['note']} — {effect['provision']}"
-            if effect.get("commencement") or effect.get("commencement_source"):
-                note += f"; commencement: {effect.get('commencement', '')} {effect.get('commencement_source', '')}".rstrip()
-            if note not in notes:
-                notes.append(note)
-        reforms.append(Reform(published, identifier, (), change_note="; ".join(notes)))
 
     activations = {}
     for effect in envelope["effects"]:

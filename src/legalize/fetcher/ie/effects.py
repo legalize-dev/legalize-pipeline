@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from copy import deepcopy
 from datetime import date
 from typing import TYPE_CHECKING
 from urllib.parse import urljoin, urlparse
@@ -16,6 +17,30 @@ if TYPE_CHECKING:
     from legalize.fetcher.ie.client import ISBClient
 
 logger = logging.getLogger(__name__)
+
+# These Companies directory dates belong to the host provisions, not their later amendments.
+_COMPANIES_COMMENCEMENTS = {
+    ("IE-2024-act-11", "3 June 2014"): (
+        "1 June 2024",
+        "https://www.irishstatutebook.ie/eli/2024/si/208/made/en/html",
+        ("ss. 1(2), 20(b)",),
+    ),
+    ("IE-2022-act-39", "29 March 2013"): (
+        "1 January 2023",
+        "https://www.irishstatutebook.ie/eli/2022/si/678/made/en/html",
+        ("s. 10(c)", "ss. 1(3), 15", "ss. 1(3), 9(b)"),
+    ),
+    ("IE-2019-act-2", "8 November 1983"): (
+        "30 September 2019",
+        "https://www.irishstatutebook.ie/eli/2019/si/439/made/en/html",
+        ("ss. 6, 17(2)",),
+    ),
+    ("IE-2017-act-41", "1 November 2001"): (
+        "25 December 2017",
+        "https://www.irishstatutebook.ie/isbc/2017_41.html#commencement",
+        ("s. 66(b)", "s. 66(c)", "s. 67(c)"),
+    ),
+}
 
 
 def norm_id_from_url(url: str) -> str | None:
@@ -83,8 +108,23 @@ def _effect(note: str, provision: str, source_id: str, commencement="", commence
 
 
 def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[str], str | None]:
+    # A provision inserted into an older Act derives from the named amending instrument.
+    amenders = list(
+        re.finditer(r"\bas\s+(?:inserted|substituted)\s+by\s+", cell.text_content(), re.I)
+    )
+    if amenders:
+        cell = deepcopy(cell)
+        offset = amenders[-1].end()
+        provision = " ".join(cell.text_content()[offset:].split())
+        links = [
+            link
+            for link in cell.xpath(".//a[@href]")
+            if len("".join(link.xpath("preceding::text()"))) >= offset
+        ]
+    else:
+        links = cell.xpath(".//a[@href]")
     identifiers = {
-        identifier for url in cell.xpath(".//a/@href") if (identifier := norm_id_from_url(url))
+        identifier for link in links if (identifier := norm_id_from_url(link.get("href")))
     }
     # Some directory links incorrectly use act/pub for explicitly labelled instruments.
     instruments = re.findall(
@@ -211,6 +251,21 @@ def parse_effects(
             )
             if correction:
                 effect["source_correction"] = correction
+            if (
+                norm_id == "IE-2014-act-38"
+                and re.search(r"\bas (?:inserted|substituted) by\b", provision)
+                and (
+                    commencement_fix := _COMPANIES_COMMENCEMENTS.get(
+                        (identifier, effect["commencement"])
+                    )
+                )
+                and provision.endswith(commencement_fix[2])
+            ):
+                effect["directory_commencement"] = effect["commencement"]
+                effect["directory_commencement_source"] = effect["commencement_source"]
+                effect["commencement"], effect["commencement_source"] = commencement_fix[:2]
+                effect["effective_date"] = source_date(effect["commencement"]).isoformat()
+                effect["source_correction"] = effect["commencement_source"]
             if (
                 norm_id == "IE-2002-act-28"
                 and identifier == "IE-1990-act-25"

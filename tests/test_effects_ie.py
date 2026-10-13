@@ -1,3 +1,4 @@
+import re
 from datetime import date
 
 import pytest
@@ -17,6 +18,71 @@ def test_citation_identity_keeps_act_namespaces():
     assert (
         norm_id_from_url("https://www.irishstatutebook.ie/2024/en/si/0356.html") == "IE-2024-si-356"
     )
+
+
+def test_inserted_and_substituted_relations_use_the_amending_instrument():
+    from pathlib import Path
+
+    source = (Path(__file__).parent / "fixtures/ie/sample-effects-companies-2014.html").read_bytes()
+    effects = parse_effects(source, "IE-2014-act-38")
+    indirect = [
+        row for row in effects if re.search(r"as (?:inserted|substituted) by", row["provision"])
+    ]
+    assert len(indirect) == 16
+    assert {row["source_id"] for row in indirect} == {
+        "IE-2024-act-11",
+        "IE-2022-act-39",
+        "IE-2019-act-2",
+        "IE-2017-act-41",
+        "IE-2015-act-61",
+        "IE-2018-si-6",
+        "IE-2020-act-8",
+        "IE-2021-act-30",
+    }
+    assert not any(int(row["source_id"].split("-")[1]) < 2014 for row in effects)
+    assert any("Gas Regulation Act 2013 (39/2013)" in row["provision"] for row in indirect)
+
+
+def test_indirect_relation_preserves_namespaces_even_when_year_and_number_match():
+    source = b"""<h3 id="effects">Effects</h3><table><tr><td>Application restricted</td>
+    <td>Public Act (<a href="/eli/2020/act/1">1/2020</a>) as <em>inserted</em> by
+    Private Act (<a href="/eli/2020/prv/1">1/2020</a>), s. 2</td></tr></table>"""
+    assert [row["source_id"] for row in parse_effects(source, "IE-2014-act-38")] == [
+        "IE-2020-act-P1"
+    ]
+
+
+def test_companies_commencement_repairs_preserve_the_directory_claims():
+    from pathlib import Path
+
+    source = (Path(__file__).parent / "fixtures/ie/sample-effects-companies-2014.html").read_bytes()
+    effects = parse_effects(source, "IE-2014-act-38")
+    repaired = [row for row in effects if row.get("directory_commencement")]
+    assert len(repaired) == 11
+    expected = {
+        "IE-2024-act-11": ("2014-06-03", "2024-06-01", "/2024/si/208/made/en/html"),
+        "IE-2022-act-39": ("2013-03-29", "2023-01-01", "/2022/si/678/made/en/html"),
+        "IE-2019-act-2": ("1983-11-08", "2019-09-30", "/2019/si/439/made/en/html"),
+        "IE-2017-act-41": ("2001-11-01", "2017-12-25", "/isbc/2017_41.html#commencement"),
+    }
+    for row in repaired:
+        old, actual, evidence = expected[row["source_id"]]
+        assert source_date(row["directory_commencement"]).isoformat() == old
+        assert row["directory_commencement_source"]
+        assert row["effective_date"] == actual
+        assert row["source_correction"].endswith(evidence)
+        assert row["commencement_source"] == row["source_correction"]
+    assert not any(
+        row.get("directory_commencement") for row in parse_effects(source, "IE-2014-act-39")
+    )
+    altered = source.replace(b">20</a>(b)", b">99</a>(b)")
+    assert altered != source
+    gas = next(
+        row
+        for row in parse_effects(altered, "IE-2014-act-38")
+        if row["source_id"] == "IE-2024-act-11"
+    )
+    assert "directory_commencement" not in gas
 
 
 def test_effects_keep_pending_repeals_and_do_not_invent_publication_dates():

@@ -5,7 +5,7 @@ boxes as you close them. **This file, not your context, is where the state lives
 When you lose the thread after a long run, `cat PROGRESS.md` and resume from the
 first unticked box — then re-read that step's file in full before touching anything.
 
-Currently on: **Step 8** — the resumed benchmark reproduced the Companies Act failure at 49/50. The 2023 PDF uses indented primary labels for sections 890A and 934; the extraction repair passes the complete PDF and focused regressions. The identical-sample gate must pass before full fetch. Full bootstrap and publication have not started.
+Currently on: **Step 8** — the PDF repair completed every Companies archive, then the benchmark stopped at 49/50 on indirect-effect identities. The relation and commencement repair passes 119 focused tests and the complete Companies effects/enacted-body preflight. The identical-sample gate must pass before full fetch. Full bootstrap and publication have not started.
 
 Worktree: `engine-ie`, branch `feat/ie-v04`, based on `origin/main` `781ee4d`.
 Existing publication: `legalize-ie/main` `046eacac6559cc6f1900a0c976e9fb40800c8f60`, cloned intact to `../countries/ie`.
@@ -47,12 +47,16 @@ Validation before resumption (2026-10-08):
 - Upstream integration preserves Ireland source/text-state/warning fields alongside staged commencement and expiry data. Optional test constructor arguments now use keywords; `legal_quote` is registered with the shared structural roles.
 - Final engine suite: **2,517 passed, 27 skipped**. Existing pytest fixture deprecation warnings remain. Ruff lint/format passed.
 - Old raw downloads and sample outputs remain untouched. The full-run cache is an independent copy, not a symlink: `../countries/data-ie-v04-full`.
-- The exact 50 benchmark identities are being rerun with four workers at one request/second per worker. The earlier attempt was stopped before the final structural-role fix; its logs remain separately labelled interrupted.
+- The exact 50 benchmark identities must pass with four workers at one request/second per worker. The earlier attempt was stopped before the final structural-role fix; its logs remain separately labelled interrupted.
 - Durable local runner/config/logs/results live in `.pipeline/ie-v04-resume/`. Inspect `benchmark.pid`, the actual process command, `benchmark.log`, and `benchmark-result.json` before resuming. A process exit or an incomplete result is not a passed gate.
 - LRC reuse terms are confirmed; source attribution, transformation and unofficial-text notices are recorded in the generated README metadata and the updated reuse assessment.
 - The resumed benchmark finished 49/50 after 1,411.93 seconds. Its Companies failure identifies the exact January 2023 source PDF (`0036beba…`), where sections 890A and 934 exist but their labels are indented beneath aligned titles. No source-omission exception was added.
 - A four-page source excerpt reproduces both missing headings before the fix. The repair preserves aligned titles and rejects indented quoted titles; all 57 PDF/history checks pass. The full original PDF passes with 1,774 sections and 23,419 paragraphs in 84.7 seconds. The final complete engine suite passes **2,519 tests, 27 skipped**; Ruff passes.
 - The persistent `resume.py` runs benchmark then full fetch, stopping on a failed benchmark. Its self-check verifies that failure never launches the full fetch; the fetch runner independently checks 50/50 and the source hash. No generation or publication is automated by that runner.
+
+- The `8badcc1` benchmark completed in 2,033.55 seconds at 49/50: all Companies archive PDFs parsed, but indirect references incorrectly created events for older host Acts. The full fetch correctly did not start.
+- Indirect `as inserted/substituted by` citations now identify only the later instrument, retaining the complete source citation. Eleven stale Companies commencement dates have narrowly scoped repairs backed by official orders/the commencement table; original claims remain in provenance. See `research/ie-v04/companies-effects.md`.
+- All 119 focused effects/history checks pass. The complete Companies directory/enacted-body preflight resolves 1,710 effects across 66 source IDs. Invalid event dates fail before PDF extraction. The complete archive benchmark remains required. The final engine suite passes **2,524 tests, 27 skipped**; Ruff lint/format passes.
 
 ## Previous responsibility split
 - Research: source census, archives, licences and saved evidence.
