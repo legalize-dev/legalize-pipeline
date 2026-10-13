@@ -290,7 +290,11 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
             plain = [line["text"] for line in lines]
             if (
                 started
-                and any(text == "About this Revised Act" for text in plain)
+                and (
+                    "About this Revised Act" in plain
+                    or "Introduction" in plain
+                    and any(text.startswith("This Revised Act presents the text") for text in plain)
+                )
                 and plain
                 and re.match(r"Number \d+ of \d{4}", plain[0])
             ):
@@ -346,8 +350,21 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
             ]
             if body_images and not active:
                 raise UnsupportedPDF(f"Image-only Revised Act PDF body page: {number + 1}")
-            if not active and number != len(pdf.pages) - 1:
-                raise UnsupportedPDF(f"Empty page inside Revised Act PDF body: {number + 1}")
+            if not active:
+                # A separator may contain only XEP's white page backgrounds and running headers.
+                if any(
+                    shape["bottom"] > body_top
+                    and shape["top"] < page.height - 36
+                    and (
+                        shape.get("stroke")
+                        or shape.get("fill")
+                        and shape.get("non_stroking_color") not in (1, (1, 1, 1))
+                    )
+                    for shape in page.curves + page.lines + page.rects
+                ):
+                    raise UnsupportedPDF(f"Empty page inside Revised Act PDF body: {number + 1}")
+                page.close()
+                continue
             if any(
                 text in ("Annotations", "Amendments:", "Modifications (not altering text):")
                 for text in plain
