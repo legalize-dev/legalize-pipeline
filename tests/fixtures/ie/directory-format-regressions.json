@@ -87,14 +87,14 @@
     "file": "sample-duty-order-index-1941.html",
     "source_url": "https://www.irishstatutebook.ie/eli/1941/si",
     "source_sha256": "4362e3f8de07b49ae89f9ecc88c026f830962bc44bf36423364cf5e17d897bc5",
-    "fixture_sha256": "4343608868ad9c7c7c672272c14fe5cb8acc992d6e666c7e330726e6a23cc0b8",
+    "fixture_sha256": "07bac22088bb6ec15bd5425a1fbe13e19d9011f41e1371d685e4a198717573ac",
     "extraction": "unchanged relevant index rows"
   },
   {
     "file": "sample-duty-order-index-1955.html",
     "source_url": "https://www.irishstatutebook.ie/eli/1955/si",
     "source_sha256": "0c712bb8abcc1a68420fb134c76e6dcd80f08e854155c14dd3a2449bdc2224e5",
-    "fixture_sha256": "51a0df585742663de0e773c2527abd9ea8fa8498d4883b6b8f026eab93698fff",
+    "fixture_sha256": "99b95fe6c1749c621aade3ad84556ecc562996d0b97a3db74cc16cb7da5513ea",
     "extraction": "unchanged relevant index rows"
   },
   {

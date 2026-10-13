@@ -774,12 +774,27 @@ class ISBTextParser(TextParser):
                 raise ValueError("Malformed ISB HTML footnote definition")
             marker, body_text = match.groups()
             number = marker if marker.isdigit() else f"star{len(marker)}"
+            names = [
+                anchor.get("name", anchor.get("id", ""))
+                for anchor in node.iter("a")
+                if re.fullmatch(r"fn_\d+", anchor.get("name", anchor.get("id", "")))
+            ]
+            existing = {
+                ctx.footnote_anchors[f"ret_{name}"][0]
+                for name in names
+                if f"ret_{name}" in ctx.footnote_anchors
+            }
+            if existing:
+                if len(existing) != 1 or definitions[next(iter(existing))] != body_text:
+                    raise ValueError(f"Conflicting ISB HTML footnote {number}")
+                number = next(iter(existing))
+            elif number in definitions and definitions[number] != body_text:
+                # Forms restart their visible numbering; the source anchors remain unique.
+                number = f"{number}-{names[0]}"
             for anchor in node.iter("a"):
                 name = anchor.get("name", anchor.get("id", ""))
                 if re.fullmatch(r"fn_\d+", name):
                     ctx.footnote_anchors[f"ret_{name}"] = (number, marker)
-            if number in definitions and definitions[number] != body_text:
-                raise ValueError(f"Conflicting ISB HTML footnote {number}")
             definitions[number] = body_text
             footnote_nodes.add(node)
         ctx.footnotes.extend(definitions.items())
@@ -1169,6 +1184,18 @@ def _html_inline_text(
                     )
                 elif tag == "sup" and text.strip():
                     number = text.strip()
+                    following = child.getnext()
+                    target = (
+                        ctx.footnote_anchors.get(following.get("name", following.get("id", "")))
+                        if ctx and following is not None and following.tag == "a"
+                        else None
+                    )
+                    if target:
+                        if target[1] != number:
+                            raise ValueError(
+                                f"ISB HTML footnote marker disagrees with its anchor: {number}"
+                            )
+                        number = target[0]
                     text = (
                         f"[^{number}]"
                         if ctx and any(n == number for n, _ in ctx.footnotes)
@@ -1204,6 +1231,66 @@ def _gazette_date(text: str) -> date | None:
     return _parse_date_from_parts(int(match[1]), match[2], int(match[3])) if match else None
 
 
+# Only these conflicting XML dates have been corroborated against official source documents.
+_XML_ENACTMENT_CORRECTIONS = {
+    ("5", "1922"): ("19221202", "1922-12-21", "/isbc/1922_5.html"),
+    ("24", "1924"): ("19240610", "1924-07-10", "/isbc/1924_24.html"),
+    ("21", "1925"): ("19250621", "1925-06-27", "/isbc/1925_21.html"),
+    ("22", "1925"): ("19250621", "1925-06-27", "/isbc/1925_22.html"),
+    ("10", "1926"): ("19260301", "1926-03-11", "/isbc/1926_10.html"),
+    ("17", "1926"): ("19260521", "1926-05-27", "/eli/1926/act/17/enacted/en/html"),
+    ("33", "1926"): ("19260711", "1926-07-17", "/isbc/1926_33.html"),
+    ("15", "1931"): ("19310521", "1931-05-27", "/isbc/1931_15.html"),
+    ("5", "1931"): ("19310321", "1931-03-27", "/isbc/1931_5.html"),
+    ("18", "1933"): ("19330721", "1933-07-27", "/isbc/1933_18.html"),
+    ("P2", "1933"): ("19330711", "1933-07-17", "/eli/1933/prv/2/enacted/en/html"),
+    ("23", "1934"): ("19340605", "1934-06-06", "/isbc/1934_23.html"),
+    ("5", "1935"): ("19350219", "1935-02-27", "/eli/1935/act/5/enacted/en/html"),
+    ("34", "1936"): ("19360624", "1936-07-24", "/isbc/1936_34.html"),
+    ("20", "1938"): ("19380721", "1938-07-27", "/isbc/1938_20.html"),
+    ("21", "1941"): ("19410801", "1941-08-07", "/isbc/1941_21.html"),
+    ("19", "1947"): ("19470619", "1947-07-19", "/eli/1947/act/19/enacted/en/html"),
+    ("10", "1956"): ("19560321", "1956-03-27", "/isbc/1956_10.html"),
+    ("26", "1958"): ("19581125", "1958-07-30", "/isbc/1958_26.html"),
+    ("21", "1959"): ("19590719", "1959-07-29", "/isbc/1959_21.html"),
+    ("13", "1960"): ("19600502", "1960-05-24", "/isbc/1960_13.html"),
+    ("12", "1966"): ("19660531", "1966-06-01", "/isbc/1966_12.html"),
+    ("5", "1967"): ("19670767", "1967-03-07", "/isbc/1967_5.html"),
+    ("25", "1972"): ("19721102", "1972-11-29", "/isbc/1972_25.html"),
+    ("14", "1974"): ("19740621", "1974-06-27", "/isbc/1974_14.html"),
+    ("7", "1979"): ("19790310", "1979-03-20", "/eli/1979/act/7/enacted/en/html"),
+    ("4", "1992"): ("19920308", "1992-03-18", "/isbc/1992_4.html"),
+    ("5", "1996"): ("19960306", "1996-03-16", "/isbc/1996_5.html"),
+    ("26", "2005"): ("20051017", "2005-11-27", "/pdf/2005/en.act.2005.0026.pdf"),
+    ("21", "2014"): ("20140726", "2014-07-28", "/pdf/2014/en.act.2014.0021.pdf"),
+    ("5", "2015"): ("20141119", "2015-03-11", "/pdf/2015/en.act.2015.0005.pdf"),
+    ("24", "2019"): ("20190724", "2019-07-11", "/pdf/2019/en.act.2019.0024.pdf"),
+}
+
+
+def _xml_printed_identities(root) -> set[tuple[str, str]]:
+    return {
+        (f"{'P' if match[2] else ''}{match[1]}", match[3])
+        for node in root.findall("frontmatter/actnumber")
+        if (
+            match := re.fullmatch(
+                r"Number\s+(\d+)(?:\s+\(\s*(Private)\s*\))?\s+of\s+(\d{4})\.?",
+                " ".join(" ".join(node.itertext()).split()),
+                re.I,
+            )
+        )
+    }
+
+
+def _xml_date_correction(root):
+    identities = _xml_printed_identities(root)
+    if len(identities) == 1:
+        correction = _XML_ENACTMENT_CORRECTIONS.get(next(iter(identities)))
+        if correction and root.findtext("metadata/dateofenactment") == correction[0]:
+            return correction
+    return None
+
+
 def _xml_enactment_date(root) -> date | None:
     raw = root.findtext("metadata/dateofenactment") or ""
     if not raw:
@@ -1216,7 +1303,9 @@ def _xml_enactment_date(root) -> date | None:
                 re.fullmatch(rf"{printed.year}0*{first}0*{second}", raw)
                 for first, second in ((printed.month, printed.day), (printed.day, printed.month))
             ):
-                raise ValueError(f"Conflicting ISB enactment dates: {raw!r}, {printed}")
+                correction = _xml_date_correction(root)
+                if not correction or correction[1] != printed.isoformat():
+                    raise ValueError(f"Conflicting ISB enactment dates: {raw!r}, {printed}")
             return printed
     try:
         return date.fromisoformat(raw)
@@ -1239,7 +1328,9 @@ def _signature_dates(text: str) -> list[date]:
     ).split()
     ordinals += [f"twenty-{word}" for word in ordinals[:9]] + ["thirtieth", "thirty-first"]
     for day, word in sorted(enumerate(ordinals, 1), key=lambda item: len(item[1]), reverse=True):
-        text = re.sub(rf"\b{word.replace('-', '[- ]')}\b(?=\s+day of)", str(day), text, flags=re.I)
+        text = re.sub(
+            rf"\b{word.replace('-', '[- ]')}\b(?=\s+day\s*of)", str(day), text, flags=re.I
+        )
     units = "one two three four five six seven eight nine".split()
     numbers = (
         [""]
@@ -1249,7 +1340,7 @@ def _signature_dates(text: str) -> list[date]:
     for tens in "twenty thirty forty fifty sixty seventy eighty ninety".split():
         numbers += [tens] + [f"{tens}-{unit}" for unit in units]
     written_year = (
-        r"\bone thousand nine hundred(?: and)?[ -]+("
+        r"\bone thousand,? nine hundred(?: and)?[ -]+("
         + "|".join(word.replace("-", "[- ]") for word in sorted(numbers[1:], key=len, reverse=True))
         + r")\b"
     )
@@ -1260,9 +1351,9 @@ def _signature_dates(text: str) -> list[date]:
         flags=re.I,
     ).replace("_", " ")
     matches = re.finditer(
-        r"(?:GIVEN under.{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+this\s+|"
-        r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|DUBLIN\.\s+This\s+)"
-        r"(\d{1,2})(?:st|nd|rd|th)?\.?(?:\s+day of)?\s*"
+        r"(?:(?:GIVEN under|SEALED with).{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+this\s+|"
+        r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|SIGNED[^0-9]{0,180}?\bthis\s+|DUBLIN\.\s+This\s+)"
+        r"(\d{1,2})(?:st|nd|rd|th)?\.?(?:\s*day\s*of)?\s*"
         r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s+(\d{4})",
         text,
         re.I,
@@ -1293,6 +1384,7 @@ def _parse_date_from_parts(day: int, month_str: str, year: int) -> date:
         "october": 10,
         "november": 11,
         "december": 12,
+        "decembe": 12,  # The enacted 2017 Act 33 XML truncates December.
     }
     months.update({name[:3]: value for name, value in list(months.items())})
     month = months.get(month_str.lower())
@@ -1452,20 +1544,13 @@ class ISBMetadataParser(MetadataParser):
                 raise ValueError(f"{norm_id}: ISB XML has no metadata")
             expected = norm_id.split("-")
             expected_identity = (expected[3].lstrip("CP"), expected[1])
-            printed_identities = {
-                match.groups()
-                for node in root.findall("frontmatter/actnumber")
-                if (
-                    match := re.fullmatch(
-                        r"Number\s+(\d+)\s+of\s+(\d{4})\.?",
-                        " ".join(" ".join(node.itertext()).split()),
-                        re.I,
-                    )
-                )
-            }
+            expected_printed = (expected[3].lstrip("C"), expected[1])
+            printed_identities = _xml_printed_identities(root)
+            if not any(number.startswith("P") for number, _ in printed_identities):
+                expected_printed = expected_identity
             source_identity = (meta.findtext("number", ""), meta.findtext("year", ""))
-            if (printed_identities and printed_identities != {expected_identity}) or (
-                source_identity != expected_identity and printed_identities != {expected_identity}
+            if (printed_identities and printed_identities != {expected_printed}) or (
+                source_identity != expected_identity and printed_identities != {expected_printed}
             ):
                 raise ValueError(f"{norm_id}: ISB XML metadata identifies a different Act")
             title_el = meta.find("title")
@@ -1504,6 +1589,13 @@ class ISBMetadataParser(MetadataParser):
             ):
                 source_fields.append(("enactment_date_source_value", raw_date))
                 basis = "isb_frontmatter_enactment_date"
+            if correction := _xml_date_correction(root):
+                source_fields.append(
+                    (
+                        "enactment_date_correction_source",
+                        "https://www.irishstatutebook.ie" + correction[2],
+                    )
+                )
             extra = tuple(source_fields) + (("publication_date_basis", basis),)
         else:
             root = lxml_html.fromstring(data)

@@ -82,3 +82,50 @@ def test_identity_uses_printed_actnumber_with_original_xml_fields_preserved(
     root.remove(root.find("frontmatter"))
     with pytest.raises(ValueError, match="different Act"):
         ISBMetadataParser().parse(etree.tostring(root), identifier)
+
+
+def test_restarted_form_footnotes_are_resolved_by_their_unique_source_anchors():
+    import re
+
+    raw = (FIXTURES / "sample-ie-2005-si-229-signature.html").read_bytes()
+    version = ISBTextParser().parse_text(raw)[0].versions[0]
+    assert version.publication_date == date(2005, 4, 29)
+    text = "\n".join(p.text for p in version.paragraphs)
+    definitions = re.findall(r"\[\^([^]]+)\]:", text)
+    assert len(definitions) == len(set(definitions)) == 26
+    assert "[^1-fn_10]: Insert the name and address of the body or person" in text
+    assert "[^1-fn_18]: Insert the name and address of the relevant authority" in text
+    for number in definitions:
+        assert text.count(f"[^{number}]") >= 2
+
+
+@pytest.mark.parametrize(
+    ("identifier", "expected"),
+    [
+        ("IE-1977-si-390", "1977-12-22"),
+        ("IE-1972-si-164", "1972-06-29"),
+        ("IE-2017-act-33", "2017-12-13"),
+        ("IE-1978-si-203", "1978-07-11"),
+        ("IE-2003-si-196", "2003-05-20"),
+        ("IE-1997-si-85", "1997-01-29"),
+        ("IE-1959-act-P1", "1959-03-03"),
+    ],
+)
+def test_remaining_signature_spacings_and_private_identity(identifier, expected):
+    suffix = "html" if "-si-" in identifier else "xml"
+    raw = (FIXTURES / f"sample-{identifier.lower()}-secondary.{suffix}").read_bytes()
+    assert ISBMetadataParser().parse(raw, identifier).publication_date == date.fromisoformat(
+        expected
+    )
+    assert ISBTextParser().parse_text(raw)[0].versions[0].publication_date == date.fromisoformat(
+        expected
+    )
+
+
+@pytest.mark.parametrize("number", [1, 2])
+def test_private_acts_need_not_repeat_private_in_the_printed_number(number):
+    raw = (FIXTURES / f"sample-ie-1924-act-p{number}-secondary.xml").read_bytes()
+    assert (
+        ISBMetadataParser().parse(raw, f"IE-1924-act-P{number}").identifier
+        == f"IE-1924-act-P{number}"
+    )

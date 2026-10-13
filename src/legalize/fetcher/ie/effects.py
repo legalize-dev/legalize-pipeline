@@ -21,9 +21,14 @@ logger = logging.getLogger(__name__)
 # Order-series numbers differ from S.I. numbers; verified against the annual eISB indexes.
 _DUTY_ORDERS = {
     ("E.I.D.", "117", "1937"): "IE-1937-si-3",
+    ("E.I.D.", "217", "1941"): "IE-1941-si-136",
     ("E.I.D.", "223", "1941"): "IE-1941-si-464",
+    ("E.I.D.", "267", "1951"): "IE-1951-si-357",
+    ("E.I.D.", "273", "1952"): "IE-1952-si-71",
     ("E.I.D.", "347", "1955"): "IE-1955-si-66",
     ("E.I.D.", "357", "1955"): "IE-1955-si-173",
+    ("E.I.D.", "359", "1955"): "IE-1955-si-194",
+    ("E.I.D.", "397", "1957"): "IE-1957-si-77",
     ("I.D.", "14", "1958"): "IE-1958-si-30",
     ("I.D.", "128", "1962"): "IE-1962-si-163",
 }
@@ -138,12 +143,13 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     }
     # Some directory links incorrectly use act/pub for explicitly labelled instruments.
     instruments = re.findall(
-        r"S\.?\s*I[.,]?\s*(?:No\.?\s*)?(\d+)\s*(?:of\s+|/)(\d{4})", provision, re.I
+        r"S\.?\s*I[.,]?\s*(?:No\.?\s*)?(\d+),?\s*(?:(?:of\s+){1,2}|/)(\d{4})", provision, re.I
     )
+    instruments += re.findall(r"E\.I\.D\. \(No\. S\.\s*I\. (\d+)\) O\., (\d{4})", provision)
     for number, year in instruments:
         identifiers.discard(f"IE-{year}-act-{int(number)}")
         identifiers.add(f"IE-{year}-si-{int(number)}")
-    for citation in re.findall(r"\b((?:E\.)?I\.D\.) \(No\. (\d+)\) O\., (\d{4})", provision):
+    for citation in re.findall(r"\b((?:E\.)?I\.D\.) \(No\. (\d+)\),? O\., (\d{4})", provision):
         if citation not in _DUTY_ORDERS:
             raise ValueError(f"{norm_id}: unresolved duties order: {citation}")
         identifiers.add(_DUTY_ORDERS[citation])
@@ -152,7 +158,15 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     if not identifiers:
         for number, year in re.findall(r"\b(\d+)\s*/\s*(\d{4})\b", provision):
             identifiers.add(f"IE-{year}-act-{int(number)}")
+        if match := re.match(r"^(\d+) of (\d{4})(?:,|$)", provision):
+            identifiers.add(f"IE-{match[2]}-act-{int(match[1])}")
     correction = None
+    if norm_id == "IE-1942-act-22" and provision == "20/13, ss. 1(5), 26":
+        identifiers.add("IE-2013-act-20")
+        correction = "https://www.irishstatutebook.ie/eli/2013/act/20/section/26/enacted/en/html"
+    if norm_id == "IE-1936-act-45" and note == "S.3 rep. (in pt.)." and not provision:
+        identifiers.add("IE-1989-act-3")
+        correction = "https://www.irishstatutebook.ie/eli/1989/act/3/schedule/1/enacted/en/html"
     if (
         norm_id == "IE-1923-act-15"
         and not provision
@@ -227,7 +241,7 @@ def parse_effects(
     footnotes = [
         _text(node)
         for node in doc.xpath('//*[@id="effects"]/following-sibling::*[not(self::table)]')
-        if _text(node).startswith("*")
+        if re.match(r"^(?:Ss?\.[\d\s(),a-z-]+)?\*", _text(node), re.I)
     ]
     if not any(cells_by_row):
         raise ValueError(f"{norm_id}: effects table has no source rows")
@@ -262,7 +276,7 @@ def parse_effects(
             and not any(texts[2:])
             and previous_effects
             and re.fullmatch(
-                r"(?:but see|see also) ss?\. [\d(), .-]+|And see (?:regs|oo)\. under",
+                r"(?:but see|see also) ss?\. [\d(), .-]+|And see (?:regs|oo)\. under|, expired\.",
                 provision,
                 re.I,
             )
@@ -271,21 +285,28 @@ def parse_effects(
                 effect["provision"] += f"; {provision}"
             continue
         previous_effects = []
-        marker = re.search(r"\*+", note)
+        marker = re.search(r"\*+", note + " " + provision)
         matching_footnotes = [
             footnote
             for footnote in footnotes
-            if marker and re.match(r"\*+", footnote)[0] == marker[0]
+            if marker and re.search(r"\*+", footnote)[0] == marker[0]
         ]
+        if not ids and provision == "Order made under*" and len(matching_footnotes) == 1:
+            ids, correction = _affecting_ids(cells[1], matching_footnotes[0], norm_id, note)
         judicial = bool(re.search(r"declared (?:unconstitutional|invalid)", note, re.I))
         judicial = judicial and bool(re.search(r"\bv\.? .+(?:\[\d{4}\]|\(\d{4}\))", provision))
+        judicial_footnotes = []
+        section = re.match(r"S\.\s*(\d+[A-Z]?)", note)
+        for footnote in matching_footnotes:
+            if not re.search(r"invalid|inconsistent|not compatible", footnote, re.I):
+                continue
+            scope_match = re.match(r"Ss?\.\s*([^:]+):", footnote.lstrip("* "), re.I)
+            if scope_match and section and not re.search(rf"\b{section[1]}\b", scope_match[1]):
+                continue
+            judicial_footnotes.append(footnote)
         judicial = judicial or (
-            not provision
-            and bool(matching_footnotes)
-            and all(
-                re.search(r"invalid|inconsistent|not compatible", footnote, re.I)
-                for footnote in matching_footnotes
-            )
+            (not provision or re.search(r"declared (?:unconstitutional|invalid)", note, re.I))
+            and bool(judicial_footnotes)
         )
         if not ids and judicial:
             if editorial_notes is None:
@@ -293,9 +314,39 @@ def parse_effects(
                     f"{norm_id}: judicial source note requires an editorial_notes destination"
                 )
             entry = {"note": note, "provision": provision, "kind": "judicial_finding"}
-            if matching_footnotes:
-                entry["footnotes"] = matching_footnotes
+            if judicial_footnotes:
+                entry["footnotes"] = judicial_footnotes
             editorial_notes.append(entry)
+            previous_note = ""
+            continue
+        if (
+            not ids
+            and re.fullmatch(r"S\. \d+\(\d+\) proclamation made", note)
+            and re.fullmatch(r"Iris Oifigiuil,? \d+ [A-Za-z]+ \d{4}", provision)
+        ):
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: gazette source note requires an editorial_notes destination"
+                )
+            gazette_date = source_date(provision)
+            if gazette_date is None:
+                raise ValueError(f"{norm_id}: invalid gazette proclamation date")
+            editorial_notes.append(
+                {
+                    "kind": "gazette_proclamation",
+                    "note": note,
+                    "provision": provision,
+                    "gazette_date": gazette_date.isoformat(),
+                }
+            )
+            previous_note = ""
+            continue
+        if not ids and note == "Virt. Rep., Principal Act, Rep." and not provision:
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: undated classification requires an editorial_notes destination"
+                )
+            editorial_notes.append({"kind": "directory_classification", "note": note})
             previous_note = ""
             continue
         if not ids and re.fullmatch(r"Spent\.?", note, re.I) and not any(texts[2:]):
@@ -309,7 +360,7 @@ def parse_effects(
             if not note or re.fullmatch(r"Not affected\.?", note, re.I):
                 continue
             if re.fullmatch(
-                r"References construed|(?:\w+ )?Schedule(?: \w+)?|Parts? (?:[IVX]+[A-Z]?|\d+[A-Z]?)(?:, (?:[IVX]+[A-Z]?|\d+[A-Z]?))*(?: Chapter \d+[A-Z]?)?",
+                r"References construed|(?:\w+ )?Schedule(?: \w+)?|Parts? (?:[IVX]+[A-Z]?|\d+[A-Z]?)(?:, (?:[IVX]+[A-Z]?|\d+[A-Z]?))*(?: Chapter \d+[A-Z]?)?(?: \(ss?\. [\dA-Z, -]+\))?",
                 note,
                 re.I,
             ):
@@ -338,6 +389,8 @@ def parse_effects(
             )
             if correction:
                 effect["source_correction"] = correction
+            if provision == "Order made under*" and matching_footnotes:
+                effect["directory_footnotes"] = matching_footnotes
             if (
                 norm_id == "IE-2014-act-38"
                 and re.search(r"\bas (?:inserted|substituted) by\b", provision)

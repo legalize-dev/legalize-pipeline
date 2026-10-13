@@ -982,6 +982,7 @@ def test_older_instrument_asterisk_notes_use_explicit_return_anchors():
 def test_conflicting_html_footnote_definition_is_rejected():
     data = (FIXTURES / "sample-v04-si-2024-356.html").read_bytes()
     data = data.replace(b"OJ No. L143, 30.4.2004, p. 87", b"Different reference", 1)
+    data = data.replace(b'name="fn_2"', b'name="fn_0"')
     with pytest.raises(ValueError, match="Conflicting ISB HTML footnote 1"):
         ISBTextParser().parse_text(data)
 
