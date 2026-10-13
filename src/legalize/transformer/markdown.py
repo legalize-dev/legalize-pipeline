@@ -247,9 +247,7 @@ def render_norm_at_date(
         and metadata.text_state is TextState.POINT_IN_TIME
         and source_id is not None
     ):
-        if effective_date is not None:
-            target_date = max(target_date, effective_date)
-        # A published amendment can apply later; exclude versions not published yet.
+        # Freeze publication before advancing to commencement, which may include a later repeal.
         blocks = [
             replace(
                 block,
@@ -257,7 +255,9 @@ def render_norm_at_date(
             )
             for block in blocks
         ]
-        if effective_date is None:
+        if effective_date is not None:
+            target_date = max(target_date, effective_date)
+        else:
             target_date = max(
                 (v.in_force_from for block in blocks for v in block.versions),
                 default=target_date,
