@@ -235,6 +235,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             "position": i,
             "versions": [],
         }
+        if block.expiry_date:
+            article["expiry_date"] = block.expiry_date.isoformat()
 
         for version in block.versions:
             text = "\n\n".join(p.text for p in version.paragraphs)
@@ -243,7 +245,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
                 "source_id": version.norm_id,
                 "text": text,
             }
-            if version.effective_date and version.effective_date != version.publication_date:
+            # An explicit same-day commencement is different from an unknown date.
+            if version.effective_date:
                 version_dict["effective_date"] = version.effective_date.isoformat()
             if version.text_state is not None:
                 version_dict["text_state"] = version.text_state.value
@@ -251,15 +254,23 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
                 version_dict["source"] = version.source
             if version.source_warning:
                 version_dict["source_warning"] = version.source_warning
-            if norm.metadata.country == "ie":
-                version_dict["paragraphs"] = [
-                    {"css_class": paragraph.css_class, "text": paragraph.text}
-                    for paragraph in version.paragraphs
-                ]
+            if version.superseded_before_commencement:
+                version_dict["superseded_before_commencement"] = True
             # Preserve CSS classes for lossless round-trip
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
                 version_dict["css_classes"] = css_classes
+            if norm.metadata.country == "ie" or any(
+                p.expiry_date or "\n\n" in p.text for p in version.paragraphs
+            ):
+                version_dict["paragraphs"] = [
+                    {
+                        "css_class": p.css_class,
+                        "text": p.text,
+                        **({"expiry_date": p.expiry_date.isoformat()} if p.expiry_date else {}),
+                    }
+                    for p in version.paragraphs
+                ]
             article["versions"].append(version_dict)
 
         # current_text = latest version
@@ -300,6 +311,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             row["has_source_date"] = False
         if reform.status is not None:
             row["status"] = reform.status.value
+        if reform.effective_date is not None:
+            row["effective_date"] = reform.effective_date.isoformat()
         reforms.append(row)
 
     return {
@@ -364,8 +377,14 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
             css_classes = v.get("css_classes")
             if "paragraphs" in v:
                 paragraphs = [
-                    Paragraph(css_class=paragraph["css_class"], text=paragraph["text"])
-                    for paragraph in v["paragraphs"]
+                    Paragraph(
+                        css_class=p["css_class"],
+                        text=p["text"],
+                        expiry_date=date.fromisoformat(p["expiry_date"])
+                        if p.get("expiry_date")
+                        else None,
+                    )
+                    for p in v["paragraphs"]
                 ]
             elif v["text"].strip():
                 lines = [line.strip() for line in v["text"].split("\n\n") if line.strip()]
@@ -376,11 +395,14 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 Version(
                     norm_id=v["source_id"],
                     publication_date=date.fromisoformat(v["date"]),
-                    effective_date=date.fromisoformat(v.get("effective_date", v["date"])),
+                    effective_date=(
+                        date.fromisoformat(v["effective_date"]) if v.get("effective_date") else None
+                    ),
                     paragraphs=tuple(paragraphs),
                     text_state=TextState(v["text_state"]) if v.get("text_state") else None,
                     source=v.get("source"),
                     source_warning=v.get("source_warning"),
+                    superseded_before_commencement=v.get("superseded_before_commencement", False),
                 )
             )
         blocks.append(
@@ -388,6 +410,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 id=art["block_id"],
                 block_type=art["block_type"],
                 title=art["title"],
+                expiry_date=(
+                    date.fromisoformat(art["expiry_date"]) if art.get("expiry_date") else None
+                ),
                 versions=tuple(versions),
             )
         )
@@ -413,6 +438,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 change_note=r.get("change_note", ""),
                 has_source_date=r.get("has_source_date", True),
                 status=NormStatus(r["status"]) if r.get("status") else None,
+                effective_date=(
+                    date.fromisoformat(r["effective_date"]) if r.get("effective_date") else None
+                ),
             )
         )
 

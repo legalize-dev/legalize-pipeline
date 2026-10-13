@@ -36,27 +36,20 @@ Preserve source attribution. It also says XML is provided for Acts from 1922 onw
 Actual 1922/1, 1960/45 and private 2023/1 XML were downloaded and parsed successfully;
 the previous blanket claim that pre-1995 Acts lack XML is false.
 
-**The legal basis for LRC redistribution remains unresolved; individual permission
-is not universally required.** [S.I. 376/2021](https://www.irishstatutebook.ie/eli/2021/si/376/made/en/html)
-requires eligible documents to be made available for reuse (regulation 5), permits
-requests without expressly requiring one before every reuse (regulation 6), and
-sets free and normally unconditional reuse as defaults (regulations 8 and 10).
-That supports a statutory reuse argument, but does not establish that every LRC
-publication falls within the regime. The LRC explicitly describes itself as a
-[research organisation](https://www.lawreform.ie/contact-us/); regulation 3(2)(l)
-excludes documents other than research data held by research-performing organisations.
-Its public-body status alone does not resolve that exception or classify Revised
-Acts as research data. No authoritative classification resolving this issue was found.
+**LRC reuse terms confirmed on 2026-10-08.** The project owner supplied the LRC's
+written reply on 2026-10-13. It confirms that Revised Acts are available under
+CC BY 4.0 through the Oireachtas Open Data PSI Licence and says a matching website
+notice will be added. This is direct source confirmation, superseding the earlier
+unresolved classification assessment; it is not inferred from the eISB licence.
+The public notice was not visible on the Revised Acts introduction page when
+rechecked on 2026-10-13. The private correspondence is retained by the owner.
 
-No express LRC licence was established by the reviewed homepage, Revised Acts
-introduction, FOI scheme, privacy notice or sitemap. The copyright footer neither
-grants a licence nor establishes that statutory reuse is prohibited. Do not assign
-the eISB licence or automatically infer CC BY 4.0 for LRC output. Section 76 of the
-Copyright and Related Rights Act 2000 protects acts specifically authorised by an
-enactment; it is not an independent blanket reuse grant. Local extraction and quality
-work can proceed while the applicable statutory or licensed redistribution basis is
-resolved. The dated [reuse assessment and enquiry wording](ie-v04/reuse-assessment.md)
-record the primary sources, concrete uncertainty and proposed plain-text scope.
+Credit the source bodies, link the [licence](https://www.oireachtas.ie/en/open-data/license/),
+retain copyright and warranty notices, identify the Markdown transformation and
+state that this is neither official text nor an official restatement. The scope
+remains plain legislative text and its linked historical versions, excluding LRC
+editorial annotations, commentary and logos. See the updated
+[reuse assessment](ie-v04/reuse-assessment.md).
 
 `irishstatutebook.ie/robots.txt` returned 404; LRC robots returned
 `User-agent: *` and an empty `Disallow`. No published request-rate limit was found.
@@ -137,7 +130,7 @@ primary source. Reconciliation was required by the full-pipeline 1922/1 sample.
 Source correction evidence and the effects-fixture manifest are documented in
 [`ie-v04/effects-source-corrections.md`](ie-v04/effects-source-corrections.md).
 This mapping does not establish a redistribution licence: the eISB and LRC source
-licensing conclusions in section 0.1 remain separate gates.
+licensing evidence in section 0.1 establishes the separate source terms.
 
 ## 0.4 Formatting inventory
 

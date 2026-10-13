@@ -264,6 +264,14 @@ class GitRepo:
             norm_id = info.trailers.get("Norm-Id", "")
             if source_id and norm_id:
                 self._existing_commits.add((source_id, norm_id))
+        if hasattr(self, "_existing_stages"):
+            self._existing_stages.add(
+                (
+                    info.trailers.get("Source-Id", ""),
+                    info.trailers.get("Norm-Id", ""),
+                    info.trailers.get("Effective-Date", ""),
+                )
+            )
 
         return sha
 
@@ -306,8 +314,32 @@ class GitRepo:
             logger.warning("Could not load existing commits", exc_info=True)
         return self._existing_commits
 
-    def has_commit_with_source_id(self, source_id: str, norm_id: str | None = None) -> bool:
+    def has_commit_with_source_id(
+        self,
+        source_id: str,
+        norm_id: str | None = None,
+        *,
+        effective_date=None,
+        stage: bool = False,
+    ) -> bool:
         """Checks whether a commit with this Source-Id + Norm-Id already exists."""
+        if stage or effective_date is not None:
+            if not hasattr(self, "_existing_stages"):
+                output = self._run(
+                    [
+                        "log",
+                        "--format=%(trailers:key=Source-Id,valueonly,separator=)%x09%(trailers:key=Norm-Id,valueonly,separator=)%x09%(trailers:key=Effective-Date,valueonly,separator=)%x00",
+                    ],
+                    check=False,
+                )
+                self._existing_stages = {
+                    tuple(entry.strip("\n").split("\t")) for entry in output.split("\0")
+                }
+            return (
+                source_id,
+                norm_id,
+                effective_date.isoformat() if effective_date else "",
+            ) in self._existing_stages
         if not hasattr(self, "_existing_commits"):
             self.load_existing_commits()
 

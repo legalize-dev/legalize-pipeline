@@ -458,7 +458,7 @@ class TestGenericPipeline:
 
 @pytest.mark.parametrize("committer", [commit_one, commit_all_fast])
 def test_eu_source_selection_does_not_activate_other_countries_future_text(tmp_path, committer):
-    norm = _make_norma(country="es")
+    norm = _make_norma(country="fr")
     block = norm.blocks[0]
     original = replace(block.versions[0], paragraphs=(Paragraph("parrafo", "Old provision."),))
     deferred = Version(
@@ -474,11 +474,11 @@ def test_eu_source_selection_does_not_activate_other_countries_future_text(tmp_p
     )
     data, repo = tmp_path / "data", tmp_path / "repo"
     save_structured_json(data, norm)
-    config = Config(countries={"es": CountryConfig(data_dir=str(data), repo_path=str(repo))})
+    config = Config(countries={"fr": CountryConfig(data_dir=str(data), repo_path=str(repo))})
     if committer is commit_one:
-        committer(config, "es", norm.metadata.identifier)
+        committer(config, "fr", norm.metadata.identifier)
     else:
-        committer(config, "es")
-    markdown = next((repo / "es").rglob("*.md")).read_text()
+        committer(config, "fr")
+    markdown = next((repo / "fr").rglob("*.md")).read_text()
     assert "Old provision." in markdown
     assert "Deferred provision." not in markdown

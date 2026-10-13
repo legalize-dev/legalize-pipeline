@@ -841,14 +841,14 @@
         "Condiciones de reutilización / Aviso legal: https://www.boe.es/informacion/aviso_legal/index.php"
       ],
       "data_license": "Condiciones de reutilización del BOE — cita obligatoria de la fuente",
-      "scope": "Cubre legislación estatal española y normativa de las comunidades autónomas publicada en el BOE, en su versión consolidada (texto vigente con todas sus redacciones). Cada norma es un fichero Markdown y cada reforma es un commit de git con la fecha oficial de publicación. Las normas de ámbito estatal se ubican en el directorio es/ y las autonómicas en directorios por jurisdicción (es-pv/, es-ct/, etc.). Datos obtenidos de la API de datos abiertos del BOE.",
+      "scope": "Incluye el catálogo de legislación consolidada del BOE, sin corte de antigüedad, y disposiciones de la Sección I desde 2010 disponibles como texto original. Abarca normativa estatal y autonómica publicada por el BOE. Cada norma declara si su cuerpo es una versión histórica consolidada (point_in_time) o el texto original sin incorporar reformas posteriores (as_enacted). Las rutas por jurisdicción están declaradas en .legalize.yml.",
       "norm_types": [
         {
           "label": "Constitución",
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Norma suprema del ordenamiento (rango: constitucion).",
           "examples": [
-            "es/BOE-A-1978-31229.md"
+            "es/bb/BOE-A-1978-31229.md"
           ]
         },
         {
@@ -862,7 +862,7 @@
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Leyes ordinarias (rango: ley).",
           "examples": [
-            "es/BOE-A-2015-11430.md"
+            "es/70/BOE-A-2015-11430.md"
           ]
         },
         {
@@ -876,7 +876,7 @@
           "pattern": "BOE-A-AAAA-N.md",
           "note": "Textos refundidos (rango: real_decreto_legislativo).",
           "examples": [
-            "es/BOE-A-1996-8930.md"
+            "es/d9/BOE-A-1996-8930.md"
           ]
         },
         {
@@ -893,13 +893,13 @@
         },
         {
           "label": "Normativa autonómica (foral/regional)",
-          "pattern": "es-XX/BOE-A-AAAA-N.md",
+          "pattern": "es-XX/XX/BOE-A-AAAA-N.md",
           "note": "Leyes y decretos de comunidades autónomas, ubicados en directorios por jurisdicción ELI (es-pv, es-ct, es-ga, etc.). Incluye rangos forales: ley foral, decreto legislativo, decreto-ley, decreto-ley foral, decreto foral legislativo.",
           "examples": []
         }
       ],
       "attribution": "> Fuente de los datos: Agencia Estatal Boletín Oficial del Estado (https://www.boe.es). Datos reutilizados conforme a las condiciones de reutilización del BOE (Resolución de 27 de junio de 2024). Este repositorio es una obra derivada basada en datos de la Agencia Estatal Boletín Oficial del Estado.",
-      "notes": "## Estructura de ficheros\n\nEstructura plana: un directorio por ámbito (es/ para el Estado; es-XX/ por comunidad autónoma según código ELI). El rango de la norma (constitución, ley orgánica, ley, real decreto, etc.) figura en el frontmatter YAML, nunca en la ruta del fichero.\n\n## Limitaciones\n\nLas imágenes del texto original se omiten (el proyecto no incorpora activos binarios). Se conserva el texto, las tablas, el formato enriquecido y los metadatos. El identificador del fichero es el ID oficial del BOE; un cambio de formato implicaría regenerar todo el historial de commits."
+      "notes": "## Estructura de ficheros\n\nUn directorio por ámbito (es/ para el Estado; es-XX/ por comunidad autónoma según código ELI), dividido en subdirectorios con los dos primeros caracteres del SHA-1 del identificador. El manifiesto .legalize.yml declara la ruta de cada norma. El rango figura en el frontmatter YAML.\n\n## Limitaciones\n\nTexto consolidado de carácter meramente informativo. El historial refleja las versiones proporcionadas por el BOE; puede no incluir redacciones anteriores que la fuente no exponga. El texto se transforma a Markdown; se conservan referencias a imágenes oficiales, sin copiar activos binarios. Las tablas anidadas se representan como HTML para preservar sus celdas. Las fechas de publicación y de entrada en vigor se distinguen: Source-Date fecha la publicación del acto, y last_updated la entrada en vigor de la redacción incluida. Si una publicación tiene varias fases de entrada en vigor, cada fase conserva su propio commit y Effective-Date. Cuando el BOE no declara la fecha de vigencia de un bloque, last_updated se omite y extra.effective_date_unknown_blocks identifica la incertidumbre. Los actos sin consolidación conservan su cuerpo original y registran las reformas conocidas sin inventar texto consolidado. Se excluyen actos judiciales, correcciones como documentos independientes y publicaciones dominadas por imágenes; las exclusiones se registran durante la descarga."
     },
     "eu": {
       "code": "eu",
@@ -1113,7 +1113,7 @@
         "Supplementary parliamentary metadata: https://api.oireachtas.ie/v1/legislation",
         "Revised Acts and archives: https://revisedacts.lawreform.ie/revacts/chron"
       ],
-      "data_license": "eISB: Oireachtas Open Data PSI Licence / CC BY 4.0 (https://www.irishstatutebook.ie/open-data.html). LRC: redistribution terms remain under review; no CC BY grant is asserted for LRC material.",
+      "data_license": "Oireachtas (Open Data) PSI Licence, incorporating Creative Commons Attribution 4.0 International (CC BY 4.0): https://www.oireachtas.ie/en/open-data/license/. eISB publishes these terms at https://www.irishstatutebook.ie/open-data.html; the Law Reform Commission confirmed their application to Revised Acts on 8 October 2026.",
       "scope": "Acts published in the eISB annual indexes from 1922 onward, including public Acts, private Acts and constitutional amendments; the current Constitution of Ireland; and the statutory instruments referenced by their amendment histories. This is not a complete collection of statutory instruments or pre-1922 legislation.",
       "norm_types": [
         {
@@ -1132,8 +1132,8 @@
           "note": "Source instruments needed to resolve amendment histories, including their dependencies."
         }
       ],
-      "attribution": "> Contains Irish Public Sector Information licensed under the Oireachtas (Houses of the Oireachtas) Open Data PSI Licence / Creative Commons Attribution 4.0 International, sourced from https://www.irishstatutebook.ie.",
-      "notes": "## Text and history\n\nEnacted texts are marked `as_enacted`. LRC archived PDF snapshots retain their stated cutoff and source URL. Mutable consolidated texts are marked `current`; the notice explains that they cannot establish the text at an earlier commit date.\n\nAmendment records cite the actual amending instrument. Snapshot cutoffs and commencement dates are not represented as new publication dates. Undated source publications omit `Source-Date`. The original publication date remains unchanged across versions.\n\nA verified incomplete source carries a `source_warning` and a visible notice naming the missing provision. The available official text is preserved without reconstruction. Content-bearing binary figures are marked `[image omitted]`; source image counts are retained in metadata.\n\nPaths follow the sharded template declared in `.legalize.yml`. The corpus conforms to the Legalize v0.4 identifier, source, date and history conventions.\n\n## Source terms\n\neISB material is reused under its published Open Data PSI Licence (CC BY 4.0), with attribution. That grant does not extend automatically to LRC material. LRC redistribution terms must be established separately before publishing a rebuilt corpus that includes its snapshots."
+      "attribution": "> Contains Irish Public Sector Information from the Houses of the Oireachtas, the electronic Irish Statute Book (Office of the Attorney General) and the Law Reform Commission. Copyright remains with the respective licensors. Reused under the [Oireachtas (Open Data) PSI Licence](https://www.oireachtas.ie/en/open-data/license/), incorporating [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/). Sources: https://www.irishstatutebook.ie and https://revisedacts.lawreform.ie.",
+      "notes": "## Text and history\n\nEnacted texts are marked `as_enacted`. LRC archived PDF snapshots retain their stated cutoff and source URL. Mutable consolidated texts are marked `current`; the notice explains that they cannot establish the text at an earlier commit date.\n\nAmendment records cite the actual amending instrument. Snapshot cutoffs and commencement dates are not represented as new publication dates. Undated source publications omit `Source-Date`. The original publication date remains unchanged across versions.\n\nA verified incomplete source carries a `source_warning` and a visible notice naming the missing provision. The available official text is preserved without reconstruction. Content-bearing binary figures are marked `[image omitted]`; source image counts are retained in metadata.\n\nPaths follow the sharded template declared in `.legalize.yml`. The corpus conforms to the Legalize v0.4 identifier, source, date and history conventions.\n\n## Source terms\n\neISB and LRC Revised Acts are reused under the Oireachtas (Open Data) PSI Licence, incorporating CC BY 4.0. The LRC confirmed the application of these terms to Revised Acts on 8 October 2026. See the [copyright and re-use policy](https://www.oireachtas.ie/en/copyright-and-reuse/).\n\nLegalize converts source documents into Markdown and structured version history. Formatting and image omissions are described above; LRC editorial annotations, commentary and logos are excluded. Source links, revision cutoffs and source warnings are preserved. This is not the official text of an Act or an official restatement. Legalize is independent and is not endorsed by the source bodies.\n\nThe Houses of the Oireachtas disclaim liability arising from reuse and do not certify that the material is current or error-free. Publication does not establish that a provision is in force. Consult the linked official sources and their notices before relying on the text."
     },
     "it": {
       "code": "it",

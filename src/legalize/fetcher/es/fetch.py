@@ -13,12 +13,44 @@ import requests
 from rich.console import Console
 
 from legalize.config import Config
-from legalize.models import ParsedNorm
+from legalize.models import NormMetadata, ParsedNorm
 from legalize.storage import load_norma_from_json, save_structured_json
-from legalize.transformer.xml_parser import extract_reforms, parse_text_xml
+from legalize.fetcher.es.parser import BOETextParser, extract_reforms
 
 console = Console()
 logger = logging.getLogger(__name__)
+
+
+def fetch_norm(client, boe_id: str, *, force: bool = False) -> ParsedNorm:
+    """Use a consolidated timeline when available, otherwise the original gazette."""
+    from legalize.fetcher.es.diary import fetch_diary
+
+    try:
+        metadata = fetch_metadata(client, boe_id)
+        text_xml = client.get_consolidated_text(boe_id, bypass_cache=force)
+    except requests.HTTPError as exc:
+        if exc.response is None or exc.response.status_code != 404:
+            raise
+        return fetch_diary(client, boe_id)
+    blocks = BOETextParser().parse_text(text_xml)
+    if not blocks or not any(block.versions for block in blocks):
+        raise ValueError(f"{boe_id}: empty consolidated text")
+    return ParsedNorm(metadata, tuple(blocks), tuple(extract_reforms(blocks)))
+
+
+def fetch_metadata(client, boe_id: str) -> NormMetadata:
+    """Fetch both BOE metadata surfaces, retrying incomplete transient responses."""
+    from legalize.fetcher.es.metadata import parse_metadata
+
+    meta_xml = client.get_metadata(boe_id)
+    metadata = parse_metadata(meta_xml, boe_id)
+    try:
+        diario_xml = client.get_disposition_xml(boe_id, eli_url=metadata.source)
+    except requests.HTTPError as exc:
+        if exc.response is None or exc.response.status_code != 404:
+            raise
+        diario_xml = None
+    return parse_metadata(meta_xml, boe_id, diario_xml=diario_xml)
 
 
 def fetch_one(config: Config, boe_id: str, force: bool = False) -> ParsedNorm | None:
@@ -30,13 +62,16 @@ def fetch_one(config: Config, boe_id: str, force: bool = False) -> ParsedNorm | 
     from legalize.fetcher.cache import FileCache
     from legalize.fetcher.es.client import BOEClient
     from legalize.fetcher.es.config import BOEConfig
-    from legalize.fetcher.es.metadata import parse_metadata
+    from legalize.fetcher.es.diary import ExcludedDiary, record_exclusion
 
     cc = config.get_country("es")
     json_path = Path(cc.data_dir) / "json" / f"{boe_id}.json"
     if json_path.exists() and not force:
         console.print(f"  [dim]{boe_id} already downloaded, skipping[/dim]")
         return load_norma_from_json(json_path)
+
+    # An earlier exclusion cannot hide a failed attempt to reconsider the source.
+    (Path(cc.data_dir) / "excluded" / f"{boe_id}.json").unlink(missing_ok=True)
 
     source = cc.source
     boe_config = BOEConfig(
@@ -49,31 +84,19 @@ def fetch_one(config: Config, boe_id: str, force: bool = False) -> ParsedNorm | 
     with BOEClient(boe_config, cache) as client:
         try:
             console.print(f"  Downloading [bold]{boe_id}[/bold]...")
-            meta_xml = client.get_metadata(boe_id)
-            try:
-                diario_xml = client.get_disposition_xml(boe_id)
-            except (requests.RequestException, ValueError):
-                diario_xml = None
-            metadata = parse_metadata(meta_xml, boe_id, diario_xml=diario_xml)
-            text_xml = client.get_consolidated_text(boe_id, bypass_cache=force)
-
-            blocks = parse_text_xml(text_xml)
-            reforms = extract_reforms(blocks)
-
-            norm = ParsedNorm(
-                metadata=metadata,
-                blocks=tuple(blocks),
-                reforms=tuple(reforms),
-            )
-
+            norm = fetch_norm(client, boe_id, force=force)
             save_structured_json(cc.data_dir, norm)
 
             console.print(
-                f"  [green]✓[/green] {metadata.short_title}: "
-                f"{len(blocks)} blocks, {len(reforms)} versions"
+                f"  [green]✓[/green] {norm.metadata.short_title}: "
+                f"{len(norm.blocks)} blocks, {len(norm.reforms)} versions"
             )
             return norm
 
+        except ExcludedDiary as exc:
+            record_exclusion(cc.data_dir, exc)
+            console.print(f"  [dim]{exc}[/dim]")
+            return None
         except (requests.RequestException, ValueError, OSError):
             logger.error("Error downloading %s", boe_id, exc_info=True)
             console.print(f"  [red]✗ Error downloading {boe_id}[/red]")

@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import logging
 import re
+from copy import deepcopy
+from dataclasses import replace
 from datetime import date
 
 from lxml import etree
@@ -32,21 +34,21 @@ logger = logging.getLogger(__name__)
 
 BOE_BASE = "https://www.boe.es"
 
-_BOE_ID_RE = re.compile(r"\bBOE-[A-Z]-\d{4}-\d+\b")
+# The BOE's own id, and the autonomous gazettes it cross-references with the
+# same anchor shape: BON (Navarra), BORM (Murcia), DOGC (Catalunya), and the
+# rest. 49 of 3,869 anchors carried one and lost their link (#106).
+_BOE_ID_RE = re.compile(r"\b[A-Z]{2,6}-[A-Za-z]-\d{4}-\d+\b")
 
-# CSS classes that should NEVER appear as standalone paragraphs — they are
-# either table-cell fragments (handled by the table renderer) or chrome
-# injected by the BOE viewer that has no legal weight.
+# Viewer chrome, rather than legislative text.
 _STRIP_CLASSES = {
-    "cabeza_tabla",
-    "cuerpo_tabla_izq",
-    "cuerpo_tabla_centro",
-    "cuerpo_tabla_der",
-    "textoCompleto",
+    # The BOE viewer's "Información relacionada" box heading. Nothing but the
+    # label ever appears under it, and it was reaching the corpus as a bare
+    # paragraph reading "Información relacionada".
+    "inforel",
 }
 
 
-def _parse_date(date_str: str) -> date | None:
+def _parse_date(date_str: str | None) -> date | None:
     """Converts YYYYMMDD → date. Handles BOE's indefinite-validity sentinel 99999999."""
     if not date_str or date_str.strip() in ("", "99999999"):
         return None
@@ -63,6 +65,15 @@ def _parse_date(date_str: str) -> date | None:
 # ─────────────────────────────────────────────
 # Inline text extraction
 # ─────────────────────────────────────────────
+
+
+def _inline_markup(text: str, opening: str, closing: str) -> str:
+    """Keep word separators outside markup, including wrappers containing only whitespace."""
+    if not text.strip():
+        return " " if text else ""
+    leading = " " if text[0].isspace() else ""
+    trailing = " " if text[-1].isspace() else ""
+    return f"{leading}{opening}{text.strip()}{closing}{trailing}"
 
 
 def _extract_inline(element: etree._Element) -> str:
@@ -89,22 +100,11 @@ def _extract_inline(element: etree._Element) -> str:
             continue
         tag = etree.QName(child.tag).localname
 
-        if tag in ("b", "strong"):
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"**{inner}**")
-        elif tag in ("i", "em"):
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"*{inner}*")
-        elif tag == "sup":
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"<sup>{inner}</sup>")
-        elif tag == "sub":
-            inner = _extract_inline(child).strip()
-            if inner:
-                parts.append(f"<sub>{inner}</sub>")
+        if tag in ("b", "strong", "i", "em"):
+            marker = "**" if tag in ("b", "strong") else "*"
+            parts.append(_inline_markup(_extract_inline(child), marker, marker))
+        elif tag in {"sup", "sub"}:
+            parts.append(_inline_markup(_extract_inline(child), f"<{tag}>", f"</{tag}>"))
         elif tag == "br":
             parts.append("  \n")
         elif tag == "a":
@@ -127,7 +127,7 @@ def _extract_inline(element: etree._Element) -> str:
                 if m:
                     href = f"{BOE_BASE}/buscar/doc.php?id={m.group(0)}"
             if href:
-                parts.append(f"[{inner.strip()}]({href})")
+                parts.append(_inline_markup(inner, "[", f"]({href})"))
             else:
                 parts.append(inner)
         elif tag == "img":
@@ -140,6 +140,8 @@ def _extract_inline(element: etree._Element) -> str:
         else:
             inner = _extract_inline(child)
             if inner:
+                if tag in {"p", "div", "tr", "td", "th"}:
+                    inner = " " + inner + " "
                 parts.append(inner)
 
         if child.tail:
@@ -149,17 +151,8 @@ def _extract_inline(element: etree._Element) -> str:
 
 
 def _cell_text(cell: etree._Element) -> str:
-    """Cell text extractor for the generic table renderer."""
-    inner_parts: list[str] = []
-    for child in cell:
-        if not isinstance(child.tag, str):
-            continue
-        t = _extract_inline(child).strip()
-        if t:
-            inner_parts.append(t)
-    if not inner_parts and cell.text:
-        return cell.text.strip()
-    return " ".join(inner_parts)
+    """Preserve cell text, inline markup and tails in document order."""
+    return _extract_inline(cell).strip()
 
 
 # ─────────────────────────────────────────────
@@ -179,6 +172,52 @@ def _image_paragraph(img: etree._Element) -> Paragraph | None:
 
 
 def _table_paragraph(table: etree._Element) -> Paragraph | None:
+    if table.find(".//table") is not None:
+        # Pipe tables cannot represent a table inside a cell without losing its grid.
+        table = deepcopy(table)
+        allowed = {
+            "table",
+            "colgroup",
+            "col",
+            "thead",
+            "tbody",
+            "tfoot",
+            "tr",
+            "th",
+            "td",
+            "caption",
+            "p",
+            "span",
+            "b",
+            "strong",
+            "i",
+            "em",
+            "sup",
+            "sub",
+            "br",
+            "a",
+            "img",
+        }
+        for node in table.iter():
+            if node.tag not in allowed:
+                raise ValueError(f"Unsupported nested-table element: {node.tag}")
+            for key in list(node.attrib):
+                if key not in {"rowspan", "colspan", "href", "src", "alt"}:
+                    del node.attrib[key]
+            for key in ("href", "src"):
+                value = node.get(key)
+                if value and value.startswith("/"):
+                    node.set(key, BOE_BASE + value)
+                elif value and not value.startswith(("https://", "http://", "#")):
+                    del node.attrib[key]
+            if node.text and not node.text.strip():
+                node.text = None
+            if node.tail and not node.tail.strip():
+                node.tail = None
+        return Paragraph(
+            css_class="table",
+            text=etree.tostring(table, encoding="unicode", method="html", with_tail=False),
+        )
     md = render_table(table, _cell_text)
     if not md:
         return None
@@ -236,7 +275,7 @@ def _parse_blockquote(bq_el: etree._Element) -> list[Paragraph]:
                 continue
             if p.css_class in WRAP_CLASSES:
                 # Prefix with `> ` so it renders as a Markdown blockquote.
-                p = Paragraph(css_class="cita", text=p.text)
+                p = replace(p, css_class="cita")
             out.append(p)
         elif inner_tag == "table":
             t = _table_paragraph(inner_el)
@@ -249,6 +288,12 @@ def _parse_blockquote(bq_el: etree._Element) -> list[Paragraph]:
             out.extend(_list_paragraphs(inner_el, ordered=True))
         elif inner_tag == "ul":
             out.extend(_list_paragraphs(inner_el, ordered=False))
+    expiry = _parse_date(bq_el.get("caduca"))
+    if expiry:
+        out = [
+            replace(p, expiry_date=min(p.expiry_date, expiry) if p.expiry_date else expiry)
+            for p in out
+        ]
     return out
 
 
@@ -264,12 +309,14 @@ def _parse_p(p_el: etree._Element) -> Paragraph | None:
 
     if css in _STRIP_CLASSES:
         return None
+    if css in {"cabeza_tabla", "cuerpo_tabla_izq", "cuerpo_tabla_centro", "cuerpo_tabla_der"}:
+        css = "parrafo"
 
     text = _extract_inline(p_el).strip()
     if not text:
         return None
 
-    return Paragraph(css_class=css, text=text)
+    return Paragraph(css_class=css, text=text, expiry_date=_parse_date(p_el.get("caduca")))
 
 
 # ─────────────────────────────────────────────
@@ -338,13 +385,14 @@ def parse_text_xml(xml_data: bytes | str) -> list[Block]:
             if parsed_pub is None:
                 continue
 
-            parsed_vig = _parse_date(fecha_vig) if fecha_vig else parsed_pub
+            # None when the source is silent, not a copy of the publication date.
+            parsed_vig = _parse_date(fecha_vig)
 
             versions.append(
                 Version(
                     norm_id=version_el.get("id_norma", ""),
                     publication_date=parsed_pub,
-                    effective_date=parsed_vig if parsed_vig is not None else parsed_pub,
+                    effective_date=parsed_vig,
                     paragraphs=tuple(paragraphs),
                 )
             )
@@ -355,6 +403,7 @@ def parse_text_xml(xml_data: bytes | str) -> list[Block]:
                 block_type=block_el.get("tipo", ""),
                 title=block_el.get("titulo", ""),
                 versions=tuple(versions),
+                expiry_date=_parse_date(block_el.get("fecha_caducidad")),
             )
         )
 
@@ -382,10 +431,30 @@ def extract_reforms(blocks: list[Block]) -> list[Reform]:
 
 
 def get_block_at_date(block: Block, target_date: date) -> Version | None:
-    applicable = [v for v in block.versions if v.in_force_from <= target_date]
+    """The version of this block in force on ``target_date``.
+
+    Selected by the date the version took effect, not the date its amendment
+    was published — the spec defines point-in-time text as "the law as in
+    force", and for Spain those differ on 88.6 % of norms. A source that
+    declares no date in force falls back to publication, so a corpus whose two
+    dates always agree renders byte-for-byte as before.
+    """
+    applicable = [
+        v
+        for v in block.versions
+        if v.in_force_from <= target_date and not v.superseded_before_commencement
+    ]
+    if block.expiry_date and block.expiry_date <= target_date:
+        # The source says the unit is gone by this date. Where it materialises
+        # the repeal it emits one more version reading "(Derogado)", and that
+        # one still answers; where it does not, the block has nothing left to
+        # say and the last live text is not it. 622 of 9,723 sampled ES blocks
+        # (6.4 %) were being published as current law on that path — 378 of
+        # them in one file (#106).
+        applicable = [v for v in applicable if v.in_force_from >= block.expiry_date]
     if not applicable:
         return None
-    return max(applicable, key=lambda v: v.in_force_from)
+    return max(applicable, key=lambda v: (v.in_force_from, v.publication_date))
 
 
 # ─────────────────────────────────────────────

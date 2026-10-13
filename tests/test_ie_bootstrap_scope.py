@@ -44,8 +44,8 @@ def _norm(identifier, references=()):
         published,
         published,
         (Paragraph("parrafo", identifier),),
-        TextState.AS_ENACTED,
-        metadata.source,
+        text_state=TextState.AS_ENACTED,
+        source=metadata.source,
     )
     reforms = (Reform(published, identifier, ("full-text",)),) + tuple(
         Reform(date(int(reference.split("-")[1]), 1, 1), reference, ()) for reference in references

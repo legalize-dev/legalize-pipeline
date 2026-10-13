@@ -72,7 +72,7 @@ logger = logging.getLogger(__name__)
 # hand-rolled duplicate — which made the rows below unreachable for exactly the
 # countries that had one, and left ee out of the table altogether.
 SKIP_WEEKDAYS: dict[str, set[int]] = {
-    "es": {6},  # Mon-Sat (BOE)
+    "es": set(),  # Extraordinary BOE editions can be published on Sundays.
     "fr": {6},  # Mon-Sat (DILA)
     "se": {5, 6},  # Mon-Fri (Riksdagen)
     "at": {5, 6},  # Mon-Fri (RIS)
@@ -195,7 +195,7 @@ def _with_last_amendment(
             metadata, last_amendment=last_amendment, status=reform.status or metadata.status
         )
     state = metadata.text_state or text_state_for(metadata.country)
-    if metadata.country == "eu" and state is TextState.AS_ENACTED:
+    if metadata.country in {"es", "eu"} and state is TextState.AS_ENACTED:
         return replace(
             metadata,
             last_amendment=None if reform.norm_id == metadata.identifier else reform.norm_id,
@@ -366,6 +366,11 @@ def generic_fetch_one(
     Uses the country's client, text_parser, and metadata_parser.
     Saves structured JSON to data_dir.
     """
+    if country == "es":
+        from legalize.fetcher.es.fetch import fetch_one
+
+        return fetch_one(config, norm_id, force=force)
+
     from legalize.countries import get_client_class, get_metadata_parser, get_text_parser
 
     cc = config.get_country(country)
@@ -574,6 +579,15 @@ def generic_fetch_all(
                         f"  [dim][{done}/{len(norm_ids)}] {len(fetched)} OK, {errors} errors[/dim]"
                     )
 
+    if country == "es":
+        excluded_dir = Path(cc.data_dir) / "excluded"
+        excluded = sum(
+            (excluded_dir / f"{identifier}.json").exists()
+            for identifier in set(norm_ids) - set(fetched)
+        )
+        errors -= excluded
+        if excluded:
+            console.print(f"[dim]{excluded} source exclusions recorded in {excluded_dir}[/dim]")
     console.print(f"\n[bold green]✓ {len(fetched)} norms fetched[/bold green]")
     if errors:
         console.print(f"[yellow]⚠ {errors} errors[/yellow]")
@@ -940,7 +954,12 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
         if (
             reform.norm_id in published_ie
             if country == "ie"
-            else repo.has_commit_with_source_id(reform.norm_id, metadata.identifier)
+            else repo.has_commit_with_source_id(
+                reform.norm_id,
+                metadata.identifier,
+                effective_date=reform.effective_date,
+                stage=country == "es",
+            )
         ):
             continue
 
@@ -949,7 +968,7 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
 
         norm_meta = (
             metadata
-            if is_first and country not in {"eu", "ie"}
+            if is_first and country not in {"es", "eu", "ie"}
             else _with_last_amendment(metadata, reform, reforms)
         )
         markdown = render_norm_at_date(
@@ -957,17 +976,20 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
             blocks,
             reform.date,
             include_all=is_first,
-            source_id=reform.norm_id if country in {"eu", "ie"} else None,
+            source_id=reform.norm_id if country in {"es", "eu", "ie"} else None,
+            effective_date=(reform.effective_date or reform.date)
+            if country == "es"
+            else reform.effective_date,
         )
         changed = repo.write_and_add(file_path, markdown)
         if repo.refused:
             break
 
-        if not changed and not is_first and country not in {"eu", "ie"}:
+        if not changed and not is_first and country not in {"es", "eu", "ie"}:
             continue
 
         info = build_commit_info(commit_type, metadata, reform, blocks, file_path, markdown)
-        sha = repo.commit(info, allow_empty=country in {"eu", "ie"})
+        sha = repo.commit(info, allow_empty=country in {"es", "eu", "ie"})
 
         if sha:
             commits_created += 1
@@ -1311,6 +1333,8 @@ def commit_all_fast(
                 if country in {"eu", "ie"}
                 else reform.date
             )
+            if country == "es" and reform.effective_date is not None:
+                order_date = max(reform.date, reform.effective_date)
             all_reforms.append((order_date, json_file.stem, i, json_file))
 
     all_reforms.sort(key=lambda x: x[0])
@@ -1398,7 +1422,7 @@ def commit_all_fast(
 
                     norm_meta = (
                         metadata
-                        if is_first and country not in {"eu", "ie"}
+                        if is_first and country not in {"es", "eu", "ie"}
                         else _with_last_amendment(metadata, reform, reforms_cached)
                     )
                     markdown = render_norm_at_date(
@@ -1406,7 +1430,10 @@ def commit_all_fast(
                         blocks,
                         reform.date,
                         include_all=is_first,
-                        source_id=reform.norm_id if country in {"eu", "ie"} else None,
+                        source_id=reform.norm_id if country in {"es", "eu", "ie"} else None,
+                        effective_date=(reform.effective_date or reform.date)
+                        if country == "es"
+                        else reform.effective_date,
                     )
                     file_path = norm_to_filepath(metadata)
 

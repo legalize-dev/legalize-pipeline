@@ -1,0 +1,8 @@
+ES version-history spike — BOE consolidated XML — retrieved 2026-10-08
+Law: BOE-A-1978-31229
+Classification: point_in_time for consolidated XML; as_enacted for diary-only acts.
+publication=19781229 effective=19781229 source=BOE-A-1978-31229 blocks=210 text_chars=120703
+publication=19920828 effective=19920828 source=BOE-A-1992-20403 blocks=1 text_chars=984
+publication=20110927 effective=20110927 source=BOE-A-2011-15210 blocks=1 text_chars=3075
+publication=20240217 effective=20240217 source=BOE-A-2024-3099 blocks=1 text_chars=787
+publication=20260520 effective=20260520 source=BOE-A-2026-10881 blocks=1 text_chars=1729

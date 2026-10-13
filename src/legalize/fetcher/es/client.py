@@ -7,7 +7,11 @@ conditional requests (ETag/Last-Modified) served out of FileCache.
 from __future__ import annotations
 
 import logging
+import re
 from datetime import date
+from urllib.parse import urljoin
+
+from lxml import html
 
 from legalize.fetcher.base import HttpClient
 from legalize.fetcher.es.config import BOEConfig
@@ -118,17 +122,78 @@ class BOEClient(HttpClient):
         )
         return self._fetch(self._build_url(path), bypass_cache=True)
 
+    def get_catalog(self, limit: int, offset: int) -> bytes:
+        """One page of the consolidated catalogue.
+
+        ``/api/legislacion-consolidada?limit=&offset=`` is the filterable
+        catalogue endpoint this module's docstring said the BOE does not
+        expose. It caps a page at 10,000 entries, so the whole catalogue —
+        12,387 norms — is two requests, against the 14,926 daily summaries the
+        sweep it replaces would have walked (#99).
+        """
+        path = f"/api/legislacion-consolidada?limit={limit}&offset={offset}"
+        return self._fetch(self._build_url(path))
+
     def get_metadata(self, id_boe: str) -> bytes:
         """Fetches metadata for a norm: /api/legislacion-consolidada/id/{id}/metadatos."""
         path = f"/api/legislacion-consolidada/id/{id_boe}/metadatos"
         return self._fetch(self._build_url(path))
 
-    def get_disposition_xml(self, id_boe: str) -> bytes:
-        """Fetches the raw BOE disposition XML: /diario_boe/xml.php?id={id}.
+    def get_disposition_xml(self, id_boe: str, *, eli_url: str | None = None) -> bytes:
+        """Fetch the full diary entry through its canonical ELI XML resource."""
+        if not eli_url or not eli_url.startswith("https://www.boe.es/eli/"):
+            page = html.fromstring(
+                self._fetch(f"https://www.boe.es/buscar/doc.php?id={id_boe}").decode("utf-8")
+            )
+            links = [urljoin("https://www.boe.es", href) for href in page.xpath("//a/@href")]
+            eli_url = next(
+                (url for url in links if url.startswith("https://www.boe.es/eli/")), None
+            )
+        if not eli_url:
+            from legalize.fetcher.es.diary import ExcludedDiary, diary_xml_from_html
 
-        This is the full diary entry XML (not the open data API) which
-        contains an <analisis> section with references to affected norms.
-        """
-        base = self._config.base_url.rsplit("/", 1)[0]
-        url = f"{base}/diario_boe/xml.php?id={id_boe}"
-        return self._fetch(url)
+            title = " ".join(page.xpath("//title/text()")).removeprefix(id_boe).strip()
+            departments = page.xpath(
+                '//dt[normalize-space()="Departamento:"]/following-sibling::dd[1]/text()'
+            )
+            judicial = any(
+                name.strip() in {"Tribunal Constitucional", "Tribunal Supremo"}
+                for name in departments
+            )
+            ranks = {
+                " ".join(node.text_content().split()).removeprefix("Rango: ")
+                for node in page.xpath('//*[@id="analisis"]/ul[1]/li')
+                if node.text_content().strip().startswith("Rango:")
+            }
+            if (
+                (
+                    judicial
+                    and re.match(
+                        r"(?:Sentencias?|Autos?|Cuesti[oó]n(?:es)?|Recursos?|Conflictos?|Impugnaci[oó]n(?:es)?|Providencias?)\b",
+                        title,
+                    )
+                )
+                or ranks & {"Sentencia", "Auto", "Providencia", "Corrección de errores"}
+                or title.startswith("Corrección de")
+            ):
+                raise ExcludedDiary("judicial-or-correction", id_boe, title=title)
+            if page.xpath('//*[@id="textoxslt"]'):
+                return diary_xml_from_html(page, id_boe)
+            raise ValueError(f"{id_boe}: source page has no ELI XML resource")
+        eli_url = eli_url.rstrip("/").removesuffix("/dof")
+        return self._fetch(eli_url + "/dof/spa/xml")
+
+    def get_publication_date(self, id_boe: str) -> date:
+        """The official gazette PDF path dates even judicial acts without an ELI URI."""
+        page = html.fromstring(
+            self._fetch(f"https://www.boe.es/buscar/doc.php?id={id_boe}").decode("utf-8")
+        )
+        pattern = re.compile(r"/boe/dias/(\d{4})/(\d{2})/(\d{2})/pdfs/[^/]+\.pdf$")
+        dates = {
+            date(*(int(value) for value in match.groups()))
+            for href in page.xpath('//a[@title="Documento PDF de la publicación original"]/@href')
+            if (match := pattern.search(href))
+        }
+        if len(dates) != 1:
+            raise ValueError(f"{id_boe}: missing or ambiguous official publication date")
+        return dates.pop()

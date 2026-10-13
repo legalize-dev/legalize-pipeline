@@ -902,7 +902,7 @@ def _provisions_to_blocks(provisions: list[dict[str, Any]]) -> list[Block]:
                         Version(
                             norm_id="",
                             publication_date=date(1900, 1, 1),
-                            effective_date=date(1900, 1, 1),
+                            effective_date=None,  # SFS gives no date in force
                             paragraphs=(
                                 Paragraph(
                                     css_class="titulo_tit",
@@ -944,7 +944,7 @@ def _provisions_to_blocks(provisions: list[dict[str, Any]]) -> list[Block]:
                         Version(
                             norm_id="",
                             publication_date=date(1900, 1, 1),
-                            effective_date=date(1900, 1, 1),
+                            effective_date=None,  # SFS gives no date in force
                             paragraphs=tuple(paragraphs),
                         ),
                     ),

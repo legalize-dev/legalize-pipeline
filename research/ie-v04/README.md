@@ -3,7 +3,7 @@
 The source and scope assessment is [RESEARCH-IE.md](../RESEARCH-IE.md). The
 [quality review](quality-review.md) and its [machine-readable evidence](sample-4-review-evidence.json)
 cover the approved sample. The [reuse assessment](reuse-assessment.md) records
-the unresolved LRC publication condition. Source-specific corrections are
+the LRC confirmation of the applicable reuse terms. Source-specific corrections are
 documented in [effects-source-corrections.md](effects-source-corrections.md).
 
 `census-summary.json` counts identities separately from language manifestations.

@@ -47,16 +47,16 @@ def _norm(identifier="IE-2015-act-1"):
         published,
         published,
         (Paragraph("parrafo", "Original source body"),),
-        TextState.AS_ENACTED,
-        metadata.source,
+        text_state=TextState.AS_ENACTED,
+        source=metadata.source,
     )
     snapshot = Version(
         snapshot_id,
         published,
         snapshot_date,
         (Paragraph("parrafo", "Current consolidated body"),),
-        TextState.CURRENT,
-        "https://source.test/current",
+        text_state=TextState.CURRENT,
+        source="https://source.test/current",
     )
     reforms = (
         Reform(published, identifier, ("full-text",), status=NormStatus.IN_FORCE),
@@ -190,8 +190,8 @@ def test_current_supplementary_metadata_does_not_rewrite_published_history(
                 metadata.publication_date,
                 day,
                 (Paragraph("parrafo", "New official source body [image omitted]"),),
-                TextState.CURRENT,
-                "https://source.test/new",
+                text_state=TextState.CURRENT,
+                source="https://source.test/new",
             ),
         )
         reforms += (Reform(day, identifier, ("full-text",), has_source_date=False),)

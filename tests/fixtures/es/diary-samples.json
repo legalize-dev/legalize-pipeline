@@ -1,0 +1,27 @@
+[
+  {
+    "identifier": "BOE-A-2012-3553",
+    "file": "diary-BOE-A-2012-3553.xml.gz",
+    "source": "https://www.boe.es/eli/es-pv/l/1988/06/29/9"
+  },
+  {
+    "identifier": "BOE-A-2010-5040",
+    "file": "diary-BOE-A-2010-5040.xml.gz",
+    "source": "https://www.boe.es/eli/es/rd/2010/03/26/374"
+  },
+  {
+    "identifier": "BOE-A-2010-11887",
+    "file": "diary-BOE-A-2010-11887.xml.gz",
+    "source": "https://www.boe.es/eli/es/o/2010/07/13/edu1999"
+  },
+  {
+    "identifier": "BOE-A-2013-9074",
+    "file": "diary-BOE-A-2013-9074.xml.gz",
+    "source": "https://www.boe.es/eli/es/ai/2008/04/29/(1)"
+  },
+  {
+    "identifier": "BOE-A-2026-10881",
+    "file": "diary-BOE-A-2026-10881.xml.gz",
+    "source": "https://www.boe.es/eli/es/ref/2026/05/19/(1)"
+  }
+]

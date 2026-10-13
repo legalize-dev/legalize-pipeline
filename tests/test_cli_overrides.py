@@ -359,6 +359,34 @@ class TestCrossReferences:
         assert "amends reference(s) name no law" in result.output, result.output
         assert result.exit_code == 1
 
+    def test_missing_reference_does_not_skip_commit_date_validation(self, tmp_path, monkeypatch):
+        laws = [
+            ("DRE-2001-1-111", 'last_amendment: "outside-corpus"\n'),
+            ("DRE-2001-2-222", 'last_amendment: "DRE-2001-1-111"\n'),
+        ]
+        repo = self._repo(tmp_path, laws)
+        monkeypatch.setenv("GIT_AUTHOR_DATE", "2099-01-01T12:00:00+00:00")
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "--allow-empty",
+                "-qm",
+                "future",
+            ],
+            check=True,
+        )
+        result = self._run(tmp_path, repo)
+        assert "Sampling 500 recent commits" in result.output
+        assert "1 commit(s) with far-future date" in result.output
+        assert result.exit_code == 1
+
     def test_references_that_all_resolve_are_silent(self, tmp_path):
         laws = [
             ("DRE-2001-1-111", 'last_amendment: "DRE-2001-2-222"\n'),

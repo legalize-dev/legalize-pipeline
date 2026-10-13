@@ -1,0 +1,62 @@
+{
+ "1979": {
+  "status": 200,
+  "declared": 1934,
+  "parsed": 1934
+ },
+ "1984": {
+  "status": 200,
+  "declared": 2519,
+  "parsed": 2000
+ },
+ "1989": {
+  "status": 200,
+  "declared": 1760,
+  "parsed": 1760
+ },
+ "1993": {
+  "status": 200,
+  "declared": 1557,
+  "parsed": 1557
+ },
+ "1997": {
+  "status": 200,
+  "declared": 1875,
+  "parsed": 1875
+ },
+ "2001": {
+  "status": 200,
+  "declared": 1464,
+  "parsed": 1464
+ },
+ "2005": {
+  "status": 200,
+  "declared": 1593,
+  "parsed": 1593
+ },
+ "2009": {
+  "status": 200,
+  "declared": 1428,
+  "parsed": 1428
+ },
+ "2013": {
+  "status": 200,
+  "declared": 1419,
+  "parsed": 1419
+ },
+ "2017": {
+  "status": 200,
+  "declared": 1133,
+  "parsed": 1133
+ },
+ "2021": {
+  "status": 200,
+  "declared": 1471,
+  "parsed": 1471
+ },
+ "2025": {
+  "status": 200,
+  "declared": 1258,
+  "parsed": 1258
+ }
+}
