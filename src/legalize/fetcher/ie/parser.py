@@ -790,14 +790,40 @@ class ISBTextParser(TextParser):
                         footnote_nodes.add(sibling)
                 elif node.find(".//sup") is not None:
                     match = re.match(r"\^?(\d+)([^\d\s].+)", _html_inline_text(node))
-            if not match:
+            bracketed = re.match(r"^\[(\*+)", _html_text(node))
+            if not match and bracketed:
+                marker = bracketed[1]
+                body_text = re.sub(
+                    rf"^\[\^?{re.escape(marker)}", "[", _html_inline_text(node), count=1
+                )
+            elif match:
+                marker, body_text = match.groups()
+            else:
                 raise ValueError("Malformed ISB HTML footnote definition")
-            marker, body_text = match.groups()
             if _html_inline_text(node).startswith(f"({marker})"):
                 for sibling in node.itersiblings():
                     if sibling not in footnote_nodes:
                         break
                     body_text += " " + _html_inline_text(sibling)
+            following = node.getnext()
+            if following is not None and _html_text(following).startswith("“"):
+                continuation = []
+                depth = 0
+                for sibling in node.itersiblings():
+                    if sibling.tag != "p" or sibling.xpath('.//a[starts-with(@name, "fn_")]'):
+                        raise ValueError("Unterminated quoted ISB HTML footnote")
+                    text = _html_inline_text(sibling)
+                    continuation.append(Paragraph("parrafo", text))
+                    footnote_nodes.add(sibling)
+                    depth += _quote_delta(text)
+                    if depth == 0:
+                        break
+                if depth:
+                    raise ValueError("Unterminated quoted ISB HTML footnote")
+                for paragraph in _legal_format(continuation):
+                    body_text += "\n\n" + "\n".join(
+                        "    " + line for line in paragraph.text.splitlines()
+                    )
             number = marker if marker.isdigit() else f"star{len(marker)}"
             names = [
                 anchor.get("name", anchor.get("id", ""))
@@ -1408,6 +1434,24 @@ _INSTRUMENT_DATE_EVIDENCE = {
         "https://www.comreg.ie/media/2024/12/SI-79-of-2003-Govt-Publications.pdf#page=20",
         ("2003-02-18", "2003-02-28"),
     ),
+    ("285", "2003"): (
+        "2003-07-29",
+        "gazette_notice",
+        "https://www.irisoifigiuil.ie/archive/2003/july/2003%2007%2029%20IO%20Issue.pdf#page=1",
+        (),
+    ),
+    ("286", "2003"): (
+        "2003-07-29",
+        "gazette_notice",
+        "https://www.irisoifigiuil.ie/archive/2003/july/2003%2007%2029%20IO%20Issue.pdf#page=1",
+        (),
+    ),
+    ("287", "2003"): (
+        "2003-07-29",
+        "gazette_notice",
+        "https://www.irisoifigiuil.ie/archive/2003/july/2003%2007%2029%20IO%20Issue.pdf#page=2",
+        (),
+    ),
     ("497", "2003"): (
         "2003-11-07",
         "gazette_notice",
@@ -1461,20 +1505,20 @@ def _signature_dates(text: str) -> list[date]:
         flags=re.I,
     ).replace("_", " ")
     matches = re.finditer(
-        r"(?:(?:GI{1,2}VEN?,?(?: at Dublin)? (?:under|by)|SEALED with).{0,180}?\b(?:Sea[l1]|hand)\b[^0-9]{0,180}?|"
+        r"(?:(?:GI{1,2}VEN?,?(?: at Dublin)? (?:under|by)|SEALED with).{0,180}?\b(?:Sea[l1!]|hand)(?=\W|$)[^0-9]{0,180}?|"
         r"GIVEN\s+(?:this|on),?\s+|(?-i:GIVEN)\s+|"
         r"PRESENT when the Common Seal.{0,180}?(?:this|on the)\s+|GIVEN under the official of the Minister[^0-9]{0,180}?|"
         r"ARNA THABHAIRT.{0,180}?Shéala Oifigiúil,\s*|"
-        r"(?-i:Dated|DATED)\s*,?\s*(?:(?:this|the)\s+)?|(?-i:Made|MADE)\s+|"
+        r"(?-i:Dated|DATED|Date(?=\s+this))\s*,?\s*(?:(?:this|the)\s+)?|(?-i:Made|MADE)\s+|"
         r"SIGNED[^0-9]{0,180}?\bthis\s+(?:the\s+)?|DUBLIN\s*[:.]\s+This\s+)"
-        r'(\d{1,2})\s*(?:st|nd|rd|th|h)?[.,"]?(?:\s*day)?(?:\s*of)?\s*'
+        r'(\d{1,2})\s*(?:st|nd|rd|th|h)?[.,"]*(?:\s*day)?(?:\s*of)?[.\s]*'
         r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[,.]*\s*(?:day of\s+)?(\d{4})",
         text,
         re.I,
     )
     irish_matches = re.finditer(
-        r"ARNA THABHAIRT.{0,180}?Sh(?:éa|eá)la Oifigiúil(?:\s+an Aire Airgeadais)?[,]?\s*(?:an\s+)?"
-        r"(\d{1,2})ú?\s+lá seo de\s+(\w+),?\s*(\d{4})",
+        r"ARNA THABHAIRT.{0,180}?(?:Sh(?:éa|eá)la Oifigiúil(?:\s+an (?:Aire Airgeadais|Taoisigh))?|láimh)[,]?\s*(?:an\s+)?"
+        r"(\d{1,2})ú?\s+l[áà] seo (?:de\s+|d['’])(\w+(?:\s+Fómhair)?),?\s*(\d{4})",
         text,
         re.I,
     )
@@ -1489,10 +1533,21 @@ def _signature_dates(text: str) -> list[date]:
         text,
         re.I,
     )
+    order_matches = re.finditer(
+        r"The (\d{1,2})(?:st|nd|rd|th) day of (\w+), (\d{4})\. "
+        r"(?=It is this day ordered by the Minister for Lands,)",
+        text,
+    )
     return sorted(
         {
             _parse_date_from_parts(int(match[1]), match[2], int(match[3]))
-            for match in [*matches, *irish_matches, *numeric_matches, *reversed_matches]
+            for match in [
+                *matches,
+                *irish_matches,
+                *numeric_matches,
+                *reversed_matches,
+                *order_matches,
+            ]
         }
     )
 
@@ -1522,8 +1577,16 @@ def _parse_date_from_parts(day: int, month_str: str, year: int) -> date:
         "decembe": 12,  # The enacted 2017 Act 33 XML truncates December.
         "dcember": 12,  # S.I. 685/2019 HTML typo; the official PDF confirms December.
         "feabhra": 2,
+        "fheabhra": 2,
+        "márta": 3,
+        "bealtaine": 5,
         "mheitheamh": 6,
         "meitheamh": 6,
+        "iúil": 7,
+        "lúnasa": 8,
+        "dheireadh fómhair": 10,
+        "samhain": 11,
+        "shamhain": 11,
         "nollaig": 12,
         "sept": 9,
     }

@@ -15,7 +15,8 @@ FIXTURES = Path(__file__).parent / "fixtures/ie"
 
 @pytest.mark.parametrize(
     "evidence",
-    json.loads((FIXTURES / "additional-signature-evidence.json").read_text()),
+    json.loads((FIXTURES / "additional-signature-evidence.json").read_text())
+    + json.loads((FIXTURES / "signature-followup-evidence.json").read_text()),
     ids=lambda evidence: evidence["identifier"],
 )
 def test_verified_signature_blocks_keep_metadata_and_body_dates_aligned(evidence):
@@ -66,6 +67,31 @@ def test_verified_signature_blocks_keep_metadata_and_body_dates_aligned(evidence
 )
 def test_referenced_dates_are_not_signature_blocks(text):
     assert _signature_dates(text) == []
+
+
+def test_bracketed_asterisk_notes_keep_complete_quoted_continuations_once():
+    raw = (FIXTURES / "sample-signature-2005-717.html").read_bytes()
+    paragraphs = ISBTextParser().parse_text(raw)[0].versions[0].paragraphs
+    notes = [p.text for p in paragraphs if p.text.startswith("[^")]
+    assert len(notes) == 6
+    assert "[^star1]: [*See notes on page 8*]" in notes
+    note = next(n for n in notes if n.startswith("[^star5]:"))
+    assert "Text of Investor Compensation Act, 1998, Section 47(1)(a) and (b)" in note
+    assert "(III) a manager of a collective investment undertaking" in note
+    assert "[The Investor Compensation Company Limited]" in note
+    assert sum("[The Investor Compensation Company Limited]" in p.text for p in paragraphs) == 1
+    assert sum(p.text.count("[^star5]") for p in paragraphs) == 3
+    assert "\n\n    > " in note
+
+
+def test_unterminated_quoted_footnote_is_rejected():
+    raw = (FIXTURES / "sample-signature-2005-717.html").read_bytes()
+    before, notes = raw.split(b'<a name="fn_11">', 1)
+    assert b"Act</i>.&#8221;" in notes
+    with pytest.raises(ValueError, match="Unterminated quoted ISB HTML footnote"):
+        ISBTextParser().parse_text(
+            before + b'<a name="fn_11">' + notes.replace(b"Act</i>.&#8221;", b"Act</i>.", 1)
+        )
 
 
 @pytest.mark.parametrize(
