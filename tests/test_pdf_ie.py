@@ -514,6 +514,65 @@ def test_indented_quoted_titles_do_not_become_primary_sections(monkeypatch):
 
 
 @pytest.mark.parametrize(
+    ("name", "headings"),
+    [
+        ("children-2001-caption-indent", ["227. **Functions of Board.**"]),
+        (
+            "deeds-2006-caption-offset",
+            [
+                "74. **Registration of Deeds and Title Rules Committee.**",
+                "75. **Reports by Committee.**",
+                "76. **Amendment of section 16 of Landlord and Tenant (Ground Rents) (No. 2) Act 1978.**",
+            ],
+        ),
+        ("maritime-2021-title-marker", ["33B. **F6[Provisions supplementary to section 33A**"]),
+        (
+            "climate-2015-inserted-sections",
+            [
+                "6A. **Preparation of carbon budgets**",
+                "6B. **F15[Approval of carbon budget**",
+                "6C. **F16[Sectoral emissions ceiling**",
+                "6D. **F17[Revision of carbon budgets**",
+                "14A. **F31[Climate Reporting**",
+                "14B. **F32[Role of local authority**",
+            ],
+        ),
+        (
+            "information-2017-definition-quote",
+            ["8. **Penalties**", "9. **Liability for offences by body corporate, etc.**"],
+        ),
+    ],
+)
+def test_offset_captions_and_definition_typography_preserve_primary_sections(name, headings):
+    paragraphs, _ = parse_revised_pdf((FIXTURES / f"archive-{name}-excerpt.pdf").read_bytes())
+    actual = [p.text for p in paragraphs if p.css_class == "articulo"]
+    for heading in headings:
+        assert actual.count(heading) == 1
+    if name == "information-2017-definition-quote":
+        definition = next(p for p in paragraphs if "“member“ means" in p.text)
+        assert definition.css_class == "parrafo"
+
+
+def test_further_indented_titles_and_labels_are_not_promoted(monkeypatch):
+    import legalize.fetcher.ie.pdf as parser
+
+    data = (FIXTURES / "archive-climate-2015-inserted-sections-excerpt.pdf").read_bytes()
+    events, cutoff, expected = parser._read(data)
+    for index, event in enumerate(events):
+        if isinstance(event, parser._Line) and (
+            event.text == "Preparation of carbon budgets" or event.text.startswith("F14[6A.")
+        ):
+            events[index] = parser._Line(
+                [{**c, "x0": c["x0"] + 13.32, "x1": c["x1"] + 13.32} for c in event.chars],
+                event.page,
+                event.links,
+            )
+    monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected | {"6A"}))
+    with pytest.raises(UnsupportedPDF, match="missing sections listed in its contents: 6A"):
+        parse_revised_pdf(data)
+
+
+@pytest.mark.parametrize(
     ("name", "heading"),
     [
         ("extradition-1965-plain", "4. **Laying of orders before Houses of Oireachtas.**"),

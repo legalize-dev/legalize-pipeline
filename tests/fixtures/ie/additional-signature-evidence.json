@@ -185,8 +185,17 @@
     "source_sha256": "04df738914bbf96970cf50a1c0324245ca097cf92b84543dfb8e4ba97182ebb3",
     "file": "sample-signature-1998-568.html",
     "fixture_sha256": "31c2deab78ff4b6dc7807e312c3179a8ef60cfa2dc798e8804332e0a321b24b6",
-    "expected_date": null,
+    "expected_date": "1998-12-23",
     "signature_dates": [],
-    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted"
+    "extraction": "Unchanged opening paragraphs and signature blocks; intervening provisions omitted",
+    "basis": "official_made_date",
+    "corroboration": {
+      "identifier": "IE-1998-si-568",
+      "url": "https://pensionsauthority.ie/wp-content/uploads/2023/06/the_pensions_board_annual_report_and_accounts_1998.pdf#page=29",
+      "sha256": "36217b0fddbd073e98c657c4ad3982fff19b39ab515248a8a9c6932a6101a937",
+      "made_date": "1998-12-23",
+      "page": 29,
+      "verification": "Visually verified on printed page 29; scanned official Pensions Board annual report explicitly says the regulations were made on 23 December 1998. Individual signature and concurrence dates remain unknown."
+    }
   }
 ]

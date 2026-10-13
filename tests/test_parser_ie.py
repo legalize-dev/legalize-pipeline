@@ -1023,6 +1023,24 @@ def test_paired_apostrophe_delimiters_preserve_source_text_and_quote_boundaries(
     assert formatted[2].text.endswith(".’’,")
 
 
+def test_reversed_definition_quote_does_not_quote_the_following_provisions():
+    from legalize.fetcher.ie.parser import _legal_format
+    from legalize.models import Paragraph
+
+    source = [
+        Paragraph("parrafo", "F1[“member“ means a member of An Garda Síochána.]."),
+        Paragraph("parrafo", "The next provision remains outside a quotation."),
+        Paragraph("parrafo", "“(1) The inserted provision defines “member“ means a person;"),
+        Paragraph("parrafo", "(2) A quoted continuation.”,"),
+        Paragraph("parrafo", "This is outside the quotation."),
+    ]
+    formatted = _legal_format(source)
+    assert formatted[:2] == source[:2]
+    assert formatted[2].css_class == formatted[3].css_class == "legal_quote"
+    assert "“member“ means" in formatted[2].text
+    assert formatted[-1] == source[-1]
+
+
 @pytest.mark.parametrize(
     "fixture",
     [

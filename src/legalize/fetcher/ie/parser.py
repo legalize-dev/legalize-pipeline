@@ -322,6 +322,12 @@ _ENUMERATOR = re.compile(
 )
 
 
+def _quote_delta(text: str) -> int:
+    # Some official definitions print an opening glyph in place of the closing quote.
+    delimiters = re.sub(r"(“[^“”\n]+)“(?=\s+(?:means|includes)\b)", r"\1”", text)
+    return delimiters.count("“") - len(re.findall(r"”|’’(?=\W|$)", delimiters))
+
+
 def _legal_format(paragraphs: list[Paragraph]) -> list[Paragraph]:
     """Render explicit legal labels and quotation boundaries consistently.
 
@@ -346,7 +352,7 @@ def _legal_format(paragraphs: list[Paragraph]) -> list[Paragraph]:
             continue
         plain = re.sub(r"\*+", "", text)
         leading = re.sub(r"^F\d+\[", "", plain)
-        delta = plain.count("“") - len(re.findall(r"”|’’(?=\W|$)", plain))
+        delta = _quote_delta(plain)
         complete_quote = (
             leading.startswith("“") and bool(re.search(r"(?:”|’’)[.,;:\s)\]]*(?:and|or)?$", plain))
         ) or (leading.startswith('"') and bool(re.search(r'"[.,;:\s)\]]*(?:and|or)?$', plain)))
@@ -1365,6 +1371,13 @@ def _enactment_date(text: str) -> date | None:
 
 # Independently verified official copies fill dates omitted by these eISB transcriptions.
 _INSTRUMENT_DATE_EVIDENCE = {
+    ("568", "1998"): (
+        "1998-12-23",
+        "official_made_date",
+        "https://pensionsauthority.ie/wp-content/uploads/2023/06/"
+        "the_pensions_board_annual_report_and_accounts_1998.pdf#page=29",
+        (),
+    ),
     ("580", "2001"): (
         "2002-01-29",
         "gazette_notice",
@@ -1801,6 +1814,8 @@ class ISBMetadataParser(MetadataParser):
                         extra += (("signature_date_source", evidence[2]),)
                     else:
                         extra += (("signature_date_unknown", "true"),)
+                    if evidence[1] == "official_made_date":
+                        extra += (("made_date", evidence[0]), ("made_date_source", evidence[2]))
                 extra += (("publication_date_basis", basis),)
             elif published is not None:
                 extra += (

@@ -40,9 +40,17 @@ def test_verified_signature_blocks_keep_metadata_and_body_dates_aligned(evidence
         assert extra["publication_date_basis"] == "final_signature"
     else:
         assert extra["signature_date_unknown"] == "true"
-        assert extra["publication_date_basis"] == "gazette_notice"
+        assert extra["publication_date_basis"] == evidence.get("basis", "gazette_notice")
         assert extra["publication_date_source"] == evidence["corroboration"]["url"]
-        assert "made_date" not in extra
+        if evidence.get("basis") == "official_made_date":
+            assert extra["made_date"] == evidence["expected_date"]
+            assert extra["made_date_source"] == evidence["corroboration"]["url"]
+            assert "signature_dates" not in extra
+            assert "signature_date_source" not in extra
+            with pytest.raises(ValueError, match="lacks its title or enactment date"):
+                ISBMetadataParser().parse(raw.replace(b"568/1998", b"569/1998"), "IE-1998-si-569")
+        else:
+            assert "made_date" not in extra
     if "/ga/" in evidence["source_url"]:
         assert extra["language"] == "ga"
 

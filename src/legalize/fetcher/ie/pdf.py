@@ -25,7 +25,7 @@ from pdfplumber.utils import extract_text
 
 from legalize.fetcher._tables import render_table
 from legalize.fetcher._text import strip_control
-from legalize.fetcher.ie.parser import _legal_format
+from legalize.fetcher.ie.parser import _legal_format, _quote_delta
 from legalize.models import Paragraph
 
 _SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*\.")
@@ -530,7 +530,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 isinstance(line, _Line)
                 and line.page == start.page
                 and abs(line.top - start.top) < 6
-                and abs(line.x0 - first_label.x0) < 2
+                and abs(line.x0 - first_label.x0) < 20
                 and _section_match(line)
                 for line in lines
             )
@@ -588,9 +588,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         i += 1
         quoted = quote_depth > 0
         if quote_depth or re.match(r"^(?:F\d+\[)?“", item.text):
-            quote_depth = max(
-                0, quote_depth + item.text.count("“") - len(re.findall(r"”|’’(?=\W|$)", item.text))
-            )
+            quote_depth = max(0, quote_depth + _quote_delta(item.text))
         if isinstance(item, Paragraph):
             flush()
             paragraphs.append(item)
@@ -657,7 +655,11 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 (
                     group
                     for group in captions
-                    if group[0].page == item.page and abs(group[0].top - item.top) < 6
+                    if group[0].page == item.page
+                    and (
+                        abs(group[0].top - item.top) < 6
+                        or (abs(item.x0 - primary_x) < 2 and 0 < group[0].top - item.top < 16)
+                    )
                 ),
                 [],
             )
@@ -689,7 +691,10 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 and pending_title
                 and pending
                 and pending_x is not None
-                and abs(pending_x - title_x) < 2
+                and (
+                    abs(pending_x - title_x) < 2
+                    or (abs(item.x0 - primary_x) < 10 and abs(pending_x - title_x) < 14)
+                )
                 and abs(item.x0 - title_x) < 27
                 and (not expected or match and match[1] in expected)
                 and item.top - previous.bottom < 25
@@ -732,6 +737,17 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         if not pending:
             pending_title = sum("Bold" in c["fontname"] for c in item.chars) / len(item.chars) > 0.8
             pending_x = item.x0
+            if pending_title and abs(pending_x - title_x) >= 2 and re.match(r"^F\d+\[", text):
+                # An annotation marker may hang left of an otherwise aligned title.
+                title_start = min(
+                    (
+                        c["x0"]
+                        for c in item.chars
+                        if "Bold" in c["fontname"] and c["text"].isalpha()
+                    ),
+                    default=pending_x,
+                )
+                pending_x = min(pending_x, title_start, key=lambda x: abs(x - title_x))
         pending = _join(pending, _inline(item))
         previous = item
     flush()
