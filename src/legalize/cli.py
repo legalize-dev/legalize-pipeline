@@ -745,6 +745,7 @@ def _source_fields(path) -> dict:
     returns its whole schema on every record and most of it is holes.
     """
     import gzip
+    import hashlib
     import json
 
     def walk(node, prefix=""):
@@ -766,7 +767,16 @@ def _source_fields(path) -> dict:
     try:
         opener = gzip.open if str(path).endswith(".gz") else open
         with opener(path, "rt", encoding="utf-8") as handle:
-            return walk(json.load(handle))
+            record = json.load(handle)
+        # FileCache sidecars describe HTTP transport, not the legislation it carries.
+        if (
+            isinstance(record, dict)
+            and set(record) == {"key", "headers", "timestamp"}
+            and isinstance(record["key"], str)
+            and path.name == f"{hashlib.sha256(record['key'].encode()).hexdigest()[:16]}.meta.json"
+        ):
+            return {}
+        return walk(record)
     except (OSError, ValueError):
         return {}
 
