@@ -28,6 +28,13 @@ _EMPTY_EFFECTS_DIRECTORIES = {
 # Exact directory claims verified against the original enactments, not later amendments.
 # Evidence: tests/fixtures/ie/preexisting-rules-evidence.json.
 _PRE_EXISTING_RULES = {
+    ("IE-1997-act-26", "12/1992, s. 12"): (
+        "Offences under Act designated disqualifying or potentially disqualifying offences, "
+        "or as otherwise meriting certain treatment",
+        "Section 12(b) originally applies Part III to offences involving violence or its "
+        "threat. This is an earlier general evidence rule, not a later amendment of the 1997 Act.",
+        "https://www.irishstatutebook.ie/eli/1992/act/12/section/12/enacted/en/html",
+    ),
     ("IE-1978-act-2", "6/1957, s.42"): (
         "S.28, limitation on recovery of cert. interest.*",
         "The 1957 limitation refers to section 26 of the Agricultural Credit Act 1947. "
@@ -133,69 +140,98 @@ _COMPANIES_COMMENCEMENTS = {
 
 
 # Exact directory citations verified against the actual affecting provisions.
-# Evidence: tests/fixtures/ie/{later-insertion,verified-year,later-host}-evidence.json.
+# Evidence: tests/fixtures/ie/{later-insertion,verified-year,later-host,pension-host}-evidence.json.
 _VERIFIED_EFFECT_SOURCES = {
-    ("IE-1993-act-8", "28/1971, s. 17 and sch."): (
+    ("IE-1997-act-26", "6/1993, s. 5", "IE-1993-act-6"): (
+        "2010/act/27/section/4",
+        None,
+        None,
+    ),
+    ("IE-1997-act-26", "23/1992, s. 15E(2)(b)", "IE-1992-act-23"): (
+        "2022/act/30/section/93",
+        None,
+        None,
+    ),
+    ("IE-1997-act-26", "25/1968, s. 18A and sch. 2", "IE-1968-act-25"): (
+        "2023/act/16/section/6",
+        None,
+        None,
+    ),
+    (
+        "IE-2000-act-30",
+        "S,I, No. 419 of 1993, sch. C. See also S.I. Nos. 135 of 2013, 268 of 2014, 39 of 2019",
+        "IE-1993-si-419",
+    ): (
+        "2008/si/295",
+        "1 August 2008",
+        "2008/si/295",
+    ),
+    ("IE-2002-act-14", "S.I. No. 419 of 1993, reg. 6 and sch. C", "IE-1993-si-419"): (
+        "2008/si/295",
+        "1 August 2008",
+        "2008/si/295",
+    ),
+    ("IE-1993-act-8", "28/1971, s. 17 and sch.", "IE-1971-act-28"): (
         "2022/act/31/section/130",
         None,
         None,
     ),
-    ("IE-2005-act-26", "S.I. No. 188 of 1998, sch. B"): (
+    ("IE-2005-act-26", "S.I. No. 188 of 1998, sch. B", "IE-1998-si-188"): (
         "2012/si/448",
         None,
         None,
     ),
-    ("IE-1996-act-32", "S.I. No. 319 of 1996. art. 12(5)"): (
+    ("IE-1996-act-32", "S.I. No. 319 of 1996. art. 12(5)", "IE-1996-si-319"): (
         "1998/si/319",
         None,
         None,
     ),
-    ("IE-1993-act-27", "7/1993, s.22 (11) (c) (13)"): (
+    ("IE-1993-act-27", "7/1993, s.22 (11) (c) (13)", "IE-1993-act-7"): (
         "1996/act/7/section/22",
         None,
         None,
     ),
-    ("IE-2000-act-34", "S.I. No. 414 of 2000, reg. 5"): (
+    ("IE-2000-act-34", "S.I. No. 414 of 2000, reg. 5", "IE-2000-si-414"): (
         "2002/si/414",
         "",  # The directory commencement belongs to an unrelated beef assurance order.
         None,
     ),
-    ("IE-1989-act-6", "7/1964, s 20(4)"): (
+    ("IE-1989-act-6", "7/1964, s 20(4)", "IE-1964-act-7"): (
         "1997/act/40/section/11",
         None,
         None,
     ),
-    ("IE-1958-act-4", "23/1935, s.1 (2) (b)"): (
+    ("IE-1958-act-4", "23/1935, s.1 (2) (b)", "IE-1935-act-23"): (
         "1965/act/23/section/1",
         None,
         None,
     ),
-    ("IE-1977-act-12", "12/1950, s. 22A(1)(f)"): (
+    ("IE-1977-act-12", "12/1950, s. 22A(1)(f)", "IE-1950-act-12"): (
         "2005/act/31/section/129",
         None,
         None,
     ),
-    ("IE-1995-act-9", "25/1990, s. 101(6)(a) *"): (
+    ("IE-1995-act-9", "25/1990, s. 101(6)(a) *", "IE-1990-act-25"): (
         "2002/act/18/section/3",
         "7 November 2002",
         "2002/si/502",
     ),
-    ("IE-1995-act-11", "25/1990, s. 101(5)(a)"): (
+    ("IE-1995-act-11", "25/1990, s. 101(5)(a)", "IE-1990-act-25"): (
         "2002/act/18/section/3",
         "7 November 2002",
         "2002/si/502",
     ),
-    ("IE-1995-act-11", "25/1990, s. 101(5)(b)"): (
+    ("IE-1995-act-11", "25/1990, s. 101(5)(b)", "IE-1990-act-25"): (
         "2002/act/18/section/3",
         "7 November 2002",
         "2002/si/502",
     ),
-    ("IE-1995-act-11", "25/1990, s. 101(5)(c)"): (
+    ("IE-1995-act-11", "25/1990, s. 101(5)(c)", "IE-1990-act-25"): (
         "2002/act/18/section/3",
         "7 November 2002",
         "2002/si/502",
     ),
-    ("IE-1997-act-39", "27/1988, s. 44A"): (
+    ("IE-1997-act-39", "27/1988, s. 44A", "IE-1988-act-27"): (
         "2012/act/44/section/150",
         None,
         None,
@@ -203,6 +239,7 @@ _VERIFIED_EFFECT_SOURCES = {
     (
         "IE-2012-act-9",
         "Taxes Consolidation Act 1997 (39/1997), s. 959AF(4) (as inserted by the Finance Act 2017, s. 75, schedule 3(l))",
+        "IE-1997-act-39",
     ): (
         "2017/act/41/schedule/3",
         None,
@@ -211,6 +248,7 @@ _VERIFIED_EFFECT_SOURCES = {
     (
         "IE-2013-act-18",
         "Courts (Supplemental Provisions) Act 1961 (No. 39 of 1961), s. 46(9A)(h) (see also Financial Emergency Measures in the Public Interest Act 2015 (No. 39 of 2015), ss. 1(2), 11(1)(c))",
+        "IE-1961-act-39",
     ): (
         "2015/act/39/section/11",
         "1 January 2017",
@@ -219,6 +257,7 @@ _VERIFIED_EFFECT_SOURCES = {
     (
         "IE-2002-act-9",
         "37/2001, ss. 131, 131A, sch. 14A pt. 3 (see also 1/2014, ss. 1(22), 21(4), sch. 3)",
+        "IE-2001-act-37",
     ): (
         "2014/act/1/section/21",
         "1 June 2014",
@@ -227,6 +266,7 @@ _VERIFIED_EFFECT_SOURCES = {
     (
         "IE-2003-act-15",
         "37/2001, s. 131A(1)(a),(4), sch. 14A pt. 1 (see also 1/2014, ss. 1(22), 21(3),(4), sch. 3)",
+        "IE-2001-act-37",
     ): (
         "2014/act/1/section/21",
         "1 June 2014",
@@ -328,6 +368,13 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     instruments = re.findall(
         r"S[.,]?\s*I[.,]?\s*(?:Nol?\.?\s*)?(\d+),?\s*(?:(?:of\s+){1,2}|/)(\d{4})", provision, re.I
     )
+    for series in re.findall(
+        r"S[.,]?\s*I[.,]?\s*Nos\.?\s*(\d+\s+of\s+\d{4}"
+        r"(?:(?:\s*,\s*|\s+and\s+)\d+\s+of\s+\d{4})*)",
+        provision,
+        re.I,
+    ):
+        instruments.extend(re.findall(r"(\d+)\s+of\s+(\d{4})", series, re.I))
     instruments += re.findall(r"E\.I\.D\. \(No\. S\.\s*I\. (\d+)\) O\., (\d{4})", provision)
     for number, year in instruments:
         identifiers.discard(f"IE-{year}-act-{int(number)}")
@@ -881,7 +928,7 @@ def parse_effects(
                     "https://www.irishstatutebook.ie/eli/2014/si/103/made/en/html"
                 )
                 effect["effective_date"] = "2014-03-07"
-            if verified_source := _VERIFIED_EFFECT_SOURCES.get((norm_id, provision)):
+            if verified_source := _VERIFIED_EFFECT_SOURCES.get((norm_id, provision, identifier)):
                 path, commencement, order = verified_source
                 state = "made" if "/si/" in path else "enacted"
                 source = f"https://www.irishstatutebook.ie/eli/{path}/{state}/en/html"

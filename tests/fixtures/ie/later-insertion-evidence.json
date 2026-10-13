@@ -263,5 +263,65 @@
       "file": "sample-proof-2014-act-1-schedule-3.html",
       "sha256": "ba02747f7c450c384e7f1511e48ad961e9dfce281fe0a645b137b472257fca5f"
     }
+  },
+  {
+    "identifier": "IE-1997-act-26",
+    "original_id": "IE-1993-act-6",
+    "provision": "6/1993, s. 5",
+    "amender": "IE-2010-act-27",
+    "source_path": "2010/act/27/section/4",
+    "directory": {
+      "file": "sample-criminal-host-directory.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1997_26.html",
+      "sha256": "ddfdad98374c00a0684275538f24c58159685f925585d9d5e937b15dc39dbbe8"
+    },
+    "proof": {
+      "file": "sample-criminal-host-proof-2010-act-27-section-4.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2010/act/27/section/4/enacted/en/html",
+      "sha256": "b937ed7e092199de887d383a75769ec71fc8fb39cb0e6a22f51abd47238b6258",
+      "quote": "an offence under the Non-Fatal Offences Against the Person Act 1997"
+    },
+    "commencement": null,
+    "commencement_path": null
+  },
+  {
+    "identifier": "IE-1997-act-26",
+    "original_id": "IE-1992-act-23",
+    "provision": "23/1992, s. 15E(2)(b)",
+    "amender": "IE-2022-act-30",
+    "source_path": "2022/act/30/section/93",
+    "directory": {
+      "file": "sample-criminal-host-directory.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1997_26.html",
+      "sha256": "ddfdad98374c00a0684275538f24c58159685f925585d9d5e937b15dc39dbbe8"
+    },
+    "proof": {
+      "file": "sample-criminal-host-proof-2022-act-30-section-93.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2022/act/30/section/93/enacted/en/html",
+      "sha256": "799abf1679de911a65bddd8dbeea15503ed33c97392586016b619aad0e6de6fd",
+      "quote": "an order under section 10 (3) of the Non-Fatal Offences against the Person Act 1997"
+    },
+    "commencement": null,
+    "commencement_path": null
+  },
+  {
+    "identifier": "IE-1997-act-26",
+    "original_id": "IE-1968-act-25",
+    "provision": "25/1968, s. 18A and sch. 2",
+    "amender": "IE-2023-act-16",
+    "source_path": "2023/act/16/section/6",
+    "directory": {
+      "file": "sample-criminal-host-directory.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1997_26.html",
+      "sha256": "ddfdad98374c00a0684275538f24c58159685f925585d9d5e937b15dc39dbbe8"
+    },
+    "proof": {
+      "file": "sample-criminal-host-proof-2023-act-16-section-6.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2023/act/16/section/6/enacted/en/html",
+      "sha256": "1e02d72342ccf3519de4f8179d120cc56ef414a68a40b946a57b6c499c3f2011",
+      "quote": "An offence under the Non-Fatal Offences against the Person Act 1997 (other than section 2 or 16)"
+    },
+    "commencement": null,
+    "commencement_path": null
   }
 ]

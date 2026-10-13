@@ -245,5 +245,46 @@
       "url": "https://www.irishstatutebook.ie/eli/1998/si/188/made/en/html",
       "sha256": "aa511577dbe23318b6da1a85452cd21e62f8ec330f55e324fa86d67fa8565ab0"
     }
+  },
+  {
+    "identifier": "IE-1997-act-26",
+    "directory": {
+      "file": "sample-criminal-host-directory.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1997_26.html",
+      "sha256": "ddfdad98374c00a0684275538f24c58159685f925585d9d5e937b15dc39dbbe8"
+    },
+    "enacted": {
+      "file": "sample-preexisting-enacted-IE-1997-act-26.xml.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1997/act/26/enacted/en/html",
+      "sha256": "6a190adca159146a09849f1b47d4f202f730e8c734eba4c3350304d1cbf6bb9b"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1992-act-12",
+        "note": "Offences under Act designated disqualifying or potentially disqualifying offences, or as otherwise meriting certain treatment",
+        "provision": "12/1992, s. 12",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1992-07-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1992/act/12/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1997_26.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1992-act-12": {
+        "file": "sample-preexisting-source-IE-1992-act-12.json.gz",
+        "url": "https://www.irishstatutebook.ie/eli/1992/act/12/enacted/en/html",
+        "sha256": "b9b03c8b1f9d4d270ec399e6136c06f846e37234c951e7c0f55dbf7fa0f50797"
+      }
+    },
+    "proof": {
+      "file": "sample-preexisting-proof-criminal-evidence-1992.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1992/act/12/section/12/enacted/en/html",
+      "sha256": "c32f669ae87e0ad4fa5148d7186e3138fe5a5cbada7c0d543fe3bb9b2a454eb1"
+    }
   }
 ]

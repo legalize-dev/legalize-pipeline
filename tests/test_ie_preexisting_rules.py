@@ -30,9 +30,14 @@ def relations(record, *, changed=None, sink=True):
     doc = html.fromstring(source(record["directory"]))
     table = html.Element("table")
     expected = {e["provision"] for e in record["relations"]}
+    previous_note = ""
     for row in doc.xpath('//*[@id="effects"]/following-sibling::table[1]//tr'):
         cells = row.xpath("./td")
+        if cells and (note := " ".join(cells[0].text_content().split())):
+            previous_note = note
         if len(cells) in (2, 4) and " ".join(cells[1].text_content().split()) in expected:
+            if not " ".join(cells[0].text_content().split()):
+                cells[0].text = previous_note
             if changed:
                 cell = cells[0 if changed == "note" else 1]
                 cell.text = " ".join(cell.text_content().split()) + " (unverified)"

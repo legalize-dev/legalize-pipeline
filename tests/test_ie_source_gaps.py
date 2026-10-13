@@ -104,8 +104,10 @@ def test_verified_directory_year_transpositions_preserve_the_printed_claim(
 def test_comma_punctuation_keeps_a_statutory_instrument_out_of_the_act_namespace():
     raw = (FIXTURES / "sample-effects-eleventh-2000-30.html").read_bytes()
     effects = parse_effects(raw, "IE-2000-act-30")
-    assert sum(e["source_id"] == "IE-1993-si-419" for e in effects) == 2
-    assert not any(e["source_id"] == "IE-1993-act-419" for e in effects)
+    corrected = [e for e in effects if e.get("directory_source_id") == "IE-1993-si-419"]
+    assert len(corrected) == 2
+    assert all(e["source_id"] == "IE-2008-si-295" for e in corrected)
+    assert all("-si-" in e["source_id"] for e in effects)
     assert all("S,I, No. 419 of 1993" in e["provision"] for e in effects)
 
 
