@@ -1,0 +1,16 @@
+[
+  {
+    "identifier": "IE-1923-act-24",
+    "file": "sample-ie-1923-act-24-enactment.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1923/act/24/enacted/en/xml",
+    "sha256": "e8ee0d0e7c50186386ef5c986b752654f8e10818d5da1d47b5d66132b107ea61",
+    "captured": "2026-10-13"
+  },
+  {
+    "identifier": "IE-1949-act-27",
+    "file": "sample-ie-1949-act-27-enactment.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1949/act/27/enacted/en/xml",
+    "sha256": "57b63ab83b614017d84fd4b4afc1053c3bfa077e9074eb3aad5f2dfef64f8651",
+    "captured": "2026-10-13"
+  }
+]

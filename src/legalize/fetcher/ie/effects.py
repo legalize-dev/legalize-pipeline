@@ -18,6 +18,16 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# Order-series numbers differ from S.I. numbers; verified against the annual eISB indexes.
+_DUTY_ORDERS = {
+    ("E.I.D.", "117", "1937"): "IE-1937-si-3",
+    ("E.I.D.", "223", "1941"): "IE-1941-si-464",
+    ("E.I.D.", "347", "1955"): "IE-1955-si-66",
+    ("E.I.D.", "357", "1955"): "IE-1955-si-173",
+    ("I.D.", "14", "1958"): "IE-1958-si-30",
+    ("I.D.", "128", "1962"): "IE-1962-si-163",
+}
+
 # These Companies directory dates belong to the host provisions, not their later amendments.
 _COMPANIES_COMMENCEMENTS = {
     ("IE-2024-act-11", "3 June 2014"): (
@@ -133,12 +143,25 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     for number, year in instruments:
         identifiers.discard(f"IE-{year}-act-{int(number)}")
         identifiers.add(f"IE-{year}-si-{int(number)}")
+    for citation in re.findall(r"\b((?:E\.)?I\.D\.) \(No\. (\d+)\) O\., (\d{4})", provision):
+        if citation not in _DUTY_ORDERS:
+            raise ValueError(f"{norm_id}: unresolved duties order: {citation}")
+        identifiers.add(_DUTY_ORDERS[citation])
     if "Constitution of Ireland 1937" in provision:
         identifiers.add(CONSTITUTION_ID)
     if not identifiers:
         for number, year in re.findall(r"\b(\d+)\s*/\s*(\d{4})\b", provision):
             identifiers.add(f"IE-{year}-act-{int(number)}")
     correction = None
+    if (
+        norm_id == "IE-1923-act-15"
+        and not provision
+        and note
+        == "Compensation under collectively cited Damage to Property (Compensation) "
+        "Acts 1923 to 1933 may be made by payment of money"
+    ):
+        identifiers.add("IE-1937-act-18")
+        correction = "https://www.irishstatutebook.ie/eli/1937/act/18/section/17/enacted/en/html"
     if (
         norm_id == "IE-1997-act-39"
         and note == "S. 270(4) inserted"
@@ -199,14 +222,23 @@ def parse_effects(
     data: bytes, norm_id: str, *, editorial_notes: list[dict] | None = None
 ) -> list[dict]:
     """Preserve every resolvable effect, including continuation rows and pending changes."""
-    cells_by_row = _effect_cells(html.fromstring(data.decode("utf-8")), norm_id)
+    doc = html.fromstring(data.decode("utf-8"))
+    cells_by_row = _effect_cells(doc, norm_id)
+    footnotes = [
+        _text(node)
+        for node in doc.xpath('//*[@id="effects"]/following-sibling::*[not(self::table)]')
+        if _text(node).startswith("*")
+    ]
     if not any(cells_by_row):
         raise ValueError(f"{norm_id}: effects table has no source rows")
     effects = []
+    previous_effects = []
     previous_note = ""
     scope = ""
+    pending_reference = False
     for cells in cells_by_row:
         if not cells:
+            previous_effects = []
             continue
         if len(cells) not in (2, 4):
             raise ValueError(f"{norm_id}: unexpected effects row with {len(cells)} columns")
@@ -214,17 +246,72 @@ def parse_effects(
         note = texts[0] or previous_note
         provision = texts[1]
         ids, correction = _affecting_ids(cells[1], provision, norm_id, note)
+        if pending_reference:
+            if not ids or texts[0]:
+                raise ValueError(f"{norm_id}: See also has no following source citation")
+            note = "See also"
+            provision = f"See also; {provision}"
+            pending_reference = False
+        if not ids and not texts[0] and not any(texts[2:]) and provision.lower() == "see also":
+            pending_reference = True
+            previous_effects = []
+            continue
+        if (
+            not ids
+            and not texts[0]
+            and not any(texts[2:])
+            and previous_effects
+            and re.fullmatch(
+                r"(?:but see|see also) ss?\. [\d(), .-]+|And see (?:regs|oo)\. under",
+                provision,
+                re.I,
+            )
+        ):
+            for effect in previous_effects:
+                effect["provision"] += f"; {provision}"
+            continue
+        previous_effects = []
+        marker = re.search(r"\*+", note)
+        matching_footnotes = [
+            footnote
+            for footnote in footnotes
+            if marker and re.match(r"\*+", footnote)[0] == marker[0]
+        ]
+        judicial = bool(re.search(r"declared (?:unconstitutional|invalid)", note, re.I))
+        judicial = judicial and bool(re.search(r"\bv\.? .+(?:\[\d{4}\]|\(\d{4}\))", provision))
+        judicial = judicial or (
+            not provision
+            and bool(matching_footnotes)
+            and all(
+                re.search(r"invalid|inconsistent|not compatible", footnote, re.I)
+                for footnote in matching_footnotes
+            )
+        )
+        if not ids and judicial:
+            if editorial_notes is None:
+                raise ValueError(
+                    f"{norm_id}: judicial source note requires an editorial_notes destination"
+                )
+            entry = {"note": note, "provision": provision, "kind": "judicial_finding"}
+            if matching_footnotes:
+                entry["footnotes"] = matching_footnotes
+            editorial_notes.append(entry)
+            previous_note = ""
+            continue
+        if not ids and re.fullmatch(r"Spent\.?", note, re.I) and not any(texts[2:]):
+            if editorial_notes is not None:
+                editorial_notes.append(
+                    {"note": note, **({"provision": provision} if provision else {})}
+                )
+            previous_note = ""
+            continue
         if not provision and not ids:
             if not note or re.fullmatch(r"Not affected\.?", note, re.I):
                 continue
-            if re.fullmatch(r"Spent\.?", note, re.I) and not any(texts[2:]):
-                # An undated directory classification is not an amending enactment.
-                if editorial_notes is not None:
-                    editorial_notes.append({"note": note})
-                previous_note = ""
-                continue
             if re.fullmatch(
-                r"References construed|(?:\w+ )?Schedule(?: \w+)?|Part \w+", note, re.I
+                r"References construed|(?:\w+ )?Schedule(?: \w+)?|Parts? (?:[IVX]+[A-Z]?|\d+[A-Z]?)(?:, (?:[IVX]+[A-Z]?|\d+[A-Z]?))*(?: Chapter \d+[A-Z]?)?",
+                note,
+                re.I,
             ):
                 scope = "" if note.lower() == "references construed" else note
                 continue
@@ -286,6 +373,9 @@ def parse_effects(
                 )
                 effect["effective_date"] = "2014-03-07"
             effects.append(effect)
+            previous_effects.append(effect)
+    if pending_reference:
+        raise ValueError(f"{norm_id}: See also has no following source citation")
     return effects
 
 
@@ -357,7 +447,7 @@ def fetch_effects(
     editorial_notes: list[dict] | None = None,
 ) -> list[dict]:
     """Fetch source effects and attach actual affecting-instrument publication dates."""
-    from legalize.fetcher.ie.parser import ISBMetadataParser
+    from legalize.fetcher.ie.parser import ISBMetadataParser, _is_xml_source
 
     continuity_note = None
     if norm_id == CONSTITUTION_ID:
@@ -368,7 +458,7 @@ def fetch_effects(
         source_url = f"{client._base_url}/eli/{year}/{kind}/{number}/"
         source_url += "made/en/html" if kind == "si" else "enacted/en/html"
         page = enacted_data
-        if page.lstrip().startswith((b"<?xml", b"<act", b"<privateact")):
+        if _is_xml_source(page):
             page = client._get(source_url)
         doc = html.fromstring(page.decode("utf-8"))
         links = {

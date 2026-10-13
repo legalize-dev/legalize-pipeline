@@ -1,0 +1,200 @@
+[
+  {
+    "identifier": "IE-1936-si-340",
+    "file": "sample-ie-1936-si-340-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1936/si/340/made/en/html",
+    "source_sha256": "18dbd28c523547b99a5643b9eec38b09609ab9bb888a1d9d510459635a56a025",
+    "fixture_sha256": "0f2b5b9eead77dff3915ffb6b2ba7ce646fde024a5e1a54f90fa3a601fb2466f",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-1945-si-144",
+    "file": "sample-ie-1945-si-144-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1945/si/144/made/en/html",
+    "source_sha256": "00be2e169616863627dc8d839e1fd27522b42289576864250b97fcfe9a568873",
+    "fixture_sha256": "fe27181c72146e5fe21a95ba6d836b679871dc13d78cde51a742be99194d290a",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-1947-si-417",
+    "file": "sample-ie-1947-si-417-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1947/si/417/made/en/html",
+    "source_sha256": "ad4b5de1e9583732ff95bdbaa57e8ace8b423bc41c3408e0917b7cbec77c08ce",
+    "fixture_sha256": "d8ba8e7f4633448aeedd8647fd722409f631759f4c7fab26e2c5984f2f5f5ef1",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-1948-si-45",
+    "file": "sample-ie-1948-si-45-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1948/si/45/made/en/html",
+    "source_sha256": "5c2a376298b5a301285c14df65723459bb83cfc45c9fffe7bb0ac792762cf5e1",
+    "fixture_sha256": "2c549229c9c89c2de9be8e0530936a3d9103969d448567c3d7d0e5b463fe1eef",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-1982-si-158",
+    "file": "sample-ie-1982-si-158-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1982/si/158/made/en/html",
+    "source_sha256": "7df9194623cf789bd854a1a4dc558dc7b9fd0dad58060d5480af8f5228191133",
+    "fixture_sha256": "84b03bbe722c7c227b0306e6136303a06db82eb548aee896a61dabf151b0cfa9",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-1987-si-223",
+    "file": "sample-ie-1987-si-223-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1987/si/223/made/en/html",
+    "source_sha256": "c3e4e351756001d970c709cc6c92bc5c4f8f0643af12ae8924953059050a3cb7",
+    "fixture_sha256": "5e51ab92a1b6777e86ec14129440fcbd57f3ec2247ac1993224549e8d5bb8e9e",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-1997-si-314",
+    "file": "sample-ie-1997-si-314-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1997/si/314/made/en/html",
+    "source_sha256": "a1bc856c2b80b113c0e145220f1fcd45b940eefe042b73b288001d185951d4ad",
+    "fixture_sha256": "136e651dfaad30acfbad383586ccde5ac6da0fbcb990a00742f2f7bc2ddba11b",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-2000-si-217",
+    "file": "sample-ie-2000-si-217-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2000/si/217/made/en/html",
+    "source_sha256": "6fe830da3e8da670013d7007b06e2ec550ed245d87836f45896ee0c7752f99d1",
+    "fixture_sha256": "1f20b2edd575e2bfe3fbc8683db15a8ac48f3619de587bd6577c6666415605c6",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-2001-si-63",
+    "file": "sample-ie-2001-si-63-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2001/si/63/made/en/html",
+    "source_sha256": "094efa6364ed2466c1cd1eb0d3a8097eaf0a671d102e9191268a705ce1e2a13b",
+    "fixture_sha256": "d8ac8d4684c28af34954c070c17968073e34e64fda60ed6f8d75a1996664b6de",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-2003-si-505",
+    "file": "sample-ie-2003-si-505-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/505/made/en/html",
+    "source_sha256": "37591a7f9ab17088ed845515c2e08447e0fba2340ef25be95dad6dd306b77d11",
+    "fixture_sha256": "49179d340db174499c95c1102da8864f2b9fd1fcc70fe1f3e4b610e89db449b9",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-2005-si-229",
+    "file": "sample-ie-2005-si-229-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2005/si/229/made/en/html",
+    "source_sha256": "0290c40e5dbc99ddd26fe26f432a6f76043db75146fa37863949a0f38d259ee8",
+    "fixture_sha256": "2fa94c80ed656e9f30ff4437043c82b78be3ba1f3e5771e79269db5166510bed",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-2005-si-48",
+    "file": "sample-ie-2005-si-48-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2005/si/48/made/en/html",
+    "source_sha256": "30838f9cdd3bb99059176d66198d5bccb06990e6aa73684608ba12366bd55c43",
+    "fixture_sha256": "6bcaec361e136872550666f9f59c07aae6d5eb2b2753d34712545e9ccf9c8ce1",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-2005-si-766",
+    "file": "sample-ie-2005-si-766-signature.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2005/si/766/made/en/html",
+    "source_sha256": "52a942f4467edd6bb82ab65f300444d1115ebc39346a89ab5868f3e3e7fe9d70",
+    "fixture_sha256": "005a90c2c692cdd85df5c2a828629a15ff10548c910a5707894b0bb9cd76cb88",
+    "captured": "2026-10-13",
+    "extraction": "title and complete div#act"
+  },
+  {
+    "identifier": "IE-1998-act-26",
+    "file": "sample-ie-1998-act-26-enactment.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1998/act/26/enacted/en/xml",
+    "source_sha256": "58ad9895b135235984c7f11ce252204cbc9809d4da8301d1026da22231777aec",
+    "fixture_sha256": "58ad9895b135235984c7f11ce252204cbc9809d4da8301d1026da22231777aec",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-1998-act-44",
+    "file": "sample-ie-1998-act-44-enactment.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1998/act/44/enacted/en/xml",
+    "source_sha256": "64f26467d06a3584003b9f37b2370ed688eb0566628d1a3c0a41f119589e13b9",
+    "fixture_sha256": "64f26467d06a3584003b9f37b2370ed688eb0566628d1a3c0a41f119589e13b9",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-1951-act-8",
+    "file": "sample-ie-1951-act-8-identity.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1951/act/8/enacted/en/xml",
+    "source_sha256": "4d0c4d01693d0a8669e9a5654502446e84e7026a341f7760bb7de6124f14404f",
+    "fixture_sha256": "4d0c4d01693d0a8669e9a5654502446e84e7026a341f7760bb7de6124f14404f",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-1936-act-14",
+    "file": "sample-ie-1936-act-14-identity.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1936/act/14/enacted/en/xml",
+    "source_sha256": "32c92078877d45d01f82e8cdca9f63c2e17f2aee9f37dea941f958408b59eece",
+    "fixture_sha256": "32c92078877d45d01f82e8cdca9f63c2e17f2aee9f37dea941f958408b59eece",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-2004-act-7",
+    "file": "sample-ie-2004-act-7-identity.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/2004/act/7/enacted/en/xml",
+    "source_sha256": "12e3d2fe9d543b296370b08f3fe186cfb7eedd5067aee0b6f7aabc8435d4c02d",
+    "fixture_sha256": "12e3d2fe9d543b296370b08f3fe186cfb7eedd5067aee0b6f7aabc8435d4c02d",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-1955-act-25",
+    "file": "sample-ie-1955-act-25-identity.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1955/act/25/enacted/en/xml",
+    "source_sha256": "bb5ec796b43c50cf925ae7bca17839fb5a1ad459308f27bc619a57a34e4c417e",
+    "fixture_sha256": "bb5ec796b43c50cf925ae7bca17839fb5a1ad459308f27bc619a57a34e4c417e",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-1948-act-13",
+    "file": "sample-ie-1948-act-13-identity.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1948/act/13/enacted/en/xml",
+    "source_sha256": "b1ce34e47be4b326ac6724a1d0f0019d771ae1bd11aa7c584624a56e6697de05",
+    "fixture_sha256": "b1ce34e47be4b326ac6724a1d0f0019d771ae1bd11aa7c584624a56e6697de05",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-1927-act-39",
+    "file": "sample-ie-1927-act-39-processing-instruction.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1927/act/39/enacted/en/xml",
+    "source_sha256": "62d680f03bddb1e72ebf65e3744e19f02263eea2a896c197043566bd7f330dd0",
+    "fixture_sha256": "62d680f03bddb1e72ebf65e3744e19f02263eea2a896c197043566bd7f330dd0",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "identifier": "IE-1937-act-38",
+    "file": "sample-ie-1937-act-38-processing-instruction.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1937/act/38/enacted/en/xml",
+    "source_sha256": "170a0880fea449f7501e31c8fd9c85597532afec89b482b93c1ccc68dbc06561",
+    "fixture_sha256": "170a0880fea449f7501e31c8fd9c85597532afec89b482b93c1ccc68dbc06561",
+    "captured": "2026-10-13",
+    "extraction": "complete unchanged source"
+  }
+]

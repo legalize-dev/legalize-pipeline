@@ -419,6 +419,10 @@ def _legal_format(paragraphs: list[Paragraph]) -> list[Paragraph]:
 # ── Text parser ─────────────────────────────────────────────────────
 
 
+def _is_xml_source(data: bytes) -> bool:
+    return data.lstrip().startswith((b"<?xml", b"<?version", b"<act", b"<privateact"))
+
+
 class ISBTextParser(TextParser):
     """Parse ISB XML or HTML into Block objects."""
 
@@ -431,13 +435,12 @@ class ISBTextParser(TextParser):
 
         All content is flattened into a single Block with one Version.
         """
-        # Detect format: XML starts with <?xml or <act, HTML with <!DOCTYPE or <html
         stripped = data.lstrip()
         if stripped.startswith(b"{") and json.loads(data).get("legalize_ie") == 1:
             from legalize.fetcher.ie.history import parse_text
 
             return parse_text(data)
-        if stripped.startswith(b"<?xml") or stripped.startswith(b"<act"):
+        if _is_xml_source(data):
             return self._parse_xml(data, published_on=published_on)
         return self._parse_html(data, published_on=published_on)
 
@@ -456,15 +459,7 @@ class ISBTextParser(TextParser):
         paragraphs: list[Paragraph] = []
 
         # Extract metadata for the Version
-        meta_el = root.find("metadata")
-        pub_date = published_on
-        if meta_el is not None:
-            doe = meta_el.findtext("dateofenactment") or ""
-            if doe:
-                try:
-                    pub_date = date.fromisoformat(doe)
-                except ValueError as exc:
-                    raise ValueError(f"Invalid ISB enactment date: {doe!r}") from exc
+        pub_date = _xml_enactment_date(root) or published_on
         if pub_date is None:
             raise ValueError("ISB text has no enactment date")
 
@@ -1209,8 +1204,28 @@ def _gazette_date(text: str) -> date | None:
     return _parse_date_from_parts(int(match[1]), match[2], int(match[3])) if match else None
 
 
+def _xml_enactment_date(root) -> date | None:
+    raw = root.findtext("metadata/dateofenactment") or ""
+    if not raw:
+        return None
+    front = root.find("frontmatter")
+    if re.fullmatch(r"\d{7,9}", raw) and front is not None:
+        printed = _enactment_date("".join(front.itertext()))
+        if printed is not None:
+            if not any(
+                re.fullmatch(rf"{printed.year}0*{first}0*{second}", raw)
+                for first, second in ((printed.month, printed.day), (printed.day, printed.month))
+            ):
+                raise ValueError(f"Conflicting ISB enactment dates: {raw!r}, {printed}")
+            return printed
+    try:
+        return date.fromisoformat(raw)
+    except ValueError as exc:
+        raise ValueError(f"Invalid ISB enactment date: {raw!r}") from exc
+
+
 def _enactment_date(text: str) -> date | None:
-    match = re.search(r"\[(\d{1,2})\s*(?:st|nd|rd|th)?\s+(\w+),?\s+(\d{4})\.?\]", text, re.I)
+    match = re.search(r"\[(\d{1,2})\s*(?:st|nd|rd|th)?\s+(\w+)\s*,?\s+(\d{4})\.?\]", text, re.I)
     if match:
         return _parse_date_from_parts(int(match[1]), match[2], int(match[3]))
     return _gazette_date(text) or _made_date(text)
@@ -1218,9 +1233,37 @@ def _enactment_date(text: str) -> date | None:
 
 def _signature_dates(text: str) -> list[date]:
     """Read explicit signature and concurrence dates, never commencement clauses."""
+    ordinals = (
+        "first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth "
+        "thirteenth fourteenth fifteenth sixteenth seventeenth eighteenth nineteenth twentieth"
+    ).split()
+    ordinals += [f"twenty-{word}" for word in ordinals[:9]] + ["thirtieth", "thirty-first"]
+    for day, word in sorted(enumerate(ordinals, 1), key=lambda item: len(item[1]), reverse=True):
+        text = re.sub(rf"\b{word.replace('-', '[- ]')}\b(?=\s+day of)", str(day), text, flags=re.I)
+    units = "one two three four five six seven eight nine".split()
+    numbers = (
+        [""]
+        + units
+        + "ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split()
+    )
+    for tens in "twenty thirty forty fifty sixty seventy eighty ninety".split():
+        numbers += [tens] + [f"{tens}-{unit}" for unit in units]
+    written_year = (
+        r"\bone thousand nine hundred(?: and)?[ -]+("
+        + "|".join(word.replace("-", "[- ]") for word in sorted(numbers[1:], key=len, reverse=True))
+        + r")\b"
+    )
+    text = re.sub(
+        written_year,
+        lambda match: str(1900 + numbers.index(match[1].lower().replace(" ", "-"))),
+        text,
+        flags=re.I,
+    ).replace("_", " ")
     matches = re.finditer(
-        r"(?:GIVEN under.{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+this\s+|Dated\s*,?\s*(?:this\s+)?|Made\s+)"
-        r"(\d{1,2})(?:st|nd|rd|th)?\.?(?:\s+day of)?\s+(\w+),?\s+(\d{4})",
+        r"(?:GIVEN under.{0,180}?\b(?:Seal|hand)\b[^0-9]{0,180}?|GIVEN\s+this\s+|"
+        r"Dated\s*,?\s*(?:(?:this|the)\s+)?|Made\s+|DUBLIN\.\s+This\s+)"
+        r"(\d{1,2})(?:st|nd|rd|th)?\.?(?:\s+day of)?\s*"
+        r"([A-Za-z]+|\d{1,2}(?:st|nd|rd|th)?)\s*[, .]?\s+(\d{4})",
         text,
         re.I,
     )
@@ -1251,7 +1294,10 @@ def _parse_date_from_parts(day: int, month_str: str, year: int) -> date:
         "november": 11,
         "december": 12,
     }
+    months.update({name[:3]: value for name, value in list(months.items())})
     month = months.get(month_str.lower())
+    if re.fullmatch(r"\d{1,2}(?:st|nd|rd|th)?", month_str, re.I):
+        month = int(re.match(r"\d+", month_str)[0])
     if month is None:
         raise ValueError(f"Unknown month in Irish source: {month_str!r}")
     return date(year, month, day)
@@ -1399,21 +1445,42 @@ class ISBMetadataParser(MetadataParser):
         """Use an ISB document when the parliamentary catalogue has no matching Act."""
         from lxml import html as lxml_html
 
-        if data.lstrip().startswith((b"<?xml", b"<act")):
+        if _is_xml_source(data):
             root = etree.fromstring(data)
             meta = root.find("metadata")
             if meta is None:
                 raise ValueError(f"{norm_id}: ISB XML has no metadata")
             expected = norm_id.split("-")
-            if meta.findtext("year") != expected[1] or meta.findtext("number") != expected[
-                3
-            ].lstrip("CP"):
+            expected_identity = (expected[3].lstrip("CP"), expected[1])
+            printed_identities = {
+                match.groups()
+                for node in root.findall("frontmatter/actnumber")
+                if (
+                    match := re.fullmatch(
+                        r"Number\s+(\d+)\s+of\s+(\d{4})\.?",
+                        " ".join(" ".join(node.itertext()).split()),
+                        re.I,
+                    )
+                )
+            }
+            source_identity = (meta.findtext("number", ""), meta.findtext("year", ""))
+            if (printed_identities and printed_identities != {expected_identity}) or (
+                source_identity != expected_identity and printed_identities != {expected_identity}
+            ):
                 raise ValueError(f"{norm_id}: ISB XML metadata identifies a different Act")
             title_el = meta.find("title")
             title = _inline_text(title_el) if title_el is not None else ""
             raw_date = meta.findtext("dateofenactment", "")
-            published = date.fromisoformat(raw_date) if raw_date else None
+            published = _xml_enactment_date(root)
             source_fields = []
+            if source_identity != expected_identity:
+                source_fields.extend(
+                    (
+                        ("identity_source_number", source_identity[0]),
+                        ("identity_source_year", source_identity[1]),
+                        ("identity_basis", "isb_frontmatter_actnumber"),
+                    )
+                )
             for child in meta:
                 if not isinstance(child.tag, str) or child.tag == "title":
                     continue
@@ -1426,8 +1493,18 @@ class ISBMetadataParser(MetadataParser):
                     if key == "enactment_date" and published is not None
                     else _inline_text(child)
                 )
+                if child.tag in ("number", "year"):
+                    value = expected_identity[0 if child.tag == "number" else 1]
                 source_fields.append((key, value))
-            extra = tuple(source_fields) + (("publication_date_basis", "isb_enactment_date"),)
+            basis = "isb_enactment_date"
+            if (
+                published
+                and re.fullmatch(r"\d{7,9}", raw_date)
+                and raw_date != published.strftime("%Y%m%d")
+            ):
+                source_fields.append(("enactment_date_source_value", raw_date))
+                basis = "isb_frontmatter_enactment_date"
+            extra = tuple(source_fields) + (("publication_date_basis", basis),)
         else:
             root = lxml_html.fromstring(data)
             title = (root.findtext(".//title") or "").strip()

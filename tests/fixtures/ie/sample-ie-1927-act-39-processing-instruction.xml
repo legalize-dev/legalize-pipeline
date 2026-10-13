@@ -1,0 +1,406 @@
+<?version xml="1.0"?>
+<act>
+<metadata>
+<title>LOCAL ELECTIONS ACT, 1927</title>
+<number>39</number>
+<year>1927</year>
+<dateofenactment>19271210</dateofenactment>
+</metadata>
+<frontmatter>
+<pc><graphic href="harp.jpg" quality="GOOD"/></pc>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<actnumber>
+<p class="0 0 0 center 1 1" just="left"><i>Number</i> 39 <i>of</i> 1927.</p>
+</actnumber>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<acttitle>
+<p class="0 0 0 center 1 1" just="left"><b>LOCAL ELECTIONS ACT, 1927.</b></p>
+</acttitle>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="0 0 0 center 0 1" just="left">ARRANGEMENT OF SECTIONS</p>
+<acttoc>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTI" xml:link="simple" show="replace"><font size="normal" smallcaps="yes">PART I.</font></xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Preliminary.</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 right 0 0" just="left">Section</p></td>
+<td colspan="1" rowspan="1" valign="top"><p just="left"/></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC1" xml:link="simple" show="replace">1.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC1" xml:link="simple" show="replace">Short title.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC2" xml:link="simple" show="replace">2.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC2" xml:link="simple" show="replace">Definitions.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC3" xml:link="simple" show="replace">3.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC3" xml:link="simple" show="replace">Saving for dissolved authorities.</xref></p></td>
+</tr>
+</tbody>
+</table>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTII" xml:link="simple" show="replace"><font size="normal" smallcaps="yes">PART II.</font></xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Elections, Etc., Outside Dublin City and County.</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC4" xml:link="simple" show="replace">4.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC4" xml:link="simple" show="replace">Application of Part II of this Act.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC5" xml:link="simple" show="replace">5.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC5" xml:link="simple" show="replace">Ordinary day of election in counties.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC6" xml:link="simple" show="replace">6.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC6" xml:link="simple" show="replace">Ordinary of day of election in county boroughs.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC7" xml:link="simple" show="replace">7.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC7" xml:link="simple" show="replace">Ordinary day of retirement of councillors, etc.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC8" xml:link="simple" show="replace">8.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC8" xml:link="simple" show="replace">Annual meetings of county councils.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC9" xml:link="simple" show="replace">9.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC9" xml:link="simple" show="replace">Annual meetings of urban district councils and commissioners of towns.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC10" xml:link="simple" show="replace">10.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC10" xml:link="simple" show="replace">Quarterly meetings of county and other borough councils.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC11" xml:link="simple" show="replace">11.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC11" xml:link="simple" show="replace">Failure to hold annual or quarterly meeting.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC12" xml:link="simple" show="replace">12.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC12" xml:link="simple" show="replace">Saving from disqualification in certain cases.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC13" xml:link="simple" show="replace">13.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC13" xml:link="simple" show="replace">Members of joint committees and joint board.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC14" xml:link="simple" show="replace">14.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC14" xml:link="simple" show="replace">Appointment of polling districts and polling places.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC15" xml:link="simple" show="replace">15.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC15" xml:link="simple" show="replace">Hours of poll.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC16" xml:link="simple" show="replace">16.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC16" xml:link="simple" show="replace">Local elections in the year 1928.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC17" xml:link="simple" show="replace">17.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC17" xml:link="simple" show="replace">Terms of office terminating in 1928.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC18" xml:link="simple" show="replace">18.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC18" xml:link="simple" show="replace">Provisions for Sundays, bank holidays, etc.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC19" xml:link="simple" show="replace">19.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC19" xml:link="simple" show="replace">Partial repeal of section 94 of Local Government (Ireland) Act, 1898.</xref></p></td>
+</tr>
+</tbody>
+</table>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTIII" xml:link="simple" show="replace"><font size="normal" smallcaps="yes">PART III.</font></xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Elections in the County of Dublin.</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC20" xml:link="simple" show="replace">20.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC20" xml:link="simple" show="replace">Application of Part III of this Act.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC21" xml:link="simple" show="replace">21.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC21" xml:link="simple" show="replace">Postponement of local election.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC22" xml:link="simple" show="replace">22.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC22" xml:link="simple" show="replace">Extension of terms of office.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC23" xml:link="simple" show="replace">23.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC23" xml:link="simple" show="replace">Annual and quarterly meetings.</xref></p></td>
+</tr>
+</tbody>
+</table>
+</acttoc>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<actsreferredto>
+<table width="100%" class="t1">
+<colgroup>
+<col width="60%"/>
+<col width="40%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="2" rowspan="1" valign="top"><p class="0 0 0 center 0 0" just="left"><font size="small" smallcaps="yes">Acts Referred to</font></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Local Government (Temporary Provisions) Act, 1923</font></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">No. 9 of 1923</font></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Local Government Act, 1925</font></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">No. 5 of 1925</font></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Local Elections (Dissolved Authorities) Act, 1926</font></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">No. 22 of 1926</font></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Local Elections Postponement Act, 1925</font></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">No. 42 of 1925</font></p></td>
+</tr>
+</tbody>
+</table>
+</actsreferredto>
+<p class="0 0 0 center 1 1" just="left"><graphic href="harp.jpg" quality="GOOD"/></p>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="0 0 0 center 1 1" just="left"><i>Number</i> 39 <i>of</i> 1927.</p>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="0 0 0 center 1 1" just="left"><b>LOCAL ELECTIONS ACT, 1927.</b></p>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="-3 3 0 left 0 1" just="left">AN ACT TO AMEND THE LAW RELATING TO LOCAL ELECTIONS, TO POSTPONE FURTHER THE ELECTIONS TO CERTAIN LOCAL AUTHORITIES IN THE COUNTY OF DUBLIN, AND TO MAKE CONSEQUENTIAL AMENDMENTS IN THE LAW RELATING TO LOCAL AUTHORITIES. [10<i>th December</i>, 1927.]</p>
+<p class="2 0 0 left 0 1" just="left">BE IT ENACTED BY THE OIREACHTAS OF SAORST<Afada/>T EIREANN AS FOLLOWS:<emdash/></p>
+</frontmatter>
+<body>
+<part id="PARTI">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART I.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Preliminary.</font></p>
+</title>
+<sect id="SEC1">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Short title.</font></p>
+</title>
+<number>1</number>
+<p class="2 0 0 left 0 1" just="left"><b>1.</b><emdash/>This Act may be cited as the Local Elections Act, 1927.</p>
+</sect>
+<sect id="SEC2">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Definitions.</font></p>
+</title>
+<number>2</number>
+<p class="2 0 0 left 0 1" just="left"><b>2.</b><emdash/>In this Act<emdash/></p>
+<p class="0 0 0 left 0 1" just="left">the expression <odq/>the Minister<cdq/> means the Minister for Local Government and Public Health;</p>
+<p class="0 0 0 left 0 1" just="left">the expression <odq/>local authority<cdq/> means and includes the council of a county, the council of a county or other borough, the council of an urban district, the commissioners of a town and, in relation to the county of Dublin, a rural district council and a board of guardians;</p>
+<p class="0 0 0 left 0 1" just="left">the expression <odq/>local electoral area<cdq/> means a local electoral area constituted under the Local Government (Ireland) Act, 1919;</p>
+<p class="0 0 0 left 0 1" just="left">the word <odq/>town<cdq/> means a town as defined in the Local Government (Ireland) Act, 1898, which is not an urban district;</p>
+<p class="0 0 0 left 0 1" just="left">every other word and expression to which a particular meaning is assigned by the Local Government (Ireland) Act, 1898, has the meaning so assigned to it.</p>
+</sect>
+<sect id="SEC3">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Saving for dissolved authorities.</font></p>
+</title>
+<number>3</number>
+<p class="2 0 0 left 0 1" just="left"><b>3.</b><emdash/>Nothing in this Act shall prejudice or affect the operation of any order under section 12 of the Local Government (Temporary Provisions) Act, 1923 (No. 9 of 1923) or section 72 of the Local Government Act, 1925 (No. 5 of 1925) nor of the Local Elections (Dissolved Authorities) Act, 1926 (No. 22 of 1926).</p>
+</sect>
+</part>
+<part id="PARTII">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART II.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Elections, etc., Outside Dublin City and County.</font></p>
+</title>
+<sect id="SEC4">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Application of Part II of this Act.</font></p>
+</title>
+<number>4</number>
+<p class="2 0 0 left 0 1" just="left"><b>4.</b><emdash/>This Part of this Act applies to every local authority whose functional area is outside the county and the county borough of Dublin and also applies to the Commissioners of the town of Balbriggan.</p>
+</sect>
+<sect id="SEC5">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Ordinary day of election in counties.</font></p>
+</title>
+<number>5</number>
+<p class="2 0 0 left 0 1" just="left"><b>5.</b><emdash/>(1) In every county the ordinary day of election of county councillors shall be such day, not earlier than the 23rd day of June nor later than the 1st day of July, as shall be fixed by the county council.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every election of aldermen and councillors of a borough other than a county borough and of urban district councillors and town commissioners shall be held on the day which is fixed under this section as the ordinary day of election of county councillors for the county in which such borough, urban district, or town is situate, and every such election shall be held together with the election of county councillors for such county.</p>
+<p class="2 0 0 left 0 1" just="left">(3) In any year in which, by virtue of this Act or otherwise, a triennial election of commissioners of the town of Balbriggan is required to be held but no election of councillors of the county of Dublin is held between the 22nd day of June and the 2nd day of July, such triennial election of commissioners of the town of Balbriggan shall be held on such day in that year, not earlier than the 23rd day of June nor later than the 1st day of July, as the council of the county of Dublin shall fix after consultation with the commissioners of the said town.</p>
+</sect>
+<sect id="SEC6">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Ordinary day of election in county boroughs.</font></p>
+</title>
+<number>6</number>
+<p class="2 0 0 left 0 1" just="left"><b>6.</b><emdash/>In every county borough the ordinary day of election of aldermen and councillors shall be such day, not earlier than the 23rd day of June nor later than the 1st day of July, as shall be fixed by the county borough council.</p>
+</sect>
+<sect id="SEC7">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Ordinary day of retirement of councillors, etc.</font></p>
+</title>
+<number>7</number>
+<p class="2 0 0 left 0 1" just="left"><b>7.</b><emdash/>(1) The ordinary day of retirement of county councillors shall be the seventh day after the ordinary day of election of such councillors and on such ordinary day of retirement the old councillors shall retire and the newly elected councillors shall come into office</p>
+<p class="2 0 0 left 0 1" just="left">(2) The ordinary day of retirement of councillors of an urban district which is not a borough and of commissioners of a town shall be the fifth day after the ordinary day of election of such council or such commissioners and on such ordinary day of retirement the old councillors or commissioners (as the case may be) shall retire and the newly elected councillors or commissioners shall come into office.</p>
+<p class="2 0 0 left 0 1" just="left">(3) The ordinary day of retirement of aldermen and councillors of a county or other borough shall be the fifth day after the ordinary day of election of such aldermen and councillors and on such ordinary day of retirement the old aldermen and councillors shall retire and the newly elected aldermen and councillors shall come into office.</p>
+</sect>
+<sect id="SEC8">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Annual meetings of county councils.</font></p>
+</title>
+<number>8</number>
+<p class="2 0 0 left 0 1" just="left"><b>8.</b><emdash/>(1) In every year in which a triennial election to a county council is held the annual meeting of such council shall be held at noon on the fourteenth day after the day of such election and in every other year the annual meeting of such council shall be held at such time on such day not earlier than the 23rd day of June nor later than the 1st day of July as such council shall fix.</p>
+<p class="2 0 0 left 0 1" just="left">(2) The first business at every annual meeting of the council of a county shall be the election of the chairman and vice-chairman, and every such chairman and vice-chairman shall come into office as soon after his election as he has made the declaration accepting office and shall continue in office until his successor has been elected and made the declaration accepting office.</p>
+</sect>
+<sect id="SEC9">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Annual meetings of urban district councils and commissioners of towns.</font></p>
+</title>
+<number>9</number>
+<p class="2 0 0 left 0 1" just="left"><b>9.</b><emdash/>(1) In every year in which a triennial election to the council of an urban district which is not a borough is held the annual meeting of such council shall be held at noon on the tenth day after the day of such election and in every other year the annual meeting of such council shall be held at such time on such day not earlier than the 23rd day of June nor later than the 1st day of July as such council shall fix.</p>
+<p class="2 0 0 left 0 1" just="left">(2) In every year in which a triennial election of the commissioners of a town is held the annual meeting of such commissioners shall be held at noon on the tenth day after the day of such election and in every other year the annual meeting of such commissioners shall be held at such time on such day not earlier than the 23rd day of June nor later than the 1st day of July as such commissioners shall fix.</p>
+<p class="2 0 0 left 0 1" just="left">(3) The first business at every annual meeting of the council of an urban district which is not a borough or of the commissioners of a town shall be the election of the chairman and vice-chairman and every such chairman and vice-chairman shall come into office as soon after his election as he has made the declaration accepting office and shall continue in office until his successor has been elected and made the declaration accepting office.</p>
+</sect>
+<sect id="SEC10">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Quarterly meetings of county and other borough councils.</font></p>
+</title>
+<number>10</number>
+<p class="2 0 0 left 0 1" just="left"><b>10.</b><emdash/>(1) The first quarterly meeting of the council of a county or other borough after a triennial election to such council shall be held at noon on the tenth day after the day of such election and a quarterly meeting of such council shall be held at such hour on such other three days before the next following 23rd day of June as such council shall fix at such first-mentioned quarterly meeting.</p>
+<p class="2 0 0 left 0 1" just="left">(2) In every year in which no triennial election to the council of a county or other borough is held a quarterly meeting of such council shall be held at such hour on such day not earlier than the 23rd day of June nor later than the 1st day of July as such council shall fix at the last previous quarterly meeting and a quarterly meeting of such council shall also be held at such hour on such other three days before the next following 23rd day of June as such council shall fix at such first mentioned quarterly meeting.</p>
+<p class="2 0 0 left 0 1" just="left">(3) The first business (after the determination of the question which of the members are to be aldermen if and when that question arises) at the quarterly meeting of the council of a county or other borough held next after the 22nd day of June in any year shall be the election of the mayor, and every such mayor shall come into office as soon after his election as he has made the declaration accepting office and shall continue in office until his successor has been elected and made the declaration accepting office.</p>
+</sect>
+<sect id="SEC11">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Failure to hold annual or quarterly meeting.</font></p>
+</title>
+<number>11</number>
+<p class="2 0 0 left 0 1" just="left"><b>11.</b><emdash/>(1) Whenever an annual meeting of the council of a county or an urban district which is not a borough or of the commissioners of a town is for any reason (including a quorum not being present) not held on the day appointed under this Act for the holding of such meeting, the county secretary or the town clerk (as the case may be) shall as soon as may be summon a meeting of such council or commissioners for a convenient hour on the day which appears to him to be the earliest convenient date for the purpose and the meeting held in pursuance of such summons shall be for all purposes an annual meeting held on a date appointed under this Act.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Whenever a quarterly meeting of the council of a county or other borough is for any reason (including a quorum not being present) not held on the day appointed under this Act for the holding of such meeting, the town clerk shall as soon as may be summon a meeting of such council for a convenient hour on the day which appears to him to be the earliest convenient date for the purpose and the meeting held in pursuance of such summons shall be for all purposes a quarterly meeting held on a date appointed under this Act.</p>
+</sect>
+<sect id="SEC12">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Saving from disqualification in certain cases.</font></p>
+</title>
+<number>12</number>
+<p class="2 0 0 left 0 1" just="left"><b>12.</b><emdash/>(1) A councillor of a county or an urban district or an alderman or a councillor of a county or other borough or a commissioner of a town who ceases to be a local government elector in such county, urban district, borough, or town on the coming into force of a new register of local government electors on the 1st day of June next before a triennial election shall not by reason only of such cesser be disqualified from continuing to hold office as such councillor, alderman, or commissioner until the ordinary day of retirement of the councillors of such county or urban district, the aldermen and councillors of such borough, or the commissioners of such town (as the case may be) next after such triennial election.</p>
+<p class="2 0 0 left 0 1" just="left">(2) The chairman of a county council, urban district council, or commissioners of a town or the mayor of a county or other borough who ceases to be a local government elector in such county, urban district, town, or borough on the coming into force of a new register of local government electors on any 1st day of June shall not by reason only of such cesser be disqualified from continuing to hold office as such chairman or mayor until his successor has been elected at the next ensuing annual meeting or quarterly meeting (as the case may be) of such council or commissioners and has made the declaration accepting office.</p>
+</sect>
+<sect id="SEC13">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Members of joint committees and joint boards.</font></p>
+</title>
+<number>13</number>
+<p class="2 0 0 left 0 1" just="left"><b>13.</b><emdash/>(1) The business to be transacted by a local authority at an annual meeting or quarterly meeting (as the case may be) next after a triennial election shall include the consideration of the election or nomination of all members of joint committees and joint boards elected or nominated by such local authority.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every member of a joint committee or joint board who is elected or nominated by a local authority and is in office as such member at the date of a triennial election to such local authority shall continue to hold office as such member of such joint committee or joint board until the day after the annual meeting or quarterly meeting (as the case may be) of such local authority next after such triennial election.</p>
+</sect>
+<sect id="SEC14">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Appointment of polling districts and polling places.</font></p>
+</title>
+<number>14</number>
+<p class="2 0 0 left 0 1" just="left"><b>14.</b><emdash/>(1) The Minister shall as soon as conveniently may be after the passing of this Act make rules for the performance by the councils of counties and county boroughs of the duties imposed or powers conferred on them by this section in relation to polling districts and polling places.</p>
+<p class="2 0 0 left 0 1" just="left">(2) The council of every county and county borough shall within three months after the said rules have been made by the Minister prepare and submit to the Minister in accordance with the said rules a scheme for the division of every local electoral area in their county or county borough into polling districts and the appointment of polling places in every such polling district in such manner as to give to all local government electors in every such local electoral area such reasonable facilities for voting as are practicable.</p>
+<p class="2 0 0 left 0 1" just="left">(3) The council of a county when preparing or amending a scheme under this section shall consult in accordance with the said rules with the council of every borough (other than a county borough) and urban district and the commissioners of every town in their county in respect of so much of such scheme or amendment as relates to such borough, urban district, or town.</p>
+<p class="2 0 0 left 0 1" just="left">(4) The Minister shall consider every scheme duly submitted to him by a council under this section and shall within one month after such scheme is so submitted to him either, as he shall think fit, confirm such scheme without alteration or confirm such scheme with such alterations as he may think proper to make therein or refuse to confirm such scheme.</p>
+<p class="2 0 0 left 0 1" just="left">(5) If the council of any county or county borough fails to submit to the Minister within the time limited by this section any such scheme as is required by this section or if the Minister refuses to confirm the scheme so submitted by such council, the Minister shall himself prepare and confirm such scheme for such county or county borough as is required by this section.</p>
+<p class="2 0 0 left 0 1" just="left">(6) Every scheme duly confirmed by the Minister under this section shall have effect when and as so confirmed and thenceforth every local electoral area in the county or county borough to which such scheme relates shall be divided into polling districts and polling places shall be appointed therein in accordance with such scheme.</p>
+<p class="2 0 0 left 0 1" just="left">(7) The council of a county or county borough may at any time amend the scheme then in force under this section in relation to their county or county borough and every such amendment if approved by the Minister shall have effect as from the date of such approval.</p>
+<p class="2 0 0 left 0 1" just="left">(8) If the council of a borough (other than a county borough) or urban district or the commissioners of a town or not less than thirty local government electors in a county or county borough satisfy the Minister that the polling districts or polling places in the county or county borough in which such borough, urban district, or town is situate or in which such electors are entitled to vote do not meet the reasonable requirements of the local government electors in such county or county borough or in some particular part thereof, the Minister may require the council of such county or county borough to amend the scheme then in force in such county or county borough under this section and if such council does not within one month after being so required duly make in such scheme all such amendments as the Minister considers to be necessary and approves of the Minister may himself amend such scheme as he thinks proper and every amendment so made by the Minister shall have effect as from the date of the making thereof.</p>
+<p class="2 0 0 left 0 1" just="left">(9) Every scheme duly confirmed by the Minister under this section and every amendment of a scheme duly approved of or made by the Minister under this section shall be published in such manner as shall be prescribed by the said rules to be made by the Minister under this section.</p>
+<p class="2 0 0 left 0 1" just="left">(10) The Minister may hold such inquiries as he may consider necessary or expendient for the purposes of this section and Article 32 of the Local Government (Application of Enactments) Order, 1898 shall apply to every such inquiry.</p>
+<p class="2 0 0 left 0 1" just="left">(11) No election shall be questioned on the ground of any non-compliance with the provisions of this section or any informality in relation to polling districts or polling places.</p>
+</sect>
+<sect id="SEC15">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Hours of poll.</font></p>
+</title>
+<number>15</number>
+<p class="2 0 0 left 0 1" just="left"><b>15.</b><emdash/>(1) The poll, if any, at an election of members of a local authority shall commence at nine o'clock in the forenoon and be kept open till nine o'clock in the afternoon and no longer.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Paragraph (<i>c</i>) of sub-article (2) of article 5 of the Local Government(Application of Enactments) Order, 1898 and so much of all Rules made under the said article 5 as relates to the hours during which a poll is to be kept open shall cease to have effect in respect of any local authority to which this Part of this Act applies.</p>
+</sect>
+<sect id="SEC16">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Local elections in the year 1928.</font></p>
+</title>
+<number>16</number>
+<p class="2 0 0 left 0 1" just="left"><b>16.</b><emdash/>(1) In every county, the election of county councillors and the elections of aldermen and councillors of boroughs (other than county boroughs), urban district councillors, and commissioners of towns which were postponed by the Local Elections Postponement Act, 1925 (No. 42 of 1925) until the year 1928 shall be held on the day in that year which is under this Act the ordinary day of election of county councillors in that county, and every such election shall be deemed to be a triennial election and this Part of this Act shall apply thereto accordingly.</p>
+<p class="2 0 0 left 0 1" just="left">(2) In every county borough the election of aldermen and councillors which was postponed by the Local Elections Postponement Act, 1925 until the year 1928 shall be held on the day in that year which is under this Act the ordinary day of election of aldermen and councillors in that county borough and every such election shall be deemed to be a triennial election and this Part of this Act shall apply thereto accordingly.</p>
+<p class="2 0 0 left 0 1" just="left">(3) In every county, county and other borough, urban district, and town, triennial elections of councillors, aldermen and councillors, or commissioners (as the case may be) shall, notwithstanding anything to the contrary contained in the Local Government (Ireland) Act, 1919, be held in every third year after the year 1928 and in no other year.</p>
+</sect>
+<sect id="SEC17">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Terms of office terminating in 1928.</font></p>
+</title>
+<number>17</number>
+<p class="2 0 0 left 0 1" just="left"><b>17.</b><emdash/>(1) Every term of office of a member of a local authority which is at the passing of this Act due to terminate in the year 1928 shall terminate on the day which is by virtue of this Act the ordinary day of retirement of members of such local authority in that year in lieu of the day on which such term of office would have terminated if this Act had not been passed, and every such term of office shall be extended or curtailed (as the case may require) accordingly.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every term of office of a member of any board, committee, joint board, or joint committee who is nominated or elected to such membership by a local authority in respect of which a statutory election is due to be held in the year 1928 shall terminate on the day appointed by this Act for the holding of the first annual meeting or quarterly meeting (as the case may be) of such local authority after such election in lieu of the day on which such term of office would have terminated if this Act had not been passed, and every such term of office shall be extended or curtailed (as the case may require) accordingly.</p>
+<p class="2 0 0 left 0 1" just="left">(3) Every term of office of a chairman or a vice-chairman of the council of a county or of the council of an urban district or of the commissioners of a town which is at the passing of this Act due to terminate in the year 1928 shall terminate when his successor has been elected at the annual meeting of such council or commissioners held next after the triennial elections in the year 1928 and has made the declaration accepting office and such term of office shall be extended or curtailed (as the case may require) accordingly.</p>
+</sect>
+<sect id="SEC18">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Provision for Sundays, bank holidays, etc.</font></p>
+</title>
+<number>18</number>
+<p class="2 0 0 left 0 1" just="left"><b>18.</b><emdash/>Whenever the day on which anything is required by this Part of this Act to be done falls on a Sunday or on a bank holiday that thing shall be done on the next following day which is neither a Sunday, nor a bank holiday.</p>
+</sect>
+<sect id="SEC19">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Partial repeal of section 94 of Local Government (Ireland) Act, 1898.</font></p>
+</title>
+<number>19</number>
+<p class="2 0 0 left 0 1" just="left"><b>19.</b><emdash/>Sub-sections (6) to (15) of section 94 of the Local Government (Ireland) Act, 1898 shall cease to have effect in respect of any local authority to which this Part of this Act applies.</p>
+</sect>
+</part>
+<part id="PARTIII">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART III.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Elections in the County of Dublin.</font></p>
+</title>
+<sect id="SEC20">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Application of Part III. of this Act.</font></p>
+</title>
+<number>20</number>
+<p class="2 0 0 left 0 1" just="left"><b>20.</b><emdash/>This Part of this Act applies to the council of the county of Dublin and to every local authority whose functional area is situate within the county of Dublin except the commissioners of the town of Balbriggan.</p>
+</sect>
+<sect id="SEC21">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Postponement of local elections.</font></p>
+</title>
+<number>21</number>
+<p class="2 0 0 left 0 1" just="left"><b>21.</b><emdash/>(1) Section 2 of the Local Elections Postponement Act, 1925 (No. 42 of 1925) shall cease to apply to the local authorities to which this Part of this Act applies and in lieu thereof it is hereby enacted that the statutory elections of members of such local authorities which but for that Act would have been held in the year 1926 shall be postponed until and shall be held on such date not being later than the 31st day of March, 1929 as the Minister shall by order prescribe.</p>
+<p class="2 0 0 left 0 1" just="left">(2) An order under this section (including an order under this sub-section) may be revoked by a subsequent order but in every such case a new date for the holding of such election shall be prescribed by such subsequent order.</p>
+<p class="2 0 0 left 0 1" just="left">(3) In this Part of this Act the expression <odq/>the prescribed date<cdq/> means the date prescribed under this section for the holding of the statutory elections of the local authority in relation to which the expression is used.</p>
+</sect>
+<sect id="SEC22">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Extension of terms of office.</font></p>
+</title>
+<number>22</number>
+<p class="2 0 0 left 0 1" just="left"><b>22.</b><emdash/>(1) The term of office of every member of a local authority to which this Part of this Act applies shall be extended until the day after the prescribed date.</p>
+<p class="2 0 0 left 0 1" just="left">(2) The term of office of every member of a board, committee, joint board or joint committee who is nominated or elected by a local authority to which this Part of this Act applies is hereby extended until the annual meeting of such local authority held next after the prescribed date.</p>
+<p class="2 0 0 left 0 1" just="left">(3) The term of office of every chairman and vice-chairman of or appointed by a local authority to which this Part of this Act applies who is in office on the prescribed date shall terminate when and so soon as his successor has been elected at the annual meeting of such local authority held next after the prescribed date and has made the declaration accepting office and such term of office shall be extended or curtailed (as the case may require) accordingly.</p>
+</sect>
+<sect id="SEC23">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Annual and quarterly meetings.</font></p>
+</title>
+<number>23</number>
+<p class="2 0 0 left 0 1" just="left"><b>23.</b><emdash/>(1) The Minister shall in every order made by him under this Part of this Act prescribing a date on which a statutory election of a local authority is to be held prescribe the day and hour on and at which the first annual meeting of such local authority after such election is to be held.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every local authority to which this Part of  applies shall hold an annual meeting on the day and at the hour prescribed in that behalf under this section and shall transact at such meeting all the business which such local authority is by law required to transact at an annual meeting held next after a statutory election.</p>
+</sect>
+</part>
+</body>
+</act>

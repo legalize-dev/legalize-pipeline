@@ -1,0 +1,121 @@
+[
+  {
+    "file": "sample-effects-continuation-1927-7.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1927_7.html",
+    "source_sha256": "9dad03c5a21ac6be26f401a0a9524ae8e3756ae1728bc8a4d17f78068080ddb4",
+    "fixture_sha256": "a83ca0225115fd155628e546f64e213e8875cb3656f4bcfbc9ceef15f9433480",
+    "extraction": "complete effects table"
+  },
+  {
+    "file": "sample-effects-continuation-1930-10.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1930_10.html",
+    "source_sha256": "1c7ea03b936bf2ec0f2dcefb4e40ce826e6bad00ac2ac3f7595c8974deb74860",
+    "fixture_sha256": "14301c9e48cf218ef70adf04413faa670d5abeed87e03ae88e2c73e0422b0548",
+    "extraction": "complete effects table"
+  },
+  {
+    "file": "sample-effects-continuation-1933-8.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1933_8.html",
+    "source_sha256": "5bad1514e86cb3d7b63c58c75d335fee427ee5e3bb2160a81554240458c8301b",
+    "fixture_sha256": "136915527154b6f1d30019766930cfcf571401143c597915ef67aa5beb1fa2f7",
+    "extraction": "complete effects table"
+  },
+  {
+    "file": "sample-effects-judicial-1924-16.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1924_16.html",
+    "source_sha256": "72ae5f6574fea5a5f3f1ae1f8ba6f52068c7e2df2dbc8d690bf6a49dd6d99568",
+    "fixture_sha256": "25dbfde2a9f93b26e813f33dcdd87f3a432b156793297f2dc34d6a68cf024777",
+    "extraction": "unchanged relevant rows and judicial footnotes"
+  },
+  {
+    "file": "sample-effects-judicial-1927-23.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1927_23.html",
+    "source_sha256": "647b52c07196ffb19e97505357690098211acce01c5f6f61d6290eec21d5d9b4",
+    "fixture_sha256": "af83a46383c3eb7fc36227b0ad428885c7d3783ec3be967bf15cc949e3bd00d4",
+    "extraction": "unchanged relevant rows and judicial footnotes"
+  },
+  {
+    "file": "sample-effects-judicial-1935-6.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1935_6.html",
+    "source_sha256": "3e13390ca41fc92d2933a2175fa2a3b52af70ddba980ee4de3d9764ee018fbac",
+    "fixture_sha256": "690e50a78afefac3c6360f2f4df28238c395c3ddb591887f29c4c298909b6887",
+    "extraction": "unchanged relevant rows and judicial footnotes"
+  },
+  {
+    "file": "sample-effects-judicial-1937-30.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1937_30.html",
+    "source_sha256": "b7305c796b0f9caa51bf378cea9c7f72285520c78bf4622937516665d42fbee9",
+    "fixture_sha256": "15348fc271dd02c6850db4f90a131919392789b9adddd91f453de5e6ab6f196c",
+    "extraction": "unchanged relevant rows and judicial footnotes"
+  },
+  {
+    "file": "sample-effects-judicial-1946-26.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1946_26.html",
+    "source_sha256": "bec6ca3b676a92e9252778bc7363e4300b782c1fcb1fef0071a68a6faa3e5c6c",
+    "fixture_sha256": "1081d222c574a6de1f7e3287f11f253bea1d84e75427b9f45455f0eb2e9601e9",
+    "extraction": "unchanged relevant rows and judicial footnotes"
+  },
+  {
+    "file": "sample-effects-blank-citation-1923-15.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1923_15.html",
+    "source_sha256": "e95818e8e3b6afd19a51b6d4a7fd0f6098f26ca1d1f0654bda3f3f89634134f3",
+    "fixture_sha256": "5b80af4282131d6933d030b815dccdefc372270f542bf371ca627a7bcbbd3414",
+    "extraction": "complete effects table"
+  },
+  {
+    "file": "sample-effects-spent-provision-1938-18.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1938_18.html",
+    "source_sha256": "4f7ff6335e43c6bbc57eb23371c68d4e172bad6e5bfa6bd49a02a8f46bd9bd8d",
+    "fixture_sha256": "8f0f7face446ac5d4d8c6ca0ee0b4077ebdf773e2bbdce881950acfe9a7d6836",
+    "extraction": "complete effects table"
+  },
+  {
+    "file": "sample-effects-scope-1942-22.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1942_22.html",
+    "source_sha256": "0d8c77f98e363a07510aa61f5697656b03d19c840aface957d7889a422ab211f",
+    "fixture_sha256": "901aa3c4791062f4d5811c68c1a6d243bbdd1ada2db62d5e1ce246963e2b0bd0",
+    "extraction": "unchanged relevant rows and judicial footnotes"
+  },
+  {
+    "file": "sample-duty-order-index-1937.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1937/si",
+    "source_sha256": "3405b0c0af771d91c1e5ebfe591d54bc4b5caaa8aefce2d4d9eb1f148f595430",
+    "fixture_sha256": "faf7c13694132ed4355acc487c91292f50d01ccb95ba1f45a78f7e59a73d3731",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1941.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1941/si",
+    "source_sha256": "4362e3f8de07b49ae89f9ecc88c026f830962bc44bf36423364cf5e17d897bc5",
+    "fixture_sha256": "4343608868ad9c7c7c672272c14fe5cb8acc992d6e666c7e330726e6a23cc0b8",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1955.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1955/si",
+    "source_sha256": "0c712bb8abcc1a68420fb134c76e6dcd80f08e854155c14dd3a2449bdc2224e5",
+    "fixture_sha256": "51a0df585742663de0e773c2527abd9ea8fa8498d4883b6b8f026eab93698fff",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1958.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1958/si",
+    "source_sha256": "baa109abc96b07479d830913f09403144ee0ea80a02a5f7e14d5e9e26ec2ba51",
+    "fixture_sha256": "bbeadc2caf807f2309d2684c8252367d4692555cce0d68bb3ba8b9cf006b5a43",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1962.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1962/si",
+    "source_sha256": "0f54a95f27315bc096af84d1d659dcfa47908b030be1e7717a6a4c0b6046a06d",
+    "fixture_sha256": "238830db445396e6ed198b5dc9ec6c6aad8b671845db7a590bce80b956077d8a",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-finance-1937-section17.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1937/act/18/section/17/enacted/en/html",
+    "source_sha256": "ad78b6682c97fe437d25ce91700f4bb5010e4f83139436fb0b00b8acd732bd19",
+    "fixture_sha256": "8df0aff114456bfde47824a2291c3e1957acc870d98e40130ff2dd9ebd7369ed",
+    "extraction": "complete div#act"
+  }
+]

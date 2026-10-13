@@ -1,0 +1,504 @@
+<?version xml="1.0"?>
+<act>
+<metadata>
+<title>INTERPRETATION ACT, 1937</title>
+<number>38</number>
+<year>1937</year>
+<dateofenactment>19371208</dateofenactment>
+</metadata>
+<frontmatter>
+<pc><graphic href="harp.jpg" quality="GOOD"/></pc>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<actnumber>
+<p class="0 0 0 center 1 1" just="left"><i>Number</i> 38 <i>of</i> 1937.</p>
+</actnumber>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<acttitle>
+<p class="0 0 0 center 1 1" just="left"><b>INTERPRETATION ACT, 1937.</b></p>
+</acttitle>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="0 0 0 center 0 1" just="left">ARRANGEMENT OF SECTIONS</p>
+<acttoc>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTI" xml:link="simple" show="replace">PART I</xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Preliminary and General</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 right 0 0" just="left">Section</p></td>
+<td colspan="1" rowspan="1" valign="top"></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC1" xml:link="simple" show="replace">1.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC1" xml:link="simple" show="replace">Short title.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC2" xml:link="simple" show="replace">2.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC2" xml:link="simple" show="replace">Commencement.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC3" xml:link="simple" show="replace">3.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC3" xml:link="simple" show="replace">Definitions.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC4" xml:link="simple" show="replace">4.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC4" xml:link="simple" show="replace">Application to certain Acts of the Oireachtas of Saorst<afada/>t Eireann.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC5" xml:link="simple" show="replace">5.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC5" xml:link="simple" show="replace">Non-application of the Interpretation Act, 1923.</xref></p></td>
+</tr>
+</tbody>
+</table>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTII" xml:link="simple" show="replace">PART II</xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Form, Citation, and Operation of Acts of the Oireachtas</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC6" xml:link="simple" show="replace">6.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC6" xml:link="simple" show="replace">Form of Acts of the Oireachtas.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC7" xml:link="simple" show="replace">7.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC7" xml:link="simple" show="replace">Citation of Acts of the Oireachtas.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC8" xml:link="simple" show="replace">8.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC8" xml:link="simple" show="replace">Date of passing of Acts of the Oireachtas.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC9" xml:link="simple" show="replace">9.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC9" xml:link="simple" show="replace">Commencement of Acts and instruments.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC10" xml:link="simple" show="replace">10.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC10" xml:link="simple" show="replace">Exercise of statutory powers before commencement of the Act.</xref></p></td>
+</tr>
+</tbody>
+</table>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTIII" xml:link="simple" show="replace">PART III</xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Meaning and Construction of Particular Words and Expressions</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC11" xml:link="simple" show="replace">11.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC11" xml:link="simple" show="replace">Certain general rules of construction.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC12" xml:link="simple" show="replace">12.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC12" xml:link="simple" show="replace">Interpretation of the expressions and words in the Schedule.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC13" xml:link="simple" show="replace">13.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC13" xml:link="simple" show="replace">Construction of certain statutory instruments.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC14" xml:link="simple" show="replace">14.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC14" xml:link="simple" show="replace">Offences under two or more laws.</xref></p></td>
+</tr>
+</tbody>
+</table>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTIV" xml:link="simple" show="replace">PART IV</xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Statutory Powers and Duties</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC15" xml:link="simple" show="replace">15.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC15" xml:link="simple" show="replace">Construction and exercise of statutory powers.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC16" xml:link="simple" show="replace">16.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC16" xml:link="simple" show="replace">Construction and performance of statutory duties.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC17" xml:link="simple" show="replace">17.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC17" xml:link="simple" show="replace">Rules of Court.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC18" xml:link="simple" show="replace">18.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC18" xml:link="simple" show="replace">Service by post.</xref></p></td>
+</tr>
+</tbody>
+</table>
+<p class="0 0 0 center 0 1" just="left"><xref href="#PARTV" xml:link="simple" show="replace">PART V</xref></p>
+<p class="0 0 0 center 0 1" just="left"><font size="normal" smallcaps="yes">Effect of Repeals and Revocations</font></p>
+<table width="100%" class="t1">
+<colgroup>
+<col width="20%"/>
+<col width="80%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC19" xml:link="simple" show="replace">19.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC19" xml:link="simple" show="replace">Date of operation of repeals and revocations.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC20" xml:link="simple" show="replace">20.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC20" xml:link="simple" show="replace">Construction of references to repealed statutes and revoked instruments.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC21" xml:link="simple" show="replace">21.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC21" xml:link="simple" show="replace">Operation of repeals, cessers, and terminations of statutes.</xref></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 2 right 0 1" just="left"><xref href="#SEC22" xml:link="simple" show="replace">22.</xref></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="-5 5 0 left 0 1" just="left"><xref href="#SEC22" xml:link="simple" show="replace">Operation of revocations, cessers and terminations of statutory instruments.</xref></p></td>
+</tr>
+</tbody>
+</table>
+<p class="0 0 0 center 0 1" just="left"><xref href="#SCHED" xml:link="simple" show="replace">SCHEDULE</xref></p>
+</acttoc>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<actsreferredto>
+<table width="100%" class="t1">
+<colgroup>
+<col width="60%"/>
+<col width="40%"/>
+</colgroup>
+<tbody>
+<tr>
+<td colspan="2" rowspan="1" valign="top"><p class="0 0 0 center 1 1" just="left"><font size="small" smallcaps="yes">Act Referred to</font></p></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Interpretation Act, 1923</font></p></td>
+<td colspan="1" rowspan="1" valign="top"><p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">No. 46 of 1923</font></p></td>
+</tr>
+</tbody>
+</table>
+</actsreferredto>
+<p class="0 0 0 center 1 1" just="left"><graphic href="harp.jpg" quality="GOOD"/></p>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="0 0 0 center 1 1" just="left"><i>Number</i> 38 <i>of</i> 1937.</p>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="0 0 0 center 1 1" just="left"><b>INTERPRETATION ACT, 1937.</b></p>
+<p class="0 0 0 center 0 1" just="left"><hr1/></p>
+<p class="-3 3 0 left 0 1" just="left">AN ACT TO MAKE, FOR THE PURPOSE OF THE CONSTITUTION OF IRELAND LATELY ENACTED BY THE PEOPLE, DIVERS PROVISIONS IN RELATION TO THE FORM, OPERATION, AND INTERPRETATION OF ACTS OF THE OIREACHTAS AND OF INSTRUMENTS MADE UNDER SUCH ACTS. [8<i>th December,</i> 1937.]</p>
+<p class="2 0 0 left 0 1" just="left">BE IT ENACTED BY THE OIREACHTAS OF SAORST<Afada/>T EIREANN AS FOLLOWS:<emdash/></p>
+</frontmatter>
+<body>
+<part id="PARTI">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART I.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Preliminary and General.</font></p>
+</title>
+<sect id="SEC1">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Short title.</font></p>
+</title>
+<number>1</number>
+<p class="2 0 0 left 0 1" just="left"><b>1.</b><emdash/>This Act may be cited as the Interpretation Act, 1937.</p>
+</sect>
+<sect id="SEC2">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Commencement.</font></p>
+</title>
+<number>2</number>
+<p class="2 0 0 left 0 1" just="left"><b>2.</b><emdash/>This Act shall come into operation immediately after the coming into operation of the Constitution of Ireland lately enacted by the People.</p>
+</sect>
+<sect id="SEC3">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Definitions.</font></p>
+</title>
+<number>3</number>
+<p class="2 0 0 left 0 1" just="left"><b>3.</b><emdash/>In this Act<emdash/></p>
+<p class="0 0 0 left 0 1" just="left">the word <odq/>statute<cdq/> includes (in addition to Acts of the Oireachtas) Acts of the Oireachtas of Saorst<afada/>t Eireann, Acts of the Parliament of the former United Kingdom of Great Britain and Ireland, and Acts of a Parliament sitting in Ireland at any time before the coming into force of the Union with Ireland Act, 1800;</p>
+<p class="0 0 0 left 0 1" just="left">the word <odq/>instrument<cdq/> means an order, regulation, rule, bye-law, warrant, licence, certificate, or other like document;</p>
+<p class="0 0 0 left 0 1" just="left">the expression <odq/>statutory instrument<cdq/> means an instrument made, issued, or granted under a power or authority conferred by statute;</p>
+<p class="0 0 0 left 0 1" just="left">references to instruments made wholly or partly under an Act of the Oireachtas shall be construed as referring to instruments made, issued, or granted under a power or authority conferred by an Act of the Oireachtas or conferred by the joint operation of an Act of the Oireachtas and some other statute.</p>
+</sect>
+<sect id="SEC4">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Application to certain Acts of the Oireachtas of Saorst<afada/>t Eireann.</font></p>
+</title>
+<number>4</number>
+<p class="2 0 0 left 0 1" just="left"><b>4.</b><emdash/>Save as is otherwise expressly provided by this Act, every provision of this Act which relates to Acts of the Oireachtas shall apply and have effect in relation to this Act and every other Act of the Oireachtas of Saorst<afada/>t Eireann (whether passed before or after this Act) which is expressed to come into operation immediately after the coming into operation of the Constitution, and accordingly this Act and every such other Act shall, for the purpose of such application but no further or otherwise, be deemed to be an Act of the Oireachtas and (save as is otherwise expressly provided by this Act) the expression <odq/>Act of the Oireachtas<cdq/> shall in this Act be construed and have effect as including this Act and every such other Act of the Oireachtas of Saorst<afada/>t Eireann.</p>
+</sect>
+<sect id="SEC5">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Non-application of the Interpretation Act, 1923.</font></p>
+</title>
+<number>5</number>
+<p class="2 0 0 left 0 1" just="left"><b>5.</b><emdash/>(1) The Interpretation Act, 1923 (No. 46 of 1923), shall not apply to any Act of the Oireachtas or to any instrument made wholly or partly under any such Act.</p>
+<p class="2 0 0 left 0 1" just="left">(2) The foregoing sub-section of this section shall not preclude or prejudice the application to this Act and to other Acts of the Oireachtas of Saorst<afada/>t Eireann which are expressed to come into operation immediately after the coming into operation of the Constitution of so much of the Interpretation Act, 1923 (No. 46 of 1923), as concerns events happening or things to be done in relation to an Act before it comes into operation.</p>
+</sect>
+</part>
+<part id="PARTII">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART II.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Form, Citation, and Operation of Acts of the Oireachtas.</font></p>
+</title>
+<sect id="SEC6">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Form of Acts of the Oireachtas.</font></p>
+</title>
+<number>6</number>
+<p class="2 0 0 left 0 1" just="left"><b>6.</b><emdash/>(1) Every Act of the Oireachtas shall be a public document and shall be judicially noticed.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every Act of the Oireachtas shall be divided into sections numbered consecutively and any such section may be sub-divided in such manner and to such extent as is convenient.</p>
+<p class="2 0 0 left 0 1" just="left">(3) The sections of an Act of the Oireachtas may, where convenient, be grouped in Parts, Chapters, or other divisions numbered consecutively.</p>
+</sect>
+<sect id="SEC7">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Citation of Acts of the Oireachtas.</font></p>
+</title>
+<number>7</number>
+<p class="2 0 0 left 0 1" just="left"><b>7.</b><emdash/>(1) Every Act of the Oireachtas may be cited in any other Act of the Oireachtas or in any instrument or other document either by the short title of the Act so cited or by the calendar year in which the Act so cited was passed and the consecutive number of such Act in such year.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Any enactment contained in an Act of the Oireachtas may be cited in any other Act of the Oireachtas or in any instrument or other document by reference to the Part, section, sub-section, or other sub-division of the first-mentioned Act which contains the enactment so cited.</p>
+</sect>
+<sect id="SEC8">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Date of passing of Acts of the Oireachtas.</font></p>
+</title>
+<number>8</number>
+<p class="2 0 0 left 0 1" just="left"><b>8.</b><emdash/>(1) The date of the passing of every Act of the Oireachtas shall be the date of the day on which the Bill for such Act is signed by the President.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Immediately after the passing of every Act of the Oireachtas, the Clerk of D<afada/>il Eireann shall endorse on such Act, immediately after the title thereof, the date of the passing of such Act, and such date shall be taken to be part of such Act.</p>
+<p class="2 0 0 left 0 1" just="left">(3) Every enactment contained in an Act of the Oireachtas shall, unless the contrary intention is expressed in such Act, be deemed to be in operation as from the end of the day before the date of the passing of such Act.</p>
+<p class="2 0 0 left 0 1" just="left">(4) This section shall not apply to this Act or to any other Act of the Oireachtas of Saorst<afada/>t Eireann which is expressed to come into operation immediately after the coming into operation of the Constitution, and accordingly the expression <odq/>Act of the Oireachtas<cdq/> shall not in this section include any such Act of the Oireachtas of Saorst<afada/>t Eireann.</p>
+</sect>
+<sect id="SEC9">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Commencement of Acts and instruments.</font></p>
+</title>
+<number>9</number>
+<p class="2 0 0 left 0 1" just="left"><b>9.</b><emdash/>(1) Where an Act of the Oireachtas, or a portion of any such Act, or an instrument made wholly or partly under any such Act, or a portion of any such instrument is expressed to come into operation on a particular day (whether such day is before or after the date of the passing of such Act or the making of such instrument and whether such day is named in such Act or instrument or is to be fixed or ascertained in any particular manner), such Act, portion of an Act, instrument, or portion of an instrument shall come into operation at the end of the day before such particular day.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every instrument made wholly or partly under an Act of the Oireachtas shall, unless the contrary intention is expressed in such instrument, be deemed to be in operation as from the end of the day before the day on which such instrument is made.</p>
+</sect>
+<sect id="SEC10">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Exercise of statutory powers before commencement of the Act.</font></p>
+</title>
+<number>10</number>
+<p class="2 0 0 left 0 1" just="left"><b>10.</b><emdash/>(1) Where an Act of the Oireachtas or any particular enactment contained in any such Act is expressed to come into operation on a day subsequent to the date of the passing of such Act, the following provisions shall have effect, that is to say:<emdash/></p>
+<p class="-5 9 0 left 0 1" just="left">(<i>a</i>) if the day on which such Act or such enactment (as the case may be) comes into operation is to be fixed or ascertained in any particular manner, the instrument, act, or thing whereby such day is fixed or ascertained may, subject to any restrictions imposed by such Act, be made or done at any time after the passing of such Act;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>b</i>) if such Act confers a power to make or do, for the purposes of such Act or such enactment (as the case may be), any instrument, act, or thing the making or doing of which is necessary or expedient to enable such Act or enactment to have full force and effect immediately upon its coming into operation, such power may, subject to any restrictions imposed by such Act, be exercised at any time after the passing of such Act.</p>
+<p class="2 0 0 left 0 1" just="left">(2) In the application of this section to an Act of the Oireachtas of Saorst<afada/>t Eireann which is expressed to come into operation immediately after the coming into operation of the Constitution, nothing in this section shall operate to enable any instrument, act, or thing to be made or done under or in relation to any such Act before the coming into operation of the Constitution.</p>
+</sect>
+</part>
+<part id="PARTIII">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART III.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Meaning and Construction of Particular Words and Expressions.</font></p>
+</title>
+<sect id="SEC11">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Certain general rules of construction.</font></p>
+</title>
+<number>11</number>
+<p class="2 0 0 left 0 1" just="left"><b>11.</b><emdash/>The following provisions shall apply and have effect in relation to the construction of every Act of the Oireachtas and of every instrument made wholly or partly under any such Act, that is to say:<emdash/></p>
+<p class="-5 9 0 left 0 1" just="left">(<i>a</i>) <i>Singular and plural</i>. Every word importing the singular shall, unless the contrary intention appears, be construed as if it also imported the plural, and every word importing the plural shall, unless the contrary intention appears, be construed as if it also imported the singular;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>b</i>) <i>Masculine and feminine</i>. Every word importing the masculine gender shall, unless the contrary intention appears, be construed as if it also imported the feminine gender;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>c</i>) <i>Person</i>. The word <odq/>person<cdq/> shall, unless the contrary intention appears, be construed as importing a body corporate (whether a corporation aggregate or a corporation sole) and an unincorporated body of persons as well as an individual;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>d</i>) <i>Time</i>. Every word or expression relating to time and every reference to a point of time shall, unless the contrary intention appears, be construed as relating or referring to Greenwich mean time, but subject to the provisions of any enactment whereunder the time in Ireland differs from Greenwich mean time during a specified period;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>e</i>) <i>Distance</i>. Every word or expression relating to the distance between two points and every reference to the distance from or to a point shall, unless the contrary intention appears, be construed as relating or referring to such distance measured in a straight line on a horizontal plane;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>f</i>) <i>Citations</i>. Every description of or citation from any statute, instrument, or other document shall, unless the contrary intention appears, be construed as including the word, sub-section, section, or other portion mentioned or referred to as forming the beginning or as forming the end of the portion comprised in the description or citation or as being the point from which or to which such portion extends;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>g</i>) <i>Marginal notes</i>. No marginal note placed at the side of any section or provision to indicate the subject, contents, or effect of such section or provision and no heading or cross-line placed at the head or beginning of a Part, section or provision or a group of sections or provisions to indicate the subject, contents, or effect of such Part, section, provision, or group shall be taken to be part of the Act or instrument or be considered or judicially noticed in relation to the construction or interpretation of the Act or instrument or any portion thereof;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>h</i>) <i>Periods of time</i>. Where a period of time is expressed to begin on or be reckoned from a particular day, that day shall, unless the contrary intention appears, be deemed to be included in such period, and, where a period of time is expressed to end on or be reckoned to a particular day, that day shall, unless the contrary intention appears, be deemed to be included in such period;</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>i</i>) <i>Offences by corporations</i>. References to a person in relation to an offence (whether punishable on indictment or on summary conviction) shall, unless the contrary intention appears, be construed as including references to a body corporate.</p>
+</sect>
+<sect id="SEC12">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Interpretation of the expressions and words in the Schedule.</font></p>
+</title>
+<number>12</number>
+<p class="2 0 0 left 0 1" just="left"><b>12.</b><emdash/>In every Act of the Oireachtas and every instrument made wholly or partly under any such Act, every word and every expression to which a particular meaning, construction, or effect is assigned in the <xref href="#SCHED" xml:link="simple" show="replace">Schedule</xref> to this Act shall, unless the contrary intention appears, have the meaning, construction, or effect so assigned to it.</p>
+</sect>
+<sect id="SEC13">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Construction of certain statutory instruments.</font></p>
+</title>
+<number>13</number>
+<p class="2 0 0 left 0 1" just="left"><b>13.</b><emdash/>Every expression and every word used in an instrument made wholly or partly under an Act of the Oireachtas shall, unless the contrary intention appears, have in such instrument the same meaning as it has in the Act or Acts under which such instrument is made.</p>
+</sect>
+<sect id="SEC14">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Offences under two or more laws.</font></p>
+</title>
+<number>14</number>
+<p class="2 0 0 left 0 1" just="left"><b>14.</b><emdash/>Where any act, whether of commission or omission, constitutes an offence under two or more statutes or under a statute and at common law, the offender shall, unless the contrary intention appears, be liable to be prosecuted and punished under either or any of those statutes or at common law, but shall not be liable to be punished twice for the same offence.</p>
+</sect>
+</part>
+<part id="PARTIV">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART IV.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Statutory Powers and Duties.</font></p>
+</title>
+<sect id="SEC15">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Construction and exercise of statutory powers.</font></p>
+</title>
+<number>15</number>
+<p class="2 0 0 left 0 1" just="left"><b>15.</b><emdash/>(1) Every power conferred by an Act of the Oireachtas or by an instrument made wholly or partly under any such Act may, unless the contrary intention appears in such Act or instrument, be exercised from time to time as occasion requires.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every power conferred by an Act of the Oireachtas or by an instrument made wholly or partly under any such Act on the holder of an office as such shall, unless the contrary intention appears in such Act or instrument, be deemed to be conferred on and may accordingly be exercised by the holder for the time being of such office.</p>
+<p class="2 0 0 left 0 1" just="left">(3) Every power conferred by an Act of the Oireachtas to make any regulations, rules, or bye-laws shall, unless the contrary intention appears in such Act, be construed as including a power, exercisable in the like manner and subject to the like consent and conditions (if any), to revoke or amend any regulations, rules, or bye-laws made under such power and (where requisite) to make other regulations, rules, or bye-laws in lieu of those so revoked.</p>
+</sect>
+<sect id="SEC16">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Construction and performance of statutory duties.</font></p>
+</title>
+<number>16</number>
+<p class="2 0 0 left 0 1" just="left"><b>16.</b><emdash/>(1) Every duty imposed by an Act of the Oireachtas or by an instrument made wholly or partly under any such Act shall, unless the contrary intention appears in such Act or instrument, be performed from time to time as occasion requires.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Every duty imposed by an Act of the Oireachtas or by an instrument made wholly or partly under any such Act on the holder of an office as such shall, unless the contrary intention appears in such Act or instrument, be deemed to be imposed on and shall accordingly be performed by the holder for the time being of such office.</p>
+</sect>
+<sect id="SEC17">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Rules of Court.</font></p>
+</title>
+<number>17</number>
+<p class="2 0 0 left 0 1" just="left"><b>17.</b><emdash/>Whenever an Act of the Oireachtas confers any new jurisdiction on a court of justice or extends or varies an existing jurisdiction of a court of justice, the authority having for the time being power to make rules or orders regulating the practice and procedure of such court shall have, and may at any time exercise, power to make rules or orders for regulating the practice and procedure of such court in the exercise of the jurisdiction so conferred, extended, or varied.</p>
+</sect>
+<sect id="SEC18">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Service by post.</font></p>
+</title>
+<number>18</number>
+<p class="2 0 0 left 0 1" just="left"><b>18.</b><emdash/>Where an Act of the Oireachtas or an instrument made wholly or partly under any such Act authorises or requires a document to be served by post, whether the word <odq/>serve<cdq/> or any of the words <odq/>give<cdq/>, <odq/>deliver<cdq/>, or <odq/>send<cdq/>, or any other word is used, then, unless the contrary intention appears, the service of such document may be effected by properly addressing, prepaying (where requisite), and posting a letter containing such document, and in such case the service of such document shall, unless the contrary is proved, be deemed to have been effected at the time at which such letter would be delivered in the ordinary course of post.</p>
+</sect>
+</part>
+<part id="PARTV">
+<title>
+<p class="0 0 0 center 0 1" just="left">PART V.</p>
+<p fli="0" li="0" ri="0" just="center" before="0"><font size="normal" smallcaps="yes">Effect of Repeals and Revocations.</font></p>
+</title>
+<sect id="SEC19">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Date of operation of repeals and revocations.</font></p>
+</title>
+<number>19</number>
+<p class="2 0 0 left 0 1" just="left"><b>19.</b><emdash/>(1) Where an Act of the Oireachtas repeals the whole or a portion of a previous statute and substitutes other provisions for the statute or portion of a statute so repealed, the statute or portion of a statute so repealed shall, unless the contrary is expressly provided in the repealing Act, continue in force until the said substituted provisions come into operation.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Where an instrument made wholly or partly under an Act of the Oireachtas revokes the whole or a portion of a previous statutory instrument (whether made wholly or partly under such Act or under another statute) and substitutes other provisions for the instrument or portion of an instrument so revoked, the instrument or portion of an instrument so revoked shall, unless the contrary is expressly provided in the revoking instrument, continue in force until the said substituted provisions come into operation.</p>
+</sect>
+<sect id="SEC20">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Construction of references to repealed statutes and revoked instruments.</font></p>
+</title>
+<number>20</number>
+<p class="2 0 0 left 0 1" just="left"><b>20.</b><emdash/>(1) Whenever any statute or portion of a statute is repealed and re-enacted, with or without modification, by an Act of the Oireachtas, references in any other statute or in any statutory instrument to the statute or portion of a statute so repealed and re-enacted shall, unless the contrary intention appears, be construed as references to the portion of such Act of the Oireachtas containing such re-enactment.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Whenever a statutory instrument or a portion of a statutory instrument is revoked and re-enacted, with or without modification, by an instrument made wholly or partly under an Act of the Oireachtas, references in any other statutory instrument to the statutory instrument or portion of a statutory instrument so revoked and re-enacted shall, unless the contrary intention appears, be construed as references to the said instrument containing such re-enactment.</p>
+</sect>
+<sect id="SEC21">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Operation of repeals, cessers, and terminations of statutes.</font></p>
+</title>
+<number>21</number>
+<p class="2 0 0 left 0 1" just="left"><b>21.</b><emdash/>(1) Where an Act of the Oireachtas repeals the whole or a portion of a previous statute, then, unless the contrary intention appears, such repeal shall not<emdash/></p>
+<p class="-5 9 0 left 0 1" just="left">(<i>a</i>) revive anything not in force or not existing immediately before such repeal takes effect, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>b</i>) affect the previous operation of the statute or portion of a statute so repealed or anything duly done or suffered thereunder, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>c</i>) affect any right, privilege, obligation, or liability acquired, accrued, or incurred under the statute or portion of a statute so repealed, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>d</i>) affect any penalty, forfeiture, or punishment incurred in respect of any offence against or contravention of the statute or portion of a statute so repealed which was committed before such repeal, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>e</i>) prejudice or affect any legal proceedings, civil or criminal, pending at the time of such repeal in respect of any such right, privilege, obligation, liability, offence, or contravention as aforesaid.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Where an Act of the Oireachtas repeals the whole or a portion of a previous statute, then, unless the contrary intention appears, any legal proceedings, civil or criminal, in respect of any right, privilege, obligation, or liability acquired, accrued, or incurred under or any offence against or contravention of the statute or portion of a statute so repealed may be instituted, continued or enforced, and any penalty, forfeiture, or punishment in respect of any such offence or contravention may be imposed and carried out as if such statute or portion of a statute had not been repealed.</p>
+<p class="2 0 0 left 0 1" just="left">(3) Where an Act of the Oireachtas or a portion of any such Act ceases by any means or for any reason (other than repeal by a subsequent Act of the Oireachtas) to be in force, the preceding sub-sections of this section shall apply and have effect in relation to such Act or portion of an Act as if such cesser were caused by a repeal effected by an Act of the Oireachtas, and accordingly, for the purposes of such application, every reference in either of the said preceding sub-sections to a repeal shall be construed as a reference to a cesser by any means or for any reason (other than such repeal) to be in force.</p>
+</sect>
+<sect id="SEC22">
+<title>
+<p fli="0" li="0" ri="0" just="left" before="0"><font size="small" smallcaps="no">Operation of revocations, cessers and terminations of statutory instruments.</font></p>
+</title>
+<number>22</number>
+<p class="2 0 0 left 0 1" just="left"><b>22.</b><emdash/>(1) Where an instrument made wholly or partly under an Act of the Oireachtas revokes the whole or a portion of a previous statutory instrument, then, unless the contrary intention appears, such revocation shall not<emdash/></p>
+<p class="-5 9 0 left 0 1" just="left">(<i>a</i>) revive anything not in force or not existing immediately before such revocation takes effect, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>b</i>) affect the previous operation of the statutory instrument or portion of a statutory instrument so revoked or anything duly done or suffered thereunder, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>c</i>) affect any right, privilege, obligation, or liability acquired, accrued, or incurred under the statutory instrument or portion of a statutory instrument so revoked, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>d</i>) affect any penalty, forfeiture, or punishment incurred in respect of any offence against or contravention of the statutory instrument or portion of a statutory instrument so revoked which was committed before such revocation, or</p>
+<p class="-5 9 0 left 0 1" just="left">(<i>e</i>) prejudice or affect any legal proceedings, civil or criminal, pending at the time of such revocation in respect of any such right, privilege, obligation, liability, offence, or contravention as aforesaid.</p>
+<p class="2 0 0 left 0 1" just="left">(2) Where an instrument made wholly or partly under an Act of the Oireachtas revokes the whole or a portion of a previous statutory instrument, then, unless the contrary intention appears, any legal proceedings, civil or criminal, in respect of any right, privilege, obligation, or liability acquired, accrued, or incurred under or any offence against or contravention of the statutory instrument or portion of the statutory instrument so revoked may be instituted, continued, or enforced and any penalty, forfeiture, or punishment in respect of any such offence or contravention may be imposed and carried out as if such statutory instrument or portion of a statutory instrument had not been revoked.</p>
+<p class="2 0 0 left 0 1" just="left">(3) Where an instrument made wholly or partly under an Act of the Oireachtas or a portion of an instrument so made ceases by any means or for any reason (other than revocation by a subsequent such instrument) to be in force, the preceding sub-sections of this section shall apply and have effect in relation to such instrument or portion of an instrument as if such cesser were caused by a revocation effected by a subsequent such instrument, and accordingly, for the purposes of such application, every reference in either of the said preceding sub-sections to a revocation shall be construed as a reference to a cesser by any means or for any reason (other than such revocation) to be in force.</p>
+</sect>
+</part>
+</body>
+<backmatter>
+<schedule id="SCHED">
+<title>
+<pc>SCHEDULE.</pc>
+<p fli="0" li="0" ri="0" just="center" before="1" after="1"><font size="normal" smallcaps="yes">Interpretation of Particular Expressions and Words.</font></p>
+</title>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Affidavit.</font></p>
+<p class="2 0 0 left 0 1" just="left">1.<emdash/>The word <odq/>affidavit<cdq/>, in the case of persons for the time being allowed by law to declare instead of swearing, includes declaration.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Bank of Ireland.</font></p>
+<p class="2 0 0 left 0 1" just="left">2.<emdash/>The expression <odq/>the Bank of Ireland<cdq/> means either, as the context requires, the Governor and Company of the Bank of Ireland or the bank of the said Governor and Company.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">British statute.</font></p>
+<p class="2 0 0 left 0 1" just="left">3.<emdash/>The expression <odq/>British statute<cdq/> means an Act of the Parliament of the late United Kingdom of Great Britain and Ireland.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Circuit Court.</font></p>
+<p class="2 0 0 left 0 1" just="left">4.<emdash/>The expression <odq/>the Circuit Court<cdq/> means the Circuit Court of Justice as established and for the time being maintained by law.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Commencement.</font></p>
+<p class="2 0 0 left 0 1" just="left">5.<emdash/>The word <odq/>commencement<cdq/>, when used in relation to a statute or a statutory instrument or a portion of a statute or statutory instrument, means the time at which such statute, statutory instrument, or portion of a statute or statutory instrument comes into operation.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Consular officer.</font></p>
+<p class="2 0 0 left 0 1" just="left">6.<emdash/>The expression <odq/>consular officer<cdq/> means a person in the Civil Service of Ireland who is a consul-general, a consul, or a vice-consul.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Constitution.</font></p>
+<p class="2 0 0 left 0 1" just="left">7.<emdash/>The expression <odq/>the Constitution<cdq/> means the Constitution of Ireland enacted by the people on the 1st day of July, 1937.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">D<afada/>il Eireann.</font></p>
+<p class="2 0 0 left 0 1" just="left">8.<emdash/>The expression <odq/>D<afada/>il Eireann<cdq/> means the House of the Oireachtas to which that name is given by section 1 of Article 15 of the Constitution.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">District Court.</font></p>
+<p class="2 0 0 left 0 1" just="left">9.<emdash/>The expression <odq/>the District Court<cdq/> means the District Court of Justice as established and for the time being maintained by law.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Financial year.</font></p>
+<p class="2 0 0 left 0 1" just="left">10.<emdash/>The expression <odq/>financial year<cdq/> means a period of twelve months ending on the 31st day of the month of March in any year.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Government.</font></p>
+<p class="2 0 0 left 0 1" just="left">11.<emdash/>The expression <odq/>the Government<cdq/> means the Government mentioned in Article 28 of the Constitution.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Great Britain.</font></p>
+<p class="2 0 0 left 0 1" just="left">12.<emdash/>The expression <odq/>Great Britain<cdq/> does not include the Channel Islands or the Isle of Man.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">High Court.</font></p>
+<p class="2 0 0 left 0 1" just="left">13.<emdash/>The expression <odq/>the High Court<cdq/> means the High Court of Justice established and for the time being maintained by law in pursuance of Article 34 of the Constitution.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Land.</font></p>
+<p class="2 0 0 left 0 1" just="left">14.<emdash/>The word <odq/>land<cdq/> includes messuages, tenements, and hereditaments, houses and buildings, of any tenure.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Lands Clauses Acts.</font></p>
+<p class="2 0 0 left 0 1" just="left">15.<emdash/>The expression <odq/>the Lands Clauses Acts<cdq/> means the Lands Clauses Consolidation Act, 1845, the Lands Clauses Consolidation Acts Amendment Act, 1860, the Railways Act (Ireland), 1851, the Railways Act (Ireland), 1860, the Railways Act (Ireland), 1864, the Railways Traverse Act, the Acquisition of Land (Assessment of Compensation) Act, 1919, and every statute for the time being in force amending those Acts or any of them.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Local financial year.</font></p>
+<p class="2 0 0 left 0 1" just="left">16.<emdash/>The expression <odq/>local financial year<cdq/> means a period of twelve months ending on the 31st day of the month of March in any year.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Midnight.</font></p>
+<p class="2 0 0 left 0 1" just="left">17.<emdash/>The word <odq/>midnight<cdq/> means, in relation to any particular day, the point of time at which such day ends.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Minister of State.</font></p>
+<p class="2 0 0 left 0 1" just="left">18.<emdash/>The expression <odq/>Minister of State<cdq/> means a member of the Government having charge of a Department of State.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Month.</font></p>
+<p class="2 0 0 left 0 1" just="left">19.<emdash/>The word <odq/>month<cdq/> means a calendar month.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Oath.</font></p>
+<p class="2 0 0 left 0 1" just="left">20.<emdash/>The word <odq/>oath<cdq/>, in the case of persons for the time being allowed by law to affirm instead of swearing, includes affirmation.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Oireachtas.</font></p>
+<p class="2 0 0 left 0 1" just="left">21.<emdash/>The expression <odq/>the Oireachtas<cdq/> means the National Parliament provided for by Article 15 of the Constitution.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Ordnance Map.</font></p>
+<p class="2 0 0 left 0 1" just="left">22.<emdash/>The expression <odq/>ordnance map<cdq/> means a map made under the powers conferred by the Survey (Ireland) Acts, 1825 to 1870, and the statutes for the time being in force amending those Acts or any of them.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">President.</font></p>
+<p class="2 0 0 left 0 1" just="left">23.<emdash/>The expression <odq/>the President<cdq/> means the President of Ireland and includes any commission or other body or authority for the time being lawfully exercising the powers and performing the duties of the President.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Pre-union Irish Statute.</font></p>
+<p class="2 0 0 left 0 1" just="left">24.<emdash/>The expression <odq/>pre-union Irish statute<cdq/> means an Act passed by a Parliament sitting in Ireland at any time before the coming into force of the Union with Ireland Act, 1800.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Rateable valuation.</font></p>
+<p class="2 0 0 left 0 1" just="left">25.<emdash/>The expression <odq/>rateable valuation<cdq/> means the valuation under the Valuation Acts of the property in relation to which the expression is used.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Rules of court.</font></p>
+<p class="2 0 0 left 0 1" just="left">26.<emdash/>The expression <odq/>rules of court<cdq/> means rules made by the authority for the time being having power to make rules regulating the practice and procedure of the court in relation to which the expression is used.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Saorst<afada/>t Eireann statute.</font></p>
+<p class="2 0 0 left 0 1" just="left">27.<emdash/>The expression <odq/>Saorst<afada/>t Eireann statute<cdq/> means an Act of the Oireachtas of Saorst<afada/>t Eireann.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Seanad Eireann.</font></p>
+<p class="2 0 0 left 0 1" just="left">28.<emdash/>The expression <odq/>Seanad Eireann<cdq/> means the House of the Oireachtas to which that name is given by section 1 of Article 15 of the Constitution.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Statutory declaration.</font></p>
+<p class="2 0 0 left 0 1" just="left">29.<emdash/>The expression <odq/>statutory declaration<cdq/> means a declaration made by virtue of the Statutory Declarations Act, 1835.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Supreme Court.</font></p>
+<p class="2 0 0 left 0 1" just="left">30.<emdash/>The expression <odq/>the Supreme Court<cdq/> means the Supreme Court of Justice as established and for the time being maintained by law in pursuance of Article 34 of the Constitution.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Swear.</font></p>
+<p class="2 0 0 left 0 1" just="left">31.<emdash/>The word <odq/>swear<cdq/>, in the case of persons for the time being allowed by law to affirm or declare instead of swearing, includes affirm and declare.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Town.</font></p>
+<p class="2 0 0 left 0 1" just="left">32.<emdash/>The word <odq/>town<cdq/> means the area comprised in a town (not being an urban district) in which the Towns Improvement (Ireland) Act, 1854, is in operation.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Valuation Acts.</font></p>
+<p class="2 0 0 left 0 1" just="left">33.<emdash/>The expression <odq/>Valuation Acts<cdq/> means the Acts for the time being in force relating to the valuation of rateable property.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Week.</font></p>
+<p class="2 0 0 left 0 1" just="left">34.<emdash/>The word <odq/>week<cdq/>, when used without qualification, means the period between midnight on any Saturday and midnight on the next following Saturday.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Week-day.</font></p>
+<p class="2 0 0 left 0 1" just="left">35.<emdash/>The word <odq/>week-day<cdq/> means a day which is not a Sunday.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Writing.</font></p>
+<p class="2 0 0 left 0 1" just="left">36.<emdash/>The word <odq/>writing<cdq/> includes printing, type-writing, lithograpy, photography, and other modes of representing or reproducing words in visible form, and cognate words shall be construed accordingly.</p>
+<p class="0 0 0 left 0 1" just="left"><font size="small" smallcaps="no">Year.</font></p>
+<p class="2 0 0 left 0 1" just="left">37.<emdash/>The word <odq/>year<cdq/>, when used without qualification, means a period of twelve months beginning on the 1st day of the month of January in any year.</p>
+</schedule>
+</backmatter>
+</act>
