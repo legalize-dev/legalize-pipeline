@@ -549,6 +549,23 @@ class TestCrossReferences:
 
         assert "](#" not in "\n".join(p.text for p in paragraphs)
 
+    def test_schedule_title_footnote_keeps_its_definition(self):
+        """Statute of Limitations 1962, Second Schedule: the note sits in the title."""
+        xml = b"""<act><body><sect id="SEC1"><number>1.</number><title>Only</title>
+          <p>body</p></sect></body><backmatter><schedule><title><p>ENGLISH STATUTES
+          <fn><marker>*</marker><p>*See First Schedule.</p></fn></p>
+          <p>see <xref href="#SEC1">section 1</xref></p></title>
+          <p>row</p></schedule></backmatter></act>"""
+        paragraphs = (
+            ISBTextParser().parse_text(xml, published_on=date(2024, 1, 1))[0].versions[0].paragraphs
+        )
+        text = "\n".join(p.text for p in paragraphs)
+
+        assert "ENGLISH STATUTES [^*]" in text
+        assert "[^*]: *See First Schedule." in text
+        # Cross-references in headings stay plain text, as they always have.
+        assert "see section 1" in text
+
     def test_anchor_keeps_accents_and_matches_the_heading(self):
         """Irish headings carry fadas; the anchor has to keep them."""
         assert (

@@ -122,6 +122,16 @@ def _image_note(source: str) -> str:
 # ── Inline text extraction ──────────────────────────────────────────
 
 
+def _title_text(title: etree._Element, ctx: _ParseContext | None) -> str:
+    """A part, chapter or schedule heading, keeping its footnote definitions.
+
+    Schedule titles carry footnotes (Statute of Limitations 1962, Second
+    Schedule): without the context the call is emitted and its definition lost.
+    Cross-references stay plain text, as they always have in these headings.
+    """
+    return _inline_text(title, replace(ctx, anchors={}) if ctx is not None else None)
+
+
 def _inline_text(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
     """Extract text from an element, resolving ISB entities and inline formatting.
 
@@ -574,7 +584,7 @@ class ISBTextParser(TextParser):
         """Parse a <part> element."""
         title_el = part.find("title")
         if title_el is not None:
-            title_text = _inline_text(title_el)
+            title_text = _title_text(title_el, ctx)
             if title_text:
                 paragraphs.append(Paragraph(css_class="titulo_tit", text=title_text))
 
@@ -599,7 +609,7 @@ class ISBTextParser(TextParser):
         """Parse a <chapter> element."""
         title_el = chapter.find("title")
         if title_el is not None:
-            title_text = _inline_text(title_el)
+            title_text = _title_text(title_el, ctx)
             if title_text:
                 paragraphs.append(Paragraph(css_class="capitulo_tit", text=title_text))
 
@@ -649,7 +659,7 @@ class ISBTextParser(TextParser):
         # Schedule heading
         title_el = schedule.find("title")
         if title_el is not None:
-            title_text = _inline_text(title_el)
+            title_text = _title_text(title_el, ctx)
             if title_text:
                 paragraphs.append(Paragraph(css_class="titulo_tit", text=title_text))
 
