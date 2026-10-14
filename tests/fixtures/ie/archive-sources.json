@@ -1,0 +1,148 @@
+[
+  {
+    "file": "archive-adoptive-leave-2020.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_plain.pdf?versionId=69y4xbSnQcS_MSyOzc2J26FqjjJ4oy80",
+    "sha256": "d2f5c211386caafbfe05db8bc537f656079176af013c692fe449288a6c462f11",
+    "retrieved": "2026-10-08T12:14:38Z"
+  },
+  {
+    "file": "archive-adoptive-leave-2021.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_new_plain.pdf?versionId=HnxBKDDS1gxp2fa6DZ_0VMbT_XkYbhGB",
+    "sha256": "41ac0b77d1ed4c9c341f0511a4732118a610f99ad7c94f85d1b277d9dc0a56ac",
+    "retrieved": "2026-10-08T12:14:37Z"
+  },
+  {
+    "file": "archive-adoptive-leave-2023.pdf",
+    "source": "https://revisedacts.lawreform.ie/eli/1995/act/2/revised/en/pdf?annotations=false",
+    "sha256": "d8451512b41d4436b4ef29c292ea3f1b3cf8337f540f2ec98b0b1694d2f98b05",
+    "retrieved": "2026-10-08T12:14:35Z"
+  },
+  {
+    "file": "archive-digital-services-2024.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2024/2/act_new_plain.pdf?versionId=2lmG6rX2fHMnG8PP1mLdp2U3g3R0OD73",
+    "sha256": "da9b1e9d81a1bcfc42b9261fed3777810840fb1e1d7f6aef9878650e3c73ebf7",
+    "retrieved": "2026-10-08T12:10:59Z"
+  },
+  {
+    "file": "archive-digital-services-2025.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2024/2/act_new_plain.pdf?versionId=xt9E6IAt23fzqjWGv1vuUJIF300RlIod",
+    "sha256": "802cc8a5f20258a1abba536a6fb06763cba605c0d7ceeb51584dc0297a7d0257",
+    "retrieved": "2026-10-08T12:10:58Z"
+  },
+  {
+    "file": "archive-digital-services-2026.pdf",
+    "source": "https://revisedacts.lawreform.ie/eli/2024/act/2/revised/en/pdf?annotations=false",
+    "sha256": "429a30dfd01488e4cdc3874b007a57f455c1ec0379e493a270fd6916948dc53d",
+    "retrieved": "2026-10-08T12:10:57Z"
+  },
+  {
+    "file": "archive-digital-services-2026.html",
+    "source": "https://revisedacts.lawreform.ie/eli/2024/act/2/revised/en/html",
+    "sha256": "83f53eea5c03dcad392a701ce49ffedcf596b1f96f1727faa2dc78c3e7dce38c",
+    "retrieved": "2026-10-08T12:10:53Z"
+  },
+  {
+    "file": "archive-valuation-2024.pdf",
+    "source": "https://revisedacts.lawreform.ie/eli/2001/act/13/revised/en/pdf?annotations=false",
+    "sha256": "c73419eb2406c648790a435946bd5334f5f140392c68294c944151b3ef343620",
+    "retrieved": "2026-10-08T12:26:45Z"
+  },
+  {
+    "file": "archive-valuation-2024.html",
+    "source": "https://revisedacts.lawreform.ie/eli/2001/act/13/revised/en/html",
+    "sha256": "d7ad1373fc2668c56eb07db2705da77f321eb74969d1f4605dd0fe05c2a1b39d",
+    "retrieved": "2026-10-08T12:26:45Z"
+  },
+  {
+    "file": "archive-valuation-2018.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2001/13/act_plain.pdf?versionId=null",
+    "sha256": "ef072a40a3a969e6f2c9781cf9eb8c0a59a14884a5871d686d32a7141cb59f98",
+    "retrieved": "2026-10-08T13:52:38Z"
+  },
+  {
+    "file": "archive-adoption-2018.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2010/21/act_plain.pdf?versionId=null",
+    "sha256": "6043712fac1c4628260c3b4a406ffcd99a3d4bb3688a428bad6c5a20d97421d4",
+    "retrieved": "2026-10-08T13:59:40Z"
+  },
+  {
+    "file": "archive-credit-union-2018.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2012/40/act_plain.pdf?versionId=null",
+    "sha256": "c8e6318ea138118f6883369c16d36764145ced1b0ea7514b25b20f1aed55d1e5",
+    "retrieved": "2026-10-08T14:00:02Z"
+  },
+  {
+    "file": "archive-companies-2018-excerpt.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_plain.pdf?versionId=null",
+    "sha256": "2d1bac07e1b97a17d0d997c1bee55abb72e9992e3be63ea1b6ec558061b953ae",
+    "retrieved": "2026-10-08T14:02:03Z",
+    "source_sha256": "54e2098e23546816642d07a854e4ea543b3a25fa4fbafbb8ead8653d117ce461",
+    "source_pages": [
+      1,
+      77,
+      137,
+      182,
+      198,
+      345,
+      622
+    ],
+    "transformation": "Unchanged source pages extracted with PDFium; a geometry regression excerpt, not a complete Act."
+  },
+  {
+    "file": "archive-companies-2020-incomplete-excerpt.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_plain.pdf?versionId=zWvvcC6Yt_9JcvtYlWMTswZegPCYau.W",
+    "sha256": "9c03f42205c5e2d47a32fb858fdbd5e5bf105623c49fd486f30a61221df5af06",
+    "retrieved": "2026-10-08",
+    "source_sha256": "d487045605971cca95feddf6dbd824188edd95e9f1e0f1d62c191cdd083e777d",
+    "source_pages": [
+      1,
+      5,
+      61,
+      77,
+      931,
+      932
+    ],
+    "transformation": "Unchanged source pages extracted with PDFium. Deliberately incomplete excerpt of cover, contents, first sections and the source transition1384 to1385; not eligible for the full-source hash exception."
+  },
+  {
+    "file": "archive-companies-2020-overlap-excerpt.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_plain.pdf?versionId=5xXM.aPWu8I28jFiDNFOVM094l.mg9ws",
+    "sha256": "0b2e1a61455516e17939b1f5cb68e2df718cd74cf69c1f439089943cd884acc8",
+    "retrieved": "2026-10-08",
+    "source_sha256": "1e6a866df584baa5f2048e81344e8944d01d4f4aed47ea6430403b9309d2bcdc",
+    "source_pages": [
+      1,
+      78,
+      676,
+      686,
+      692,
+      796,
+      801,
+      999,
+      1015,
+      1027,
+      1028,
+      1031,
+      1035,
+      1036,
+      1038,
+      1048,
+      1060
+    ],
+    "transformation": "Unchanged source pages extracted with PDFium. Caption-overlap geometry regression excerpt containing all nineteen affected section openings, not a complete Act and not eligible for the full-source hash exception."
+  },
+  {
+    "file": "archive-companies-2023-indent-excerpt.pdf",
+    "source": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_new_plain.pdf?versionId=iXfHd3elTG28CfNMMtML8_1DCdc.hoYY",
+    "sha256": "586c6c6a42619edad9faea97a004512b2921c4725b9ef9db37e9cad9017ff7ab",
+    "retrieved": "2026-10-13",
+    "source_sha256": "0036bebadc54facc2648125c062f675e0d0a0267ea9b002007162fabc2d710c7",
+    "source_pages": [
+      1,
+      80,
+      769,
+      807
+    ],
+    "transformation": "Unchanged source pages extracted with PDFium. Cover, first sections and indented primary labels 890A and 934; an incomplete geometry regression excerpt, not a complete legal snapshot."
+  }
+]

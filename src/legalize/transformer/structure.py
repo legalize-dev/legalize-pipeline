@@ -65,6 +65,7 @@ _CSS_ROLES: dict[str, ParagraphRole] = {
     "cita_ley": ParagraphRole.QUOTE,
     "cita_art": ParagraphRole.QUOTE,
     "quote": ParagraphRole.QUOTE,
+    "legal_quote": ParagraphRole.QUOTE,
     "nota_pie": ParagraphRole.NOTE,
     "nota_pie_2": ParagraphRole.NOTE,
     "firma": ParagraphRole.SIGNATURE,

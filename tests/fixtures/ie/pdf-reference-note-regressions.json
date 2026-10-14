@@ -1,0 +1,34 @@
+[
+  {
+    "identifier": "IE-1965-act-17",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1965/17/act_plain.pdf?versionId=l9aCxzNVn7H6qaT_TCwOaPmC1HhhQnlF",
+    "sha256": "51332cff65cac5b35679af7b7b04623a88d18a17caac940506653c35c183f511",
+    "error": "Revised Act PDF is missing sections listed in its contents: 4, 44A",
+    "pages": [
+      1,
+      8,
+      12,
+      26
+    ],
+    "file": "archive-extradition-1965-treaty-notes-excerpt.pdf",
+    "fixture_sha256": "3b2bc95091c28b1a4d195ebf482dcce47b1ca846c5c3f700d0a25dd5f85b037f"
+  },
+  {
+    "identifier": "IE-1965-act-27",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1965/27/act_plain.pdf?versionId=null",
+    "sha256": "58ce285f678b73e3792130211fc2e922d841c996bc8b879df3d89f695f21d40e",
+    "error": "Duplicate primary section 5 in Revised Act PDF",
+    "pages": [
+      1,
+      11,
+      32,
+      33,
+      37,
+      42,
+      43,
+      49
+    ],
+    "file": "archive-succession-1965-reference-notes-excerpt.pdf",
+    "fixture_sha256": "781c3b7cd0d87986205366237e8e626264eade92a302bb9cb69552134bed7bdd"
+  }
+]

@@ -94,6 +94,7 @@ _SIMPLE_CSS_MAP: dict[str, Callable[[str], str]] = {
     # --- synthetic classes emitted by the XML parser ---
     "image": lambda t: f"{t}\n",
     "list_item": lambda t: f"{t}\n",
+    "legal_quote": lambda t: f"{t}\n",
     "pre": lambda t: f"```\n{t}\n```\n",
     # --- generic fallbacks used by non-ES parsers (kept for back-compat) ---
     "h1": lambda t: f"# {t}\n",
@@ -204,6 +205,15 @@ def render_paragraphs(
         if formatter is not None:
             rendered = formatter(text).rstrip("\n")
             if rendered:
+                # Explicit legal quote fragments share a CommonMark container.
+                # An unquoted blank line closes it and turns later nested list
+                # entries into code blocks. Other countries' quote classes keep
+                # their existing byte-for-byte rendering.
+                if css == "legal_quote" and i and plist[i - 1].css_class == "legal_quote":
+                    previous = re.match(r"^([ \t]*>)(?: |$)", lines[-2].splitlines()[-1])
+                    current = re.match(r"^([ \t]*>)(?: |$)", rendered)
+                    if previous and current and previous[1] == current[1]:
+                        lines[-1] = current[1]
                 lines.append(rendered)
                 lines.append("")
         else:
@@ -271,9 +281,29 @@ def render_norm_at_date(
 
     selected = []
     for block in blocks:
-        if metadata.country == "eu":
-            applicable = [v for v in block.versions if v.in_force_from <= target_date]
-            version = max(applicable, key=lambda v: v.in_force_from) if applicable else None
+        if metadata.country in {"eu", "ie"}:
+            applicable = [
+                v
+                for v in block.versions
+                if v.in_force_from <= target_date
+                and not (
+                    metadata.country == "ie"
+                    and source_id is not None
+                    and v.norm_id.startswith("revised-")
+                    and v.in_force_from == target_date
+                )
+            ]
+            version = (
+                max(
+                    applicable,
+                    key=lambda v: (
+                        v.in_force_from,
+                        metadata.country == "ie" and v.norm_id != metadata.identifier,
+                    ),
+                )
+                if applicable
+                else None
+            )
             version = next(
                 (
                     v
@@ -312,6 +342,29 @@ def render_norm_at_date(
             for block in blocks
         ]
 
+    states = {v.text_state for v in selected if v is not None and v.text_state is not None}
+    sources = {v.source for v in selected if v is not None and v.source}
+    if len(states) > 1 or len(sources) > 1:
+        raise ValueError(
+            f"{metadata.identifier}: selected blocks disagree on their source or text state"
+        )
+    if states or sources:
+        metadata = replace(
+            metadata,
+            text_state=next(iter(states), metadata.text_state),
+            source=next(iter(sources), metadata.source),
+        )
+    warnings = list(
+        dict.fromkeys(v.source_warning for v in selected if v is not None and v.source_warning)
+    )
+    if warnings or metadata.country == "ie":
+        extra = dict(metadata.extra)
+        # A source defect belongs to its snapshot, not every version of the law.
+        extra.pop("source_warning", None)
+        if warnings:
+            extra["source_warning"] = " ".join(warnings)
+        metadata = replace(metadata, extra=tuple(extra.items()))
+
     # The date the law reads as. The spec defines it as "the date this version
     # took effect", which is a property of what ended up in the file, not of
     # the day the run happened (#106).
@@ -348,6 +401,8 @@ def render_norm_at_date(
             version_date = None
     if metadata.country == "es" and metadata.text_state is TextState.AS_ENACTED:
         version_date = target_date
+    if metadata.country == "ie" and metadata.text_state is not TextState.POINT_IN_TIME:
+        version_date = target_date
     parts.append(render_frontmatter(metadata, version_date, structure))
 
     title = metadata.title.rstrip(". ").strip()
@@ -356,6 +411,8 @@ def render_norm_at_date(
     notice = _NOTICES.get(metadata.text_state or text_state_for(metadata.country))
     if notice:
         parts.append(f"{notice}\n")
+    if source_warning := dict(metadata.extra).get("source_warning"):
+        parts.append(f"> **Incomplete source:** {source_warning}\n\n")
 
     for version in selected:
         if version is None:

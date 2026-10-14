@@ -1107,24 +1107,33 @@
       "code": "ie",
       "name": "Ireland",
       "language": "en",
-      "source_name": "Irish Statute Book (ISB) — Office of the Houses of the Oireachtas",
+      "source_name": "Electronic Irish Statute Book — Office of the Attorney General; Law Reform Commission",
       "source_urls": [
-        "Portal: https://www.irishstatutebook.ie",
-        "Discovery API: https://api.oireachtas.ie/v1/legislation",
-        "Revised acts: https://revisedacts.lawreform.ie"
+        "Enacted legislation and effects: https://www.irishstatutebook.ie",
+        "Supplementary parliamentary metadata: https://api.oireachtas.ie/v1/legislation",
+        "Revised Acts and archives: https://revisedacts.lawreform.ie/revacts/chron"
       ],
-      "data_license": "CC-BY 4.0 (Oireachtas Open Data PSI Licence)",
-      "scope": "Phase 1 covers **Acts of the Oireachtas (1922–present)** sourced from the official ELI XML. Statutory Instruments (~35,000, HTML only) and the Constitution (HTML only) are out of scope for Phase 1.",
+      "data_license": "Oireachtas (Open Data) PSI Licence, incorporating Creative Commons Attribution 4.0 International (CC BY 4.0): https://www.oireachtas.ie/en/open-data/license/. eISB publishes these terms at https://www.irishstatutebook.ie/open-data.html; the Law Reform Commission confirmed their application to Revised Acts on 8 October 2026.",
+      "scope": "Acts published in the eISB annual indexes from 1922 onward, including public Acts, private Acts and constitutional amendments; the current Constitution of Ireland; and the statutory instruments referenced by their amendment histories. This is not a complete collection of statutory instruments or pre-1922 legislation.",
       "norm_types": [
         {
-          "label": "Acts of the Oireachtas",
-          "pattern": "",
-          "examples": [],
-          "note": "every public Act, sourced as official ELI XML from the Irish Statute Book (e.g. `eli/2024/act/1`)."
+          "label": "Acts",
+          "pattern": "IE-{year}-act-{number}",
+          "note": "Public Acts, private Acts (P prefix) and constitutional amendment Acts (C prefix), with distinct identities."
+        },
+        {
+          "label": "Constitution of Ireland",
+          "pattern": "IE-1937-constitution",
+          "note": "The latest consolidated official text, explicitly marked current."
+        },
+        {
+          "label": "Statutory instruments",
+          "pattern": "IE-{year}-si-{number}",
+          "note": "Source instruments needed to resolve amendment histories, including their dependencies."
         }
       ],
-      "attribution": "> Contains Irish Public Sector Information licensed under the Oireachtas (Houses of the Oireachtas) Open Data PSI Licence / Creative Commons Attribution 4.0 International, sourced from https://www.irishstatutebook.ie.",
-      "notes": "## Known limitations\n\n- **Statutory Instruments** (~35,000) are published as HTML only and are out of scope for Phase 1.\n- The **Constitution of Ireland** (Bunreacht na hÉireann) has no XML — only a special HTML path — and is handled separately.\n- Texts are sourced *as enacted*; consolidated/revised versions are cross-referenced from the Law Reform Commission's revised acts."
+      "attribution": "> Contains Irish Public Sector Information from the Houses of the Oireachtas, the electronic Irish Statute Book (Office of the Attorney General) and the Law Reform Commission. Copyright remains with the respective licensors. Reused under the [Oireachtas (Open Data) PSI Licence](https://www.oireachtas.ie/en/open-data/license/), incorporating [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/). Sources: https://www.irishstatutebook.ie and https://revisedacts.lawreform.ie.",
+      "notes": "## Text and history\n\nEnacted texts are marked `as_enacted`. LRC archived PDF snapshots retain their stated cutoff and source URL. Mutable consolidated texts are marked `current`; the notice explains that they cannot establish the text at an earlier commit date.\n\nAmendment records cite the actual amending instrument. Snapshot cutoffs and commencement dates are not represented as new publication dates. Undated source publications omit `Source-Date`. The original publication date remains unchanged across versions.\n\nA verified incomplete source carries a `source_warning` and a visible notice naming the missing provision. The available official text is preserved without reconstruction. Content-bearing binary figures are marked `[image omitted]`; source image counts are retained in metadata.\n\nPaths follow the sharded template declared in `.legalize.yml`. The corpus conforms to the Legalize v0.4 identifier, source, date and history conventions.\n\n## Source terms\n\neISB and LRC Revised Acts are reused under the Oireachtas (Open Data) PSI Licence, incorporating CC BY 4.0. The LRC confirmed the application of these terms to Revised Acts on 8 October 2026. See the [copyright and re-use policy](https://www.oireachtas.ie/en/copyright-and-reuse/).\n\nLegalize converts source documents into Markdown and structured version history. Formatting and image omissions are described above; LRC editorial annotations, commentary and logos are excluded. Source links, revision cutoffs and source warnings are preserved. This is not the official text of an Act or an official restatement. Legalize is independent and is not endorsed by the source bodies.\n\nThe Houses of the Oireachtas disclaim liability arising from reuse and do not certify that the material is current or error-free. Publication does not establish that a provision is in force. Consult the linked official sources and their notices before relying on the text."
     },
     "it": {
       "code": "it",

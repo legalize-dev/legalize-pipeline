@@ -1,0 +1,685 @@
+[
+  {
+    "identifier": "IE-1922-act-5",
+    "file": "sample-ie-1922-act-5-date-conflict.xml",
+    "raw_date": "19221202",
+    "expected_date": "1922-12-21",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1922/act/5/enacted/en/xml",
+    "xml_source_sha256": "c08085a432c79b6808bf4ee766259f5f9bacaee06b05b10c1fa42fd17449e684",
+    "fixture_sha256": "bcd7387679c5452db85abed6fa4fc402d1e0f6bf4cbe8089b442df7fcc8a281a",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1922_5.html",
+      "source_sha256": "eaae2fb521f2b29df913ded9566fc8a6a4cb5b267e639df712b0944f5a7d237c",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 21 December 1922 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1924-act-24",
+    "file": "sample-ie-1924-act-24-date-conflict.xml",
+    "raw_date": "19240610",
+    "expected_date": "1924-07-10",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1924/act/24/enacted/en/xml",
+    "xml_source_sha256": "d5fc5466ed1b988a3c4288c83bcb5da2d768f392c90d684fb031774a721ed7f6",
+    "fixture_sha256": "1090da5749fdd44970fcf71c6193ee7ba541a86755b9442571e25c596e8befe5",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1924_24.html",
+      "source_sha256": "c9be63c60be344538fa6e90a91345ab7f401561ac8538a761e7556c5527d9670",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 10 July 1924 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1925-act-21",
+    "file": "sample-ie-1925-act-21-date-conflict.xml",
+    "raw_date": "19250621",
+    "expected_date": "1925-06-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1925/act/21/enacted/en/xml",
+    "xml_source_sha256": "44acb5ef32f28e87dd99b5e6e89c33b85ac85e5cb54e8134acc428ccb8b53cd3",
+    "fixture_sha256": "6bee1fc4f722381d0072623ed83e5178cf793efaf025c769ca7b8496196dace4",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1925_21.html",
+      "source_sha256": "c16982c973bc582bda449d01e4739d386fef6cf3906de8d91670216a6b49a7c9",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Commenced on enactment 27 June 1925 Whole Act"
+    }
+  },
+  {
+    "identifier": "IE-1925-act-22",
+    "file": "sample-ie-1925-act-22-date-conflict.xml",
+    "raw_date": "19250621",
+    "expected_date": "1925-06-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1925/act/22/enacted/en/xml",
+    "xml_source_sha256": "1a44344112b606a221c045b79b222a28ba1092dcf3b9bcf0d935a842db323e96",
+    "fixture_sha256": "c4e17d4347ad278f6040e1f0db7fb1ba98e28daeb3afcf98693f689a8ee26a54",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1925_22.html",
+      "source_sha256": "f76670bb9a6f09e493d4c73476ee70b33c2691774708cf94627337dee481fed4",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 27 June 1925 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1926-act-10",
+    "file": "sample-ie-1926-act-10-date-conflict.xml",
+    "raw_date": "19260301",
+    "expected_date": "1926-03-11",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1926/act/10/enacted/en/xml",
+    "xml_source_sha256": "0fb51a9e679bc72e408bbeb742c51137d4ece1b166306353e0a09c63a07037c9",
+    "fixture_sha256": "6e12143b5103430fc42fd45417b1de0fc6b48764b71eb1fcc3fcf91fdd1b3bb0",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1926_10.html",
+      "source_sha256": "f8a1488c8fe9a269d636766912dac2f135452c3108f83dc9b2def531f6817e2c",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 11 March 1926 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1926-act-17",
+    "file": "sample-ie-1926-act-17-date-conflict.xml",
+    "raw_date": "19260521",
+    "expected_date": "1926-05-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1926/act/17/enacted/en/xml",
+    "xml_source_sha256": "b77f8cb80961e69d1b9056123ce1a7e47b43be0f2ddca7ce18653ce207b6eb82",
+    "fixture_sha256": "3576041f76859d02537b97d856ffe0f6ded1634947187c3b1c30bad85f440570",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/eli/1926/act/17/enacted/en/html",
+      "source_sha256": "fd4e6c4dcad8bc11e756dbefabda1a83fe1baa79597aa1b541eec4682dd3048b",
+      "basis": "enacted_html"
+    }
+  },
+  {
+    "identifier": "IE-1926-act-33",
+    "file": "sample-ie-1926-act-33-date-conflict.xml",
+    "raw_date": "19260711",
+    "expected_date": "1926-07-17",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1926/act/33/enacted/en/xml",
+    "xml_source_sha256": "462a475b5ce99cfb2a910e25bc4f548aa0d8a0552f582353efeec8e5bf2a7e4c",
+    "fixture_sha256": "8e3b490d6933598ef1219f484189322795ea7b98b3cd1e16182299941fb5f903",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1926_33.html",
+      "source_sha256": "099f9eb75e8399ed5779b091798029851afeafb1265f3bf9c366fd5f88a3fd4d",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 17 July 1926 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1931-act-15",
+    "file": "sample-ie-1931-act-15-date-conflict.xml",
+    "raw_date": "19310521",
+    "expected_date": "1931-05-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1931/act/15/enacted/en/xml",
+    "xml_source_sha256": "c311e3758bbe14ffb9f6cb3c20d72382a733d345332af16e524f88e048795c5b",
+    "fixture_sha256": "6377b87cd27007d0188adf63a2b812530bc05a6f89aaf080a16e7c2420fd4304",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1931_15.html",
+      "source_sha256": "219888984382dc9293da2a3fd5aab1718e58942eeb243d6c48874aef54fcc269",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 27 May 1931 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1931-act-5",
+    "file": "sample-ie-1931-act-5-date-conflict.xml",
+    "raw_date": "19310321",
+    "expected_date": "1931-03-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1931/act/5/enacted/en/xml",
+    "xml_source_sha256": "362c0eedcebdcafee6b5232a68b54fb63cd5bf98347fb6f961830b0ff2d44abc",
+    "fixture_sha256": "b4dc30fd4b67eccbee96d8b798542453198a5af552594e7baa5d84c84cfb9940",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1931_5.html",
+      "source_sha256": "f510785755ad62ca42f19f27c8bb67bd79d76a4e2ed2a7ad67d609b3280f4791",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 27 March 1931 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1933-act-18",
+    "file": "sample-ie-1933-act-18-date-conflict.xml",
+    "raw_date": "19330721",
+    "expected_date": "1933-07-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1933/act/18/enacted/en/xml",
+    "xml_source_sha256": "773eca7e55545b76dffe4e094ac1aa78caa2a7f54bd3fd2c50670282b32be8a3",
+    "fixture_sha256": "6fa9600d1df557c71d25e747cd1e10c9885571683848c2e1a689f7f063bfaf21",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1933_18.html",
+      "source_sha256": "636a4e7212e7ee6bb60f2657f01e169431da988bc5023187a481c8953b94196e",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 27 July 1933 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1933-act-P2",
+    "file": "sample-ie-1933-act-p2-date-conflict.xml",
+    "raw_date": "19330711",
+    "expected_date": "1933-07-17",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1933/prv/2/enacted/en/xml",
+    "xml_source_sha256": "55cdd15a200c30a965fa293f503e7c6f0b5fdaaffa14366869936df71891df87",
+    "fixture_sha256": "f8929172a0e3aae438bc29d6cba7de07a1af475b2050385db51bb1d67011a016",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/eli/1933/prv/2/enacted/en/html",
+      "source_sha256": "25ca1ce969ac9578748233ad900a04181386cdc51fa989ccba1681a1ac1dddcf",
+      "basis": "enacted_html"
+    }
+  },
+  {
+    "identifier": "IE-1934-act-23",
+    "file": "sample-ie-1934-act-23-date-conflict.xml",
+    "raw_date": "19340605",
+    "expected_date": "1934-06-06",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1934/act/23/enacted/en/xml",
+    "xml_source_sha256": "e1a36c2fc6924c2babb8b61313b782cf5875ab25aef295aaa445fa789e04da26",
+    "fixture_sha256": "62b9a52ce1392b227263ef1ec98333b9bbf13f179663ab0795dadae216b2cec0",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1934_23.html",
+      "source_sha256": "dd6ba906d2e63456d8079e6137eda3a1d953de353ad77322dbc9f6bd6f3d1ee0",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 6 June 1934 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1935-act-5",
+    "file": "sample-ie-1935-act-5-date-conflict.xml",
+    "raw_date": "19350219",
+    "expected_date": "1935-02-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1935/act/5/enacted/en/xml",
+    "xml_source_sha256": "8224370f8caa857bc5a68e2f9d23ebb01721b6566b366b99405c402ed6f8f595",
+    "fixture_sha256": "12425bd3fff76df05b0d00ac7efb30115c5f2bbb833f9ebac0c27779972113cb",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/eli/1935/act/5/enacted/en/html",
+      "source_sha256": "7fa68cdcc0d93a57bfaf8539ec3592c43faf6ad8f84cea1f8187a9ed3d1631ce",
+      "basis": "enacted_html"
+    }
+  },
+  {
+    "identifier": "IE-1936-act-34",
+    "file": "sample-ie-1936-act-34-date-conflict.xml",
+    "raw_date": "19360624",
+    "expected_date": "1936-07-24",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1936/act/34/enacted/en/xml",
+    "xml_source_sha256": "c63f367a2819c19fbfd69feda99f371141a8aa8f31a671dc13318156004401ad",
+    "fixture_sha256": "836f5e1ff56c061ca09a6e9b08a240f5dd2836769d970deabbae617e90c5dd7e",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1936_34.html",
+      "source_sha256": "031cd1945dc96c4ca1215dea63b18841d75f165af81fb42c29e8514e57b094f1",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 24 July 1936 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1938-act-20",
+    "file": "sample-ie-1938-act-20-date-conflict.xml",
+    "raw_date": "19380721",
+    "expected_date": "1938-07-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1938/act/20/enacted/en/xml",
+    "xml_source_sha256": "42e907d162056074649eb002589287e4d358cc52476e2cd28426e817ae702ddb",
+    "fixture_sha256": "fda79291512925ab638439c16ddd14a65df5ec0655577773921b71068283f2b5",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1938_20.html",
+      "source_sha256": "8a83607080074039294c8dc584bbd71bf031a731467104283a646699cf761014",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 27 July 1938 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1941-act-21",
+    "file": "sample-ie-1941-act-21-date-conflict.xml",
+    "raw_date": "19410801",
+    "expected_date": "1941-08-07",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1941/act/21/enacted/en/xml",
+    "xml_source_sha256": "c985ed846051f39c1c524ab502c3ba8db38789ec644b8ea0fe425c6fd45ab95c",
+    "fixture_sha256": "de4cbfe6b004105d5cbc1db138692ea3d3f21e32dc7adcf7296b46d8cde39a0f",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1941_21.html",
+      "source_sha256": "e829018d2c3fc415a779ed5bcec37b4a94a67816fdb167591e3e6ebac6dc49b1",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 7 August 1941 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1947-act-19",
+    "file": "sample-ie-1947-act-19-date-conflict.xml",
+    "raw_date": "19470619",
+    "expected_date": "1947-07-19",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1947/act/19/enacted/en/xml",
+    "xml_source_sha256": "11c03a31ae4ea05868758873db8a0f4579a3fc188d4bc42d2473b0befbab19f5",
+    "fixture_sha256": "04e7d71ebdee4d23ee858c5af2d409ff2aee1ba4b423ffe54584d58f37ee633f",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/eli/1947/act/19/enacted/en/html",
+      "source_sha256": "3258db8209d6c3239e951b775db2ee7592bceaba8d22f39f92df6fdab1218ea6",
+      "basis": "enacted_html"
+    }
+  },
+  {
+    "identifier": "IE-1956-act-10",
+    "file": "sample-ie-1956-act-10-date-conflict.xml",
+    "raw_date": "19560321",
+    "expected_date": "1956-03-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1956/act/10/enacted/en/xml",
+    "xml_source_sha256": "6ee5c293be53ff3e2c99f46c10a8ce81a89a9c88ba2bbf168a74c776438f08a4",
+    "fixture_sha256": "990a3b16886b3b8766196c16c8c0f53f7174d2e8d266214ea4eb8bc758715d7b",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1956_10.html",
+      "source_sha256": "ef479842d2cafcb1d3202aae5ae9b2e90270252f603801e28a61003b1ff934b6",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Part I 27 March 1956 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1958-act-26",
+    "file": "sample-ie-1958-act-26-date-conflict.xml",
+    "raw_date": "19581125",
+    "expected_date": "1958-07-30",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1958/act/26/enacted/en/xml",
+    "xml_source_sha256": "de5d7e0a2cdde0769db0d1d152a45ef3891da3ab4d9017d50513926767167e8d",
+    "fixture_sha256": "ee92e07a30b42a86519eddcabffa273c7a48a8d80460223f43aec916815dd568",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1958_26.html",
+      "source_sha256": "522b934b8764bbde7742fefec0d44eb8e8143bb805dd1f43c2f07331d213ccb6",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 30 July 1958 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1959-act-21",
+    "file": "sample-ie-1959-act-21-date-conflict.xml",
+    "raw_date": "19590719",
+    "expected_date": "1959-07-29",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1959/act/21/enacted/en/xml",
+    "xml_source_sha256": "72720e5989e7a99914ae4f0253ca4ae93d86990ed57fd285b7845b937e2fe998",
+    "fixture_sha256": "71aefc6c30fb087a558f1f3fa5ee2a8b9f1a59381c604dc25cb9882ee850615f",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1959_21.html",
+      "source_sha256": "6e0a0ef3147e2d9272681846046adaa6c66a986fea29335e52503aea5a7ead82",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 29 July 1959 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1960-act-13",
+    "file": "sample-ie-1960-act-13-date-conflict.xml",
+    "raw_date": "19600502",
+    "expected_date": "1960-05-24",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1960/act/13/enacted/en/xml",
+    "xml_source_sha256": "5ff24c7142b5ec5f98c6f1351de4f3d09dae859d30bc8aa72b8f532e3bc79e47",
+    "fixture_sha256": "2f3fa6c7f47bae5a26f05bf2ecea07f98baa9b991aa90f0bf632c3e9661a1f3e",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1960_13.html",
+      "source_sha256": "f66cdc1b782f54a512d4fa97c12db2d436b559146a56e01ea0c79b38706c6e94",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "S. 1 24 May 1960 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1966-act-12",
+    "file": "sample-ie-1966-act-12-date-conflict.xml",
+    "raw_date": "19660531",
+    "expected_date": "1966-06-01",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1966/act/12/enacted/en/xml",
+    "xml_source_sha256": "c0d109137a5cb8309043506e663439425cefa56f66c6ecee4246337f9ce45a20",
+    "fixture_sha256": "974372c9c6fdeedb5b2947709eb48342bb20ce7d37b9688db367f0ace2d9e1f8",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1966_12.html",
+      "source_sha256": "22ccd18b584613fcd81a80b82ead80ba46994736c48bce618d08d86ed6f004c5",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 1 June 1966 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1967-act-5",
+    "file": "sample-ie-1967-act-5-date-conflict.xml",
+    "raw_date": "19670767",
+    "expected_date": "1967-03-07",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1967/act/5/enacted/en/xml",
+    "xml_source_sha256": "6d9406c9e78138d579d5632cad37f734d16a76616b904c5df28dbb3b761db2d1",
+    "fixture_sha256": "c2912061a90ff7997b412799a71ff1717738ebf539a8e9510c4ae4b0508f32f6",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1967_5.html",
+      "source_sha256": "3247fe2c897d2407eda837181f9085b2d2910e8fbdff865fea80d497f7862b17",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Ss. 1 - 6 7 March 1967 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1972-act-25",
+    "file": "sample-ie-1972-act-25-date-conflict.xml",
+    "raw_date": "19721102",
+    "expected_date": "1972-11-29",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1972/act/25/enacted/en/xml",
+    "xml_source_sha256": "2285dd53c58247866bfffea33c999c1e3edb027c622b144ed7db9b9258aff55f",
+    "fixture_sha256": "7718c86be1f8f9645fb03fd2799b9aa414395031c4c861d65ebec70ae3b2cb31",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1972_25.html",
+      "source_sha256": "20de8e0d23eccee24fd5ab00e2f5c8832c767a5fe89a5d958f2f0b84eeabaf50",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 29 November 1972 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1974-act-14",
+    "file": "sample-ie-1974-act-14-date-conflict.xml",
+    "raw_date": "19740621",
+    "expected_date": "1974-06-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1974/act/14/enacted/en/xml",
+    "xml_source_sha256": "ffd1e4570f7f2569041694a5d8f97263050c4b5ea8785da29eab7cf8e01b65ff",
+    "fixture_sha256": "2f6ed8e61df79e4a5d177f9eda1ecf47435ea920e56ad987d6214967401b9257",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1974_14.html",
+      "source_sha256": "240c2e0b3f3a5e95ee6bd60f709c67019405404c79b1b8a342617ef24495fa2c",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "S. 1 27 June 1974 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1979-act-7",
+    "file": "sample-ie-1979-act-7-date-conflict.xml",
+    "raw_date": "19790310",
+    "expected_date": "1979-03-20",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1979/act/7/enacted/en/xml",
+    "xml_source_sha256": "eaae31c8e87d25c6b21242ed7af6a4d3b599054b94b6f607733f9c994a8a07c3",
+    "fixture_sha256": "9866dc4a9a04a9ceafc59e83fdf85cbc95913b49ffbf54a7732d3c5d71eb5af7",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/eli/1979/act/7/enacted/en/html",
+      "source_sha256": "4d5d8b5ad5e97dafc60b2089c18836e9a1bc555752d3580fa0b32c7b34c199a9",
+      "basis": "enacted_html"
+    }
+  },
+  {
+    "identifier": "IE-1992-act-4",
+    "file": "sample-ie-1992-act-4-date-conflict.xml",
+    "raw_date": "19920308",
+    "expected_date": "1992-03-18",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1992/act/4/enacted/en/xml",
+    "xml_source_sha256": "324a0375d80a51433325c9267e8dbb2917726609210fe032d3bf2ac933371a16",
+    "fixture_sha256": "67a1704190ae62a38470b14a24f12a0969f3cb6c5e598ffaf9031d20844358fa",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1992_4.html",
+      "source_sha256": "b9891d51423f344a3b9df21b180a4e15df9e5211f94ab8143c421bc24530005b",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Ss. 1-3 18 March 1992 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-1996-act-5",
+    "file": "sample-ie-1996-act-5-date-conflict.xml",
+    "raw_date": "19960306",
+    "expected_date": "1996-03-16",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/1996/act/5/enacted/en/xml",
+    "xml_source_sha256": "e818eb28cccab308722d8440cc28923e779ba64a3f84fbd4160a99963b8c7210",
+    "fixture_sha256": "d8f8c7759fb2480d74183abddbc04371900f918959f39efa32395d2abc4c77fe",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/1996_5.html",
+      "source_sha256": "fc6927ca8cbb75e3864b7f7b2e9bb0193004f2a40dc2908cb4e47d8a7c6b2178",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Ss. 1-5 16 March 1996 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-2004-act-13",
+    "file": "sample-ie-2004-act-13-date-conflict.xml",
+    "raw_date": "20040005",
+    "expected_date": "2004-05-05",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2004/act/13/enacted/en/xml",
+    "xml_source_sha256": "9297eb1a614b9060b182f6ddc0b341771d298599ef52aa0ba9796c3b52cddcc0",
+    "fixture_sha256": "fa0edcabebd98b74ca44e34a143a2274f4ea27cf5c9c094787ed887a2df64bcc",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2004/en.act.2004.0013.pdf",
+      "source_sha256": "913632d0f34b7d3fa20779b1a3b0f6041559c116b1dd080140bf648abd07068e",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[5th May, 2004]"
+    }
+  },
+  {
+    "identifier": "IE-2005-act-16",
+    "file": "sample-ie-2005-act-16-date-conflict.xml",
+    "raw_date": "20050719",
+    "expected_date": "2005-07-09",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2005/act/16/enacted/en/xml",
+    "xml_source_sha256": "a3eb797a171dbbdfe931787190ab7676448a7aee95ba7cc03b2671074e687f18",
+    "fixture_sha256": "0506f2cd828b1d97d0cd0e3697b17620cc1dda9b31862cc4565fca04882d6549",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2005/en.act.2005.0016.pdf",
+      "source_sha256": "1046b17ee5af01ee22d2afb3a9f760f77dad79235e39e50fec4ce1246c86b69c",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[9th July, 2005]"
+    }
+  },
+  {
+    "identifier": "IE-2005-act-26",
+    "file": "sample-ie-2005-act-26-date-conflict.xml",
+    "raw_date": "20051017",
+    "expected_date": "2005-11-27",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2005/act/26/enacted/en/xml",
+    "xml_source_sha256": "e8dc2ac03b086044be68ab0146032a4fe0c982c2f7cf009b649655d6b6e96b5b",
+    "fixture_sha256": "f46576f938a20e6561bc3be9517b8bf59c8a2b597b570c82771726c47f2f3458",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2005/en.act.2005.0026.pdf",
+      "source_sha256": "a5f1e62198ddcf1ffbfc27322b490bc661d6500085cb7db614c5d10742f6592a",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[27th November, 2005]"
+    }
+  },
+  {
+    "identifier": "IE-2006-act-31",
+    "file": "sample-ie-2006-act-31-date-conflict.xml",
+    "raw_date": "2006",
+    "expected_date": "2006-12-11",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2006/act/31/enacted/en/xml",
+    "xml_source_sha256": "bcf3af96c7652a3bd4131bec66dd05f6ab40c27d0608aba05fcc60ccfcce0d57",
+    "fixture_sha256": "f11a11e78fa352819807b2e9e929c86c260039c9dac3bd69b4dbcbd1022129d2",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2006/en.act.2006.0031.pdf",
+      "source_sha256": "06b542b7adce429b0d599643a746fffcdec9b8c8a8fb1fe8200940b821231792",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[11th December, 2006]"
+    }
+  },
+  {
+    "identifier": "IE-2006-act-39",
+    "file": "sample-ie-2006-act-39-date-conflict.xml",
+    "raw_date": "2006",
+    "expected_date": "2006-12-23",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2006/act/39/enacted/en/xml",
+    "xml_source_sha256": "4ef2a24cdf5edabab3c4e1b56173e7ff2ed6cb12054b5c53cd0afefca8164eaa",
+    "fixture_sha256": "df872e719737048ed292c31b78c9fa6f66072c55af7f685949509971bfc72928",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2006/en.act.2006.0039.pdf",
+      "source_sha256": "3346025bb9770bc7847f2437ddaac22f0ec9b702aaf111ed2658ea78a5fb797c",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[23rd December, 2006]"
+    }
+  },
+  {
+    "identifier": "IE-2013-act-22",
+    "file": "sample-ie-2013-act-22-date-conflict.xml",
+    "raw_date": "20130604",
+    "expected_date": "2013-07-02",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2013/act/22/enacted/en/xml",
+    "xml_source_sha256": "6af404bf5a82f26fa11e58800d554dde58169fc69e77c069130db46f1593e13b",
+    "fixture_sha256": "0afee822c7dcf5db929d34c997439d5317681df7443ade87508a00e2a0f6dd2a",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/isbc/2013_22.html",
+      "source_sha256": "b548e26352697d4e46f9543ee1d70ae733d51c2ccec3bab9ed7be62d5bb9297b",
+      "basis": "directory_enactment_statement",
+      "date_excerpt": "Whole Act 2 July 2013 Commenced on enactment"
+    }
+  },
+  {
+    "identifier": "IE-2013-act-27",
+    "file": "sample-ie-2013-act-27-date-conflict.xml",
+    "raw_date": "20130724",
+    "expected_date": "2013-07-22",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2013/act/27/enacted/en/xml",
+    "xml_source_sha256": "6aecbf9e1dd87fad90dff9d69703813f64fb420dd099ee579afaa8a4ad9a5d16",
+    "fixture_sha256": "6a31c9ee9307ed7eda118e7574bcad4e0e8e1cfa9a7697e5a1b597f1a92cf8e3",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2013/en.act.2013.0027.pdf",
+      "source_sha256": "5121a7510d0152f302b34493b2093904364ee39153d4762f68074da741382ad2",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[22nd July, 2013]"
+    }
+  },
+  {
+    "identifier": "IE-2013-act-5",
+    "file": "sample-ie-2013-act-5-date-conflict.xml",
+    "raw_date": "20130205",
+    "expected_date": "2013-03-13",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2013/act/5/enacted/en/xml",
+    "xml_source_sha256": "093963d950da7d9f8ee6afd57d41a4cc1420a7c96d821722bb45424b1ec919be",
+    "fixture_sha256": "0538b7ebe51a4b1c5fd86a36182929c7848477151baa8cc9861be3683c7f57ff",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2013/en.act.2013.0005.pdf",
+      "source_sha256": "927a91de93a2c4c9c0e913c59f01d40b5610c289021c3f4b4fd5b6bfec40b05f",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[13th March, 2013]"
+    }
+  },
+  {
+    "identifier": "IE-2014-act-21",
+    "file": "sample-ie-2014-act-21-date-conflict.xml",
+    "raw_date": "20140726",
+    "expected_date": "2014-07-28",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2014/act/21/enacted/en/xml",
+    "xml_source_sha256": "1f9958728525c68ff3f411d1aa14ea573561da52fc389be3c030751a6d8aadc8",
+    "fixture_sha256": "cc4c51c4e42779128470a4348395ff93f084698fe1b5f15d42c95fb9617fcf73",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2014/en.act.2014.0021.pdf",
+      "source_sha256": "ead80566dfb4d0e5707ae9e04e2f072293f815ec2b5b132d41113d390da8cba9",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[28th July, 2014]"
+    }
+  },
+  {
+    "identifier": "IE-2015-act-5",
+    "file": "sample-ie-2015-act-5-date-conflict.xml",
+    "raw_date": "20141119",
+    "expected_date": "2015-03-11",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2015/act/5/enacted/en/xml",
+    "xml_source_sha256": "bf2090df8b1bd31ee5feed004f41baa4eb2ad1f9d675389ee3a7c9e1d0f56cc9",
+    "fixture_sha256": "3af795d618d909e6e4f4303a766d886ccce89deea8e17ada2bbfbef75fb49e62",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2015/en.act.2015.0005.pdf",
+      "source_sha256": "aea16f32d9d0727e6e368ab285246f01159d3e7ae4842d102e90972cff2af555",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[11th March, 2015]"
+    }
+  },
+  {
+    "identifier": "IE-2015-act-58",
+    "file": "sample-ie-2015-act-58-date-conflict.xml",
+    "raw_date": "20151221",
+    "expected_date": "2015-12-25",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2015/act/58/enacted/en/xml",
+    "xml_source_sha256": "060a90d0d0af0991e9f64ea7f43c72ce42332066d9ce60106b6deb497f5808a8",
+    "fixture_sha256": "e1d0ee8da49619078beb16f92c7131d91f4fae1ce638c65ed3117cc9e5c346f9",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2015/en.act.2015.0058.pdf",
+      "source_sha256": "36ca4feaff336e12dcf0d619796e2b92c33049854598e2f029cb4c98bb1877ab",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[25th December, 2015]"
+    }
+  },
+  {
+    "identifier": "IE-2019-act-24",
+    "file": "sample-ie-2019-act-24-date-conflict.xml",
+    "raw_date": "20190724",
+    "expected_date": "2019-07-11",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2019/act/24/enacted/en/xml",
+    "xml_source_sha256": "150895f1205f3b3505ad42fabd98f480292a4339f0a4337bf730199f5f71f197",
+    "fixture_sha256": "f6e055434b690c2ba652871774c71cfa69ebcfbbfd9913e8888a2c67cc290dc6",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2019/en.act.2019.0024.pdf",
+      "source_sha256": "f5f074afc42fde7c30714e7dbe76dbbf39efe536234a9dc132e2b3fcdef336d8",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[11th July, 2019]"
+    }
+  },
+  {
+    "identifier": "IE-2021-act-44",
+    "file": "sample-ie-2021-act-44-date-conflict.xml",
+    "raw_date": "20211215",
+    "expected_date": "2021-12-18",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2021/act/44/enacted/en/xml",
+    "xml_source_sha256": "5857c8674e9bf8b042eed1c7c011bf4ee3dc000bc7e87283ef416c17b8358fc2",
+    "fixture_sha256": "79068b3959716bf8fb31bba8dafc599e5670ba0ee03b2650e3e101359094e8e6",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2021/en.act.2021.0044.pdf",
+      "source_sha256": "f8ddc54e5498098bdb352ed441bd5ea75c62f9b51679c9eb735a502a3af7d2fd",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[18th December, 2021]"
+    }
+  },
+  {
+    "identifier": "IE-2021-act-46",
+    "file": "sample-ie-2021-act-46-date-conflict.xml",
+    "raw_date": "20211231",
+    "expected_date": "2021-12-21",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2021/act/46/enacted/en/xml",
+    "xml_source_sha256": "84bfe014a6a9c50f06f5edb167c32a978ae3a5ab46f0c60e4149ab6846b9523c",
+    "fixture_sha256": "ed52157742c51f69730b4e60227f544e6bedf61787e602dabb3d73bd81696c4e",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2021/en.act.2021.0046.pdf",
+      "source_sha256": "a9adf8ef0290686136739a46a476ce79c643613ec8ee9b6200a0a0ef8b2dcda1",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[21st December, 2021]"
+    }
+  },
+  {
+    "identifier": "IE-2023-act-23",
+    "file": "sample-ie-2023-act-23-date-conflict.xml",
+    "raw_date": "20230723",
+    "expected_date": "2023-07-17",
+    "xml_source_url": "https://www.irishstatutebook.ie/eli/2023/act/23/enacted/en/xml",
+    "xml_source_sha256": "e4da8bd6657d1fa02ae7fbcbb9796d13539ff1a541ab3f211e36bf064d12e35c",
+    "fixture_sha256": "90eb1bbc13d30a4877d69eb6ed22800c220b9f6dbe78deeba63bc6d6fe0ce619",
+    "extraction": "unchanged metadata, actnumber, enactment paragraph and first body node",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/pdf/2023/en.act.2023.0023.pdf",
+      "source_sha256": "25ac913290971d680a828724c12240924e99765a54ae913052f55249555f3a63",
+      "basis": "enacted_pdf",
+      "date_excerpt": "[17th July, 2023]"
+    }
+  }
+]

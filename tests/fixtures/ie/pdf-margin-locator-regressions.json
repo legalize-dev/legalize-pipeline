@@ -1,0 +1,89 @@
+[
+  {
+    "identifier": "IE-1994-act-16",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1994/16/act_new_plain.pdf?versionId=SA1QMyRUeLlXoSWlvF8i3ML4M5Is5hQy",
+    "sha256": "f587c43ae2b9894ecb859aa57d3fb84bd51495cdba3b4b5bf1f7931da4f33da9",
+    "pages": [
+      1,
+      6,
+      57
+    ],
+    "file": "archive-ie-1994-act-16-margin-locators.pdf",
+    "fixture_sha256": "6c400cd56acd506fd0a8441f2bcaaf7a30a653a3aa0607d94ca6faf4f33edbc9"
+  },
+  {
+    "identifier": "IE-1996-act-16",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1996/16/act_plain.pdf?versionId=null",
+    "sha256": "02e58e29a6dab01f9233350ee3d01d0e0b6a8abbf0dd907680df5a5d03d5eba2",
+    "pages": [
+      1,
+      7,
+      18
+    ],
+    "file": "archive-ie-1996-act-16-margin-locators.pdf",
+    "fixture_sha256": "2932316547548dc64610272ddcd2f7beee840a97068d5103aa1fd27bcf575cff"
+  },
+  {
+    "identifier": "IE-1996-act-20",
+    "url": "https://revisedacts.lawreform.ie/eli/1996/act/20/revised/en/pdf?annotations=false",
+    "sha256": "ad250df17029daaead3c7d1f587c6c96066d5aa10c5707245591a2cbfb0ae530",
+    "pages": [
+      1,
+      4,
+      21
+    ],
+    "file": "archive-ie-1996-act-20-margin-locators.pdf",
+    "fixture_sha256": "5c95cabd191463352e4d37789faa1adbbb8548576d1d9434ff23ae39d1fee31c"
+  },
+  {
+    "identifier": "IE-1996-act-34",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1996/34/act_new_plain.pdf?versionId=tmR0qUhaXO92Jr98OQh9p370EbCm.HF3",
+    "sha256": "d54ee789082b70cecba2cf5669b0e3fbccc13c7cde48e40041c80b391789ed89",
+    "pages": [
+      1,
+      4,
+      9
+    ],
+    "file": "archive-ie-1996-act-34-margin-locators.pdf",
+    "fixture_sha256": "09e9693777ef00658e5bceb2ffac89eb48e8f67bf933ccb28dfd9f651e7dc80c"
+  },
+  {
+    "identifier": "IE-1999-act-15",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1999/15/act_plain.pdf?versionId=null",
+    "sha256": "94da2e8e7032878b74854800793b6e54e9fbb13094154d1bada2e3777d9a440d",
+    "pages": [
+      1,
+      7,
+      16
+    ],
+    "file": "archive-ie-1999-act-15-margin-locators.pdf",
+    "fixture_sha256": "6ee35f9457d3ec9b69ee83062af3ad7e00a58bed240fcc0a2133a8713bd84427"
+  },
+  {
+    "identifier": "IE-2006-act-29",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2006/29/act_plain.pdf?versionId=null",
+    "sha256": "c276cec024afd50c9e7405cb451fb4b7f805d345aed09189d7310b87b51e09cc",
+    "pages": [
+      1,
+      8,
+      29
+    ],
+    "file": "archive-ie-2006-act-29-margin-locators.pdf",
+    "fixture_sha256": "441f604926a7e24919884cd3ed80832195af40cfd4c791a9621e1b9896782981"
+  },
+  {
+    "identifier": "IE-2009-act-27",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2009/27/act_plain.pdf?versionId=null",
+    "sha256": "d88f55ae591f19a84978c88c47b6b2bc1741372a5ae5c41d3e366d4849eab69a",
+    "pages": [
+      1,
+      18,
+      21,
+      27,
+      35,
+      46
+    ],
+    "file": "archive-ie-2009-act-27-margin-locators.pdf",
+    "fixture_sha256": "6ac34ded80f70a6e0f530acb42b4dcd740b636718f9873bbb85853084bc6f650"
+  }
+]

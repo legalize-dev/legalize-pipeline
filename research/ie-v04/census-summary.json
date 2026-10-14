@@ -1,0 +1,27 @@
+{
+  "fetched_date": "2026-10-08",
+  "isb_index_pages": 210,
+  "isb_failed_pages": 0,
+  "isb_act_rows": 4171,
+  "isb_act_unique": 4114,
+  "isb_act_types": {
+    "pub": 4009,
+    "prv": 73,
+    "cam": 32
+  },
+  "isb_act_html_indexed": 4114,
+  "isb_act_pdf_indexed": 1338,
+  "isb_si_rows": 42032,
+  "lrc_norms": 602,
+  "lrc_version_rows": 2599,
+  "lrc_act_norms": 576,
+  "lrc_act_version_rows": 2548,
+  "lrc_act_historical_pdf_rows": 1972,
+  "lrc_act_distinct_historical_plain_urls": 1925,
+  "oireachtas_bill_count": 4068,
+  "lrc_eli_manifestations": 603,
+  "lrc_act_language": "en",
+  "lrc_other_act_manifestations": [
+    "2003/act/32/ga"
+  ]
+}

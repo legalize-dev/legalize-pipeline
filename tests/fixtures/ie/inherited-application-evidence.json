@@ -1,0 +1,170 @@
+[
+  {
+    "identifier": "IE-1958-act-11",
+    "directory": {
+      "file": "sample-continuity-directory-1958-11.html",
+      "url": "https://www.irishstatutebook.ie/isbc/1958_11.html",
+      "sha256": "1dbf885cf0058a9e3742de577e98f95731f3793211cf5f11c72b28edc3f82988"
+    },
+    "enacted": {
+      "file": "sample-continuity-enacted-1958-11.xml",
+      "sha256": "619da823aa92e901134fd6f9efbb75b213318f4bf4982ee8a4d713d7bc5b74e2"
+    },
+    "predating": [
+      {
+        "source_id": "IE-1947-si-115",
+        "note": "Excl. provns. ext. to Customs-free Airport. *",
+        "provision": "S.R. & O. No. 115 of 1947",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1947-04-21",
+        "source_url": "https://www.irishstatutebook.ie/eli/1947/si/115/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1958_11.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1947-si-115": {
+        "file": "sample-continuity-source-IE-1947-si-115.html",
+        "sha256": "0ffd1a6725cd7cb89883f1b8fcfbd188d09bea7a046964b4d5adbb834f398ab6"
+      }
+    }
+  },
+  {
+    "identifier": "IE-1980-act-10",
+    "directory": {
+      "file": "sample-continuity-directory-1980-10.html",
+      "url": "https://www.irishstatutebook.ie/isbc/1980_10.html",
+      "sha256": "871adb90455a1ca7175285d6769c0c36c1b01d4ec633916ea632718cb4bfe7fd"
+    },
+    "enacted": {
+      "file": "sample-continuity-enacted-1980-10.xml",
+      "sha256": "3576248ee6f91b8d59eabc8fbde41c0c0395b387da2dab2535be2c5fc0d27f4c"
+    },
+    "predating": [
+      {
+        "source_id": "IE-1971-act-30",
+        "note": "Applic. of (see s.11 (2)).",
+        "provision": "30/1971, ss. 2, 7.*",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1971-12-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1971/act/30/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1980_10.html"
+      },
+      {
+        "source_id": "IE-1971-act-30",
+        "note": "Ext. (see s.11 (2)).",
+        "provision": "30/1971, ss. 2, 8 (1). *",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1971-12-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1971/act/30/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1980_10.html"
+      },
+      {
+        "source_id": "IE-1976-act-11",
+        "note": "Provn. for purposes of rights under.",
+        "provision": "11/1976, ss. 2, 22 (7). *",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1976-04-06",
+        "source_url": "https://www.irishstatutebook.ie/eli/1976/act/11/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1980_10.html"
+      },
+      {
+        "source_id": "IE-1963-act-28",
+        "note": "Rstrct.",
+        "provision": "28/1963, ss. 75 (4) (b); *",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1963-08-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1963/act/28/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1980_10.html"
+      },
+      {
+        "source_id": "IE-1966-act-21",
+        "note": "Rstrct.",
+        "provision": "21/1966, ss. 62 (6), 66 (17).*",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1966-07-12",
+        "source_url": "https://www.irishstatutebook.ie/eli/1966/act/21/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1980_10.html"
+      },
+      {
+        "source_id": "IE-1971-act-30",
+        "note": "S. 59 appl. (see s.11 (2)).",
+        "provision": "30/1971, ss. 2, 4 (3).*",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1971-12-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1971/act/30/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1980_10.html"
+      },
+      {
+        "source_id": "IE-1978-act-16",
+        "note": "S. 88 appl.",
+        "provision": "16/1978, ss. 2, 18, 21 (1).*",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1978-06-28",
+        "source_url": "https://www.irishstatutebook.ie/eli/1978/act/16/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1980_10.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1971-act-30": {
+        "file": "sample-continuity-source-IE-1971-act-30.json",
+        "sha256": "35bd1fe8c42780791b42b2de357baf50708d08c000f02b4c0c83d81b8b9f1dfd"
+      },
+      "IE-1976-act-11": {
+        "file": "sample-continuity-source-IE-1976-act-11.json",
+        "sha256": "6587fda188ff2dc0846392ca0fc8bdcb0575ad240ec7a87d989624d74d5c840f"
+      },
+      "IE-1963-act-28": {
+        "file": "sample-continuity-source-IE-1963-act-28.json",
+        "sha256": "b676c624aca19eeec3e53f1247453468f55d9e27efff9cbd8a0af51a144a8079"
+      },
+      "IE-1966-act-21": {
+        "file": "sample-continuity-source-IE-1966-act-21.json",
+        "sha256": "22bdc6cc609350489ecffb6f9ecb79faf3d311df92ace5859be11e4d5dba6b86"
+      },
+      "IE-1978-act-16": {
+        "file": "sample-continuity-source-IE-1978-act-16.json",
+        "sha256": "6d24c020146f39849561b8a46e4ae894aa10f3ca7265f10ad22e80ccaac8556e"
+      }
+    }
+  }
+]

@@ -1,0 +1,91 @@
+[
+  {
+    "identifier": "IE-2000-act-30",
+    "directory": {
+      "file": "sample-pension-host-directory-IE-2000-act-30.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/2000_30.html",
+      "sha256": "0fd0d9f6fc54cdf12a4d5346972db0d71bb3fd853e76734d4527f6bfd6b03deb"
+    },
+    "proof": {
+      "file": "sample-pension-host-proof-2008-si-295.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2008/si/295/made/en/html",
+      "sha256": "312c880d6d611a4f18e966e0944dac6d4ed986b22bf8c03f316d4cb37700eca3"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1993-si-419",
+        "note": "S. 119 schemes established under section excluded from Pensions Act 1990 (25/1990), Part IV",
+        "provision": "S,I, No. 419 of 1993, sch. C. See also S.I. Nos. 135 of 2013, 268 of 2014, 39 of 2019",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1993-12-30",
+        "source_url": "https://www.irishstatutebook.ie/eli/1993/si/419/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2000_30.html"
+      },
+      {
+        "source_id": "IE-1993-si-419",
+        "note": "S. 121 schemes established under section excluded from Pensions Act 1990 (25/1990), Part IV",
+        "provision": "S,I, No. 419 of 1993, sch. C. See also S.I. Nos. 135 of 2013, 268 of 2014, 39 of 2019",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1993-12-30",
+        "source_url": "https://www.irishstatutebook.ie/eli/1993/si/419/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2000_30.html"
+      }
+    ],
+    "followups": [
+      {
+        "file": "sample-pension-host-proof-2013-si-135.html.gz",
+        "url": "https://www.irishstatutebook.ie/eli/2013/si/135/made/en/html",
+        "sha256": "ec1f8c6fb005fe3e0d9173e4a94165527fd702438ef8d67bead9d3d1a3999349"
+      },
+      {
+        "file": "sample-pension-host-proof-2014-si-268.html.gz",
+        "url": "https://www.irishstatutebook.ie/eli/2014/si/268/made/en/html",
+        "sha256": "fbf7ea10859e58b22d048f0a7485d1c431cfa853de74813c5334852c0f6f32df"
+      },
+      {
+        "file": "sample-pension-host-proof-2019-si-39.html.gz",
+        "url": "https://www.irishstatutebook.ie/eli/2019/si/39/made/en/html",
+        "sha256": "cc9246b2354515ff807c174e13543ee17bf98a35a747b0df32c44a0ecd87f9b2"
+      }
+    ]
+  },
+  {
+    "identifier": "IE-2002-act-14",
+    "directory": {
+      "file": "sample-pension-host-directory-IE-2002-act-14.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/2002_14.html",
+      "sha256": "ebc8a3cba63d54f36e1de463acaec84b930fdd8ed5bfb80b91b794d471746008"
+    },
+    "proof": {
+      "file": "sample-pension-host-proof-2008-si-295.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2008/si/295/made/en/html",
+      "sha256": "312c880d6d611a4f18e966e0944dac6d4ed986b22bf8c03f316d4cb37700eca3"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1993-si-419",
+        "note": "S. 44 defined benefit scheme established under excluded from application of Pensions Act 1990 Part IV",
+        "provision": "S.I. No. 419 of 1993, reg. 6 and sch. C",
+        "commencement": "31 December 1993",
+        "commencement_source": "Occupational Pension Schemes (Funding Standard) Regulations, 1993 (S.I. No. 419 of 1993), reg. 1(2)",
+        "effective_date": "1993-12-31",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1993-12-30",
+        "source_url": "https://www.irishstatutebook.ie/eli/1993/si/419/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2002_14.html"
+      }
+    ]
+  }
+]

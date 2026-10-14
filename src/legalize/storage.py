@@ -248,13 +248,21 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             # An explicit same-day commencement is different from an unknown date.
             if version.effective_date:
                 version_dict["effective_date"] = version.effective_date.isoformat()
+            if version.text_state is not None:
+                version_dict["text_state"] = version.text_state.value
+            if version.source:
+                version_dict["source"] = version.source
+            if version.source_warning:
+                version_dict["source_warning"] = version.source_warning
             if version.superseded_before_commencement:
                 version_dict["superseded_before_commencement"] = True
             # Preserve CSS classes for lossless round-trip
             css_classes = [p.css_class for p in version.paragraphs]
             if css_classes and any(c != "parrafo" for c in css_classes):
                 version_dict["css_classes"] = css_classes
-            if any(p.expiry_date or "\n\n" in p.text for p in version.paragraphs):
+            if norm.metadata.country == "ie" or any(
+                p.expiry_date or "\n\n" in p.text for p in version.paragraphs
+            ):
                 version_dict["paragraphs"] = [
                     {
                         "css_class": p.css_class,
@@ -269,7 +277,7 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
         if block.versions:
             last = (
                 block.versions[-1]
-                if norm.metadata.country == "eu"
+                if norm.metadata.country in {"eu", "ie"}
                 else max(block.versions, key=lambda v: v.publication_date)
             )
             article["current_text"] = "\n\n".join(p.text for p in last.paragraphs)
@@ -301,6 +309,8 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
             row["change_note"] = reform.change_note
         if not reform.has_source_date:
             row["has_source_date"] = False
+        if reform.status is not None:
+            row["status"] = reform.status.value
         if reform.effective_date is not None:
             row["effective_date"] = reform.effective_date.isoformat()
         reforms.append(row)
@@ -389,6 +399,9 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                         date.fromisoformat(v["effective_date"]) if v.get("effective_date") else None
                     ),
                     paragraphs=tuple(paragraphs),
+                    text_state=TextState(v["text_state"]) if v.get("text_state") else None,
+                    source=v.get("source"),
+                    source_warning=v.get("source_warning"),
                     superseded_before_commencement=v.get("superseded_before_commencement", False),
                 )
             )
@@ -424,6 +437,7 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
                 affected_blocks=affected,
                 change_note=r.get("change_note", ""),
                 has_source_date=r.get("has_source_date", True),
+                status=NormStatus(r["status"]) if r.get("status") else None,
                 effective_date=(
                     date.fromisoformat(r["effective_date"]) if r.get("effective_date") else None
                 ),

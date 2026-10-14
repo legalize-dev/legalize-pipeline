@@ -1,0 +1,12 @@
+{
+  "identifier": "IE-2013-act-26",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/26/act_plain.pdf?versionId=null",
+  "sha256": "3c2c55532c4da86f8809f5b16443e656a1d582093d9339c314b54265c35306e8",
+  "file": "archive-central-bank-2013-numbered-table-header.pdf",
+  "pages": [
+    1,
+    12,
+    80
+  ],
+  "fixture_sha256": "83267ca85dfc779535c6353398f359c18fba34a70cac4e1a66bcd5978b13b957"
+}

@@ -1,0 +1,128 @@
+[
+  {
+    "identifier": "IE-1965-act-17",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1965/17/act_plain.pdf?versionId=l9aCxzNVn7H6qaT_TCwOaPmC1HhhQnlF",
+    "sha256": "51332cff65cac5b35679af7b7b04623a88d18a17caac940506653c35c183f511",
+    "error": "Revised Act PDF is missing sections listed in its contents: 4, 44A",
+    "pages": [
+      1,
+      8,
+      10,
+      29
+    ],
+    "file": "archive-extradition-1965-plain-excerpt.pdf",
+    "fixture_sha256": "196cdf6cdd4f42150226d95b279379fa1e72d5792be9fe02f65f7a192d5910fa"
+  },
+  {
+    "identifier": "IE-1969-act-14",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1969/14/act_plain.pdf?versionId=null",
+    "sha256": "2aed0cfee9cd656d3b835b81fa65d93c34b76639fd4f2400651d326128c71a70",
+    "error": "Revised Act PDF is missing sections listed in its contents: 2",
+    "pages": [
+      1,
+      7
+    ],
+    "file": "archive-industrial-1969-baseline-excerpt.pdf",
+    "fixture_sha256": "f0bc8842b9d61899a18358d347f745a217f43e59cd38acc5756a2819671c2bd4"
+  },
+  {
+    "identifier": "IE-1994-act-28",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1994/28/act_plain.pdf?versionId=null",
+    "sha256": "1ff0ca7e0086ac5a7afee87e025da29187a93195d43db6a4677bb253bf8ec123",
+    "error": "Unassigned marginal text in Revised Act PDF",
+    "pages": [
+      1,
+      7,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28
+    ],
+    "file": "archive-maintenance-1994-schedule-excerpt.pdf",
+    "fixture_sha256": "6d1d2f50cf6274dc4ced01924a390bff488fb5cc9e596b259d307780848752b4"
+  },
+  {
+    "identifier": "IE-1965-act-27",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1965/27/act_plain.pdf?versionId=null",
+    "sha256": "58ce285f678b73e3792130211fc2e922d841c996bc8b879df3d89f695f21d40e",
+    "error": "Duplicate primary section 5 in Revised Act PDF",
+    "pages": [
+      1,
+      11,
+      22,
+      38,
+      51
+    ],
+    "file": "archive-succession-1965-notes-excerpt.pdf",
+    "fixture_sha256": "af160ffdfa2867c2fc4623056c91d651dbc840d99b243df4df43403d1c6bda61"
+  },
+  {
+    "identifier": "IE-2015-act-18",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2015/18/act_plain.pdf?versionId=m8DP_vb7eGQAhMFfdT6VbCBHymiDyk8t",
+    "sha256": "16d920e98a136b17c7a168f4f1eadafb8003127ff1fd9e94080c8716282687b2",
+    "error": "Revised Act PDF is missing sections listed in its contents: 12A, 12B",
+    "pages": [
+      1,
+      10,
+      19,
+      20
+    ],
+    "file": "archive-customs-2015-page-title-excerpt.pdf",
+    "fixture_sha256": "bed27fc658ae5a8387cdb0faa7597818c1c78a421c43fc611d7c549973bfb0a8"
+  },
+  {
+    "identifier": "IE-2022-act-41",
+    "url": "https://revisedacts.lawreform.ie/eli/2022/act/41/revised/en/pdf?annotations=false",
+    "sha256": "434f54775f4274dd1ed97087e30554f0269575356701cbd7a2f308cbf8b9082a",
+    "error": "Revised Act PDF is missing sections listed in its contents: 2",
+    "pages": [
+      1,
+      7,
+      8
+    ],
+    "file": "archive-online-2022-label-excerpt.pdf",
+    "fixture_sha256": "1514966bea57564718bc359e39f8935097104432ae6ca58f04a5b7d4eff89fb9"
+  },
+  {
+    "identifier": "IE-2001-act-18",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2001/18/act_new_plain.pdf?versionId=_x6MH7v3UjnYPeZKA8IP8lFRxbZcFNy8",
+    "sha256": "581c06eb63775877d34f8d691bb70648e44eaa1be48dcdd737a8bd5a104a57c6",
+    "error": "Revised Act PDF is missing sections listed in its contents: 1",
+    "pages": [
+      1,
+      5
+    ],
+    "file": "archive-offenders-2001-first-label-excerpt.pdf",
+    "fixture_sha256": "b720fea0a123426761be8d1bcfc8f96fcebf3ea91dddd94ed4aedaaaf513b57d"
+  },
+  {
+    "identifier": "IE-2006-act-28",
+    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2006/28/act_new_plain.pdf?versionId=WTgYpsgJwwytLNhWTvxPg1t62X6aopfg",
+    "sha256": "1c09e828ecdb048bdc5f22d3803b82909aee16321e6ba17fa4bd6efab82338c2",
+    "error": "Revised Act PDF has no first section",
+    "pages": [
+      1,
+      3,
+      4
+    ],
+    "file": "archive-road-2006-first-label-excerpt.pdf",
+    "fixture_sha256": "1a7776666a6d76c52e1abf2164facbb28c2ddd7aad7b19dfa412b85cc0c7d4f3"
+  },
+  {
+    "identifier": "IE-2017-act-11",
+    "url": "https://revisedacts.lawreform.ie/eli/2017/act/11/revised/en/pdf?annotations=false",
+    "sha256": "c450d687d0be72849490e9e429c2b3e3152a12b5186955aa0252783864c5359f",
+    "error": "Revised Act PDF has no first section",
+    "pages": [
+      1,
+      4
+    ],
+    "file": "archive-information-2017-first-label-excerpt.pdf",
+    "fixture_sha256": "9c94d616ca95ddc4dd7a459f32a9d020d5c5af238d62c1614f5365446928d8ff"
+  }
+]

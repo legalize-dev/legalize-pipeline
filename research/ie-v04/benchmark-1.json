@@ -1,0 +1,26 @@
+{
+  "workers": 1,
+  "requests_per_second_per_worker": 1.0,
+  "seconds": 824.09,
+  "laws": 50,
+  "successful": 35,
+  "failed": [
+    "IE-2001-act-13",
+    "IE-1929-act-10",
+    "IE-1935-act-39",
+    "IE-1946-act-38",
+    "IE-1949-act-29",
+    "IE-1966-act-6",
+    "IE-1972-act-22",
+    "IE-1975-act-22",
+    "IE-1993-act-11",
+    "IE-1996-act-2",
+    "IE-2002-act-28",
+    "IE-2005-act-6",
+    "IE-2010-act-21",
+    "IE-2012-act-40",
+    "IE-2014-act-38"
+  ],
+  "http_calls": 791,
+  "errors": []
+}

@@ -1,0 +1,15 @@
+{
+  "identifier": "IE-2007-act-23",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/23/act_new_plain.pdf?versionId=WX3rdTe6kC1ujq_ZONWBw0_vwZLopcZp",
+  "sha256": "f79ded4c4ea5d225a4fd4d94a02d9f9e1d53a64d9f31c968be6e8bc518718575",
+  "file": "archive-health-2007-blank-page-excerpt.pdf",
+  "pages": [
+    1,
+    10,
+    79,
+    80,
+    81
+  ],
+  "blank_page": 4,
+  "fixture_sha256": "acb9a469ca1dd895477f0a31f91c7378d7ecf9ec615e16857c7963e2c2623254"
+}

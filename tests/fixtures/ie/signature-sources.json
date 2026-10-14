@@ -1,0 +1,23 @@
+[
+  {
+    "fixture": "sample-v04-1999-si-440.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1999/si/440/made/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "d5c8d03f53435fcfdb710db3717aded770babf4b2b89aaae79b0b2ef996a8c45",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-v04-2003-si-155.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/155/made/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "3b03fe9bfbcce51d5c3ec459e3fe6436274d2a24f9a0a2574d028c09284afee0",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-v04-1979-si-63.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1979/si/63/made/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "a3800df625c55456bba89d61d4476858adbf8c7cce0cb53608156d1ca12532e3",
+    "capture": "complete response body from existing local cache"
+  }
+]

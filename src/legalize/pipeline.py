@@ -13,6 +13,7 @@ Generic (country-agnostic) flows:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -22,6 +23,7 @@ import sys
 import threading
 import time
 from collections import Counter
+from contextlib import ExitStack
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
@@ -31,7 +33,7 @@ import requests
 from rich.console import Console
 
 from legalize.committer.git_ops import FastImportDied, FastImporter, GitRepo
-from legalize.committer.message import build_commit_info
+from legalize.committer.message import build_commit_info, format_commit_message
 from legalize.config import Config
 from legalize.models import (
     CommitInfo,
@@ -169,17 +171,29 @@ def finalize_daily(
     return commits_created
 
 
-def _with_last_amendment(metadata: NormMetadata, reform: Reform) -> NormMetadata:
+def _with_last_amendment(
+    metadata: NormMetadata, reform: Reform, reforms: tuple[Reform, ...] = ()
+) -> NormMetadata:
     """Name the amending act on a body that does not change when one lands.
 
-    Only for AS_ENACTED. On a point-in-time norm the amendments *are* the versions,
-    so putting one in the frontmatter states the timeline twice and contradicts the
-    body. And a parser that already knows the official ID keeps it: reform.norm_id
+    Ireland also records effects between archived snapshots, whose body cutoff
+    stays unchanged. Other countries only derive this field for AS_ENACTED,
+    and a parser that already knows the official ID keeps it: reform.norm_id
     is an internal dedupe key on some countries — Portugal's is
     "DRE-133879986@2020-05-17" — while the field is documented as the official ID.
     """
     from legalize.countries import text_state_for
 
+    if metadata.country == "ie":
+        last_amendment = None
+        for event in reforms or (reform,):
+            if event.norm_id != metadata.identifier and event.norm_id.startswith("IE-"):
+                last_amendment = event.norm_id
+            if event == reform:
+                break
+        return replace(
+            metadata, last_amendment=last_amendment, status=reform.status or metadata.status
+        )
     state = metadata.text_state or text_state_for(metadata.country)
     if metadata.country in {"es", "eu"} and state is TextState.AS_ENACTED:
         return replace(
@@ -364,8 +378,15 @@ def generic_fetch_one(
     json_path = Path(cc.data_dir) / "json" / f"{safe_id}.json"
 
     if json_path.exists() and not force:
-        console.print(f"  [dim]{norm_id} already processed, skipping[/dim]")
-        return load_norma_from_json(json_path)
+        if country == "ie":
+            from legalize.fetcher.ie.history import cached_norm_for_text
+
+            cached = cached_norm_for_text(json_path)
+        else:
+            cached = load_norma_from_json(json_path)
+        if cached is not None:
+            console.print(f"  [dim]{norm_id} already processed, skipping[/dim]")
+            return cached
 
     client_cls = get_client_class(country)
     text_parser = get_text_parser(country)
@@ -383,8 +404,18 @@ def generic_fetch_one(
             if hasattr(client, "get_text") and "meta_data" in client.get_text.__code__.co_varnames:
                 get_text_kwargs["meta_data"] = meta_data
             text_data = client.get_text(norm_id, **get_text_kwargs)
+            if country == "ie":
+                from legalize.fetcher.ie.history import cached_norm_for_text
+
+                unchanged = cached_norm_for_text(json_path, text_data)
+                if unchanged is not None:
+                    return unchanged
             blocks = text_parser.parse_text(text_data)
             reforms = _extract_reforms_generic(text_parser, client, norm_id, blocks, text_data)
+            if country == "ie":
+                from legalize.fetcher.ie.history import metadata_for_text
+
+                metadata = metadata_for_text(metadata, text_data)
 
             # Suvestine: replace blocks + reforms with versioned historical data.
             # For a suvestine-capable country a fetch/parse failure is a hard
@@ -426,6 +457,10 @@ def generic_fetch_one(
             )
 
             save_structured_json(cc.data_dir, norm)
+            if country == "ie":
+                from legalize.fetcher.ie.history import save_source_stamp
+
+                save_source_stamp(json_path, text_data)
 
             console.print(
                 f"  [green]✓[/green] {metadata.short_title}: "
@@ -530,10 +565,11 @@ def generic_fetch_all(
             }
             for future in as_completed(futures):
                 done += 1
+                norm_id = futures.pop(future)
                 try:
                     norm = future.result()
                     if norm is not None:
-                        fetched.append(futures[future])
+                        fetched.append(norm_id)
                     else:
                         errors += 1
                 except Exception:
@@ -697,6 +733,171 @@ def _extract_reforms_generic(text_parser, client, norm_id, blocks, text_data=Non
 # ─────────────────────────────────────────────
 
 
+_IE_CURRENT_METADATA_FIELDS = frozenset(
+    {
+        b"parliament_metadata",
+        b"parliament_title_en",
+        b"parliament_title_ga",
+        b"parliament_long_title_en",
+        b"parliament_long_title_ga",
+        b"parliament_date_signed",
+        b"oireachtas_uri",
+        b"related_docs",
+        b"summary",
+        b"pdf_url",
+        b"images_dropped",
+        b"images_dropped_by_source",
+        b"has_formulas",
+        b"legislation_directory_notes",
+        b"legislation_directory_corrections",
+    }
+)
+
+
+def _ie_historical_content(content: bytes) -> bytes:
+    """Exclude only current supplementary observations from historical comparison."""
+    if not content.startswith(b"---\n"):
+        return content
+    frontmatter, separator, body = content[4:].partition(b"\n---\n")
+    if not separator:
+        return content
+    lines = (
+        line
+        for line in frontmatter.split(b"\n")
+        if line.partition(b":")[0] not in _IE_CURRENT_METADATA_FIELDS
+    )
+    return b"---\n" + b"\n".join(lines) + separator + body
+
+
+def _ie_read_history_blob(process, object_id: str, identifier: str) -> bytes:
+    """Request and read one blob, without buffering the law's complete history."""
+    process.stdin.write(object_id.encode("ascii") + b"\n")
+    process.stdin.flush()
+    header = process.stdout.readline().split()
+    if (
+        len(header) != 3
+        or header[0] != object_id.encode("ascii")
+        or header[1] != b"blob"
+        or not header[2].isdigit()
+    ):
+        raise HistoryMismatch(f"{identifier}: cannot read published history; rebuild locally")
+    size = int(header[2])
+    content = process.stdout.read(size)
+    if len(content) != size or process.stdout.read(1) != b"\n":
+        raise HistoryMismatch(f"{identifier}: incomplete published blob; rebuild locally")
+    return content
+
+
+def _validate_ie_published_history(
+    repo_path: str | Path,
+    norm: ParsedNorm,
+    reforms: tuple[Reform, ...],
+    records: list[tuple[str, str, dict[str, str]]] | None = None,
+) -> set[str]:
+    """Validate the complete published prefix against HEAD before writing any new event.
+
+    Batch-check is the fast path. If current supplementary metadata changed,
+    stream one historical blob at a time through one cat-file process and still
+    compare every legal field, source warning and body byte exactly.
+    """
+    metadata = norm.metadata
+    if records is None:
+        histories = {}
+        _published(repo_path, ie_histories=histories, identifier=metadata.identifier)
+        records = histories.get(metadata.identifier, [])
+    if not records:
+        return set()
+
+    for index, (_, _, trailers) in enumerate(records):
+        if index >= len(reforms) or trailers["Source-Id"] != reforms[index].norm_id:
+            raise HistoryMismatch(
+                f"{metadata.identifier}: source history gained an earlier event or changed "
+                "a published event; rebuild locally before publication"
+            )
+        reform = reforms[index]
+        source_date = reform.date.isoformat() if reform.has_source_date else ""
+        if trailers.get("Source-Date", "") != source_date:
+            raise HistoryMismatch(
+                f"{metadata.identifier}: publication date changed for {reform.norm_id}; "
+                "rebuild locally before publication"
+            )
+
+    file_path = norm_to_filepath(metadata)
+    queries = [f"{sha}:{file_path}" for sha, _, _ in records] + [f"HEAD:{file_path}"]
+    result = subprocess.run(
+        ["git", "-C", str(repo_path), "cat-file", "--batch-check=%(objectname) %(objecttype)"],
+        input="\n".join(queries) + "\n",
+        capture_output=True,
+        text=True,
+    )
+    objects = [line.split() for line in result.stdout.splitlines()]
+    if (
+        result.returncode
+        or len(objects) != len(queries)
+        or any(len(parts) != 2 or parts[1] != "blob" for parts in objects)
+    ):
+        raise HistoryMismatch(
+            f"{metadata.identifier}: published history has a missing law file; rebuild locally"
+        )
+    if objects[-1][0] != objects[-2][0]:
+        raise HistoryMismatch(
+            f"{metadata.identifier}: HEAD differs from its published history; rebuild locally"
+        )
+    with ExitStack() as stack:
+        blobs = None
+        for index, (_, message, _) in enumerate(records):
+            reform = reforms[index]
+            markdown = render_norm_at_date(
+                _with_last_amendment(metadata, reform, reforms),
+                norm.blocks,
+                reform.date,
+                include_all=index == 0,
+                source_id=reform.norm_id,
+            )
+            content = markdown.encode("utf-8")
+            object_id = objects[index][0]
+            algorithm = {40: "sha1", 64: "sha256"}.get(len(object_id))
+            if algorithm is None:
+                raise HistoryMismatch(f"{metadata.identifier}: unsupported Git object identity")
+            expected = hashlib.new(
+                algorithm, f"blob {len(content)}\0".encode() + content
+            ).hexdigest()
+            if object_id != expected:
+                if blobs is None:
+                    blobs = stack.enter_context(
+                        subprocess.Popen(
+                            ["git", "-C", str(repo_path), "cat-file", "--batch"],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.DEVNULL,
+                        )
+                    )
+                    stack.callback(blobs.stdout.close)
+                    stack.callback(blobs.stdin.close)
+                published = _ie_read_history_blob(blobs, object_id, metadata.identifier)
+                matches = _ie_historical_content(published) == _ie_historical_content(content)
+                del published
+                if not matches:
+                    raise HistoryMismatch(
+                        f"{metadata.identifier}: source content changed for published event "
+                        f"{reform.norm_id}; rebuild locally before publication"
+                    )
+            info = build_commit_info(
+                CommitType.BOOTSTRAP if index == 0 else CommitType.REFORM,
+                metadata,
+                reform,
+                norm.blocks,
+                file_path,
+                markdown,
+            )
+            if message.rstrip("\n") != format_commit_message(info).rstrip("\n"):
+                raise HistoryMismatch(
+                    f"{metadata.identifier}: source history changed for published event "
+                    f"{reform.norm_id}; rebuild locally before publication"
+                )
+    return {trailers["Source-Id"] for _, _, trailers in records}
+
+
 def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False) -> int:
     """Generate commits for ONE law from its JSON in data/.
 
@@ -744,14 +945,21 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
 
     commits_created = 0
     file_path = norm_to_filepath(metadata)
+    published_ie = (
+        _validate_ie_published_history(cc.repo_path, norm, reforms) if country == "ie" else set()
+    )
 
     for reform in reforms:
         # Idempotency check: Source-Id + Norm-Id (a single Source-Id can be both its own norm AND a reform of another)
-        if repo.has_commit_with_source_id(
-            reform.norm_id,
-            metadata.identifier,
-            effective_date=reform.effective_date,
-            stage=country == "es",
+        if (
+            reform.norm_id in published_ie
+            if country == "ie"
+            else repo.has_commit_with_source_id(
+                reform.norm_id,
+                metadata.identifier,
+                effective_date=reform.effective_date,
+                stage=country == "es",
+            )
         ):
             continue
 
@@ -760,31 +968,35 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
 
         norm_meta = (
             metadata
-            if is_first and country not in {"es", "eu"}
-            else _with_last_amendment(metadata, reform)
+            if is_first and country not in {"es", "eu", "ie"}
+            else _with_last_amendment(metadata, reform, reforms)
         )
         markdown = render_norm_at_date(
             norm_meta,
             blocks,
             reform.date,
             include_all=is_first,
-            source_id=reform.norm_id if country in {"es", "eu"} else None,
+            source_id=reform.norm_id if country in {"es", "eu", "ie"} else None,
             effective_date=(reform.effective_date or reform.date)
             if country == "es"
             else reform.effective_date,
         )
         changed = repo.write_and_add(file_path, markdown)
+        if repo.refused:
+            break
 
-        if not changed and not is_first and country not in {"es", "eu"}:
+        if not changed and not is_first and country not in {"es", "eu", "ie"}:
             continue
 
         info = build_commit_info(commit_type, metadata, reform, blocks, file_path, markdown)
-        sha = repo.commit(info, allow_empty=country in {"es", "eu"})
+        sha = repo.commit(info, allow_empty=country in {"es", "eu", "ie"})
 
         if sha:
             commits_created += 1
             console.print(f"    [green]✓[/green] {reform.date} — {info.subject}")
 
+    if repo.refused:
+        raise ShadowedLaw(f"{norm_id}: another act already holds {file_path}")
     return commits_created
 
 
@@ -873,7 +1085,12 @@ def commit_all(
 # ─────────────────────────────────────────────
 
 
-def _published(repo_path: str | Path) -> tuple[Counter, set[str]]:
+def _published(
+    repo_path: str | Path,
+    *,
+    ie_histories: dict[str, list[tuple[str, str, dict[str, str]]]] | None = None,
+    identifier: str | None = None,
+) -> tuple[Counter, set[str]]:
     """What the repo already carries, keyed by version, and the laws it names.
 
     The key is ``(Source-Id, Norm-Id, Source-Date)`` and it is *counted*, not a
@@ -911,17 +1128,20 @@ def _published(repo_path: str | Path) -> tuple[Counter, set[str]]:
     """
     import subprocess
 
+    args = ["git", "-C", str(repo_path), "log"]
+    if ie_histories is not None:
+        args += ["--reverse", "--format=%x1e%H%x00%B"]
+        args += (
+            ["--fixed-strings", f"--grep=Norm-Id: {identifier}"]
+            if identifier
+            else ["--grep=^Norm-Id: "]
+        )
+        args.append("HEAD")
+    else:
+        args += ["--format=%x1e%B", "--grep=^Norm-Id: ", "refs/heads/main"]
     try:
         out = subprocess.run(
-            [
-                "git",
-                "-C",
-                str(repo_path),
-                "log",
-                "--format=%x1e%B",
-                "--grep=^Norm-Id: ",
-                "refs/heads/main",
-            ],
+            args,
             capture_output=True,
             text=True,
         )
@@ -933,13 +1153,39 @@ def _published(repo_path: str | Path) -> tuple[Counter, set[str]]:
     versions: Counter = Counter()
     norms: set[str] = set()
     for body in out.stdout.split("\x1e"):
+        sha = ""
+        if ie_histories is not None:
+            sha, _, body = body.partition("\0")
         trailers = dict(re.findall(r"^([A-Z][\w-]*): *(.+?)\s*$", body, re.M))
         source, norm = trailers.get("Source-Id"), trailers.get("Norm-Id")
+        if identifier and norm != identifier:
+            continue
         if norm:
             norms.add(norm)
         if source and norm:
             versions[(source, norm, trailers.get("Source-Date", ""))] += 1
+            if ie_histories is not None:
+                ie_histories.setdefault(norm, []).append((sha.strip(), body, trailers))
     return versions, norms
+
+
+def _check_ie_fast_import_head(repo_path: str | Path) -> None:
+    """Validate the branch fast-import actually extends, without changing checkout."""
+    # FastImporter currently writes this ref, independent of GitConfig.branch.
+    # Its history must be the HEAD read by the Irish published-prefix validator.
+    targets = []
+    for ref in ("HEAD", "refs/heads/main"):
+        result = subprocess.run(
+            ["git", "-C", str(repo_path), "rev-parse", "--verify", ref],
+            capture_output=True,
+            text=True,
+        )
+        targets.append(result.stdout.strip() if result.returncode == 0 else None)
+    if targets[0] != targets[1]:
+        raise HistoryMismatch(
+            "ie: HEAD differs from refs/heads/main, the ref fast-import extends; "
+            "select the intended checkout before running the import"
+        )
 
 
 def commit_all_fast(
@@ -948,6 +1194,8 @@ def commit_all_fast(
     limit: int | None = None,
     offset: int = 0,
     dry_run: bool = False,
+    *,
+    norm_ids: set[str] | None = None,
 ) -> int:
     """Generate commits for ALL laws using git fast-import.
 
@@ -959,15 +1207,30 @@ def commit_all_fast(
     holding anything else raises HistoryMismatch rather than stacking a second
     history on the first. It still does not skip individual commits — the unit
     is the prefix, not the file.
+
+    An explicit norm_ids set limits processing to a caller's verified source
+    closure; every selected identifier must have structured data.
     """
     cc = config.get_country(country)
     json_dir = Path(cc.data_dir) / "json"
     if not json_dir.exists():
+        if norm_ids:
+            raise NothingPublished(
+                f"{country}: selected norms have no structured data: {', '.join(sorted(norm_ids))}"
+            )
         console.print("[red]No data in data/json/. Run fetch first.[/red]")
         return 0
 
     json_files = sorted(json_dir.glob("*.json"))
     total_available = len(json_files)
+    if norm_ids is not None:
+        by_identifier = {path.stem: path for path in json_files}
+        missing = norm_ids - by_identifier.keys()
+        if missing:
+            raise NothingPublished(
+                f"{country}: selected norms have no structured data: {', '.join(sorted(missing))}"
+            )
+        json_files = [by_identifier[identifier] for identifier in sorted(norm_ids)]
     json_files = json_files[offset:]
     if limit:
         json_files = json_files[:limit]
@@ -1001,14 +1264,26 @@ def commit_all_fast(
     # already does per reform (``has_commit_with_source_id``); the bootstrap
     # path simply never had it. ``bootstrap --fresh`` empties the repo
     # first, so a deliberate rebuild sees nothing here and re-emits everything.
-    already, published_norms = _published(cc.repo_path)
+    if country == "ie":
+        _check_ie_fast_import_head(cc.repo_path)
+    ie_histories = {} if country == "ie" else None
+    already, published_norms = _published(cc.repo_path, ie_histories=ie_histories)
+    published_ie_dates: dict[tuple[str, str], set[str]] = {}
+    if country == "ie":
+        for (source, identifier, published), count in already.items():
+            if count:
+                published_ie_dates.setdefault((source, identifier), set()).add(published)
     skipped = 0
     seen_identifiers: set[str] = set()
 
     for json_file in json_files:
         try:
             norm = load_norma_from_json(json_file)
-        except (OSError, ValueError):
+        except (OSError, ValueError) as exc:
+            if norm_ids is not None:
+                raise NothingPublished(
+                    f"{country}: selected norm cannot be loaded: {json_file}"
+                ) from exc
             logger.error("Error loading %s, skipping", json_file, exc_info=True)
             continue
 
@@ -1024,20 +1299,39 @@ def commit_all_fast(
             )
 
         seen_identifiers.add(norm.metadata.identifier)
+        if country == "ie":
+            _validate_ie_published_history(
+                cc.repo_path, norm, reforms, ie_histories.get(norm.metadata.identifier, [])
+            )
+        missing_ie_event = False
         for i, reform in enumerate(reforms):
             key = (
                 reform.norm_id,
                 norm.metadata.identifier,
                 reform.date.isoformat() if reform.has_source_date else "",
             )
+            known_dates = published_ie_dates.get(key[:2])
+            if country == "ie" and known_dates is not None and known_dates != {key[2]}:
+                raise HistoryMismatch(
+                    f"{norm.metadata.identifier}: publication date changed for {reform.norm_id}; "
+                    "rebuild locally before publication instead of duplicating the source event"
+                )
             if already[key] > 0:
+                if country == "ie" and missing_ie_event:
+                    raise HistoryMismatch(
+                        f"{norm.metadata.identifier}: source history gained an earlier event; "
+                        "rebuild locally before publication"
+                    )
                 already[key] -= 1
                 skipped += 1
                 continue
+            missing_ie_event = True
             # A retroactive EU consolidation may precede its base publication
             # in legal time. Queue the original first without falsifying dates.
             order_date = (
-                max(norm.metadata.publication_date, reform.date) if country == "eu" else reform.date
+                max(norm.metadata.publication_date, reform.date)
+                if country in {"eu", "ie"}
+                else reform.date
             )
             if country == "es" and reform.effective_date is not None:
                 order_date = max(reform.date, reform.effective_date)
@@ -1128,15 +1422,15 @@ def commit_all_fast(
 
                     norm_meta = (
                         metadata
-                        if is_first and country not in {"es", "eu"}
-                        else _with_last_amendment(metadata, reform)
+                        if is_first and country not in {"es", "eu", "ie"}
+                        else _with_last_amendment(metadata, reform, reforms_cached)
                     )
                     markdown = render_norm_at_date(
                         norm_meta,
                         blocks,
                         reform.date,
                         include_all=is_first,
-                        source_id=reform.norm_id if country in {"es", "eu"} else None,
+                        source_id=reform.norm_id if country in {"es", "eu", "ie"} else None,
                         effective_date=(reform.effective_date or reform.date)
                         if country == "es"
                         else reform.effective_date,

@@ -1,0 +1,195 @@
+[
+  {
+    "identifier": "IE-1991-act-29",
+    "kind": "directory_citation_error",
+    "actual_target": "IE-1988-act-29",
+    "relation": {
+      "source_id": "IE-1988-si-286",
+      "note": "S. 5 form prescribed",
+      "provision": "S.I. No. 286 of 1988, reg. 4(1)",
+      "commencement": "",
+      "commencement_source": "",
+      "effective_date": null,
+      "pending": false,
+      "whole_repeal": false,
+      "partial_repeal": false,
+      "publication_date": "1988-11-10",
+      "source_url": "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html",
+      "directory_url": "https://www.irishstatutebook.ie/isbc/1991_29.html"
+    },
+    "enacted": {
+      "file": "sample-context-IE-1991-act-29-enacted.gz",
+      "sha256": "58ea7aeb6f25a2994f4bd1e4381a3c70a982b1fe1b4f765128cc937bb4347c1a",
+      "url": "https://www.irishstatutebook.ie/eli/1991/act/29/enacted/en/xml"
+    },
+    "directory": {
+      "file": "sample-context-IE-1991-act-29-directory.gz",
+      "sha256": "ddf11b06e4a5707aa80309f344ba939e0ff819ab8603cc5e11ecd17ef82caa23",
+      "url": "https://www.irishstatutebook.ie/isbc/1991_29.html"
+    },
+    "source": {
+      "file": "sample-context-IE-1988-si-286.gz",
+      "sha256": "8ea2099d585d69c7e5f17b7773dd0b22e4c3acdd3b8a30da879d21407b75054e",
+      "url": "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html"
+    },
+    "proof": {
+      "file": "sample-context-IE-1988-si-286.gz",
+      "sha256": "8ea2099d585d69c7e5f17b7773dd0b22e4c3acdd3b8a30da879d21407b75054e",
+      "url": "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html"
+    },
+    "target": {
+      "file": "sample-context-IE-1988-act-29-target.json.gz",
+      "sha256": "7b22343f84f9c6b436934e24f1bb0bc9e7442a43d033ae19e74976afb7d40f8e",
+      "url": "https://www.irishstatutebook.ie/eli/1988/act/29/enacted/en/html",
+      "title": "LOCAL GOVERNMENT (MULTI-STOREY BUILDINGS) ACT, 1988"
+    }
+  },
+  {
+    "identifier": "IE-1992-act-29",
+    "kind": "directory_citation_error",
+    "actual_target": "IE-1988-act-29",
+    "relation": {
+      "source_id": "IE-1988-si-286",
+      "note": "S. 4(1) application modified",
+      "provision": "S.I. No. 286 of 1988, reg. 5",
+      "commencement": "",
+      "commencement_source": "",
+      "effective_date": null,
+      "pending": false,
+      "whole_repeal": false,
+      "partial_repeal": false,
+      "publication_date": "1988-11-10",
+      "source_url": "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html",
+      "directory_url": "https://www.irishstatutebook.ie/isbc/1992_29.html"
+    },
+    "enacted": {
+      "file": "sample-context-IE-1992-act-29-enacted.gz",
+      "sha256": "22ac837844d45dea1cb70e90329175839c995b90c901a6e166297733081000d1",
+      "url": "https://www.irishstatutebook.ie/eli/1992/act/29/enacted/en/xml"
+    },
+    "directory": {
+      "file": "sample-context-IE-1992-act-29-directory.gz",
+      "sha256": "76b29f9e3776cd558d5a777ad09aae8b7a8b228539c8270b14eee926fd005d3f",
+      "url": "https://www.irishstatutebook.ie/isbc/1992_29.html"
+    },
+    "source": {
+      "file": "sample-context-IE-1988-si-286.gz",
+      "sha256": "8ea2099d585d69c7e5f17b7773dd0b22e4c3acdd3b8a30da879d21407b75054e",
+      "url": "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html"
+    },
+    "proof": {
+      "file": "sample-context-IE-1988-si-286.gz",
+      "sha256": "8ea2099d585d69c7e5f17b7773dd0b22e4c3acdd3b8a30da879d21407b75054e",
+      "url": "https://www.irishstatutebook.ie/eli/1988/si/286/made/en/html"
+    },
+    "target": {
+      "file": "sample-context-IE-1988-act-29-target.json.gz",
+      "sha256": "7b22343f84f9c6b436934e24f1bb0bc9e7442a43d033ae19e74976afb7d40f8e",
+      "url": "https://www.irishstatutebook.ie/eli/1988/act/29/enacted/en/html",
+      "title": "LOCAL GOVERNMENT (MULTI-STOREY BUILDINGS) ACT, 1988"
+    }
+  },
+  {
+    "identifier": "IE-1996-act-21",
+    "kind": "directory_citation_error",
+    "actual_target": "IE-1966-act-21",
+    "relation": {
+      "source_id": "IE-1974-si-132",
+      "note": "S. 26(1)(b) applied with modifications",
+      "provision": "S.I. No. 132 of 1974, reg. 2",
+      "commencement": "",
+      "commencement_source": "",
+      "effective_date": null,
+      "pending": false,
+      "whole_repeal": false,
+      "partial_repeal": false,
+      "publication_date": "1974-05-10",
+      "source_url": "https://www.irishstatutebook.ie/eli/1974/si/132/made/en/html",
+      "directory_url": "https://www.irishstatutebook.ie/isbc/1996_21.html"
+    },
+    "enacted": {
+      "file": "sample-context-IE-1996-act-21-enacted.gz",
+      "sha256": "b68fa9d290fc4dd59648e43532bae2d61a98068edab2b782e45cfc4c3acbd8bc",
+      "url": "https://www.irishstatutebook.ie/eli/1996/act/21/enacted/en/xml"
+    },
+    "directory": {
+      "file": "sample-context-IE-1996-act-21-directory.gz",
+      "sha256": "2cd65bd589e2b60812634268e2849b07d24699b88f194b834156542dad3a8b7b",
+      "url": "https://www.irishstatutebook.ie/isbc/1996_21.html"
+    },
+    "source": {
+      "file": "sample-context-IE-1974-si-132.gz",
+      "sha256": "4c66ebe15038e2e45c8177db7beb84ef44d3823e48244ccb1d620a49e58c00f7",
+      "url": "https://www.irishstatutebook.ie/eli/1974/si/132/made/en/html"
+    },
+    "proof": {
+      "file": "sample-context-IE-1974-si-132.gz",
+      "sha256": "4c66ebe15038e2e45c8177db7beb84ef44d3823e48244ccb1d620a49e58c00f7",
+      "url": "https://www.irishstatutebook.ie/eli/1974/si/132/made/en/html"
+    },
+    "target": {
+      "file": "sample-context-IE-1966-act-21-target.json.gz",
+      "sha256": "22bdc6cc609350489ecffb6f9ecb79faf3d311df92ace5859be11e4d5dba6b86",
+      "url": "https://www.irishstatutebook.ie/eli/1966/act/21/enacted/en/html",
+      "title": "HOUSING ACT, 1966"
+    }
+  },
+  {
+    "identifier": "IE-1981-act-16",
+    "kind": "host_provision",
+    "actual_target": "IE-1981-act-16",
+    "relation": {
+      "source_id": "IE-1975-si-307",
+      "note": "S.37 (1), cesser. of applic. of.",
+      "provision": "S. I. No. 307 of 1975, par. 9 (2)",
+      "commencement": "",
+      "commencement_source": "",
+      "effective_date": null,
+      "pending": false,
+      "whole_repeal": false,
+      "partial_repeal": false,
+      "publication_date": "1975-12-16",
+      "source_url": "https://www.irishstatutebook.ie/eli/1975/si/307/made/en/html",
+      "directory_url": "https://www.irishstatutebook.ie/isbc/1981_16.html"
+    },
+    "enacted": {
+      "file": "sample-context-IE-1981-act-16-enacted.gz",
+      "sha256": "191c2e672d9341197284d2592dac56675e71aee9fba2eb066c002b16d8ec0b27",
+      "url": "https://www.irishstatutebook.ie/eli/1981/act/16/enacted/en/xml"
+    },
+    "directory": {
+      "file": "sample-context-IE-1981-act-16-directory.gz",
+      "sha256": "7509d5174ac4621cf470e44a280de880f8becf6ee722ae238ce983787ade26ec",
+      "url": "https://www.irishstatutebook.ie/isbc/1981_16.html"
+    },
+    "source": {
+      "file": "sample-context-IE-1975-si-307.gz",
+      "sha256": "36e2cf01f4757ed5971f9c36b30e21c1ae9525f09704022362473a1345bdea79",
+      "url": "https://www.irishstatutebook.ie/eli/1975/si/307/made/en/html"
+    },
+    "proof": {
+      "file": "sample-context-finance-1992-section-152.gz",
+      "sha256": "eda3967b14e3f87c86c8a4701098d2a8f35c81a76925a6ac0b98f1e4536fa7ca",
+      "url": "https://www.irishstatutebook.ie/eli/1992/act/9/section/152/enacted/en/html"
+    },
+    "later_relation": {
+      "source_id": "IE-1992-act-9",
+      "note": "S.37 (1), cesser. of applic. of.",
+      "provision": "9/1992, s.152 (1)",
+      "commencement": "",
+      "commencement_source": "",
+      "effective_date": null,
+      "pending": false,
+      "whole_repeal": false,
+      "partial_repeal": false,
+      "publication_date": "1992-05-28",
+      "source_url": "https://www.irishstatutebook.ie/eli/1992/act/9/enacted/en/html",
+      "directory_url": "https://www.irishstatutebook.ie/isbc/1981_16.html"
+    },
+    "later_metadata": {
+      "file": "sample-context-finance-1992-metadata.gz",
+      "sha256": "d34fb00417b79b6e403e5a7ea3234214809d696630d1de2569f7e75786e4537e",
+      "url": "https://www.irishstatutebook.ie/eli/1992/act/9/enacted/en/xml"
+    }
+  }
+]

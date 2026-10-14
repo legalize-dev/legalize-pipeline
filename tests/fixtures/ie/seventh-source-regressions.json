@@ -1,0 +1,51 @@
+[
+  {
+    "identifier": "IE-2015-act-66",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2015_66.html",
+    "source_sha256": "d211f1f7e61741f25d8d514e27549a4578a9a616969461b5f2f8dad848a1f562",
+    "file": "sample-effects-seventh-2015-act-66.html",
+    "fixture_sha256": "36291e5fc88bd825c2a8d19a227503dc538a96e7bfb14e1a0628e8891bc3ceb1"
+  },
+  {
+    "identifier": "IE-2015-act-16",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2015_16.html",
+    "source_sha256": "95e0e6161a252b60e10f1910b987e5fe3d46af227785467489ca77b5b781c51a",
+    "file": "sample-effects-seventh-2015-act-16.html",
+    "fixture_sha256": "d3ef0517f944821b6bac83336b2b3c76960c2cac488842d1e811c0c395b71960"
+  },
+  {
+    "identifier": "IE-2015-act-27",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2015_27.html",
+    "source_sha256": "342b5aa3b4458dedbb0ff0362d1c2f61db44651c781094d00f8ad6c2250104b8",
+    "file": "sample-effects-seventh-2015-act-27.html",
+    "fixture_sha256": "e3546516c29e61352cff968c2753355a80c3af88fd80652588cecea12e5ff961"
+  },
+  {
+    "identifier": "IE-2015-act-9",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2015_9.html",
+    "source_sha256": "fc070476e626fa73c8fd55d749aee64c439b0061a85c93e7b5d4f2efa3841393",
+    "file": "sample-effects-seventh-2015-act-9.html",
+    "fixture_sha256": "c279e38fece37be676477607c2eba5f93434d2819e42f5fb7440ef5ab8e9a483"
+  },
+  {
+    "identifier": "IE-1984-act-9",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1984_9.html",
+    "source_sha256": "f811f551ab579e7c559aeebf5334999351b198e4b8cae779825c9ffd2e7ad9b4",
+    "file": "sample-effects-seventh-1984-act-9.html",
+    "fixture_sha256": "2a2891bef21ef994092adbb8fd3bb5b3f5c1a7328895b3410803bcae81860aac"
+  },
+  {
+    "identifier": "IE-1966-act-21",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1966_21.html",
+    "source_sha256": "15f3c8d0437731678fd285ed81eaca3a17c0b538bc6aa5424a4da281472580c7",
+    "file": "sample-effects-seventh-1966-act-21.html",
+    "fixture_sha256": "d17c515d849f997b6f0d39e916199a160453e38d5ce5c48aab37454844d23d5d"
+  },
+  {
+    "corroboration": {
+      "url": "https://www.irishstatutebook.ie/eli/2017/act/19/section/2/enacted/en/html",
+      "sha256": "1e5a087206a3ab952d378e0ff0563f0fc9389026158a3987d9b821fbf6124ce8",
+      "text": "Repeals 2. (1) Section 24 of the Principal Act is repealed. (2) Part 11 of the Children and Family Relationships Act 2015 is repealed."
+    }
+  }
+]

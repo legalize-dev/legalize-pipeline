@@ -203,6 +203,10 @@ class Version:
     effective_date: date | None
     paragraphs: tuple[Paragraph, ...]
     superseded_before_commencement: bool = False
+    # A source can switch from an enactment to dated consolidated snapshots.
+    text_state: TextState | None = None
+    source: str | None = None
+    source_warning: str | None = None
 
     @property
     def in_force_from(self) -> date:
@@ -298,6 +302,7 @@ class Reform:
     has_source_date: bool = True
     # A publication may introduce several successive versions of the same text.
     effective_date: Optional[date] = None
+    status: NormStatus | None = None
 
 
 # ─────────────────────────────────────────────

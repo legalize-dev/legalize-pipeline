@@ -1,0 +1,176 @@
+[
+  {
+    "file": "sample-duty-order-index-1941.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1941/si",
+    "source_sha256": "4362e3f8de07b49ae89f9ecc88c026f830962bc44bf36423364cf5e17d897bc5",
+    "fixture_sha256": "07bac22088bb6ec15bd5425a1fbe13e19d9011f41e1371d685e4a198717573ac",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1951.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1951/si",
+    "source_sha256": "19a53cc31287b51d1b666d51fca270a52881cd885523faf79a48ff6db54d639b",
+    "fixture_sha256": "28e82cd6e8726dc577c3aaa410de9801fad4abebc22438c668b71534e8927af4",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1952.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1952/si",
+    "source_sha256": "880ca17b8a1ba2eabc298d7202997a453a2cd2d0d5dc16b7d2f8e54d7c8b9172",
+    "fixture_sha256": "0ad1f42287fd2510a589c16541ba1214508059df8374b15841bf160ec6c061f5",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1954.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1954/si",
+    "source_sha256": "123a7b48880c7bc98f00103d86a31c12ff60721ddaa1aed1ff53f0c1e418ab97",
+    "fixture_sha256": "6354d0d8c28c01bbf644fb98374a08a40864568e89f5a3138e19ef8b871c6e2a",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1955.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1955/si",
+    "source_sha256": "0c712bb8abcc1a68420fb134c76e6dcd80f08e854155c14dd3a2449bdc2224e5",
+    "fixture_sha256": "99b95fe6c1749c621aade3ad84556ecc562996d0b97a3db74cc16cb7da5513ea",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-duty-order-index-1957.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1957/si",
+    "source_sha256": "27f12380eec292d7a8f6ddafa6d5bf1e481e0be4d65d7bb5974058710aa7e77e",
+    "fixture_sha256": "3e1730ebdae3d85e41811b840e34bf92fb19c3c2c3be1c4fb341aa3a778b48c3",
+    "extraction": "unchanged relevant index rows"
+  },
+  {
+    "file": "sample-effects-secondary-1936-55.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1936_55.html",
+    "source_sha256": "2e45b938adfde02991b8c1a82a70ffd5d7e71c1cc4102d7c1ed029257d3fb77c",
+    "fixture_sha256": "76ca4c5d34ca220cf609e00cf78de721acca5efc70b56b3577c1a9e569ea590f",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-effects-secondary-1936-45.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1936_45.html",
+    "source_sha256": "21a8972d133fad4f93097e5c0b8dc7aab371706882c2bd540e45ffa7bcb2b43b",
+    "fixture_sha256": "f7b20bd98a003f387d0803456c4c50b7f80a1021c97a736d67ac11c25ad70ddb",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-effects-secondary-1939-13.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1939_13.html",
+    "source_sha256": "dc81d6715449a3bb865ab191f01d6789fe592f43c2cc85251a4ec4a69451cfb1",
+    "fixture_sha256": "72e0a24dbb782e76aa2d326b5f4a4085a9acd6aed6697048843f389cb46d67f5",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-effects-secondary-1942-22.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1942_22.html",
+    "source_sha256": "0d8c77f98e363a07510aa61f5697656b03d19c840aface957d7889a422ab211f",
+    "fixture_sha256": "bd8f1405141fcc6d02757516c3b2d1f786e21161d22d861efdab5df51ae18975",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-effects-secondary-1955-28.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1955_28.html",
+    "source_sha256": "4e2df80b7b4cdf0b228ec2f0aaa141b801f69c54c134c9e24e44854460823ada",
+    "fixture_sha256": "ac6f0cd395b11e66c2243623ab3b0f4d7ccf9395e88b9649a6d390e3dccee3dc",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-effects-secondary-1958-5.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1958_5.html",
+    "source_sha256": "acdf81a5b44b8a0609d0c7a4e280823df028e05a3179133dc50ca6bd14ccb1c9",
+    "fixture_sha256": "e2c0fd31a2828cac39b5c58c5afb15902d6d17c7cb7d36ada84383c99a4a8039",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-effects-secondary-1961-24.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1961_24.html",
+    "source_sha256": "e73c379ea00d84378ab82b9626401b8fac10ba04f304c9a86e723667464f5f97",
+    "fixture_sha256": "4aa451a5475d8e0e9fc64542c852a0ac03ea87ae34a3e05c49d7ac333b84368b",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-effects-secondary-1977-12.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1977_12.html",
+    "source_sha256": "e7dffe74737093bc78128f8ae5b348181302ca45305369b9acd28ae10bb20eb0",
+    "fixture_sha256": "9c57ac4df6e9e022dfed77648681d10a9c91d2a5fcab80e5cdea034ddefb2301",
+    "extraction": "unchanged selected rows and footnotes"
+  },
+  {
+    "file": "sample-ie-1959-act-p1-secondary.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1959/prv/1/enacted/en/xml",
+    "source_sha256": "c17cb2ed57d429128f4cae33f16b30c8ae2b2aa1d79d59adcda5ee932baabc63",
+    "fixture_sha256": "c17cb2ed57d429128f4cae33f16b30c8ae2b2aa1d79d59adcda5ee932baabc63",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "file": "sample-ie-1924-act-p1-secondary.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1924/prv/1/enacted/en/xml",
+    "source_sha256": "e9441df524d68ffb6e7d7e8e70982fc2ad82fe3287f345112bd547ee46492e33",
+    "fixture_sha256": "e9441df524d68ffb6e7d7e8e70982fc2ad82fe3287f345112bd547ee46492e33",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "file": "sample-ie-1924-act-p2-secondary.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1924/prv/2/enacted/en/xml",
+    "source_sha256": "8fc47a80f60568fd025cd86b2ba0f0d0f6ebc238fe060a0053b9d9f734c86c2b",
+    "fixture_sha256": "8fc47a80f60568fd025cd86b2ba0f0d0f6ebc238fe060a0053b9d9f734c86c2b",
+    "extraction": "complete unchanged source"
+  },
+  {
+    "file": "sample-ie-1977-si-390-secondary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1977/si/390/made/en/html",
+    "source_sha256": "f220f12c6efdfca43d8aca23b8959b272a4dc0582e49a5b88348d5ecb07f91d1",
+    "fixture_sha256": "4a2231230fbb821343ac4ae567239cdffb436a052d67c26ce6fa671d2f720fd3",
+    "extraction": "title and legislative body"
+  },
+  {
+    "file": "sample-ie-1972-si-164-secondary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1972/si/164/made/en/html",
+    "source_sha256": "8da5b119b5eccda8a914cd591a80dfcbf4e7d98d9883dd6e951d7780c090fc26",
+    "fixture_sha256": "24ac28139d0445915ea1b2632c2a3dfcbd5e9d34bc8ca7c8416af7a9783d2720",
+    "extraction": "title and legislative body"
+  },
+  {
+    "file": "sample-ie-2017-act-33-secondary.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/2017/act/33/enacted/en/xml",
+    "source_sha256": "967c3a99f05ac734fd45e9ac3f160dfd5dcf494bf30fd4a5e5ebf3190a32c40f",
+    "fixture_sha256": "967c3a99f05ac734fd45e9ac3f160dfd5dcf494bf30fd4a5e5ebf3190a32c40f",
+    "extraction": "complete unchanged source",
+    "corroboration": {
+      "source_url": "https://www.irishstatutebook.ie/eli/2017/act/33/enacted/en/pdf",
+      "sha256": "59694ec18f45e6fbb31c9abf70fb09c1279df2d3e2d9fe53b6c798c03f5ff5da",
+      "date_excerpt": "[13th December, 2017]",
+      "pdf_page": 5
+    }
+  },
+  {
+    "file": "sample-ie-1978-si-203-secondary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1978/si/203/made/en/html",
+    "source_sha256": "e63d13d704007711ed1a48ec4c8ac6a147e8de653d52cc53a2a5565c0b3506ad",
+    "fixture_sha256": "40bfd5735684238a4031923dcaf80924622a48fa8931124b6c787082de10d1b0",
+    "extraction": "title and legislative body"
+  },
+  {
+    "file": "sample-ie-2003-si-196-secondary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/196/made/en/html",
+    "source_sha256": "250a85e01d8bd7f9f1ff6605659317f77e122203cd73dd1f734a9c5288f9bcab",
+    "fixture_sha256": "20d2f9cedb695bba94f3297558fb7b8196fd86c7d9ec32f6aac75f2636536b0d",
+    "extraction": "title and legislative body"
+  },
+  {
+    "file": "sample-ie-1997-si-85-secondary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1997/si/85/made/en/html",
+    "source_sha256": "d6edacee005559ec0a634f7ea9d6122386c99b4a110dd222d5a0a6ad0b1cee26",
+    "fixture_sha256": "efd0e7d252df61aeee1f39027632b91c3dc79d9359a7f2cc96b31c4f7affdf35",
+    "extraction": "title and legislative body"
+  },
+  {
+    "file": "sample-insurance-1989-schedule1.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1989/act/3/schedule/1/enacted/en/html",
+    "source_sha256": "1fd1cfc0b85414e598fa3daa952d03f6368361370141dd37c1aed50ebd4f5da3",
+    "fixture_sha256": "84613627d6033eee9ca8d8702336cd58500d63f3ebab6d006625c5af9ba4854b",
+    "extraction": "complete div#act"
+  }
+]

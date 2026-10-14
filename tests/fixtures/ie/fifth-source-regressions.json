@@ -1,0 +1,129 @@
+[
+  {
+    "source_url": "https://www.irishstatutebook.ie/eli/2021/act/3/enacted/en/xml",
+    "source_sha256": "9d6d25884ee1c5e5526e9462ae4adf4677aa51934a4b1b60e075fa7e96aaf844",
+    "file": "sample-ie-2021-act-3-fifth.xml",
+    "fixture_sha256": "382ee96251e0e41723cddbd352875ca69e8762dd25696296cfe695ad3a0280c8"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/eli/2022/act/38/enacted/en/xml",
+    "source_sha256": "9ef4c38f01fe3eafe915c67c10bd6bde4217e60a1ab9e522ebc2f887e564f5e1",
+    "file": "sample-ie-2022-act-38-fifth.xml",
+    "fixture_sha256": "703168db0cbb9d79a00e5f8780d78f507c59c124f8cc8e88fb1009e5173f75fe"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/79/made/en/html",
+    "source_sha256": "1ec0454f65c8441af61fcf0795c9721d63d61bdc0f6b9056aa412a198d3b278a",
+    "file": "sample-ie-2003-si-79-fifth.html",
+    "fixture_sha256": "1af2fb5a75b4405bf176646016f70617cf349de74f392174c301a600ca6ae728"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/497/made/en/html",
+    "source_sha256": "13f284198bbb8d0185e8395020b8cd663d763392ffbfe05217a082db6cf268f4",
+    "file": "sample-ie-2003-si-497-fifth.html",
+    "fixture_sha256": "ca83eb68d1c39b7659e26ccf301d710e83a24649604a955403ac2a3bb0bd5b92"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/eli/2006/si/341/made/en/html",
+    "source_sha256": "d9efc575c4cb9bfd570dc06720e95f64dca314f7853b4500146237901c507e42",
+    "file": "sample-ie-2006-si-341-fifth.html",
+    "fixture_sha256": "a77096b86f726352b8680bc9127400c691606b188978fdb494b04770e5309217"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2010_25.html",
+    "source_sha256": "b1925692ca75654e15e32fc893b6e8730fe92164d82a796cb3cb746321094536",
+    "file": "sample-effects-fifth-2010-act-25.html",
+    "fixture_sha256": "9553c283c63a150e63ef49fd028bd8ca313b5298bada6772db3b75aa40a36f15"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2007_10.html",
+    "source_sha256": "1cecc1d113daf5b7566ac32780f4e9830982a1d2a174db4ad4f9e7125d6b540a",
+    "file": "sample-effects-fifth-2007-act-10.html",
+    "fixture_sha256": "64f33fc2eb239f363420ca92009051283227cf6a623cca30edcde557f75cd637"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2006_23.html",
+    "source_sha256": "c09d5abb84ebec515479345304a6cf80e3c8d51a6d7c2b2565e0d28a586cb0f6",
+    "file": "sample-effects-fifth-2006-act-23.html",
+    "fixture_sha256": "4a4c1c451234f026aa61b12e32251cfe8f9f335f43d4db1cb72ca1f84995835e"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2006_26.html",
+    "source_sha256": "6c0a21852f3a1061a44b40bc0a3e99a1f39f64009ce1f751e8e2b627652bf302",
+    "file": "sample-effects-fifth-2006-act-26.html",
+    "fixture_sha256": "70f4fd6532e96a20d86bff77a7be895d6f33b31bb1e74fa12e5c8029d85edfdf"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2009_45.html",
+    "source_sha256": "07526390033d47f4da6e286035c399c098cac0204629e5509990387acad358b0",
+    "file": "sample-effects-fifth-2009-act-45.html",
+    "fixture_sha256": "f787168d718ee45c50f99617b3943f683efb50779061639809f1f6489a465345"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2013_23.html",
+    "source_sha256": "1ca2497bf9dff5a22d6445788a424ac0be696e9956362ea8833b251e5a064a5e",
+    "file": "sample-effects-fifth-2013-act-23.html",
+    "fixture_sha256": "dd4d56556a6175a45fbeb8c078ddb9f1f1925dc289378cf8940a3ff7a6ed0dc6"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2011_10.html",
+    "source_sha256": "6efebbdd0db5e91685443ba7e7284c705c822231dc5a3742cfb2adfb0a5e2992",
+    "file": "sample-effects-fifth-2011-act-10.html",
+    "fixture_sha256": "aeb3c9b82a95d12c59ab5f642d988e76e9da40195a4dc337a7908759fd29d45f"
+  },
+  {
+    "source_url": "https://www.irishstatutebook.ie/isbc/2009_32.html",
+    "source_sha256": "7254bc500dbfa91165f2ca9597ada0be82c59ebdff582ecb91aca93efc3a01e6",
+    "file": "sample-effects-fifth-2009-act-32.html",
+    "fixture_sha256": "a55a1ebb5acd0e69abd599f5866b6fb130a059926ebe1210261a13fcfc30f85e"
+  },
+  {
+    "corroboration": [
+      {
+        "url": "https://www.comreg.ie/media/2024/12/SI-79-of-2003-Govt-Publications.pdf#page=20",
+        "sha256": "f11f3eb7540b41952abe79fd9a501c2c37b16257fb24691a1cc6ebb60d42a5d2",
+        "signature_dates": [
+          "2003-02-18",
+          "2003-02-28"
+        ],
+        "visually_verified": true
+      },
+      {
+        "url": "https://www.irisoifigiuil.ie/archive/2003/november/2003%2011%2007%20IO%20Issue.PDF#page=2",
+        "sha256": "af20b678c4414dc16be79872c454cf2083d29cc7a8255de8ccddb182e54fc064",
+        "signature_date": "2003-10-21",
+        "publication_date": "2003-11-07",
+        "notice_identifies": "S.I. No. 497 of 2003"
+      },
+      {
+        "url": "https://www.irishstatutebook.ie/pdf/2021/en.act.2021.0003.pdf",
+        "sha256": "a2ae91140033eab140d39912f55510f50683ef975b2e9ab501790a5a36be065f",
+        "printed_date": "18th March, 2021"
+      },
+      {
+        "url": "https://www.irishstatutebook.ie/pdf/2022/en.act.2022.0038.pdf",
+        "sha256": "545fc1b2de5518c4e9957ca065324756a594b79f26966938249925685a2bdef9",
+        "printed_identity": "Number 38 of 2022"
+      },
+      {
+        "url": "https://www.irishstatutebook.ie/eli/2017/act/4/section/3/enacted/en/html",
+        "sha256": "786cceac62affd7a7fe8576712469c21b1172c7f5171b163fa80c03e54e38270",
+        "text": "Construction of references 3. A reference in any enactment, within the meaning of the Interpretation Act 2005 , to\u2014 (a) subsection (9) of section 99 of the Act of 2006 shall be construed as a reference to subsections (8A) and (8B) (inserted by section 2 (c)) of the said section 99, and (b) subsection (10) of section 99 of the Act of 2006 shall be construed as a reference to subsection (8C) (inserted by section 2 (c)) of the said section 99."
+      },
+      {
+        "url": "https://www.irishstatutebook.ie/eli/2011/act/28/section/9/enacted/en/html",
+        "sha256": "ec3192e84174c1b4956cad5c14ef8e7eef5de3bef79c9771e90d486ebf943b97",
+        "text": "Amendments to Act of 2010. 9.\u2014 The Act of 2010 is amended\u2014 (a) in subsection (1) of section 3, by substituting for the definition of \u201cspecified person\u201d the following: \u201c \u2018specified person\u2019 means a person who at the time of an alleged offence under section 4 or 5\u2014 (a) is the holder of a learner permit permitting the holder to drive a vehicle of the category concerned, (b) is the holder of a first driving licence licensing the holder to drive a vehicle of the category concerned within a period of 2 years from the date of its issue, (c) is the holder of a driving licence licensing the holder to drive a vehicle in the category C, C1, D, D1, EB, EC, EC1, ED, ED1 or W while driving, attempting to drive or being in charge of such a vehicle, (d) is the holder of a licence to drive a small public service vehicle granted under section 34 of the Taxi Regulation Act 2003 or section 82 of the Principal Act, or a person purporting to be such a holder, while driving, attempting to drive or being in charge of such a vehicle when the vehicle is being used in the course of business, or (e) does not hold a driving licence licensing the holder to drive a vehicle of the category concerned.\u201d, (b) in paragraph (a) of section 7, by substituting \u201csection 9(2)\u201d for \u201csection 9(1)\u201d, (c) in subsection (4) of section 10, by substituting \u201c(including the functions under section 9)\u201d for \u201c(including the powers under section 9)\u201d, (d) in section 12(1), by inserting \u201cor hospital\u201d after \u201cat a Garda S\u00edoch\u00e1na station\u201d, (e) in section 24, by inserting after subsection (4) the following: \u201c(5) A member of the Garda S\u00edoch\u00e1na may, for the purpose of making a requirement of a person under subsection (1), enter without warrant any hospital where the person is or where the member, with reasonable cause, suspects him or her to be. (6) A designated doctor or designated nurse may, for the purpose of carrying out a medical examination under subsection (1), enter any hospital where the person is or where the doctor or nurse is informed by a member of the Garda S\u00edoch\u00e1na that the person is. (7) Section 1 (1) of the Probation of Offenders Act 1907 does not apply to an offence under this section.\u201d, (f) in section 25, by deleting subsection (6), (g) in section 29\u2014 (i) by substituting for subsection (8) the following: \u201c(8) Where\u2014 (a) a person who is eligible under subsection (1) to be served with a fixed penalty notice pays the fixed charge in accordance with this section and the concentration of alcohol purported to be present in his or her body, as stated or certified in accordance with this Part\u2014 (i) did not exceed 80 milligrammes of alcohol per 100 millilitres of blood, 107 milligrammes of alcohol per 100 millilitres of urine, or 35 microgrammes of alcohol per 100 millilitres of breath, 3 penalty points shall be endorsed on the entry relating to the person, or (ii) exceeded 80 milligrammes but did not exceed 100 milligrammes of alcohol per 100 millilitres of blood, exceeded 107 milligrammes but did not exceed 135 milligrammes of alcohol per 100 millilitres of urine, or exceeded 35 microgrammes but did not exceed 44 microgrammes of alcohol per 100 millilitres of breath, the person shall be disqualified for holding a driving licence for a period of 6 months beginning on the date referred to in subsection (14), or (b) a specified person, who is eligible under subsection (2) to be served with a fixed penalty notice, pays the fixed charge and payment is made in accordance with this section, he or she shall be disqualified for holding a driving licence for a period of 3 months beginning on the date referred to in subsection (14).\u201d, (ii) in subsection (11)(b), by substituting \u201cthis Part\u201d for \u201cChapter 2\u201d, and (iii) by inserting after subsection (18) the following: \u201c(18A) A document purporting to be a certificate or receipt of posting or delivery issued by An Post or another postal service is admissible in evidence as proof of the posting or delivery, as the case may be, of a fixed penalty notice,\u201d, (h) by substituting for section 31 the following: \u201c31.\u2014 Section 39(2) of the Act of 1994 is amended by inserting \u2018making a requirement of the person under section 12(2) of this Act or section 4(4) of the Road Traffic Act 2006 , or\u2019 after \u2018for the purpose of\u2019.\u201d, (i) in section 46, by deleting \u201c(as amended by section 12 of the Act of 2000)\u201d, (j) in subsection (2) of section 48, by substituting \u201csubsection (4)(b)\u201d for \u201csubsection (5)(b)\u201d, (k) in subsection (7) of section 60, by substituting \u201cSection 41(1)\u201d for \u201cSection 41\u201d, (l) in section 61\u2014 (i) by substituting for subsection (3) the following: \u201c(3) Where a person of whom the production of a driving licence or learner permit is required under this section refuses or fails so to produce the licence or permit or produces the licence or permit but refuses or fails to permit the member of the Garda S\u00edoch\u00e1na to whom it is produced to read it, the member may demand of the person his or her name and address and date of birth and, if the person refuses or fails to give to the member his or her name and address and date of birth or gives to the member a name or address or date of birth which is false or misleading, he or she commits an offence.\u201d, and (ii) in subsection (4), by substituting for paragraph (b) the following: \u201c(b) a person who, when his or her name and address and date of birth are lawfully demanded of him or her by the member under this section, refuses or fails to give to the member his or her name and address and date of birth or gives to the member a name or address or date of birth which the member has reasonable grounds for believing to be false or misleading.\u201d, and (m) in section 85, by deleting paragraph (d)."
+      },
+      {
+        "url": "https://www.irishstatutebook.ie/eli/2017/act/22/section/29/enacted/en/html",
+        "sha256": "f0e83843db54d4345f8c4c5bf8d1663550bc2b4bfd88feaedd365dc7f075096a",
+        "text": "References in enactments 29. (1) References to any of the dissolved bodies (other than the Financial Services Ombudsman Council) in any enactment (other than this Act) or any instrument made under such an enactment shall, on and after the establishment day, be construed as references to the Office. (2) References to the Financial Services Ombudsman Council in any enactment (other than this Act) or any instrument made under such an enactment shall, on and after the establishment day, be construed as references to the Council. (3) References to the Financial Services Ombudsman, the Deputy Financial Services Ombudsman or the Pensions Ombudsman in any enactment (other than this Act) or any instrument made under such an enactment shall, on and after the establishment day, be construed as references to the Ombudsman."
+      },
+      {
+        "source_url": "https://www.irishstatutebook.ie/eli/2003/si/497/made/en/html",
+        "source_limitation": "ret_fn_5 is visibly labelled 1, but explicitly points to the sixth footnote, O.J. L 141/27 of 11/6/1993. Preserve that anchor association. The final schedule footnote includes three following bullet paragraphs."
+      }
+    ]
+  }
+]

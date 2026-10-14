@@ -6,6 +6,7 @@ on its ``last_updated``.
 """
 
 from datetime import date
+from dataclasses import replace
 
 import pytest
 
@@ -178,6 +179,35 @@ class TestPerNormOverride:
     def test_norm_can_opt_back_into_the_default(self):
         md = render_norm_at_date(_norm("se", text_state=TextState.POINT_IN_TIME), _blocks(), PUB)
         assert "text_state" not in md
+
+    def test_source_history_can_move_from_enactment_to_consolidation(self):
+        original = _blocks()[0]
+        revised_on = date(2021, 4, 1)
+        blocks = [
+            replace(
+                original,
+                versions=(
+                    replace(original.versions[0], text_state=TextState.AS_ENACTED),
+                    Version(
+                        norm_id="revised-2000123@2021-04-01",
+                        publication_date=PUB,
+                        effective_date=revised_on,
+                        paragraphs=(Paragraph(css_class="parrafo", text="Amended Article 1"),),
+                        text_state=TextState.POINT_IN_TIME,
+                        source="https://example.test/revised/2021-04-01",
+                    ),
+                ),
+            )
+        ]
+        metadata = _norm("ie", text_state=TextState.AS_ENACTED)
+        enacted = render_norm_at_date(metadata, blocks, PUB)
+        revised = render_norm_at_date(metadata, blocks, revised_on)
+        assert 'text_state: "as_enacted"' in enacted
+        assert "Amended Article 1" not in enacted
+        assert "text_state" not in revised
+        assert "Amended Article 1" in revised
+        assert 'source: "https://example.test/revised/2021-04-01"' in revised
+        assert f'publication_date: "{PUB}"' in revised
 
 
 class TestConformance:

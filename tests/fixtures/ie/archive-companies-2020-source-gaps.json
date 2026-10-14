@@ -1,0 +1,100 @@
+{
+  "identifier": "IE-2014-act-38",
+  "classification": "official_source_body_omission",
+  "missing_sections": [
+    "1384A"
+  ],
+  "same_cutoff_complete_alternative_found": false,
+  "sources": [
+    {
+      "catalog_dates": [
+        "2020-01-01",
+        "2020-01-21"
+      ],
+      "plain_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_plain.pdf?versionId=zWvvcC6Yt_9JcvtYlWMTswZegPCYau.W",
+      "plain_sha256": "d487045605971cca95feddf6dbd824188edd95e9f1e0f1d62c191cdd083e777d",
+      "cover_date": "2020-01-01",
+      "annotated_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act.pdf?versionId=ipJAq_1hg6.4vrpCvM7tws1XXxyE9TJr",
+      "annotated_sha256": "6531f4d507bf846031a7a4b70978813d1c824cee4f52b81ec6644ae3023d3d9b",
+      "annotated_1384A_occurrences": [
+        {
+          "page": 63,
+          "line": "1384A. Application of section 393 to a company to which Part 23 applies"
+        }
+      ]
+    },
+    {
+      "catalog_dates": [
+        "2020-03-30"
+      ],
+      "plain_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_plain.pdf?versionId=9QFgE6AZalw43ImJsxGTrRn9IP32dRLl",
+      "plain_sha256": "c056a097cf75e05af4f180de51d3be8623292dc0e9deff789430116d8c5a21bd",
+      "cover_date": "2020-01-01",
+      "annotated_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act.pdf?versionId=2XE3k_SvovqjKOBARckdfin1XFm9OpIm",
+      "annotated_sha256": "1f5f1fc1ac3909a6e3c20c18c14999f4cca2e46208000333c47d5ddc4ac304b7",
+      "annotated_1384A_occurrences": [
+        {
+          "page": 63,
+          "line": "1384A. Application of section 393 to a company to which Part 23 applies"
+        }
+      ]
+    },
+    {
+      "catalog_dates": [
+        "2020-08-21"
+      ],
+      "plain_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_plain.pdf?versionId=5xXM.aPWu8I28jFiDNFOVM094l.mg9ws",
+      "plain_sha256": "1e6a866df584baa5f2048e81344e8944d01d4f4aed47ea6430403b9309d2bcdc",
+      "cover_date": "2020-08-21",
+      "annotated_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act.pdf?versionId=7M4VdHQEVTstDC6rIswjYzgnuJTG1lIK",
+      "annotated_sha256": "ed9733a5b8575cad4ef720710864734552e1c7f059a40212b3996579f02b0275",
+      "annotated_1384A_occurrences": [
+        {
+          "page": 64,
+          "line": "1384A. Application of section 393 to a company to which Part 23 applies"
+        }
+      ]
+    },
+    {
+      "catalog_dates": [
+        "2020-12-31"
+      ],
+      "plain_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act_plain.pdf?versionId=l6nNPYDSRSbv0HfotOuN8KRruUgdirNt",
+      "plain_sha256": "a02cbaf5440607a30604171a50a483e4b8a8db5a7f742ad7e10fdde34e937947",
+      "cover_date": "2020-12-31",
+      "annotated_url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/38/act.pdf?versionId=DsfqV5Gp1B5BKdLwqLTQaSoYQloOh78y",
+      "annotated_sha256": "d364723259e66c5bc01d7010a3fd8c9dd51db4047340f59774bbf2a14dfda0e3",
+      "annotated_1384A_occurrences": [
+        {
+          "page": 64,
+          "line": "1384A. Application of section 393 to a company to which Part 23 applies"
+        }
+      ]
+    }
+  ],
+  "verification": [
+    "Every listed plain and annotated PDF has section 1384A in its contents but no legislative body for that section.",
+    "The January plain body was visually inspected at PDF page 932: section 1384(2) is followed directly by Part 24 and section 1385.",
+    "Before the hash-specific exception, direct parsing of the complete January plain source rejected only section 1384A.",
+    "Section 1384A was inserted by Act 9/2017 s.83 and commenced on 9 June 2017 under SIs 246/2017 and 250/2017."
+  ],
+  "source_manifestations": "The official historical catalogue lists plain and annotated PDFs for these rows. Both variants have the same omission; no complete same-cutoff manifestation was found.",
+  "primary_evidence": [
+    "https://www.irishstatutebook.ie/eli/2017/act/9/section/83/enacted/en/html",
+    "https://www.irishstatutebook.ie/eli/2017/si/246/made/en/html",
+    "https://www.irishstatutebook.ie/eli/2017/si/250/made/en/html"
+  ],
+  "representation": "Retain only the exact verified complete PDF files with an explicit per-version source warning; do not reconstruct the missing text. The parser exception permits only the exact missing section set {1384A} for each recorded plain SHA-256. All other missing sections and all other bytes remain errors.",
+  "presentation_equivalence": {
+    "plain_sha256": [
+      "d487045605971cca95feddf6dbd824188edd95e9f1e0f1d62c191cdd083e777d",
+      "c056a097cf75e05af4f180de51d3be8623292dc0e9deff789430116d8c5a21bd"
+    ],
+    "declared_cutoff": "2020-01-01",
+    "full_source_text_equal_after": "Removing exact repeated running headers, the final numeric page footer and whitespace differences only; no punctuation or legislative text discarded.",
+    "normalized_source_text_sha256": "9ec68420afe4b7dd325ca1e4f936be08ab865078a4630e8b43234453eb7d319e",
+    "parsed_difference": "Only section 1181(4) changes from the end of the preceding (3)(b) paragraph to a separate paragraph; all parsed words are identical. The page break at section 1184(3) produces no parsed difference.",
+    "corrected_paragraph_layout_sha256": "c056a097cf75e05af4f180de51d3be8623292dc0e9deff789430116d8c5a21bd",
+    "date_limit": "The March catalogue label is not a new legal cutoff; both source covers explicitly state 1 January 2020."
+  }
+}

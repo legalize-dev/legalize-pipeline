@@ -1,0 +1,246 @@
+[
+  {
+    "identifier": "IE-1979-si-185",
+    "source_url": "https://www.irishstatutebook.ie/1979/ga/si/0185.html",
+    "source_sha256": "8ed38d72dcfbc0914f93588d14732b05fef6dcd3f2815e41c5122e7b518543aa",
+    "file": "sample-signature-1979-185.html",
+    "fixture_sha256": "8ed38d72dcfbc0914f93588d14732b05fef6dcd3f2815e41c5122e7b518543aa",
+    "expected_date": "1979-05-17",
+    "signature_dates": [
+      "1979-05-17"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1997-si-234",
+    "source_url": "https://www.irishstatutebook.ie/eli/1997/si/234/made/en/html",
+    "source_sha256": "01f68d1c5ce1ddb9ce5b33eeafc8184d50b7437d4ee198386e6357923bd5cac8",
+    "file": "sample-signature-1997-234.html",
+    "fixture_sha256": "01f68d1c5ce1ddb9ce5b33eeafc8184d50b7437d4ee198386e6357923bd5cac8",
+    "expected_date": "1997-05-28",
+    "signature_dates": [
+      "1997-05-28"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-2005-si-717",
+    "source_url": "https://www.irishstatutebook.ie/eli/2005/si/717/made/en/html",
+    "source_sha256": "891e806e85690ee30d26654d3c36928a05a9659cda0311d7fa545fc425c3a9f0",
+    "file": "sample-signature-2005-717.html",
+    "fixture_sha256": "891e806e85690ee30d26654d3c36928a05a9659cda0311d7fa545fc425c3a9f0",
+    "expected_date": "2005-11-15",
+    "signature_dates": [
+      "2005-11-15"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-2003-si-287",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/287/made/en/html",
+    "source_sha256": "5115c0dd0b34594b1d6ae3923004d9a7bf432d79b5eb6ff5320d0a3de8f4a247",
+    "file": "sample-signature-2003-287.html",
+    "fixture_sha256": "5115c0dd0b34594b1d6ae3923004d9a7bf432d79b5eb6ff5320d0a3de8f4a247",
+    "expected_date": "2003-07-29",
+    "signature_dates": [],
+    "extraction": "Complete unchanged official HTML",
+    "corroboration": {
+      "identifier": "IE-2003-si-287",
+      "publication_date": "2003-07-29",
+      "url": "https://www.irisoifigiuil.ie/archive/2003/july/2003%2007%2029%20IO%20Issue.pdf#page=2",
+      "page": 2,
+      "sha256": "a50f39ccf875cefb08ab4d51277f1bbee7f685154000b6684430ec217ab492c0"
+    }
+  },
+  {
+    "identifier": "IE-2003-si-285",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/285/made/en/html",
+    "source_sha256": "06235c1bb63f4b5e83842403a9c43a4ef9a38c3b15995054240b28c9d58f1308",
+    "file": "sample-signature-2003-285.html",
+    "fixture_sha256": "06235c1bb63f4b5e83842403a9c43a4ef9a38c3b15995054240b28c9d58f1308",
+    "expected_date": "2003-07-29",
+    "signature_dates": [],
+    "extraction": "Complete unchanged official HTML",
+    "corroboration": {
+      "identifier": "IE-2003-si-285",
+      "publication_date": "2003-07-29",
+      "url": "https://www.irisoifigiuil.ie/archive/2003/july/2003%2007%2029%20IO%20Issue.pdf#page=1",
+      "page": 1,
+      "sha256": "a50f39ccf875cefb08ab4d51277f1bbee7f685154000b6684430ec217ab492c0"
+    }
+  },
+  {
+    "identifier": "IE-2003-si-286",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/286/made/en/html",
+    "source_sha256": "b9ea6b41da1015c322a6addd0de8425d30826ae1652f2473f808332a8edf9416",
+    "file": "sample-signature-2003-286.html",
+    "fixture_sha256": "b9ea6b41da1015c322a6addd0de8425d30826ae1652f2473f808332a8edf9416",
+    "expected_date": "2003-07-29",
+    "signature_dates": [],
+    "extraction": "Complete unchanged official HTML",
+    "corroboration": {
+      "identifier": "IE-2003-si-286",
+      "publication_date": "2003-07-29",
+      "url": "https://www.irisoifigiuil.ie/archive/2003/july/2003%2007%2029%20IO%20Issue.pdf#page=1",
+      "page": 1,
+      "sha256": "a50f39ccf875cefb08ab4d51277f1bbee7f685154000b6684430ec217ab492c0"
+    }
+  },
+  {
+    "identifier": "IE-1976-si-177",
+    "source_url": "https://www.irishstatutebook.ie/1976/ga/si/0177.html",
+    "source_sha256": "7711b8975e0bb9809c5b079fef68c40a5830411bc048abf81959406879cfb46e",
+    "file": "sample-signature-1976-177.html",
+    "fixture_sha256": "7711b8975e0bb9809c5b079fef68c40a5830411bc048abf81959406879cfb46e",
+    "expected_date": "1976-07-29",
+    "signature_dates": [
+      "1976-07-29"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1988-si-31",
+    "source_url": "https://www.irishstatutebook.ie/1988/ga/si/0031.html",
+    "source_sha256": "3ca9d3c9a98fbfa33a18eb085765d14e3e2c2aea4f7e98b919aaeb8bb4b7d238",
+    "file": "sample-signature-1988-31.html",
+    "fixture_sha256": "3ca9d3c9a98fbfa33a18eb085765d14e3e2c2aea4f7e98b919aaeb8bb4b7d238",
+    "expected_date": "1988-02-26",
+    "signature_dates": [
+      "1988-02-26"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1974-si-216",
+    "source_url": "https://www.irishstatutebook.ie/eli/1974/si/216/made/en/html",
+    "source_sha256": "0f13b39f6ca5e5995a8ba91452636f894bf41ed85c85042548488812b61a1282",
+    "file": "sample-signature-1974-216.html",
+    "fixture_sha256": "0f13b39f6ca5e5995a8ba91452636f894bf41ed85c85042548488812b61a1282",
+    "expected_date": "1974-07-09",
+    "signature_dates": [
+      "1974-07-09"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1977-si-322",
+    "source_url": "https://www.irishstatutebook.ie/1977/ga/si/0322.html",
+    "source_sha256": "eac3105dbbb039a9be95a01ac5d964d7208e03b0db863b5d8fd53aa19aada1dc",
+    "file": "sample-signature-1977-322.html",
+    "fixture_sha256": "eac3105dbbb039a9be95a01ac5d964d7208e03b0db863b5d8fd53aa19aada1dc",
+    "expected_date": "1977-10-11",
+    "signature_dates": [
+      "1977-10-11"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1981-si-291",
+    "source_url": "https://www.irishstatutebook.ie/1981/ga/si/0291.html",
+    "source_sha256": "f35bb5a364da4eb9f58d76d955fcb08e5b470bd53c5246bd5f28667de8dd8715",
+    "file": "sample-signature-1981-291.html",
+    "fixture_sha256": "f35bb5a364da4eb9f58d76d955fcb08e5b470bd53c5246bd5f28667de8dd8715",
+    "expected_date": "1981-08-21",
+    "signature_dates": [
+      "1981-08-21"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1982-si-69",
+    "source_url": "https://www.irishstatutebook.ie/1982/ga/si/0069.html",
+    "source_sha256": "bdbc905198914bc0f3cf42ec1313630571f696a0129613074c4aa513503c6811",
+    "file": "sample-signature-1982-69.html",
+    "fixture_sha256": "bdbc905198914bc0f3cf42ec1313630571f696a0129613074c4aa513503c6811",
+    "expected_date": "1982-03-23",
+    "signature_dates": [
+      "1982-03-23"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1983-si-353",
+    "source_url": "https://www.irishstatutebook.ie/1983/ga/si/0353.html",
+    "source_sha256": "f7f509cbfb1fda36f0df2583960a7f3875ad941ea169acda763ba90af306f6f8",
+    "file": "sample-signature-1983-353.html",
+    "fixture_sha256": "f7f509cbfb1fda36f0df2583960a7f3875ad941ea169acda763ba90af306f6f8",
+    "expected_date": "1983-11-21",
+    "signature_dates": [
+      "1983-11-21"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1983-si-258",
+    "source_url": "https://www.irishstatutebook.ie/1983/ga/si/0258.html",
+    "source_sha256": "eed7adf83ac4ffa48a15c5d89df578e677f8e8a87888753cbac66d4de56eddf3",
+    "file": "sample-signature-1983-258.html",
+    "fixture_sha256": "eed7adf83ac4ffa48a15c5d89df578e677f8e8a87888753cbac66d4de56eddf3",
+    "expected_date": "1983-08-30",
+    "signature_dates": [
+      "1983-08-30"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1985-si-24",
+    "source_url": "https://www.irishstatutebook.ie/1985/ga/si/0024.html",
+    "source_sha256": "048a534f5aa06083c2ccd1254424cae87f4ad5b79e195f14863f581cc6b0dc48",
+    "file": "sample-signature-1985-24.html",
+    "fixture_sha256": "048a534f5aa06083c2ccd1254424cae87f4ad5b79e195f14863f581cc6b0dc48",
+    "expected_date": "1985-02-01",
+    "signature_dates": [
+      "1985-02-01"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1986-si-381",
+    "source_url": "https://www.irishstatutebook.ie/1986/ga/si/0381.html",
+    "source_sha256": "8efda59b8325aa37a711a0b71aa1368037f465247a6d9004ee61a35dfec2d8b8",
+    "file": "sample-signature-1986-381.html",
+    "fixture_sha256": "8efda59b8325aa37a711a0b71aa1368037f465247a6d9004ee61a35dfec2d8b8",
+    "expected_date": "1986-11-24",
+    "signature_dates": [
+      "1986-11-24"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1986-si-295",
+    "source_url": "https://www.irishstatutebook.ie/1986/ga/si/0295.html",
+    "source_sha256": "8a8da92a90448206816503c9e58abefe22bf71a381c0011c4ce394a3d30a858c",
+    "file": "sample-signature-1986-295.html",
+    "fixture_sha256": "8a8da92a90448206816503c9e58abefe22bf71a381c0011c4ce394a3d30a858c",
+    "expected_date": "1986-08-26",
+    "signature_dates": [
+      "1986-08-26"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-1986-si-61",
+    "source_url": "https://www.irishstatutebook.ie/1986/ga/si/0061.html",
+    "source_sha256": "82da7db9627cf87365159a5b51f22150fd222217bea8c31c5f0693057f42207e",
+    "file": "sample-signature-1986-61.html",
+    "fixture_sha256": "82da7db9627cf87365159a5b51f22150fd222217bea8c31c5f0693057f42207e",
+    "expected_date": "1986-03-07",
+    "signature_dates": [
+      "1986-03-07"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  },
+  {
+    "identifier": "IE-2003-si-530",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/530/made/en/html",
+    "source_sha256": "2d70cff31441dc8b312776c9b772f40aa0ec3b82834349346b63187fdb781ee0",
+    "file": "sample-signature-2003-530.html",
+    "fixture_sha256": "2d70cff31441dc8b312776c9b772f40aa0ec3b82834349346b63187fdb781ee0",
+    "expected_date": "2003-11-06",
+    "signature_dates": [
+      "2003-11-05",
+      "2003-11-06"
+    ],
+    "extraction": "Complete unchanged official HTML"
+  }
+]

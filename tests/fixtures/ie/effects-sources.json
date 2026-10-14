@@ -1,0 +1,157 @@
+[
+  {
+    "fixture": "sample-effects-environment-2015.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2015_29.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "044f60900c0add60a0c9958c815c331dbb07426817fda00b5a29a2c540027b7c",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-limerick-2024.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2024_7.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "e3969b36c8a14de1960857f3a40f275f1d4c608f3a1a202d1ba09b023ada39a2",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-private-1925.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/pa1925.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "edf3ae2ad6e47b4572ce2060efe1a71497fe3cdae37bfc3ddfd712c0297a3763",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-private-2003.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/pa2003.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "f3b154da0d63292e9bd2064433db51c5f90be80742a138ca6bec1bbee068944e",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-source-si-2024-356.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2024/si/356/made/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "3c62ceff49cd1f0036839a96b9ffa5063829592acc633b1ac2bc06709012161d",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-source-si-2024-357.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2024/si/357/made/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "60b10580457ffb988a9e553a68767cb0fcd95e61d450f1c57537b247f082ae80",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-unaffected-2026.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2026_36.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "3353a54c5e45d390e16b7fe9479b1b2bbf4123d7f01a759fbed4d4a8b6501861",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-si-index-2024.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/si2024.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "f32bfc09787a525cb6f3aca4f7fa5808d219e6708846c911caf6392b78979bbd",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-si-range-2024.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/si2024_351-400.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "d6cad3414e5201180d52dc24d72159353f4f8adfe362fca83fc85ce100055651",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-tax-source-errors.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1997_39.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "e0bd79039b3dd7231f8416cfa44b6346e1debe3dd2f549e8b4c59973b209177f",
+    "capture": "six exact source rows excerpted"
+  },
+  {
+    "fixture": "sample-effects-act-2024-34-metadata.json",
+    "source_url": "https://api.oireachtas.ie/v1/legislation?act_year=2024&act_no=34&bill_status=Enacted&limit=1&lang=en",
+    "retrieved_on": "2026-10-08",
+    "sha256": "12ef2ff4a04ec7bd87ec465198acc8d7e9ae9da4d370ea7e4b3879abb35dcdb2",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-act-2025-9-metadata.json",
+    "source_url": "https://api.oireachtas.ie/v1/legislation?act_year=2025&act_no=9&bill_status=Enacted&limit=1&lang=en",
+    "retrieved_on": "2026-10-08",
+    "sha256": "e3777e7c7e33758b1cb0321da5150d2afa2b98a098f9abab013baa60dad3dc3b",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-act-2026-14-metadata.json",
+    "source_url": "https://api.oireachtas.ie/v1/legislation?act_year=2026&act_no=14&bill_status=Enacted&limit=1&lang=en",
+    "retrieved_on": "2026-10-08",
+    "sha256": "0f3709a8a983bf6ac4260851be874cfe6a09f42e758c0481b58515507a9ea2ba",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-constitution-1922.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1922_1.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "4c8bdde9bc59d35da63287847463982e450e082e1deb3261422479c8f7fbc266",
+    "capture": "first effects row excerpted verbatim into a minimal table"
+  },
+  {
+    "fixture": "sample-effects-spent-1929.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1929_10.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "273e78ad52039b79fb4adebcdd653d08313f13727ba0c8af9290e6f5453d0a3a",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-appropriation-2002.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/2002_28.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "f8d34aaa321ca98b31628b3f247b07ca677e42afbc17f35aefae80c050d174ce",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-appropriation-2002.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/2002/act/28/enacted/en/xml",
+    "retrieved_on": "2026-10-08",
+    "sha256": "9da1ced7f7c6d0f28d81572d7c2a3ed2db30bc32124738f4ace147326082358a",
+    "capture": "complete response body"
+  },
+  {
+    "fixture": "sample-effects-animals-1966.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/1966/act/6/enacted/en/xml",
+    "retrieved_on": "2026-10-08",
+    "sha256": "c8045239521ba9283a75d8a0fc2e96c740260466b28a2860c7cc07511a3caea4",
+    "capture": "complete response body from local cache"
+  },
+  {
+    "fixture": "sample-effects-airport-1947.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1947/si/115/made/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "0ffd1a6725cd7cb89883f1b8fcfbd188d09bea7a046964b4d5adbb834f398ab6",
+    "capture": "complete response body from local cache"
+  },
+  {
+    "fixture": "sample-effects-airport-1951.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1951/si/60/made/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "a2ff1a4e5ce15b92936b63ad78c64d609edb83575a8f7f9ffcf51e2a0b2b648a",
+    "capture": "complete response body from local cache"
+  },
+  {
+    "fixture": "sample-effects-animals-1966-airport.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1966_6.html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "e4bd1a0b357e8b35a2792456e282caa6da62e3c37e943953ac505d21e7a1de0c",
+    "source_sha256": "bacac6aa385353f6a4f0192936d8a7237b6d67bf685ad122d2692fb2581ec320",
+    "capture": "Two source rows serialized as a DOM excerpt with their exact directory footnote; no other effects included."
+  },
+  {
+    "fixture": "sample-effects-interpretation-1937-section20.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1937/act/38/section/20/enacted/en/html",
+    "retrieved_on": "2026-10-08",
+    "sha256": "511814fe3d9a622ef1fa53bde95cbc459a98cb5278b62f279142fe648f4e24bb",
+    "capture": "complete response body; primary evidence for the directory footnote"
+  }
+]

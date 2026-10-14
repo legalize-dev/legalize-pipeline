@@ -1,0 +1,226 @@
+[
+  {
+    "file": "sample-ie-1997-si-375-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1997/si/375/made/en/html",
+    "source_sha256": "3bf18815711f3c28ca083f94a8277dfa50419065e2b2c587d316c52700be61ce",
+    "fixture_sha256": "98e7061d563cbe017e78b8d7cb5988b4aec64052cb14d1b9d9aaf0521ae3b512",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-2000-si-433-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2000/si/433/made/en/html",
+    "source_sha256": "3b87bff27cec0fc9bcd8c88fa352718c744aef686794604a0d4885a98f14aa85",
+    "fixture_sha256": "58eb0858e897b3ec4febccd86d27da8d9f64a1b8e0448154151e01d4781c0ada",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-1974-si-94-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1974/si/94/made/en/html",
+    "source_sha256": "8a855c5c4d91eb72890a932188715f63ac0b0fcc6af87fff7ec1c0510c7551cb",
+    "fixture_sha256": "92811112c0cf97fa9d9007ab218feea140027d53f055650276a1171e1dedfcdb",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-2003-si-249-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2003/si/249/made/en/html",
+    "source_sha256": "dc9bba337da165197a14f4b696bef57ba4e0a62d1f5a5a71dc0d802403213858",
+    "fixture_sha256": "691a2f1e106092688685e5e1eab2b9bdd86c32a552d5db26b1f63cf64c4d6234",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-2000-si-262-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2000/si/262/made/en/html",
+    "source_sha256": "225eb899f784fd11db3c728987e4ba694d14ae8897f7239ac80af47dec0fdeab",
+    "fixture_sha256": "e94f5d9526db11a7e80a1f048e8bbd09d363ac6a4b419306be94474e14161b12",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-2001-si-501-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2001/si/501/made/en/html",
+    "source_sha256": "34e8550657157c87c91d2d38be2d5b4eb90187c751c701b15a0d9e647786a85f",
+    "fixture_sha256": "01a0ef9f5af1881493fcafb4c790c098eaf543bb83df2d03a4a9c11fcbd857ea",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-2004-si-379-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2004/si/379/made/en/html",
+    "source_sha256": "033504a9bd6f04cd7d6e22fe5d8e72a7da0bffb6ac140ad9fb3c37daaac57ec1",
+    "fixture_sha256": "a703e96fce00c8b640e779c0cf7599ec4b41565c0f460130807eaf86c86ac57b",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-2017-act-14-tertiary.xml",
+    "source_url": "https://www.irishstatutebook.ie/eli/2017/act/14/enacted/en/xml",
+    "source_sha256": "6d8467334fc4328b361997ddf833b8de6ecc51673fb98277ab11b7795b168f3d",
+    "fixture_sha256": "6d8467334fc4328b361997ddf833b8de6ecc51673fb98277ab11b7795b168f3d",
+    "extraction": "complete source"
+  },
+  {
+    "file": "sample-ie-1998-si-549-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1998/si/549/made/en/html",
+    "source_sha256": "38dbd079dbfa4ae8e30930a8de0c45bfdae1dfadf09077d820c3d5ac55b21e57",
+    "fixture_sha256": "61aeecaf87e360e8c8b166a3a32972769256d8c0036c59b2a4be46cd66a83d99",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-ie-1998-si-553-tertiary.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1998/si/553/made/en/html",
+    "source_sha256": "b6c6cc8d18848e0176b01654bf5802a32157eb0d5e36f7787c109295874d34d6",
+    "fixture_sha256": "56f1759543342fd4b5443e8298f5af07d8ad88a6f70f37d082206d5f97ba0da6",
+    "extraction": "title and unchanged legislative body"
+  },
+  {
+    "file": "sample-effects-tertiary-1978-act-24.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1978_24.html",
+    "source_sha256": "b5f4583dd8a3344ec0a5460997e2694a7c0e09174b22a8ed286fbf1969323fed",
+    "fixture_sha256": "9d95025ab7ddbcb14c8bfdd821d6fd43297af3e52eb65544c22a5d89e9c74184",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1946-act-15.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1946_15.html",
+    "source_sha256": "1e851229b8412a87a746371be80416b8edae12e82cb357bb7c4ca16db2f98b82",
+    "fixture_sha256": "aa4a0ba1222ec81f2d57bb9292cbf2ac4272e615fd0911a5ea1def57384af6bf",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1986-act-9.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1986_9.html",
+    "source_sha256": "ed2febfd950fea8fb09a5bc6bdd554a1602d66b8904b7f77ac788ee89df83dc5",
+    "fixture_sha256": "4a4d5a63a9d21045624b71daa9792d726e5926fcdc9a1ec033e008d89550c829",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1982-act-25.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1982_25.html",
+    "source_sha256": "a85048aa99a6881a33fa480071943bec02ec203e69c5b63acfebce6337c20653",
+    "fixture_sha256": "9d95025ab7ddbcb14c8bfdd821d6fd43297af3e52eb65544c22a5d89e9c74184",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1952-act-25.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1952_25.html",
+    "source_sha256": "a5f4c51438fbf29e803162062976a66d67d7217817d6db5b8b3a872bea67fb39",
+    "fixture_sha256": "1d5d8aef0854cd62a71035ff3ab1389bb442546cbb46a6da7ae511d4d23e2f9e",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1992-act-23.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1992_23.html",
+    "source_sha256": "c4006f8eb7f8d0d77ed93b003ed5b9c844a289b7ff2c822ece242466c7dd292a",
+    "fixture_sha256": "af8810aaaa90cee703ccf4b19e2c2f74d72b56e614b8af8c8a40e6ec54e61a4d",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1967-act-21.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1967_21.html",
+    "source_sha256": "716f70117fcdfc8614cea1ca875c6228347cd86136a8fc457194dd152b3d38c9",
+    "fixture_sha256": "e45934494cccfdd1c87c2b0d2e83da0116c11203142ad43d0a06c3e1cc6ee27a",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1984-act-22.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1984_22.html",
+    "source_sha256": "c370c8cab2b61f56eace6ef0f24de85206a1eca7bc359d4da1c9d0f600bf9f93",
+    "fixture_sha256": "899aa8fed8d24d0f9e05825f31934e34c7d735dd2de08611f509cb955c281de8",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1990-act-33.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1990_33.html",
+    "source_sha256": "b6c18144218275a0c015322afb97d3ff19f888aadc9cf91cee904cc9ef37d6c8",
+    "fixture_sha256": "218172e29554626499c4875008d801f8f5a36e8d92303a7fda04bbdf3a5d5057",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1979-act-27.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1979_27.html",
+    "source_sha256": "6401e79756ac6a1f524ebc7190c0f407e7e9d9e46d0eda6f41519d67b281b9c1",
+    "fixture_sha256": "9243d41b1e566f03ddf0b88db6a69010aada653d521433d035a53f2ceb4252de",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1988-act-25.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1988_25.html",
+    "source_sha256": "fb82c18c32cc7bd26afeef8c9e4ca933a26084ddeecba4e934aa964b0dca2dfa",
+    "fixture_sha256": "fb5f7da9045986fc9ca7ecd2a40cc2a041a9f0bef372b583ed50004ce4740563",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1990-act-29.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1990_29.html",
+    "source_sha256": "d86c61e188cb90cc37413ff8324def1a79434034d0d2c8ad6f3db149d5bd8b2c",
+    "fixture_sha256": "d339373c7ffafd313370855edae79eb7e7d19299fdc4b7fd1918cd7928d73d6f",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1990-act-20.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1990_20.html",
+    "source_sha256": "d83d277b41671b8b4fceca9466b6777d2a9db61ff48c64a4c9ea722668447c5f",
+    "fixture_sha256": "f099b656747ab2f1c86f0e152626525931bc630ffc600f3fe1bcf098ce636038",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1986-act-13.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1986_13.html",
+    "source_sha256": "839d05424b4c2b474a52273ec573ee5ff258a724ed606f5edfa3a3caebfb7164",
+    "fixture_sha256": "0f4272cba01653bd4a2644d1e9ab1fe58965a46e1217b9f420640ee6e4151d9b",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1988-act-28.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1988_28.html",
+    "source_sha256": "35c5899b48cd843292cef96a4254249b2849b60db5bf63ea9482502f18a1638f",
+    "fixture_sha256": "2acea4c370c00fdcd2f0a6e5b832b03404b0d41ec24149d44cefab6f23e00539",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "sample-effects-tertiary-1992-act-18.html",
+    "source_url": "https://www.irishstatutebook.ie/isbc/1992_18.html",
+    "source_sha256": "a054495f6d5d9d6738f657462f144401b381fec0daa8a51075d8b9bddbbbc118",
+    "fixture_sha256": "f07980f1ec788918ff935616e1a42841003f44d072b16e56ae32706c593ae31b",
+    "extraction": "unchanged effects table and following notes"
+  },
+  {
+    "file": "proof-tertiary-criminal-2017-14.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2017/act/14/enacted/en/html",
+    "source_sha256": "4a3cc95818ffdefa58234a70c62499fa0c01c0298ef839e92affa9543fe5b12f",
+    "fixture_sha256": "03d58983a641e8af2a4e6ac9ba230f3219dab393c612bb40fd0f8744a9cf7ed9",
+    "extraction": "unchanged legislative body corroborating the correction"
+  },
+  {
+    "file": "proof-tertiary-finance-1998-s76.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/1998/act/3/section/76/enacted/en/html",
+    "source_sha256": "1dc39fb58743c9ad9ea0be374fb14da09584ee3e3f2345412ef44139c1def9b8",
+    "fixture_sha256": "e0d27b6c897ccd1764d51245e0ae1468351138469f8f88fe7e29d92d1aa03a8a",
+    "extraction": "unchanged legislative body corroborating the correction"
+  },
+  {
+    "file": "proof-tertiary-health-2005-s57.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2005/act/11/section/57/enacted/en/html",
+    "source_sha256": "8aebc3f4a9d4292ac521ad68c0fffdfe82f5b6d4cec234af3bf1fa5cc589e233",
+    "fixture_sha256": "3dfee7f1eec21d2f76bca4b50d417970f25fbde56b6f57e161f746511a68eb7a",
+    "extraction": "unchanged legislative body corroborating the correction"
+  },
+  {
+    "file": "proof-tertiary-housing-2014-s19.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2014/act/21/section/19/enacted/en/html",
+    "source_sha256": "52c8bd8ffdc432d4fdfb0d3f079e78395080dad290260da0c3c43d0ebb237530",
+    "fixture_sha256": "798e7a4c5ec7f27093be21881d3e276b5301efec14c1af0629e9393ca0250b83",
+    "extraction": "unchanged legislative body corroborating the correction"
+  },
+  {
+    "file": "proof-tertiary-redundancy-2023-section32.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2023/act/8/section/32/enacted/en/html",
+    "source_sha256": "a880c70eb4b0627d987767ca7398b49f27e6d07db29818c2486550d7497c75c1",
+    "fixture_sha256": "efc8a0ce3601db648c5cacfadd2db139b5c4442a5431891deb0deb06cc778c25",
+    "extraction": "unchanged legislative body corroborating the correction"
+  },
+  {
+    "file": "proof-tertiary-pensions-2013-section26.html",
+    "source_url": "https://www.irishstatutebook.ie/eli/2013/act/20/section/26/enacted/en/html",
+    "source_sha256": "a53b2a6996f683fd1f99c8a36c4725ec33381127421a5b01422d24d91606a31b",
+    "fixture_sha256": "44b85c789bcb92964a2949b068bd6dd814acd30435c74f79072fc317c2b7717b",
+    "extraction": "unchanged legislative body corroborating the correction"
+  }
+]

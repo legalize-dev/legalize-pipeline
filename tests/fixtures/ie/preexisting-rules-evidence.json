@@ -1,0 +1,290 @@
+[
+  {
+    "identifier": "IE-1978-act-2",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1978_2.html",
+      "file": "sample-preexisting-rules-1978-2.html.gz",
+      "sha256": "38219f3fc1c4eb7bbcb35538c4bfd52f4187a1f34c053bb8115c1fa2b67e564b"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1957-act-6",
+        "note": "S.28, limitation on recovery of cert. interest.*",
+        "provision": "6/1957, s.42",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1957-05-02",
+        "source_url": "https://www.irishstatutebook.ie/eli/1957/act/6/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1978_2.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1957-act-6": {
+        "file": "sample-preexisting-rule-IE-1957-act-6.gz",
+        "sha256": "280978d7c0aa43958c6cbbafd65e87e0326149e3e41c0aee6b12ae6332dd17c1"
+      }
+    },
+    "enacted": {
+      "file": "sample-preexisting-rules-1978-2.xml.gz",
+      "sha256": "dae6df54b3c07967542fd1ee268e075323c58e74e9c1a973ff3dc2f08d97ae60"
+    }
+  },
+  {
+    "identifier": "IE-2011-act-19",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2011_19.html",
+      "file": "sample-preexisting-rules-2011-19.html.gz",
+      "sha256": "e26b5db1da91d4ed64bad4de3a67857a1b6c5f7630970e4ee254a5640491f8aa"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1986-act-10",
+        "note": "Application of Health Acts restricted",
+        "provision": "Health (Amendment) Act 1986 (No. 10 of 1986), s. 2(1)",
+        "commencement": "7 May 1986",
+        "commencement_source": "Commenced on enactment",
+        "effective_date": "1986-05-07",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1986-05-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1986/act/10/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2011_19.html"
+      },
+      {
+        "source_id": "IE-2005-act-3",
+        "note": "Application of Health Acts restricted",
+        "provision": "Health Act 1970 (No. 1 of 1970), s. 53(2) as substituted by Health (Amendment) Act 2005 (No. 3 of 2005), s. 4(a)",
+        "commencement": "11 March 2005",
+        "commencement_source": "Commenced on enactment",
+        "effective_date": "2005-03-11",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2005-03-11",
+        "source_url": "https://www.irishstatutebook.ie/eli/2005/act/3/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2011_19.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1986-act-10": {
+        "file": "sample-preexisting-rule-IE-1986-act-10.gz",
+        "sha256": "1a874d991720097a65146e6e27f73f926b0c170013ea617c064cec98e1084bec"
+      },
+      "IE-2005-act-3": {
+        "file": "sample-preexisting-rule-IE-2005-act-3.gz",
+        "sha256": "606130db2737decdb59d148260bebfeb039686a3f41e22a23d8d80a43268b3fb"
+      }
+    },
+    "enacted": {
+      "file": "sample-preexisting-rules-2011-19.xml.gz",
+      "sha256": "78a67f29513f9326a3a045e17bc72b3347bc85a72d0acea8bba9fdf186cf591a"
+    }
+  },
+  {
+    "identifier": "IE-2006-act-33",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2006_33.html",
+      "file": "sample-preexisting-rules-2006-33.html.gz",
+      "sha256": "28d986664a6e76ac563716f3537b0c05c7fa268ff791ef4924b29de37b7add2f"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1992-act-23",
+        "note": "Terms \"presidential elector\" and \"elector\" construed",
+        "provision": "Electoral Act 1992 (23/1992), s. 7",
+        "commencement": "11 December 1992",
+        "commencement_source": "Electoral Act 1992 (Commencement) (No. 3) Order 1992 (S.I. No. 386 of 1992), art. 3(1)(b), (2)",
+        "effective_date": "1992-12-11",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1992-11-05",
+        "source_url": "https://www.irishstatutebook.ie/eli/1992/act/23/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2006_33.html"
+      },
+      {
+        "source_id": "IE-1985-act-2",
+        "note": "Time at which person attains a particular age",
+        "provision": "Age of Majority Act 1985 (2/1985), s. 4",
+        "commencement": "1 March 1985",
+        "commencement_source": "Commenced as per s. 9(2)",
+        "effective_date": "1985-03-01",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1985-02-12",
+        "source_url": "https://www.irishstatutebook.ie/eli/1985/act/2/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2006_33.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1992-act-23": {
+        "file": "sample-preexisting-rule-IE-1992-act-23.gz",
+        "sha256": "62e935c4565b01664a47e8ecffdd00edd50d27cdfc88d81608e761b3f51c669c"
+      },
+      "IE-1985-act-2": {
+        "file": "sample-preexisting-rule-IE-1985-act-2.gz",
+        "sha256": "2f32a23df226097f2f1c2c59aae0805130a35077e95d4dbef0ca6b57d303cb02"
+      }
+    },
+    "enacted": {
+      "file": "sample-preexisting-rules-2006-33.xml.gz",
+      "sha256": "3b27a917605ec4fff0b1672f8a8548295feffbfe67b2f7d7f50290129e7bf71d"
+    }
+  },
+  {
+    "identifier": "IE-2014-act-4",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2014_4.html",
+      "file": "sample-preexisting-rules-2014-4.html.gz",
+      "sha256": "88969783729c779aefd1acf01c9e8b44f5cf4be75d91692fc0b9ac7dd8118e02"
+    },
+    "relations": [
+      {
+        "source_id": "IE-2014-act-1",
+        "note": "References construed",
+        "provision": "Local Government Reform Act 2014 (No. 1 of 2014), ss. 1(22), 9(2),(3), 25(2)",
+        "commencement": "1 June 2014",
+        "commencement_source": "Local Government Reform Act 2014 (Commencement of Certain Provisions) (No. 3) Order 2014 (S.I. No. 214 of 2014), art. 2",
+        "effective_date": "2014-06-01",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2014-01-27",
+        "source_url": "https://www.irishstatutebook.ie/eli/2014/act/1/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2014_4.html"
+      }
+    ],
+    "dependencies": {
+      "IE-2014-act-1": {
+        "file": "sample-preexisting-rule-IE-2014-act-1.gz",
+        "sha256": "477d943946ac45da8d09f927426980bc9d05b1833b7bd53f8720d2d95a8f2daf"
+      }
+    },
+    "enacted": {
+      "file": "sample-preexisting-rules-2014-4.xml.gz",
+      "sha256": "7ef20f3394f82ab62fe00f32a127d6d78ec2dbbfaffe65735f59b8eae9b2c688"
+    }
+  },
+  {
+    "identifier": "IE-2018-act-11",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2018_11.html",
+      "file": "sample-preexisting-rules-2018-11.html.gz",
+      "sha256": "7bc2ac5e83dad1a98707d200eae79aef46b2f8992828ac7c2da82582cc375466"
+    },
+    "relations": [
+      {
+        "source_id": "IE-2018-act-7",
+        "note": "S. 24 references to processing construed",
+        "provision": "Data Protection Act 2018 (7/2018), ss. 1(3), 166",
+        "commencement": "25 May 2018",
+        "commencement_source": "Data Protection Act 2018 (Commencement) Order 2018 (S.I. No. 174 of 2018), art. 3",
+        "effective_date": "2018-05-25",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2018-05-24",
+        "source_url": "https://www.irishstatutebook.ie/eli/2018/act/7/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2018_11.html"
+      }
+    ],
+    "dependencies": {
+      "IE-2018-act-7": {
+        "file": "sample-preexisting-rule-IE-2018-act-7.gz",
+        "sha256": "c39d0d126f90a48b310381215de041e813c87df38a7c8221b2306cc2f8ed50d6"
+      }
+    },
+    "enacted": {
+      "file": "sample-preexisting-rules-2018-11.xml.gz",
+      "sha256": "45d43c91090decee765763c0f80ec7082c02b2996423659a1bd18c763ccd9e72"
+    }
+  },
+  {
+    "identifier": "IE-2005-act-26",
+    "directory": {
+      "file": "sample-later-host-directory-IE-2005-act-26.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/2005_26.html",
+      "sha256": "3b89bce8852b31929297327f237e50acf641e1e1726304d73a0e159f837453d8"
+    },
+    "enacted": {
+      "file": "sample-preexisting-enacted-IE-2005-act-26.xml.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2005/act/26/enacted/en/html",
+      "sha256": "e8dc2ac03b086044be68ab0146032a4fe0c982c2f7cf009b649655d6b6e96b5b"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1998-si-188",
+        "note": "S. 250 applied with modifications **",
+        "provision": "S.I. No. 188 of 1998, sch. A",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1998-05-23",
+        "source_url": "https://www.irishstatutebook.ie/eli/1998/si/188/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2005_26.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1998-si-188": {
+        "file": "sample-preexisting-source-IE-1998-si-188.json.gz",
+        "url": "https://www.irishstatutebook.ie/eli/1998/si/188/made/en/html",
+        "sha256": "aa511577dbe23318b6da1a85452cd21e62f8ec330f55e324fa86d67fa8565ab0"
+      }
+    },
+    "proof": {
+      "file": "sample-preexisting-proof-IE-1998-si-188.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1998/si/188/made/en/html",
+      "sha256": "aa511577dbe23318b6da1a85452cd21e62f8ec330f55e324fa86d67fa8565ab0"
+    }
+  },
+  {
+    "identifier": "IE-1997-act-26",
+    "directory": {
+      "file": "sample-criminal-host-directory.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1997_26.html",
+      "sha256": "ddfdad98374c00a0684275538f24c58159685f925585d9d5e937b15dc39dbbe8"
+    },
+    "enacted": {
+      "file": "sample-preexisting-enacted-IE-1997-act-26.xml.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1997/act/26/enacted/en/html",
+      "sha256": "6a190adca159146a09849f1b47d4f202f730e8c734eba4c3350304d1cbf6bb9b"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1992-act-12",
+        "note": "Offences under Act designated disqualifying or potentially disqualifying offences, or as otherwise meriting certain treatment",
+        "provision": "12/1992, s. 12",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1992-07-07",
+        "source_url": "https://www.irishstatutebook.ie/eli/1992/act/12/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1997_26.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1992-act-12": {
+        "file": "sample-preexisting-source-IE-1992-act-12.json.gz",
+        "url": "https://www.irishstatutebook.ie/eli/1992/act/12/enacted/en/html",
+        "sha256": "b9b03c8b1f9d4d270ec399e6136c06f846e37234c951e7c0f55dbf7fa0f50797"
+      }
+    },
+    "proof": {
+      "file": "sample-preexisting-proof-criminal-evidence-1992.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/1992/act/12/section/12/enacted/en/html",
+      "sha256": "c32f669ae87e0ad4fa5148d7186e3138fe5a5cbada7c0d543fe3bb9b2a454eb1"
+    }
+  }
+]

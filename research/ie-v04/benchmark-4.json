@@ -1,0 +1,16 @@
+{
+  "parser_revision": "ff896673a6ec6192aab34c091c1f4ce7c26fddc27bd8923951b08d9e27ae5a2c",
+  "peak_rss_mib": 3979.4,
+  "workers": 4,
+  "requests_per_second_per_worker": 1.0,
+  "seconds": 808.55,
+  "laws": 50,
+  "successful": 47,
+  "failed": [
+    "IE-1966-act-6",
+    "IE-1972-act-22",
+    "IE-2014-act-38"
+  ],
+  "http_calls": 802,
+  "errors": []
+}

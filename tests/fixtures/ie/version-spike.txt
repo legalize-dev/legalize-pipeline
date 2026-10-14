@@ -1,55 +1,80 @@
-Version History Spike — Ireland (IE)
+Version-history spike — Ireland (IE)
 =====================================
 
-Date: 2026-04-13
-Test law: Environment (Miscellaneous Provisions) Act 2015 (No. 29/2015)
+Verified: 2026-10-08
+Law: Adoptive Leave Act 1995, No. 2 of 1995
+Stable corpus identifier: IE-1995-act-2
+Source catalogue: https://revisedacts.lawreform.ie/revacts/chron
+All seven rows for data-eli="1995/act/2/en" were downloaded.
+Index manifest: research/ie-v04/revised-versions.json
+HTTP evidence: research/ie-v04/http-manifest.json
 
-Source 1: Irish Statute Book (irishstatutebook.ie)
---------------------------------------------------
-- URL: https://www.irishstatutebook.ie/eli/2015/act/29/enacted/en/xml
-- Result: Returns XML of the act AS ENACTED (original text from 2015)
-- Only one version available: the enacted text
-- No archive URLs, no version parameter, no point-in-time endpoint
-- CONCLUSION: ISB provides ONLY "as enacted" text. No historical versions.
+Each PDF is selectable text, not an OCR reconstruction. Word counts below include
+cover, contents and editorial material; they are extraction diagnostics, not
+numbers of legislative paragraphs. Source cover controls the snapshot date.
 
-Source 2: Revised Acts (revisedacts.lawreform.ie)
--------------------------------------------------
-- URL: https://revisedacts.lawreform.ie/eli/2015/act/29/revised/en/html
-- Result: Returns consolidated HTML "Updated to 31 July 2024"
-- Amendment annotations present: F1-F9+ with dates and source SIs
-- Example annotation: "F1 Repealed (31.07.2024) by European Union (...) Regulations 2024 (S.I. No. 356 of 2024)"
-- NO version selector, NO previous versions navigation, NO point-in-time URL parameter
-- Only ~560 of ~4,041 acts are available on Revised Acts (14%)
-- CONCLUSION: Provides current consolidated text only, not intermediate versions.
+adoptive-leave-3-Jul-2023-plain.pdf:
+  Cover date: 3 July 2023; 28 pages; 12296 extracted words
+  SHA-256: d8451512b41d4436b4ef29c292ea3f1b3cf8337f540f2ec98b0b1694d2f98b05
+  Source: https://revisedacts.lawreform.ie/eli/1995/act/2/revised/en/pdf?annotations=false
 
-Source 3: Oireachtas API (api.oireachtas.ie)
---------------------------------------------
-- URL: https://api.oireachtas.ie/v1/legislation?act_year=2015&act_no=29
-- Result: Returns metadata + link to PDF, no text content
-- versions array: [{"showAs": "As enacted", "lang": "eng", ...}] — only one version
-- CONCLUSION: Catalog/metadata only, no text, no version history.
+adoptive-leave-1-Apr-2021-plain.pdf:
+  Cover date: 1 April 2021; 28 pages; 12220 extracted words
+  SHA-256: 41ac0b77d1ed4c9c341f0511a4732118a610f99ad7c94f85d1b277d9dc0a56ac
+  Source: https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_new_plain.pdf?versionId=HnxBKDDS1gxp2fa6DZ_0VMbT_XkYbhGB
 
-GATE RESULT: FAIL
-=================
-Cannot extract 2 distinct text versions with dates from any single source.
+adoptive-leave-14-Oct-2020-plain.pdf:
+  Cover date: 14 October 2020; 30 pages; 12034 extracted words
+  SHA-256: d2f5c211386caafbfe05db8bc537f656079176af013c692fe449288a6c462f11
+  Source: https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_plain.pdf?versionId=69y4xbSnQcS_MSyOzc2J26FqjjJ4oy80
 
-- ISB: only enacted text (1 version)
-- Revised Acts: only current consolidated text (1 version), no intermediate versions
-- Oireachtas API: no text content at all
+adoptive-leave-1-Nov-2019-plain.pdf:
+  Cover date: 24 October 2019; 29 pages; 12008 extracted words
+  SHA-256: 4a050f7f89453d6eaa3243a7403d252e02ef2123e02f95a417875003fbe38934
+  Source: https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_plain.pdf?versionId=TWowaZFZbxQ5c__jufCmpy.6EslePAcV
 
-DECISION: Proceed with SINGLE-SNAPSHOT ship (as enacted text from ISB XML).
+adoptive-leave-24-Oct-2019-plain.pdf:
+  Cover date: 24 October 2019; 29 pages; 12008 extracted words
+  SHA-256: 4a050f7f89453d6eaa3243a7403d252e02ef2123e02f95a417875003fbe38934
+  Source: https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_plain.pdf?versionId=TWowaZFZbxQ5c__jufCmpy.6EslePAcV
 
-Justification:
-1. Ireland's 4,041 acts with clean XML are a valuable corpus even as enacted text
-2. The "as enacted" text IS the official published version — it has legal value
-3. Revised Acts could be added later as a Phase 2 to provide "current consolidated"
-   for the ~560 acts they cover (but still only 2 versions: enacted + current)
-4. Full point-in-time history may become available if Ireland implements the EU
-   open data directive more fully (as other EU countries have)
-5. The amendment annotations in Revised Acts (F1, F2, ...) record WHEN and HOW
-   each section changed — these could theoretically be used to reconstruct
-   intermediate versions, but this would require diffing and is unreliable
+adoptive-leave-28-May-2019-plain.pdf:
+  Cover date: 28 May 2019; 29 pages; 11988 extracted words
+  SHA-256: b5c2d5b5c63194ffea133b82e3ccbfc3f62943fd3e1a833c20e92c0c0d9d4e43
+  Source: https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_plain.pdf?versionId=42Oi2oYmSJJL.MYXeRLHFB5QNUdI2iSC
 
-Follow-up tasks:
-- Phase 2: Add Revised Acts HTML scraping for ~560 consolidated acts
-- Phase 3: Monitor if ISB or LRC adds point-in-time API
+adoptive-leave-1-Aug-2016-plain.pdf:
+  Cover date: 1 August 2016; 29 pages; 11988 extracted words
+  SHA-256: d3a5bbbe88dd03a8180137937ccd73eb04817f3d9014cbb96bad8204e2456959
+  Source: https://rev-acts.s3.eu-west-1.amazonaws.com/1995/2/act_plain.pdf?versionId=null
+
+GATE 0.5: PASS — at least two distinct, authentic dated full texts extracted.
+
+Substantive change verified in section 2 between 2020-10-14 and 2021-04-01:
+- Old definition uses employed adopting mother, adopting father or sole male adopter.
+- 2021 definition uses qualifying adopter or surviving parent.
+- Evidence: research/ie-v04/adoptive-leave-2020-2021.diff.
+
+Source defect: index rows 2019-10-24 and 2019-11-01 point to identical S3 objects.
+Both PDFs have a 24 October 2019 cover and identical SHA-256. Count six distinct
+objects from seven catalogue rows; do not manufacture a 1 November reform.
+
+Dates: Updated to is the consolidation cutoff, not publication. These documents
+do not supply the publication date of each consolidation. Do not use PDF creation
+metadata or index dates as Source-Date. Resolve the actual affecting instrument,
+or omit Source-Date and use the norm publication date under SPEC v0.4.
+
+Classification:
+- eISB ordinary enacted Acts: as_enacted, with genuine amendment-history metadata.
+- Archived Revised Acts PDF snapshots: point_in_time at their verified cutoff.
+- Latest-only Revised Acts HTML endpoint: current unless paired with immutable
+  dated source evidence for the exact text; never apply it to every historic date.
+- Constitution current HTML: current until authentic historical texts are sourced.
+
+The Digital Services Act 2024 comparison additionally demonstrates that different
+dated PDFs may differ only in editorial cover text. Dates alone do not prove a
+new legislative body. Avoid synthetic reform commits for editorial differences.
+
+GATE 0.7: source inventory and required scope established; support for historical
+PDF must be implemented and cross-format fidelity validated before production.
+Redistribution permission for LRC material remains a production gate.

@@ -1,0 +1,13 @@
+# Local source captures and visual inspection artifacts.
+*.html
+*.xml
+*.pdf
+*.png
+*.txt
+*.diff
+!adoptive-same-cutoff-pdf-html.diff
+!adoptive-history-pdf-html.diff
+isb-index/
+isb-census.json
+isb-unique-laws.json
+isb-acts-catalog.json

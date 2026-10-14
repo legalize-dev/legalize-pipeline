@@ -1,7 +1,7 @@
 """Ireland (IE) -- legislative fetcher components.
 
-Source: Irish Statute Book (ISB) for Act text (XML),
-        Oireachtas API for discovery and metadata (JSON).
+Sources: eISB enactments, catalogues and effects; LRC consolidated history;
+         Oireachtas supplementary parliamentary metadata.
 """
 
 from legalize.fetcher.ie.client import ISBClient

@@ -1,0 +1,93 @@
+[
+  {
+    "identifier": "IE-1993-act-8",
+    "directory": {
+      "file": "sample-later-host-directory-IE-1993-act-8.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/1993_8.html",
+      "sha256": "af0e92522c57a621521ab25be1c9fba507a6e036470831e095f5c08ebe55ba78"
+    },
+    "proof": {
+      "file": "sample-later-host-proof-2022-act-31-section-130.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2022/act/31/section/130/enacted/en/html",
+      "sha256": "f3b3e0ee39afc34ea0268dd357b433ce2a7857bd17e7be205987090cd556aff1"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1971-act-28",
+        "note": "S. 11(2) applied",
+        "provision": "28/1971, s. 17 and sch.",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1971-12-01",
+        "source_url": "https://www.irishstatutebook.ie/eli/1971/act/28/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1993_8.html"
+      }
+    ]
+  },
+  {
+    "identifier": "IE-2005-act-26",
+    "directory": {
+      "file": "sample-later-host-directory-IE-2005-act-26.html.gz",
+      "url": "https://www.irishstatutebook.ie/isbc/2005_26.html",
+      "sha256": "3b89bce8852b31929297327f237e50acf641e1e1726304d73a0e159f837453d8"
+    },
+    "proof": {
+      "file": "sample-later-host-proof-2012-si-448.html.gz",
+      "url": "https://www.irishstatutebook.ie/eli/2012/si/448/made/en/html",
+      "sha256": "f73eea247258a911a355efb721aca097f0ce36f2903f68bfb07f8f67ff70fe98"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1998-si-188",
+        "note": "S. 251(1) applied with modifications ***",
+        "provision": "S.I. No. 188 of 1998, sch. B",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1998-05-23",
+        "source_url": "https://www.irishstatutebook.ie/eli/1998/si/188/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2005_26.html"
+      },
+      {
+        "source_id": "IE-1998-si-188",
+        "note": "S. 251(6) applied with modifications ***",
+        "provision": "S.I. No. 188 of 1998, sch. B",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1998-05-23",
+        "source_url": "https://www.irishstatutebook.ie/eli/1998/si/188/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2005_26.html"
+      },
+      {
+        "source_id": "IE-1998-si-188",
+        "note": "S. 257 applied with modifications ***",
+        "provision": "S.I. No. 188 of 1998, sch. B",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1998-05-23",
+        "source_url": "https://www.irishstatutebook.ie/eli/1998/si/188/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2005_26.html"
+      }
+    ],
+    "continuation_amendment": {
+      "file": "sample-later-host-proof-2011-si-600.html.gz",
+      "sha256": "d5fd95f4953604d7e8934649f318122ac7193e2c61126e97be5e05eab125a127",
+      "url": "https://www.irishstatutebook.ie/eli/2011/si/600/made/en/html"
+    }
+  }
+]

@@ -1,0 +1,366 @@
+[
+  {
+    "identifier": "IE-1973-act-29",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1973_29.html",
+      "file": "sample-collective-application-1973-29.html.gz",
+      "sha256": "e52f22be913d3582740845207798a834ab2549065fcf79f98a010a0abf9ab1cf"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1959-si-125",
+        "note": "Functions and references under collectively cited Air Navigation and Transport Acts transferred and construed",
+        "provision": "S.I. No. 125 of 1959, arts, 3, 4 and sch. part 1 item 22",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1959-07-27",
+        "source_url": "https://www.irishstatutebook.ie/eli/1959/si/125/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1973_29.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1959-si-125": {
+        "file": "sample-collective-application-IE-1959-si-125.gz",
+        "sha256": "c92f07210942e6ff1fb1e40629f5a7212801c7ac65dfd39bb22431e682d37b55"
+      }
+    },
+    "enacted": {
+      "file": "sample-collective-application-1973-29.xml.gz",
+      "sha256": "685270fcb65a39da079f9b8f7d55a865967a7e0949dbc41852591e51d5a32c01"
+    }
+  },
+  {
+    "identifier": "IE-1997-act-14",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/1997_14.html",
+      "file": "sample-collective-application-1997-14.html.gz",
+      "sha256": "e0b474b4f07b6aa1bebd660d3ed71fe6aa90e777635aa6ba551d187b627661e0"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1983-act-19",
+        "note": "Substituted convictions or sentences deemed to be duly confirmed by court-martial for purposes of collectively cited Defence Acts",
+        "provision": "19/1983, s. 20",
+        "commencement": "",
+        "commencement_source": "",
+        "effective_date": null,
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1983-06-29",
+        "source_url": "https://www.irishstatutebook.ie/eli/1983/act/19/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/1997_14.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1983-act-19": {
+        "file": "sample-collective-application-IE-1983-act-19.gz",
+        "sha256": "70164a947a5906cf2b431facc6e59e3d9163f8ba740b0a35dab9d5fd3185b935"
+      }
+    },
+    "enacted": {
+      "file": "sample-collective-application-1997-14.xml.gz",
+      "sha256": "1963537ac6526f208f5a8217adf96adc75f0df3e2840ee0cdbeaa011656697cd"
+    }
+  },
+  {
+    "identifier": "IE-2000-act-37",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2000_37.html",
+      "file": "sample-collective-application-2000-37.html.gz",
+      "sha256": "0e1b304237f8b604fe2f4b02a443b34ab1f693d9dbcf5324005a69748131b97e"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1991-act-25",
+        "note": "Application of collectively cited Courts (Supplemental Provisions) Acts restricted",
+        "provision": "25/1991, s. 1(1)",
+        "commencement": "1 January 1992",
+        "commencement_source": "Payment of Wages Act 1991 (Commencement) Order 1991 (S.I. No. 350 of 1991), art. 2",
+        "effective_date": "1992-01-01",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1991-07-23",
+        "source_url": "https://www.irishstatutebook.ie/eli/1991/act/25/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2000_37.html"
+      },
+      {
+        "source_id": "IE-1991-act-23",
+        "note": "Application of collectively cited Courts (Supplemental Provisions) Acts restricted",
+        "provision": "23/1991, s. 5(2)",
+        "commencement": "16 July 1991",
+        "commencement_source": "Commenced on enactment",
+        "effective_date": "1991-07-16",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1991-07-16",
+        "source_url": "https://www.irishstatutebook.ie/eli/1991/act/23/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2000_37.html"
+      },
+      {
+        "source_id": "IE-1993-act-31",
+        "note": "S. 4 collectively cited Courts (Supplemental Provisions) Acts, reference to Dublin Circuit construed",
+        "provision": "31/1993, ss. 1(5), 26",
+        "commencement": "1 January 1994",
+        "commencement_source": "Local Government (Dublin) Act 1993 Commencement Order 1993 (S.I. No. 400 of 1993), art. 3",
+        "effective_date": "1994-01-01",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1993-12-21",
+        "source_url": "https://www.irishstatutebook.ie/eli/1993/act/31/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2000_37.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1991-act-25": {
+        "file": "sample-collective-application-IE-1991-act-25.gz",
+        "sha256": "f9e99ec613de93f1a18d6753642d2ce8a47c887c5c0f55359bf99d2636b59730"
+      },
+      "IE-1991-act-23": {
+        "file": "sample-collective-application-IE-1991-act-23.gz",
+        "sha256": "c741b3bc0d236818db0682a529b505c0f4dc37ec03a01202b8b1d6763c3970c8"
+      },
+      "IE-1993-act-31": {
+        "file": "sample-collective-application-IE-1993-act-31.gz",
+        "sha256": "c485d81012e51a8ea7067f9f0d84e7d87fab912cb1b2e7417463e9eb85be5909"
+      }
+    },
+    "enacted": {
+      "file": "sample-collective-application-2000-37.xml.gz",
+      "sha256": "646440c1b1cd064e267b611fde234338eccb1ac17a1b031eb3708f818aee0b14"
+    }
+  },
+  {
+    "identifier": "IE-2005-act-11",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2005_11.html",
+      "file": "sample-collective-application-2005-11.html.gz",
+      "sha256": "093d3cfb8bb23ae50c228a5584f7dcfba41eab2be7963dbd0a6c4381d2d8bdf5"
+    },
+    "relations": [
+      {
+        "source_id": "IE-1987-si-91",
+        "note": "Functions under collectively cited Merchant Shipping Acts transferred",
+        "provision": "Communications (Transfer of Departmental Administration and Ministerial Functions) Order 1987(S.I. No. 91 of 1987)",
+        "commencement": "31 March 1987",
+        "commencement_source": "Communications (Transfer of Departmental Administration and Ministerial Functions) Order 1987(S.I. No. 91 of 1987)",
+        "effective_date": "1987-03-31",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1987-03-31",
+        "source_url": "https://www.irishstatutebook.ie/eli/1987/si/91/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2005_11.html"
+      },
+      {
+        "source_id": "IE-1959-si-125",
+        "note": "Functions under collectively cited Merchant Shipping Acts transferred",
+        "provision": "Transport, Fuel and Power (Transfer of Departmental Administration and Ministerial Functions) Order, 1959 (S.I. No. 125 of 1959)",
+        "commencement": "27 July 1959",
+        "commencement_source": "Transport, Fuel and Power (Transfer of Departmental Administration and Ministerial Functions) Order, 1959 (S.I. No. 125 of 1959)",
+        "effective_date": "1959-07-27",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1959-07-27",
+        "source_url": "https://www.irishstatutebook.ie/eli/1959/si/125/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2005_11.html"
+      }
+    ],
+    "dependencies": {
+      "IE-1987-si-91": {
+        "file": "sample-collective-application-IE-1987-si-91.gz",
+        "sha256": "9079cedc831db25c8746b3c2135cb6f4a58a499def6acc1582f75c0d4d66bfb0"
+      },
+      "IE-1959-si-125": {
+        "file": "sample-collective-application-IE-1959-si-125.gz",
+        "sha256": "c92f07210942e6ff1fb1e40629f5a7212801c7ac65dfd39bb22431e682d37b55"
+      }
+    },
+    "enacted": {
+      "file": "sample-collective-application-2005-11.xml.gz",
+      "sha256": "f8722841b0009723fd9082ce4b7183f846c68ce9c7dd4c1278cdfec4c7ffcddd"
+    }
+  },
+  {
+    "identifier": "IE-2006-act-33",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2006_33.html",
+      "file": "sample-collective-application-2006-33.html.gz",
+      "sha256": "28d986664a6e76ac563716f3537b0c05c7fa268ff791ef4924b29de37b7add2f"
+    },
+    "relations": [
+      {
+        "source_id": "IE-2001-act-38",
+        "note": "Ministerial power to make adaptations or modifications to collectively cited Acts provided",
+        "provision": "Electoral (Amendment) Act 2001 (38/2001), s. 48(1), (3)",
+        "commencement": "1 November 2001",
+        "commencement_source": "Electoral (Amendment) Act 2001 (Commencement) Order 2001 (S.I. No. 497 of 2001), art. 2",
+        "effective_date": "2001-11-01",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2001-10-24",
+        "source_url": "https://www.irishstatutebook.ie/eli/2001/act/38/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2006_33.html"
+      },
+      {
+        "source_id": "IE-1992-si-128",
+        "note": "Collectively cited Referendum Acts adapted and modified",
+        "provision": "Referendum (Special Difficulty) Order 1992 (S.I. No. 128 of 1992), arts. 3. 4",
+        "commencement": "25 June 2021",
+        "commencement_source": "Commenced on enactment",
+        "effective_date": "2021-06-25",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1992-05-27",
+        "source_url": "https://www.irishstatutebook.ie/eli/1992/si/128/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2006_33.html"
+      }
+    ],
+    "dependencies": {
+      "IE-2001-act-38": {
+        "file": "sample-collective-application-IE-2001-act-38.gz",
+        "sha256": "a62d8084272f1bc6d90e6788d3693e328876c09346c5906ed1ec955382166264"
+      },
+      "IE-1992-si-128": {
+        "file": "sample-collective-application-IE-1992-si-128.gz",
+        "sha256": "2f204b0bca1103bba0a1144939d0296bce8e98a557128db4f35da1f306536403"
+      }
+    },
+    "enacted": {
+      "file": "sample-collective-application-2006-33.xml.gz",
+      "sha256": "3b27a917605ec4fff0b1672f8a8548295feffbfe67b2f7d7f50290129e7bf71d"
+    }
+  },
+  {
+    "identifier": "IE-2007-act-10",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2007_10.html",
+      "file": "sample-collective-application-2007-10.html.gz",
+      "sha256": "1cecc1d113daf5b7566ac32780f4e9830982a1d2a174db4ad4f9e7125d6b540a"
+    },
+    "relations": [
+      {
+        "source_id": "IE-2006-act-26",
+        "note": "Collectively cited Prisons Acts applied with modifications",
+        "provision": "Children Act 2001 (24/2001), s. 156B, as inserted by 26/2006 Criminal Justice Act 2006 (26/2006), s. 144",
+        "commencement": "23 July 2007",
+        "commencement_source": "Children Act 2001 (Commencement) (No. 3) Order 2007 (S.I. No. 524 of 2007)",
+        "effective_date": "2007-07-23",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2006-07-16",
+        "source_url": "https://www.irishstatutebook.ie/eli/2006/act/26/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2007_10.html"
+      },
+      {
+        "source_id": "IE-2001-act-24",
+        "note": "Collectively cited Prisons Acts applied with modifications",
+        "provision": "Children Act 2001 (24/2001), s. 153(4)",
+        "commencement": "23 July 2007",
+        "commencement_source": "Children Act 2001 (Commencement) (No. 3) Order 2007 (S.I. No. 524 of 2007)",
+        "effective_date": "2007-07-23",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2001-07-08",
+        "source_url": "https://www.irishstatutebook.ie/eli/2001/act/24/enacted/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2007_10.html"
+      },
+      {
+        "source_id": "IE-1985-si-331",
+        "note": "Application of collectively cited Prisons Acts restricted",
+        "provision": "Employment Equality Act 1977 (16/1977), s. 17B, as inserted by European Communities (Employment Equality) Regulations 1985 (S.I. No. 331 of 1985), reg. 5",
+        "commencement": "2 October 1985",
+        "commencement_source": "European Communities (Employment Equality) Regulations 1985 (S.I. No. 331 of 1985)",
+        "effective_date": "1985-10-02",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "1985-10-02",
+        "source_url": "https://www.irishstatutebook.ie/eli/1985/si/331/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2007_10.html"
+      }
+    ],
+    "dependencies": {
+      "IE-2006-act-26": {
+        "file": "sample-collective-application-IE-2006-act-26.gz",
+        "sha256": "051a048ff11b9a524c92dbc3c096ace706051daa6b32ffa1afa06bafcd68a4be"
+      },
+      "IE-2001-act-24": {
+        "file": "sample-collective-application-IE-2001-act-24.gz",
+        "sha256": "f120ccd365f46bcd2cd5e1058f5e941e5c5e3e9b063d64aa3e7380f2847c44d8"
+      },
+      "IE-1985-si-331": {
+        "file": "sample-collective-application-IE-1985-si-331.gz",
+        "sha256": "b7b58761c20b14552a5956e5bfbd0a272912dcf2b6b585163c5e3fea1000cf59"
+      }
+    },
+    "enacted": {
+      "file": "sample-collective-application-2007-10.xml.gz",
+      "sha256": "f2e238482380d3189446ed15ad44d1e6f349568f92e072bfa1f804fd29d6b27c"
+    }
+  },
+  {
+    "identifier": "IE-2023-act-3",
+    "directory": {
+      "url": "https://www.irishstatutebook.ie/isbc/2023_3.html",
+      "file": "sample-collective-application-2023-3.html.gz",
+      "sha256": "236896c5a4ccd3c74ea22d6e1d0623b39dbb31972fe3fc8ef8dfe9d294a4969c"
+    },
+    "relations": [
+      {
+        "source_id": "IE-2007-si-662",
+        "note": "S. 2 functions transferred and references to Minister construed in relation to collectively cited Transfer of Sentenced Persons Acts 1995 and 1997",
+        "provision": "Prisoners (Transfer of Ministerial Functions) Order 2007 (S.I. No. 662 of 2007)",
+        "commencement": "19 September 2007",
+        "commencement_source": "Prisoners (Transfer of Ministerial Functions) Order 2007 (S.I. No. 662 of 2007). art. 2",
+        "effective_date": "2007-09-19",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2007-09-25",
+        "source_url": "https://www.irishstatutebook.ie/eli/2007/si/662/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2023_3.html"
+      },
+      {
+        "source_id": "IE-2004-si-828",
+        "note": "S. 2 functions transferred and references to Minister construed in relation to collectively cited Transfer of Sentenced Persons Acts 1995 and 1997",
+        "provision": "Prisoners (Transfer of Ministerial Functions) Order 2004 (S.I. No. 828 of 2004)",
+        "commencement": "14 December 2004",
+        "commencement_source": "Prisoners (Transfer of Ministerial Functions) Order 2004 (S.I. No. 828 of 2004), art. 1(2)",
+        "effective_date": "2004-12-14",
+        "pending": false,
+        "whole_repeal": false,
+        "partial_repeal": false,
+        "publication_date": "2004-12-14",
+        "source_url": "https://www.irishstatutebook.ie/eli/2004/si/828/made/en/html",
+        "directory_url": "https://www.irishstatutebook.ie/isbc/2023_3.html"
+      }
+    ],
+    "dependencies": {
+      "IE-2007-si-662": {
+        "file": "sample-collective-application-IE-2007-si-662.gz",
+        "sha256": "edd1647689da6e90d5cf5c8cfd284f3bc44b6906c3528f1427dc734398424dd9"
+      },
+      "IE-2004-si-828": {
+        "file": "sample-collective-application-IE-2004-si-828.gz",
+        "sha256": "db2e7f9ace6daf22df3800efd22e8493e27ca809f394c943d49411bef37f5872"
+      }
+    },
+    "enacted": {
+      "file": "sample-collective-application-2023-3.xml.gz",
+      "sha256": "f967b7db40b92c0d7357d32b0f96b9a6e8501a125a3962d9f197dfcc2556444f"
+    }
+  }
+]

@@ -17,6 +17,7 @@ Generic multi-country format:
 from __future__ import annotations
 
 import re
+from dataclasses import replace
 
 from legalize.config import GitConfig
 from legalize.models import (
@@ -37,6 +38,14 @@ def build_commit_info(
     content: str,
 ) -> CommitInfo:
     """Build a complete CommitInfo from domain data."""
+    source_urls = {
+        version.source
+        for block in blocks
+        for version in block.versions
+        if version.norm_id == reform.norm_id and version.source
+    }
+    if len(source_urls) == 1:
+        norm_metadata = replace(norm_metadata, source=next(iter(source_urls)))
     affected = _get_affected_articles(reform, blocks)
     affected_str = ", ".join(affected) if affected else "N/A"
 

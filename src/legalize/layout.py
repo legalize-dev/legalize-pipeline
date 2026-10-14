@@ -179,6 +179,7 @@ LAYOUT: dict[str, str] = {
     "pt": "{directory}/{year}/{identifier}.md",
     "eu": SHARDED,
     "es": SHARDED,
+    "ie": SHARDED,
 }
 
 
