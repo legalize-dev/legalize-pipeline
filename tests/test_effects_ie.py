@@ -508,3 +508,47 @@ def test_older_effect_without_verified_continuity_still_fails(missing):
     assert notes == []
     with pytest.raises(ValueError, match="effect IE-1947-si-115 predates the original publication"):
         history._parse_on(envelope, date(2026, 10, 8))
+
+
+def _planning_directory_client(metadata):
+    from unittest.mock import Mock
+
+    client = Mock(_base_url="https://www.irishstatutebook.ie")
+    client._get.return_value = b"""<h3 id="effects">Effects</h3><table><tr>
+    <td>S. 148 modified</td><td>S. I. No. 226 of 1985, art. 39.</td></tr></table>"""
+    client.get_metadata.side_effect = metadata
+    return client
+
+
+def test_undatable_official_instrument_becomes_a_note_not_a_reform():
+    """S.I. 226/1985 is cited by the directory but eISB has no such instrument."""
+    from unittest.mock import Mock
+
+    import requests
+
+    from legalize.fetcher.ie.effects import fetch_effects
+
+    def missing(source_id):
+        raise requests.HTTPError(response=Mock(status_code=404))
+
+    notes = []
+    client = _planning_directory_client(missing)
+    effects = fetch_effects(
+        client, "IE-1963-act-33", b'<a href="/isbc/1963_33.html">x</a>', editorial_notes=notes
+    )
+
+    assert effects == []
+    assert [(n["source_id"], n["kind"]) for n in notes] == [("IE-1985-si-226", "undatable_source")]
+    assert notes[0]["basis_source"].endswith("/eli/1985/si/226/made/en/html")
+    with pytest.raises(ValueError, match="provenance sink"):
+        fetch_effects(client, "IE-1963-act-33", b'<a href="/isbc/1963_33.html">x</a>')
+
+
+def test_undatable_instrument_that_reappears_fails_loudly():
+    from legalize.fetcher.ie.effects import fetch_effects
+
+    client = _planning_directory_client(lambda source_id: b"<html>now published</html>")
+    with pytest.raises(ValueError, match="changed since it was found undatable"):
+        fetch_effects(
+            client, "IE-1963-act-33", b'<a href="/isbc/1963_33.html">x</a>', editorial_notes=[]
+        )

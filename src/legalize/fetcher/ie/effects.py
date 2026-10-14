@@ -98,6 +98,64 @@ _PRE_EXISTING_RULES = {
     ),
 }
 
+# Official instruments whose own text cannot date them. The owner decided to publish
+# the affected Acts without these events rather than guess a date. Each entry is
+# tied to the exact bytes eISB serves (None: an HTTP 404), so a corrected source
+# stops matching and the Act fails loudly until someone re-verifies it.
+_UNDATABLE_SOURCES = {
+    ("IE-1950-act-12", "IE-1992-si-121"): (
+        "ac330018c4282b76cf9c25eb243948fa787d6a788c27b8186612e9d6ab70c17f",  # pragma: allowlist secret
+        "The official signature prints 20 May 1922, before the Act it amends; "
+        "no independent source gives the correct date.",
+    ),
+    ("IE-1992-act-9", "IE-1993-si-60"): (
+        "d34e7ce42314dbe747f3ed641f501a353e3994a48982edd75e5910dbc7cdb273",  # pragma: allowlist secret
+        "The official signature prints 2 March 1992, before its enabling Act; "
+        "no independent source gives the correct date.",
+    ),
+    ("IE-1969-act-21", "IE-1975-si-127"): (
+        "ddd9f82f5bb1ca05050d47f676745879ca0c0b1a0b76091fc77857a253a35ab3",  # pragma: allowlist secret
+        "The official text has no signature date.",
+    ),
+    ("IE-1937-act-38", "IE-1988-si-257"): (
+        "c66c98348aa78e74f4bc52917744d61f145ff5a6ed8ec157c5346ad34e2c0e8b",  # pragma: allowlist secret
+        "The official signature reads '29th day of 1988'; the month is absent.",
+    ),
+    ("IE-1981-act-1", "IE-1985-si-101"): (
+        "0f634cb40aad52b1efc08c2ce0a5bb7b068764958fa84c122e7d06ab4517b062",  # pragma: allowlist secret
+        "The official text is truncated after regulation 11 and has no signature.",
+    ),
+    ("IE-1963-act-33", "IE-1984-si-201"): (
+        None,
+        "The official URL returns 404 and the 1984 annual index has no such instrument; "
+        "the directory citation may be erroneous.",
+    ),
+    ("IE-1963-act-33", "IE-1985-si-226"): (
+        None,
+        "The official URL returns 404 and the 1985 annual index skips from 225 to 227; "
+        "the directory itself refers to S.I. No. 241 of 1984.",
+    ),
+    ("IE-1994-act-8", "IE-1998-si-340"): (
+        "2f9405b4ae984cba49d94055c7515c09bf67a2914cdde2ee2f3359020546ba74",  # pragma: allowlist secret
+        "The official text is truncated within its electoral-area table and has no signature.",
+    ),
+}
+
+
+def _check_undatable(client: ISBClient, source_id: str, digest: str | None) -> None:
+    """Fail unless eISB still serves exactly the defect that was verified."""
+    import requests
+
+    try:
+        data = client.get_metadata(source_id)
+    except requests.HTTPError as exc:
+        if digest is None and exc.response is not None and exc.response.status_code == 404:
+            return
+        raise
+    if sha256(data).hexdigest() != digest:
+        raise ValueError(f"{source_id}: official source changed since it was found undatable")
+
+
 # Exact misfiled claims and host citations; see context-citations-evidence.json.
 _DIRECTORY_CONTEXT = {
     (
@@ -1159,6 +1217,21 @@ def fetch_effects(
     dated_effects = []
     for effect in effects:
         source_id = effect["source_id"]
+        if undatable := _UNDATABLE_SOURCES.get((norm_id, source_id)):
+            if editorial_notes is None:
+                raise ValueError(f"{norm_id}: undatable source requires a provenance sink")
+            _check_undatable(client, source_id, undatable[0])
+            year, kind, number = _parse_norm_id(source_id)
+            editorial_notes.append(
+                {
+                    **effect,
+                    "directory_url": directory_url,
+                    "kind": "undatable_source",
+                    "reason": undatable[1],
+                    "basis_source": f"{client._base_url}/eli/{year}/{kind}/{number}/made/en/html",
+                }
+            )
+            continue
         if "publication_date" not in effect:
             if source_id not in metadata:
                 metadata_sources[source_id] = client.get_metadata(source_id)
