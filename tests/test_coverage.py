@@ -93,3 +93,62 @@ def test_health_names_every_exclusion_a_full_run_cannot_ship(tmp_path):
     assert "1 exclusion(s) have no recorded reason" in output  # D
     assert "neither published nor excluded" not in output
     assert "name no law" not in output  # C is excluded, with its reason
+
+
+def test_a_daily_carries_the_report_forward_by_what_it_changed(tmp_path):
+    import subprocess
+
+    from legalize.coverage import update_report
+
+    repo, data = tmp_path / "repo", tmp_path / "data"
+    (repo / "ie").mkdir(parents=True)
+    gap = json.dumps(json.dumps([{"date": "2020-01-01", "reason": "scanned", "sha256": "ab"}]))
+
+    def commit(message):
+        subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "-qm",
+                message,
+            ],
+            check=True,
+        )
+        return subprocess.check_output(
+            ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True
+        ).strip()
+
+    subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
+    (repo / "ie/A.md").write_text(law("A"))
+    (repo / "ie/B.md").write_text(law("B", f"source_version_gaps: {gap}\n"))
+    data.mkdir()
+    (data / "discovery_ids.txt").write_text("A\nB\nC\nD\n")
+    record_failure(data, "C", requests.ConnectionError("DNS"))
+    record_failure(data, "D", ValueError("Malformed footnote"))
+    (repo / "coverage.json").write_text(render(coverage_report(repo, data, "index")))
+    before = commit("built")
+
+    # The daily: A gains a gap, B loses its own, C is published, E fails for good.
+    (repo / "ie/A.md").write_text(law("A", f"source_version_gaps: {gap}\n"))
+    (repo / "ie/B.md").write_text(law("B"))
+    (repo / "ie/C.md").write_text(law("C"))
+    commit("daily")
+    run = tmp_path / "run"  # a daily's own data dir holds only this run's failures
+    record_failure(run, "E", ValueError("Unreadable table"))
+    report = update_report(repo, before, run, published={"A", "B", "C"}, discovered=5)
+
+    assert (report["published"], report["discovered"]) == (3, 5)
+    assert (report["version_gaps"], report["laws_with_version_gaps"]) == (1, 1)
+    assert [e["identifier"] for e in report["excluded"]] == ["D", "E"]
+    assert report == {
+        **coverage_report(repo, run, "index"),
+        "discovered": 5,
+        "excluded": report["excluded"],
+    }

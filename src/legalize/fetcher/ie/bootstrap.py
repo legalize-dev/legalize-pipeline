@@ -18,7 +18,9 @@ from legalize.pipeline import (
 from legalize.storage import load_norma_from_json
 
 
-def fetch_dependencies(config: Config, identifiers: list[str]) -> list[str]:
+def fetch_dependencies(
+    config: Config, identifiers: list[str], *, known: set[str] = frozenset()
+) -> list[str]:
     """Close amendment references transitively; return the instruments that loaded.
 
     The walk goes on from every instrument that did load, so one run names every
@@ -26,10 +28,13 @@ def fetch_dependencies(config: Config, identifiers: list[str]) -> list[str]:
     is recorded with its reason (coverage.json lists it) and the corpus is published
     without it; a network failure stops the run instead, because a retry may succeed
     and a gap must never stand in for one.
+
+    ``known`` instruments are already published and are not fetched again; a daily
+    passes the repo's norms so that only new ones are.
     """
     cc = config.get_country("ie")
     json_dir = Path(cc.data_dir) / "json"
-    seen = set(identifiers)
+    seen = set(identifiers) | set(known)
     loaded = list(identifiers)
     failed = []
     with ThreadPoolExecutor(max_workers=cc.max_workers or 1) as pool:
@@ -55,7 +60,7 @@ def fetch_dependencies(config: Config, identifiers: list[str]) -> list[str]:
         console.print(
             f"[yellow]{len(failed)} cited instrument(s) unreadable; listed in coverage.json[/yellow]"
         )
-    return sorted(seen - set(failed))
+    return sorted(seen - set(failed) - (set(known) - set(identifiers)))
 
 
 def bootstrap(config: Config, dry_run: bool = False, limit: int | None = None) -> int:

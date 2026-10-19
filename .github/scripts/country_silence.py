@@ -29,7 +29,9 @@ WORKFLOWS = pathlib.Path(__file__).resolve().parents[1] / "workflows"
 # the whole value of this check is that an issue from it means something. A
 # daily country that has published nothing in two weeks is not having a quiet
 # fortnight, and a monthly one gets its cadence plus a full extra cycle.
-LIMIT_DAYS = {"daily": 14, "monthly": 45}
+# A country with its own daily-update-{code}.yml runs every day but commits only
+# when its source moves, which for Ireland's directory is every few weeks.
+LIMIT_DAYS = {"daily": 14, "monthly": 45, "source-driven": 45}
 
 
 def scheduled_countries() -> dict[str, str]:
@@ -46,6 +48,8 @@ def scheduled_countries() -> dict[str, str]:
     cadence = {code: "daily" for code in json.loads(matrix)}
     for path in glob.glob(str(WORKFLOWS / "monthly-update-*.yml")):
         cadence.setdefault(pathlib.Path(path).stem.rsplit("-", 1)[-1], "monthly")
+    for path in glob.glob(str(WORKFLOWS / "daily-update-*.yml")):
+        cadence.setdefault(pathlib.Path(path).stem.rsplit("-", 1)[-1], "source-driven")
     return cadence
 
 
@@ -53,10 +57,22 @@ def main() -> int:
     cadence = scheduled_countries()
     repos = json.loads(
         subprocess.run(
-            ["gh", "search", "repos", "--owner", "legalize-dev",
-             "--topic", "legalize-country", "--limit", "100",
-             "--json", "name,pushedAt"],
-            capture_output=True, text=True, check=True,
+            [
+                "gh",
+                "search",
+                "repos",
+                "--owner",
+                "legalize-dev",
+                "--topic",
+                "legalize-country",
+                "--limit",
+                "100",
+                "--json",
+                "name,pushedAt",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
     )
 

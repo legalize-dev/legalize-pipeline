@@ -72,11 +72,17 @@ _OMITTED_SNAPSHOTS = {
 }
 
 
+# The modules a parse reads. Orchestration (bootstrap, daily, discovery, revised) and
+# the package's re-exports are left out: changing how a run is scheduled must not
+# mark every stored result stale.
+PARSE_MODULES = ("client", "effects", "history", "parser", "pdf")
+
+
 @lru_cache(maxsize=1)
 def _parser_revision() -> str:
     directory = Path(__file__).parent
     return hashlib.sha256(
-        b"".join(path.read_bytes() for path in sorted(directory.glob("*.py")))
+        b"".join((directory / f"{name}.py").read_bytes() for name in PARSE_MODULES)
     ).hexdigest()
 
 
