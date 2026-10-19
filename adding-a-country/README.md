@@ -29,6 +29,10 @@ So:
    earlier. Every step file ends by naming the next one. Follow the chain.
 4. **Never work from memory of a step file.** If you are about to run a command
    and you did not read it in this hour, re-read the file. It is 40–330 lines.
+5. **Run each check when it can tell you something new.** One file changed means
+   re-running that file, not the 50-law benchmark; a batch of fixes means one full
+   test run, not one per edit. [`cost.md`](cost.md) says how, without weakening
+   any gate.
 
 | File | Step |
 |---|---|
@@ -41,6 +45,7 @@ So:
 | [`step-8-workers.md`](step-8-workers.md) | Tune `max_workers` |
 | [`step-9-production.md`](step-9-production.md) | Bootstrap, push, ship |
 | [`reference.md`](reference.md) | Version-history strategies, subnational — consult anytime |
+| [`cost.md`](cost.md) | Spending time and tokens — read before Step 1 and before any long run |
 | [`PROGRESS-template.md`](PROGRESS-template.md) | Your checklist — copy it |
 
 No step file is longer than ~350 lines. Re-reading one costs almost nothing;
