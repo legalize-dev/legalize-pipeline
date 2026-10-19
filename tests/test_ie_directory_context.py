@@ -98,12 +98,14 @@ def test_verified_directory_context_preserves_the_original_claim_and_actual_hist
 
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])
 @pytest.mark.parametrize("changed", ["note", "provision"])
-def test_unverified_directory_claim_still_fails_the_history_date_check(record, changed):
+def test_unverified_directory_claim_is_listed_undated_not_dated(record, changed):
     effects, notes, envelope = relations(record, changed=changed)
     assert notes == []
     assert record["relation"]["source_id"] in {effect["source_id"] for effect in effects}
-    with pytest.raises(ValueError, match="predates the original publication"):
-        _parse_on(envelope, date(2026, 10, 13))
+    norm = _parse_on(envelope, date(2026, 10, 13))
+    undated = {u["source_id"] for u in json.loads(dict(norm.metadata.extra)["undated_amendments"])}
+    assert {record["relation"]["source_id"]} <= undated
+    assert not undated & {r.norm_id for r in norm.reforms}
 
 
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])

@@ -84,12 +84,14 @@ def test_verified_continuity_preserves_every_relation_without_antedated_reforms(
 
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])
 @pytest.mark.parametrize("missing", ["directory_note", "re_enactment", "relation_note"])
-def test_unverified_earlier_application_still_fails_history_validation(record, missing):
+def test_unverified_earlier_application_is_listed_undated(record, missing):
     effects, notes, envelope = inherited(record, missing)
     assert len(effects) == len(record["predating"])
     assert notes == []
-    with pytest.raises(ValueError, match="predates the original publication"):
-        _parse_on(envelope, date(2026, 10, 13))
+    norm = _parse_on(envelope, date(2026, 10, 13))
+    undated = {u["source_id"] for u in json.loads(dict(norm.metadata.extra)["undated_amendments"])}
+    assert {e["source_id"] for e in effects} <= undated
+    assert not undated & {r.norm_id for r in norm.reforms}
 
 
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])

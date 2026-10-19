@@ -66,6 +66,6 @@ def test_unrecognised_marginal_text_still_rejects_the_snapshot(monkeypatch):
     for char, letter in zip(letters, "Unverified", strict=True):
         char["text"] = letter
     events[index] = replace(events[index], chars=chars)
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected))
     with pytest.raises(UnsupportedPDF, match="Unassigned marginal text"):
         parse_revised_pdf(raw)

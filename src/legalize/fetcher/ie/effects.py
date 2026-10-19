@@ -96,6 +96,36 @@ _PRE_EXISTING_RULES = {
         "and instruments. The directory's separate S.I. 600/2011 amendment is retained.",
         "https://www.irishstatutebook.ie/eli/2005/act/26/section/361/enacted/en/html",
     ),
+    ("IE-2018-act-11", "Data Protection Act 2018 (7/2018), ss. 9, 14(2), (4)"): (
+        "S. 24 references to Data Protection Commissioner construed",
+        "Section 14(2) is an earlier general rule: from the establishment day a reference "
+        "in any enactment to the Data Protection Commissioner is construed as one to the "
+        "Commission. The Childcare Support Act 2018 names the Commissioner; this is not a "
+        "later amendment of it.",
+        "https://www.irishstatutebook.ie/eli/2018/act/7/section/14/enacted/en/html",
+    ),
+    ("IE-1999-si-189", "32/1998, s. 4(4), (5)"): (
+        "Rendered spent by expiry of enabling Act",
+        "Section 4(4) ends the 1998 Act 12 months after its passing and section 4(5) allows "
+        "one continuance of at most 12 months, which this order makes. The order is spent "
+        "when that period ends: an earlier limit, not a later amendment.",
+        "https://www.irishstatutebook.ie/eli/1998/act/32/section/4/enacted/en/html",
+    ),
+    ("IE-2002-si-355", "Mental Health Act 2001 (25/2001), ss. 1(3), 6, schedule"): (
+        "Rendered obsolete by repeal of enabling provision",
+        "The order was made under sections 162, 165 and 166 of the Mental Treatment Act "
+        "1945 (Part XIV). Section 6 and the Schedule of the 2001 Act repeal the 1945 Act "
+        "other than Part VIII and four sections, from a day fixed under section 1(3). The "
+        "directory states no date, so none is assigned; this is not a 2001 amendment.",
+        "https://www.irishstatutebook.ie/eli/2001/act/25/section/6/enacted/en/html",
+    ),
+    ("IE-2005-si-512", "11/2005, ss. 1(1), 47(3)"): (
+        "Continued in force",
+        "Section 47(3) continues regulations made under sections 18, 19, 20 and 27 of the "
+        "1992 Act before its commencement. This instrument was made later, under section 27 "
+        "as inserted by section 47(2); the 2005 provision is earlier, not an amendment of it.",
+        "https://www.irishstatutebook.ie/eli/2005/act/11/section/47/enacted/en/html",
+    ),
 }
 
 # Official instruments whose own text cannot date them. The owner decided to publish
@@ -205,6 +235,18 @@ _DIRECTORY_CONTEXT = {
         "of the Finance Act 1981. The cessation comes from section 152(1) of the "
         "Finance Act 1992, retained as a separate directory effect.",
         "https://www.irishstatutebook.ie/eli/1992/act/9/section/152/enacted/en/html",
+    ),
+    (
+        "IE-1996-si-292",
+        "IE-1970-act-1",
+        "Continued in force under Health Act 1970 (1/1970)",
+        "Health Act 1970 (1/1970), s. 72(3)",
+    ): (
+        "directory_citation_error",
+        "Section 72(3) continues regulations made under the Health Act 1953. This order "
+        "was made in 1996 under sections 162, 165, 166 and 184 of the Mental Treatment Act "
+        "1945; the 1970 provision predates it and does not concern it.",
+        "https://www.irishstatutebook.ie/eli/1996/si/292/made/en/html",
     ),
 }
 
@@ -381,6 +423,17 @@ _VERIFIED_EFFECT_SOURCES = {
         "2014/act/1/section/21",
         "1 June 2014",
         "2014/si/214",
+    ),
+    # Section 2A(2)(a) of the 1930 Act names both orders; section 3 of 22/2004 inserted it.
+    ("IE-2002-si-302", "2/1930, s. 2A(2)(a)(i)-(ii).", "IE-1930-act-2"): (
+        "2004/act/22/section/3",
+        None,
+        None,
+    ),
+    ("IE-2002-si-358", "2/1930, s. 2A(2)(a)(i)-(ii).", "IE-1930-act-2"): (
+        "2004/act/22/section/3",
+        None,
+        None,
     ),
 }
 
@@ -644,7 +697,8 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     return identifiers, correction
 
 
-def _effect_cells(doc, norm_id: str) -> list[list]:
+def _effect_cells(doc, norm_id: str) -> list[list] | None:
+    """Effects rows; None when an annual directory page omits this instrument."""
     headings = doc.xpath('//*[@id="effects"]')
     if headings:
         tables = headings[0].xpath("following-sibling::table[1]")
@@ -657,6 +711,14 @@ def _effect_cells(doc, norm_id: str) -> list[list]:
     anchor = f"a{number}_{year}"
     target = doc.xpath("//*[@id=$anchor or @name=$anchor]", anchor=anchor)
     if not target:
+        # Early annual pages list only some instruments, and later ones skip a few
+        # (1996 goes from 127 to 129). Only a page that lists that year's other
+        # instruments shows the omission; anything else is still an error.
+        if kind == "si" and any(
+            re.fullmatch(rf"a\d+_{year}", node.get("id") or node.get("name") or "")
+            for node in doc.xpath("//a[@id or @name]")
+        ):
+            return None
         raise ValueError(f"{norm_id}: annual Legislation Directory has no matching norm")
     start = target[0].xpath("ancestor::tr[1]")[0]
     first = start.xpath("./td")
@@ -668,7 +730,60 @@ def _effect_cells(doc, norm_id: str) -> list[list]:
     if len(siblings) < count - 1:
         raise ValueError(f"{norm_id}: truncated annual directory group")
     rows.extend(row.xpath("./td") for row in siblings[: count - 1])
+    if first[0].get("rowspan") is None:
+        # Some pages write a group without rowspan: its further rows leave the number
+        # and title cells empty ("Art. 4 revoked" under S.I. 30/2001).
+        for row in siblings:
+            cells = row.xpath("./td")
+            if len(cells) != 4 or any(_text(cell) for cell in cells[:2]) or cells[0].xpath(".//a"):
+                break
+            rows.append(cells[2:])
     return rows
+
+
+def _annual_footnotes(doc, norm_id: str) -> list[tuple[str, str, set[str]]]:
+    """(stars, text, cited instruments) of the "*See …" rows after an SI's annual group."""
+    year, kind, number = _parse_norm_id(norm_id)
+    target = doc.xpath("//*[@id=$anchor or @name=$anchor]", anchor=f"a{number}_{year}")
+    if kind != "si" or not target:
+        return []
+    start = target[0].xpath("ancestor::tr[1]")[0]
+    count = int(start.xpath("./td")[0].get("rowspan", "1"))
+    footnotes = []
+    for row in start.xpath("following-sibling::tr")[count - 1 :]:
+        cells = row.xpath("./td")
+        if len(cells) == 4 and not _text(cells[0]) and not cells[0].xpath(".//a[@id or @name]"):
+            continue  # a continuation row of the same group, written without rowspan
+        if len(cells) != 1:
+            break
+        if not (text := _text(cells[0])):
+            continue  # the <hr> separator rows
+        if not text.startswith("*"):
+            break
+        # One cell can hold several notes: "*See also 24/2004, s. 38 **See also …".
+        cell = deepcopy(cells[0])
+        content = cell.text_content()
+        starts = [match.start() for match in re.finditer(r"\*+(?=\s*See\b)", content)]
+        if not starts:
+            continue  # a starred note that cites nothing, e.g. a court judgment
+        for begin, end in zip(starts, starts[1:] + [len(content)], strict=True):
+            links = [
+                identifier
+                for link in cell.xpath(".//a[@href]")
+                if begin <= len("".join(link.xpath("preceding::text()"))) < end
+                and (identifier := norm_id_from_url(link.get("href")))
+            ]
+            segment = " ".join(content[begin:end].split())
+            if not links:
+                links = [
+                    f"IE-{year}-{'si' if instrument else 'act'}-{int(number)}"
+                    for instrument, number, year in re.findall(
+                        r"(S\.\s*I\.\s*)?No\.\s*(\d+)\s+of\s+(\d{4})", segment
+                    )
+                ] + [f"IE-{y}-act-{int(n)}" for n, y in re.findall(r"\b(\d+)/(\d{4})\b", segment)]
+            stars = re.match(r"\*+", segment)[0]
+            footnotes.append((stars, segment, set(links)))
+    return footnotes
 
 
 def _collective_citation(note: str) -> bool:
@@ -687,6 +802,19 @@ def parse_effects(
     """Preserve every resolvable effect, including continuation rows and pending changes."""
     doc = html.fromstring(data.decode("utf-8"))
     cells_by_row = _effect_cells(doc, norm_id)
+    if cells_by_row is None:
+        if editorial_notes is None:
+            raise ValueError(f"{norm_id}: directory omission requires a provenance sink")
+        editorial_notes.append(
+            {
+                "kind": "source_coverage_warning",
+                "note": "The annual Legislation Directory does not list this instrument; "
+                "this does not establish that it has never been amended or revoked.",
+                "source_sha256": sha256(data).hexdigest(),
+            }
+        )
+        return []
+    annual_footnotes = _annual_footnotes(doc, norm_id)
     footnotes = [
         _text(node)
         for node in doc.xpath('//*[@id="effects"]/following-sibling::*[not(self::table)]')
@@ -908,6 +1036,7 @@ def parse_effects(
             and (
                 note == "Virt. Rep., Principal Act, Rep."
                 or re.fullmatch(r"Ceased in accordance with s\. \d+", note)
+                or re.fullmatch(r"Expired at (?:the )?end of .+", note)
             )
             and not provision
         ):
@@ -980,6 +1109,22 @@ def parse_effects(
                 re.I,
             ):
                 continue
+            # An instrument's own regulations, e.g. "Spent 31 Dec 2004 | Regs. 1(b), 3".
+            if re.fullmatch(
+                r"(?:regs?|arts?|rules?)\.?\s*\d+[a-z]?(?:\([0-9a-z]+\))*"
+                r"(?:\s*(?:,|and)\s*(?:\d+[a-z]?(?:\([0-9a-z]+\))*|sch(?:edule)?\.?))*\.?",
+                provision,
+                re.I,
+            ):
+                if re.match(r"(?:Spent|Expired|Ceased|Lapsed)\b", note, re.I):
+                    if editorial_notes is None:
+                        raise ValueError(
+                            f"{norm_id}: directory classification requires a provenance sink"
+                        )
+                    editorial_notes.append(
+                        {"kind": "directory_classification", "note": note, "provision": provision}
+                    )
+                continue
             raise ValueError(f"{norm_id}: unresolved affecting provision: {provision}")
         for identifier in sorted(ids - {norm_id}):
             effect = _effect(
@@ -991,6 +1136,15 @@ def parse_effects(
             )
             if correction:
                 effect["source_correction"] = correction
+            # Kept for fetch_effects, which can date an effect only once it knows the
+            # publication dates; these keys never reach the published text.
+            if cited := [
+                (text, sources)
+                for stars, text, sources in annual_footnotes
+                if marker and stars == marker[0]
+            ]:
+                effect["_footnotes"] = [text for text, _ in cited]
+                effect["_footnote_ids"] = sorted(set().union(*(s for _, s in cited)))
             if rent_amendment and identifier == "IE-2011-si-600":
                 effect["directory_source_id"] = "IE-1998-si-188"
                 effect["directory_footnotes"] = [
@@ -1189,6 +1343,12 @@ def fetch_effects(
                 "the references to provisions of the Act of 1958 were to the corresponding "
                 "provisions of this Act.",
             ),
+            "IE-1981-act-1": (
+                "311",
+                "The continuity of the operation of the law relating to the matters provided "
+                "for in the repealed enactments shall not be affected by the substitution of "
+                "this Act for those enactments",
+            ),
         }.get(norm_id)
         if continuity:
             continuity_section, continuation = continuity
@@ -1215,7 +1375,10 @@ def fetch_effects(
     metadata = {}
     metadata_sources = {}
     dated_effects = []
+    original_date = None
     for effect in effects:
+        footnotes = effect.pop("_footnotes", [])
+        footnote_ids = effect.pop("_footnote_ids", [])
         source_id = effect["source_id"]
         if undatable := _UNDATABLE_SOURCES.get((norm_id, source_id)):
             if editorial_notes is None:
@@ -1314,7 +1477,7 @@ def fetch_effects(
                 continue
         continuity_note = None
         if continuity_notes:
-            if norm_id == "IE-1980-act-10":
+            if norm_id in {"IE-1980-act-10", "IE-1981-act-1"}:
                 continuity_note = continuity_notes.get(re.sub(r"[ *]", "", effect["provision"]))
             elif effect["note"] == "Excl. provns. ext. to Customs-free Airport. *" and (
                 source_id,
@@ -1351,6 +1514,45 @@ def fetch_effects(
                     },
                 }
             )
+        elif (
+            footnote_ids
+            and effect["publication_date"]
+            and date.fromisoformat(effect["publication_date"])
+            < (
+                original_date := original_date
+                or parser.parse(enacted_data, norm_id).publication_date
+            )
+        ):
+            # An instrument published before this one cannot have amended it on that
+            # date. Date the effect only from a later instrument the directory itself
+            # names; anything else still needs a verified rule.
+            later = set()
+            for candidate in footnote_ids:
+                if candidate not in metadata:
+                    metadata_sources[candidate] = client.get_metadata(candidate)
+                    metadata[candidate] = parser.parse(metadata_sources[candidate], candidate)
+                published = metadata[candidate].publication_date
+                if published and published >= original_date:
+                    later.add(candidate)
+            if len(later) > 1:
+                raise ValueError(
+                    f"{norm_id}: directory footnote names several later sources for {source_id}"
+                )
+            if later:
+                # "Revoked | 2/1995, s. 45*" with "*See Adoptive Leave Act 2005 (No. 25 of 2005)".
+                source = metadata[later_id := later.pop()]
+                effect.update(
+                    directory_source_id=source_id,
+                    directory_footnotes=footnotes,
+                    source_id=later_id,
+                    publication_date=source.publication_date.isoformat(),
+                    source_url=source.source,
+                    source_correction=source.source,
+                )
+                dated_effects.append(effect)
+                continue
+            # Unverified: history still refuses it until the relation is researched.
+            dated_effects.append(effect)
         else:
             dated_effects.append(effect)
     return dated_effects

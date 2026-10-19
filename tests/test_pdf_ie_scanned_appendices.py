@@ -68,6 +68,6 @@ def test_verified_source_does_not_allow_an_unlisted_scanned_page(monkeypatch, re
 def test_scanned_appendix_exception_cannot_hide_missing_sections(monkeypatch):
     raw = source(EVIDENCE[0], monkeypatch)
     events, cutoff, expected = pdf._read(raw)
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected | {"9999"}))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected | {"9999"}))
     with pytest.raises(pdf.UnsupportedPDF, match="missing sections.*9999"):
         pdf.parse_revised_pdf(raw)

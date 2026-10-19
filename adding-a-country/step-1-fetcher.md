@@ -323,6 +323,15 @@ If the source has a rich construct that is not in this list, **do not silently
 drop it**. Add a new `css_class` + renderer entry in `transformer/markdown.py`
 and document it here.
 
+**When a whole version or a cited amending act cannot be read, record it — never
+drop it** (spec v0.5, §Coverage). First try to read it faithfully; a gap is the
+alternative to misplaced text, not to effort. A version you cannot read goes in the
+law's `source_version_gaps` (date, reason, SHA-256 of the bytes); an amending act
+you cannot date goes in `undated_amendments`, never a commit at a guessed date; and
+a norm that fails is recorded with its reason, which `coverage.json` lists. A
+network error is none of these: it is a failed run, retried. Ireland
+(`fetcher/ie/history.py`, `fetcher/ie/bootstrap.py`) is the reference.
+
 ## Encoding — UTF-8, always
 
 Every parser MUST output valid UTF-8 text with no C0/C1 control characters.

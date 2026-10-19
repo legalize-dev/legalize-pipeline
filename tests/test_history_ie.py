@@ -59,8 +59,12 @@ def test_verified_layout_correction_keeps_source_cutoff(monkeypatch, replacement
         )
     raw = envelope(versions=records)
     if replacement == "different_bytes":
-        with pytest.raises(ValueError, match="conflicting source texts"):
-            history._parse(raw)
+        # Two unverified bodies printing one date: neither is published, both are listed.
+        parsed = history._parse(raw)
+        assert len(parsed.blocks[0].versions) == 1
+        gaps = json.loads(dict(parsed.metadata.extra)["source_version_gaps"])
+        assert {g["url"] for g in gaps} == {r["url"] for r in records}
+        assert all("conflicting source texts" in g["reason"] for g in gaps)
         return
     parsed = history._parse(raw)
     assert len(parsed.blocks[0].versions) == 2
@@ -144,7 +148,7 @@ def envelope(*, effects=(), versions=()):
     ).encode()
 
 
-def test_pdf_failure_identifies_the_exact_source_object(monkeypatch):
+def test_pdf_failure_is_listed_with_the_exact_source_object(monkeypatch):
     from legalize.fetcher.ie import pdf
 
     data = b"Source with a missing section"
@@ -164,11 +168,12 @@ def test_pdf_failure_identifies_the_exact_source_object(monkeypatch):
             }
         ]
     )
-    with pytest.raises(pdf.UnsupportedPDF, match="Missing section 42") as error:
-        history._parse(raw)
-    assert IDENTIFIER in str(error.value)
-    assert url in str(error.value)
-    assert hashlib.sha256(data).hexdigest() in str(error.value)
+    parsed = history._parse(raw)
+    assert len(parsed.blocks[0].versions) == 1
+    [gap] = json.loads(dict(parsed.metadata.extra)["source_version_gaps"])
+    assert gap["norm_id"] == IDENTIFIER and gap["url"] == url
+    assert gap["sha256"] == hashlib.sha256(data).hexdigest()
+    assert "Missing section 42" in gap["reason"]
 
 
 def effect(identifier="IE-2020-act-1", **kwargs):
@@ -332,20 +337,18 @@ def test_bootstrap_reparses_existing_json_when_parser_revision_changes(tmp_path,
 
 def test_missing_publication_date_is_not_replaced_by_commencement():
     raw = envelope(effects=[effect(publication_date=None, effective_date="2020-01-01")])
-    with pytest.raises(ValueError, match="no unique publication date"):
-        history.extract_reforms(raw)
+    parsed = history._parse(raw)
+    assert [r.norm_id for r in parsed.reforms] == [IDENTIFIER]
+    [entry] = json.loads(dict(parsed.metadata.extra)["undated_amendments"])
+    assert entry["source_id"] == "IE-2020-act-1" and "no single publication date" in entry["reason"]
 
 
 @pytest.mark.parametrize("published", [None, "2000-01-01"])
-def test_invalid_effect_dates_fail_before_parsing_source_bodies(monkeypatch, published):
-    from legalize.fetcher.ie.parser import ISBTextParser
-
-    def unexpected_parse(*args, **kwargs):
-        pytest.fail("Invalid effect dates must fail before expensive source extraction")
-
-    monkeypatch.setattr(ISBTextParser, "parse_text", unexpected_parse)
-    with pytest.raises(ValueError, match="no unique publication date|predates the original"):
-        history._parse(envelope(effects=[effect(publication_date=published)]))
+def test_undatable_effects_are_listed_never_committed(published):
+    parsed = history._parse(envelope(effects=[effect(publication_date=published)]))
+    assert [r.norm_id for r in parsed.reforms] == [IDENTIFIER]
+    [entry] = json.loads(dict(parsed.metadata.extra)["undated_amendments"])
+    assert entry["source_id"] == "IE-2020-act-1"
 
 
 def test_pending_repeal_does_not_repeal_current_law():
@@ -401,8 +404,8 @@ def test_pdf_cover_date_is_not_a_publication_date(monkeypatch):
         "parse_revised_pdf",
         lambda _: ([Paragraph("parrafo", "Wrong source")], date(2000, 1, 1)),
     )
-    with pytest.raises(ValueError, match="predates the original Act"):
-        history._parse(raw + b" ")
+    [gap] = json.loads(dict(history._parse(raw + b" ").metadata.extra)["source_version_gaps"])
+    assert "consolidation cutoff predates the original Act" in gap["reason"]
 
 
 def test_amending_instrument_closure_is_transitive_and_fails_closed(tmp_path, monkeypatch):
@@ -696,3 +699,15 @@ def test_fast_import_rejects_changed_event_publication_dates_before_writing(
         ).strip()
         == "2"
     )
+
+
+def test_each_pinned_layout_correction_has_its_evidence():
+    records = json.loads((FIXTURES / "corrected-layouts-evidence.json").read_text())
+    pinned = {r["replaced"]["sha256"]: r["corrected"]["sha256"] for r in records}
+    assert all(history._CORRECTED_PDF_LAYOUTS[old] == new for old, new in pinned.items())
+    for record in records:
+        # The replaced file is the snapshot the catalogue dates to the cutoff; the
+        # correction is a later re-issue printing the same date.
+        assert record["replaced"]["catalog_date"] == record["cutoff"]
+        assert record["corrected"]["catalog_date"] > record["cutoff"]
+        assert record["basis"]

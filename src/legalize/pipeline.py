@@ -35,6 +35,9 @@ from rich.console import Console
 from legalize.committer.git_ops import FastImportDied, FastImporter, GitRepo
 from legalize.committer.message import build_commit_info, format_commit_message
 from legalize.config import Config
+from legalize.coverage import clear_failure, coverage_report, record_failure
+from legalize.coverage import render as render_coverage
+from legalize.layout import SOURCE_INDEX, spec_version_for
 from legalize.models import (
     CommitInfo,
     CommitType,
@@ -457,6 +460,7 @@ def generic_fetch_one(
             )
 
             save_structured_json(cc.data_dir, norm)
+            clear_failure(cc.data_dir, norm_id)
             if country == "ie":
                 from legalize.fetcher.ie.history import save_source_stamp
 
@@ -468,9 +472,10 @@ def generic_fetch_one(
             )
             return norm
 
-        except (requests.RequestException, ValueError, FileNotFoundError, OSError):
+        except (requests.RequestException, ValueError, FileNotFoundError, OSError) as exc:
             logger.error("Error processing %s", norm_id, exc_info=True)
             console.print(f"  [red]✗ Error processing {norm_id}[/red]")
+            record_failure(cc.data_dir, norm_id, exc)
             return None
 
 
@@ -750,6 +755,9 @@ _IE_CURRENT_METADATA_FIELDS = frozenset(
         b"has_formulas",
         b"legislation_directory_notes",
         b"legislation_directory_corrections",
+        # Spec v0.5 §Coverage: what is known today to be missing, not a past version.
+        b"source_version_gaps",
+        b"undated_amendments",
     }
 )
 
@@ -1611,10 +1619,16 @@ def write_repo_meta(config: Config, country: str) -> None:
     # import and deleted the corpus from the tip.
     repo.sync_index()
 
+    files = repo_meta_files(country)
+    if tuple(map(int, spec_version_for(country).split("."))) >= (0, 5):
+        # §Coverage: measured from the repo and the discovery index at publication.
+        previous = repo_dir / "coverage.json"
+        files["coverage.json"] = render_coverage(
+            coverage_report(repo_dir, cc.data_dir, SOURCE_INDEX[country]),
+            previous.read_text(encoding="utf-8") if previous.exists() else None,
+        )
     changed = [
-        rel_path
-        for rel_path, content in repo_meta_files(country).items()
-        if repo.write_and_add(rel_path, content)
+        rel_path for rel_path, content in files.items() if repo.write_and_add(rel_path, content)
     ]
     if not changed:
         return

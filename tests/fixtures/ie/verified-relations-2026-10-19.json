@@ -1,0 +1,256 @@
+[
+ {
+  "identifier": "IE-2018-act-11",
+  "kind": "pre_existing_rule",
+  "relations": [
+   {
+    "note": "S. 24 references to Data Protection Commissioner construed",
+    "provision": "Data Protection Act 2018 (7/2018), ss. 9, 14(2), (4)"
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/2018/act/11/enacted/en/xml",
+   "file": "verified-relation-2018-act-11-source.gz",
+   "sha256": "45d43c91090decee765763c0f80ec7082c02b2996423659a1bd18c763ccd9e72"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/2018_11.html",
+   "file": "verified-relation-2018-act-11-directory.gz",
+   "sha256": "22f32bd56ceaf11c96d165b8a87ec7349d93ce48ae32bd7ea70f1159c6507614"
+  },
+  "dependencies": {
+   "IE-2018-act-7": {
+    "url": "https://www.irishstatutebook.ie/eli/2018/act/7/enacted/en/xml",
+    "file": "verified-relation-2018-act-11-2018-act-7.gz",
+    "sha256": "5dff92237fc8144e9675ecd6c465b1bff973f2f4c88e003b6dab09c16294e9ec"
+   }
+  },
+  "page": {
+   "url": "https://www.irishstatutebook.ie/eli/2018/act/11/enacted/en/html",
+   "file": "verified-relation-2018-act-11-page.gz",
+   "sha256": "7b32f95ab55ce4975058db7ca23f4a8a0d30581adbe4b38e73291e5e5875b092"
+  }
+ },
+ {
+  "identifier": "IE-1999-si-189",
+  "kind": "pre_existing_rule",
+  "relations": [
+   {
+    "note": "Rendered spent by expiry of enabling Act",
+    "provision": "32/1998, s. 4(4), (5)"
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/1999/si/189/made/en/html",
+   "file": "verified-relation-1999-si-189-source.gz",
+   "sha256": "ab55ecbec5fc2403112e4de6f43e9e0abc2376ce7f22956ed6cf2c77aacfdcac"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/si1999_151-200.html",
+   "file": "verified-relation-1999-si-189-directory.gz",
+   "sha256": "e0fad065d3badcb316a27a1e0a9ba6cc3a9e5adf746b211471ce5bb39ea22191"
+  },
+  "dependencies": {
+   "IE-1998-act-32": {
+    "url": "https://www.irishstatutebook.ie/eli/1998/act/32/enacted/en/xml",
+    "file": "verified-relation-1999-si-189-1998-act-32.gz",
+    "sha256": "b1684e63b6e9b99d8b0be049b928b9d0f32542f37b23471fc139e00a560f5e74"
+   }
+  }
+ },
+ {
+  "identifier": "IE-2002-si-355",
+  "kind": "pre_existing_rule",
+  "relations": [
+   {
+    "note": "Rendered obsolete by repeal of enabling provision",
+    "provision": "Mental Health Act 2001 (25/2001), ss. 1(3), 6, schedule"
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/2002/si/355/made/en/html",
+   "file": "verified-relation-2002-si-355-source.gz",
+   "sha256": "c865070e6ec29f40250102874f93268da1be03382b1faa1d17b8234f79ce759c"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/si2002_351-400.html",
+   "file": "verified-relation-2002-si-355-directory.gz",
+   "sha256": "02e8a512fd256ff3f49e5effdf99b4fafd3316e2fd7df219cf6ce34f373396da"
+  },
+  "dependencies": {
+   "IE-2001-act-25": {
+    "url": "https://www.irishstatutebook.ie/eli/2001/act/25/enacted/en/xml",
+    "file": "verified-relation-2002-si-355-2001-act-25.gz",
+    "sha256": "4373f52b14219118b4b85d0ce68b5310edd0613a8b9e3bcf87f61dfb7ef5522c"
+   }
+  }
+ },
+ {
+  "identifier": "IE-2005-si-512",
+  "kind": "pre_existing_rule",
+  "relations": [
+   {
+    "note": "Continued in force",
+    "provision": "11/2005, ss. 1(1), 47(3)"
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/2005/si/512/made/en/html",
+   "file": "verified-relation-2005-si-512-source.gz",
+   "sha256": "2b4b4761f3584cf04bedf9ecab8ee13ff5c6178eb66fee7e5efe033491701d89"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/si2005_501-550.html",
+   "file": "verified-relation-2005-si-512-directory.gz",
+   "sha256": "43a698b210a3e4f906332a1f31ad8e44787cb6118b4cee8f1e04390b3384c52c"
+  },
+  "dependencies": {
+   "IE-2005-act-11": {
+    "url": "https://www.irishstatutebook.ie/eli/2005/act/11/enacted/en/xml",
+    "file": "verified-relation-2005-si-512-2005-act-11.gz",
+    "sha256": "f8722841b0009723fd9082ce4b7183f846c68ce9c7dd4c1278cdfec4c7ffcddd"
+   }
+  }
+ },
+ {
+  "identifier": "IE-1996-si-292",
+  "kind": "directory_citation_error",
+  "relations": [
+   {
+    "note": "Continued in force under Health Act 1970 (1/1970)",
+    "provision": "Health Act 1970 (1/1970), s. 72(3)"
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/1996/si/292/made/en/html",
+   "file": "verified-relation-1996-si-292-source.gz",
+   "sha256": "571d580820a14b71cc418d5c9cca05ea8201aa9e33a410e5f30ea5f002e2c9ca"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/si1996_251-300.html",
+   "file": "verified-relation-1996-si-292-directory.gz",
+   "sha256": "c846f7080cfcc8cede1d7a697239ec5f8c3f8b3f3a86614dfa02f3e54d69e7ff"
+  },
+  "dependencies": {
+   "IE-1970-act-1": {
+    "url": "https://www.irishstatutebook.ie/eli/1970/act/1/enacted/en/xml",
+    "file": "verified-relation-1996-si-292-1970-act-1.gz",
+    "sha256": "5229fb5c5e286fb76325a7d542130a42a1269536eb178582bec6abdd2eead555"
+   }
+  }
+ },
+ {
+  "identifier": "IE-2002-si-302",
+  "kind": "later_host",
+  "relations": [
+   {
+    "note": "Saver for ministerial functions under",
+    "provision": "2/1930, s. 2A(2)(a)(i)-(ii)."
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/2002/si/302/made/en/html",
+   "file": "verified-relation-2002-si-302-source.gz",
+   "sha256": "c9b0291e230779316a210eb0916c27f5496c08d906a3912a7633a04a9a540e43"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/si2002_301-350.html",
+   "file": "verified-relation-2002-si-302-directory.gz",
+   "sha256": "8a48dfcd138613fed400e6aad9ec51a68ac52769efdcdc9148f91c4fab8d79ce"
+  },
+  "dependencies": {
+   "IE-1930-act-2": {
+    "url": "https://www.irishstatutebook.ie/eli/1930/act/2/enacted/en/xml",
+    "file": "verified-relation-2002-si-302-1930-act-2.gz",
+    "sha256": "341da02c792db6209cc352e25c77a233cd541938b5c105bae321009b8705ebd6"
+   },
+   "IE-2004-act-22": {
+    "url": "https://www.irishstatutebook.ie/eli/2004/act/22/enacted/en/xml",
+    "file": "verified-relation-2002-si-302-2004-act-22.gz",
+    "sha256": "a7fb8132403ebbff4495fcaa54ca3c99f611d684c4781f4fd0826522cd857426"
+   }
+  }
+ },
+ {
+  "identifier": "IE-2002-si-358",
+  "kind": "later_host",
+  "relations": [
+   {
+    "note": "Saver for ministerial functions under",
+    "provision": "2/1930, s. 2A(2)(a)(i)-(ii)."
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/2002/si/358/made/en/html",
+   "file": "verified-relation-2002-si-358-source.gz",
+   "sha256": "c2956778930abe47c8a3f0afae08f562525a73856f1d841d4a384b8239d0110e"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/si2002_351-400.html",
+   "file": "verified-relation-2002-si-358-directory.gz",
+   "sha256": "02e8a512fd256ff3f49e5effdf99b4fafd3316e2fd7df219cf6ce34f373396da"
+  },
+  "dependencies": {
+   "IE-1930-act-2": {
+    "url": "https://www.irishstatutebook.ie/eli/1930/act/2/enacted/en/xml",
+    "file": "verified-relation-2002-si-358-1930-act-2.gz",
+    "sha256": "341da02c792db6209cc352e25c77a233cd541938b5c105bae321009b8705ebd6"
+   },
+   "IE-2004-act-22": {
+    "url": "https://www.irishstatutebook.ie/eli/2004/act/22/enacted/en/xml",
+    "file": "verified-relation-2002-si-358-2004-act-22.gz",
+    "sha256": "a7fb8132403ebbff4495fcaa54ca3c99f611d684c4781f4fd0826522cd857426"
+   }
+  }
+ },
+ {
+  "identifier": "IE-1981-act-1",
+  "kind": "pre_existing_application",
+  "relations": [
+   {
+    "note": "Am.",
+    "provision": "S. I. No. 19 of 1978, reg. 3;*"
+   },
+   {
+    "note": "Investigation by Ombudsman.",
+    "provision": "26/1980, ss. 5 (2), 12 (2).*"
+   },
+   {
+    "note": "S.295, power of appointment constr.",
+    "provision": "S. I. No. 214 of 1966, art. 9.*"
+   }
+  ],
+  "enacted": {
+   "url": "https://www.irishstatutebook.ie/eli/1981/act/1/enacted/en/xml",
+   "file": "verified-relation-1981-act-1-source.gz",
+   "sha256": "f3e2be0bce7990b974569d635627df16a0c05e790af84f5bf8c36f527a98cd89"
+  },
+  "directory": {
+   "url": "https://www.irishstatutebook.ie/isbc/1981_1.html",
+   "file": "verified-relation-1981-act-1-directory.gz",
+   "sha256": "a19c213161f6b561bfc7585058354a528468cb14b7398b3ebc85fe636d97cf95"
+  },
+  "dependencies": {
+   "IE-1978-si-19": {
+    "url": "https://www.irishstatutebook.ie/eli/1978/si/19/made/en/html",
+    "file": "verified-relation-1981-act-1-1978-si-19.gz",
+    "sha256": "ddcbdf905395e8a92d19b860d4121b3924f3328a175fac7d450a5506b411de7e"
+   },
+   "IE-1980-act-26": {
+    "url": "https://www.irishstatutebook.ie/eli/1980/act/26/enacted/en/xml",
+    "file": "verified-relation-1981-act-1-1980-act-26.gz",
+    "sha256": "3b92c4dd62ce93b92fbbe768bdea5205cc37a849c655e3628090cba199dbaf2f"
+   },
+   "IE-1966-si-214": {
+    "url": "https://www.irishstatutebook.ie/eli/1966/si/214/made/en/html",
+    "file": "verified-relation-1981-act-1-1966-si-214.gz",
+    "sha256": "02a3bda431912bad1563f45ab871d90777302b865d58ef5cc16e1101a0236c9b"
+   }
+  },
+  "page": {
+   "url": "https://www.irishstatutebook.ie/eli/1981/act/1/enacted/en/html",
+   "file": "verified-relation-1981-act-1-page.gz",
+   "sha256": "c51f7429e00da162d4a2788dd9e985a2dc7f956cca4dbaf7051105f8eadb4c85"
+  }
+ }
+]

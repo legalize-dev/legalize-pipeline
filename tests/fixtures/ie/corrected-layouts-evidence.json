@@ -1,0 +1,167 @@
+[
+ {
+  "identifier": "IE-1991-act-17",
+  "cutoff": "2020-05-12",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1991/17/act_plain.pdf?versionId=MZTU6t94K5dySfZfjZpR1shR53e66yx1",
+   "catalog_date": "2020-05-12",
+   "sha256": "7baddd84626261769ccaca249b2189eb4e376e5ef3556d0ebb7618220df04ff3"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1991/17/act_plain.pdf?versionId=MdJ5XbYyyeC3lv5jNeYX0RTZnXQKUc9o",
+   "catalog_date": "2020-08-19",
+   "sha256": "fc6a3bf4d7d68c658251df180f9eb2abf2447d0db70744e2fa187414b552a424"
+  },
+  "basis": "Same words; the re-issue repairs words split across lines."
+ },
+ {
+  "identifier": "IE-2001-act-8",
+  "cutoff": "2019-09-11",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2001/8/act_plain.pdf?versionId=7WqmTtLoUbK26S9eBisb_LyP4o98_ldh",
+   "catalog_date": "2019-09-11",
+   "sha256": "e61301f1ad076bcbe326b5ca267e24b422c347e1d32231f4f888d36f761a9ed9"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2001/8/act_plain.pdf?versionId=WFqFZner_WnjRF_We2RWVs_WMaKU75Az",
+   "catalog_date": "2020-07-30",
+   "sha256": "6bbd30b88975e712dc0ddae10cbb146b3f79e46da9cdcfb6833f3b8782e6dd06"
+  },
+  "basis": "Same words; the re-issue repairs split words and matches the next snapshot's layout."
+ },
+ {
+  "identifier": "IE-2004-act-27",
+  "cutoff": "2021-08-19",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2004/27/act_plain.pdf?versionId=o4FpJd3nMdUIsgmP5s830rEXGe0EFWIW",
+   "catalog_date": "2021-08-19",
+   "sha256": "4e5dcf4d50c02f76847bc15f1889f2aa2316db1ac1b226a46f3370cfb463faf5"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2004/27/act_plain.pdf?versionId=V7y.lM_aKcHRLbWBDxe4qp5uOhF3e9n8",
+   "catalog_date": "2022-01-01",
+   "sha256": "5f818aec4e623c865decb0552125718d2e62aa7df378ba407a2dadee5407cc84"
+  },
+  "basis": "Same state; the re-issue drops paragraphs (a) and (b) printed under section 135(2), which is shown as deleted."
+ },
+ {
+  "identifier": "IE-2005-act-27",
+  "cutoff": "2020-02-06",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/27/act_plain.pdf?versionId=RFI_jCa2a_Clmobr_cexsapV2hLEBaCQ",
+   "catalog_date": "2020-02-06",
+   "sha256": "0b19ca307f8c627340cafff49009c6d71ac48fdc2c14440f8b46874b5fa46cd6"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/27/act_plain.pdf?versionId=JRR1PI.Iz29CC8IuZNd1znjNjiUuHJot",
+   "catalog_date": "2020-03-27",
+   "sha256": "596b1ea03415bd9cda5bfa4f7e98e5f862ff8a0fdc7043ee04610785d4c35007"
+  },
+  "basis": "Same state; the re-issue elides section 4(1)(ia) and section 36B, which the directory records as inserted by 33/2014 without commencement, as every later snapshot does."
+ },
+ {
+  "identifier": "IE-2005-act-27",
+  "cutoff": "2020-05-27",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/27/act_plain.pdf?versionId=FFl1zyaU8wz_bVgAmaMCa0CTmJk4WHH.",
+   "catalog_date": "2020-05-27",
+   "sha256": "f2c231188b824d6dcd4fc6341516245ed28ed335aa6d0c09e2fa4ddecbd63046"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/27/act_plain.pdf?versionId=eLsSLj2X8x6N5qePE6F0qv9.OpNxOT8s",
+   "catalog_date": "2020-07-29",
+   "sha256": "cc24b5b38ede5b9c0608a67a9f6342c862b9fed5263a24e96134bd801f6b17ae"
+  },
+  "basis": "Same words; layout and annotation markers only."
+ },
+ {
+  "identifier": "IE-2007-act-10",
+  "cutoff": "2018-11-30",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/10/act_plain.pdf?versionId=null",
+   "catalog_date": "2018-11-30",
+   "sha256": "8cdbd689e8a8e2a7ba4996e7f5f8ecb6df2ca0fb5cc7f610fe4eb08f4066efc8"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/10/act_plain.pdf?versionId=BjuJYoiQp7kB5VquzxOy3Q05eNEOuWFg",
+   "catalog_date": "2020-07-20",
+   "sha256": "4837641e7e639aed3a254c8f45d7ae278c095f88c2bb1990823f46d0eeac0023"
+  },
+  "basis": "Same words; layout only."
+ },
+ {
+  "identifier": "IE-2007-act-19",
+  "cutoff": "2019-12-02",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/19/act_plain.pdf?versionId=twMFdXuv0mTrGDQMkgCz2V.HXO25E1S4",
+   "catalog_date": "2019-12-02",
+   "sha256": "2e375dc60ae9ae78ee973d6234b6615b795a61b638d887685bad20d8ebf67a9d"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/19/act_plain.pdf?versionId=8hem8KG3UhBWU8ye.Dt17lMXhha.1LMu",
+   "catalog_date": "2020-01-17",
+   "sha256": "517cd5f6eeccadfbad707b784fe1200271921217634d7c076ac6d117ef750c76"
+  },
+  "basis": "The re-issue adds Part 4A, inserted by the Consumer Protection (Gift Vouchers) Act 2019 from 2 December 2019, the cutoff itself; the first file omits it."
+ },
+ {
+  "identifier": "IE-2007-act-20",
+  "cutoff": "2020-06-12",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/20/act_plain.pdf?versionId=sBqSRLPK5PI66jeESktx_k7mvQpID4Du",
+   "catalog_date": "2020-06-12",
+   "sha256": "47008d2c5cfcbdafc1a0add59ae7b7ec5b643aa99c33ebaa4410f3783b172f46"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/20/act_plain.pdf?versionId=pKf.xYsKUBblgufNj4ERa9so9GRQjB_j",
+   "catalog_date": "2020-08-04",
+   "sha256": "0697c1a8ff093a6672c900cec1f728fe8a5449effeeaa1b7e8564e91c271568d"
+  },
+  "basis": "Same words; layout only."
+ },
+ {
+  "identifier": "IE-2007-act-25",
+  "cutoff": "2020-03-27",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/25/act_plain.pdf?versionId=UIYmkpviMWGSuXKWyn7a5LzJRJWPTJsM",
+   "catalog_date": "2020-03-27",
+   "sha256": "dc45d32f113c93a39c0779d5f3dfa56e46aeb326f88d74235d4a15bfd4d84b68"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2007/25/act_plain.pdf?versionId=oRKpTITnxCAzGVNeJcDMhUw.BxGwTiFT",
+   "catalog_date": "2020-07-29",
+   "sha256": "d4c64ae31e83c7b0e7052122d4436627106e08d5f9a861e825c894d928723681"
+  },
+  "basis": "Same words; layout, block quotes and annotation markers only."
+ },
+ {
+  "identifier": "IE-2013-act-25",
+  "cutoff": "2019-12-23",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/25/act_plain.pdf?versionId=GsQk.tDvrxzVkqetm2sBHj5YDey9KPCO",
+   "catalog_date": "2019-12-23",
+   "sha256": "fbda92661514493d63f5a28ce1d6f8fbf880106f97deed04e0b7978bfeca60c2"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/25/act_plain.pdf?versionId=GovHlDhuRQSDqyYpduz361uH0cCRfOPm",
+   "catalog_date": "2020-07-07",
+   "sha256": "d34c34affd2a06c44d18eb2443e9b1b208fb1b63cb6b0c28fb7e77de9bda7a63"
+  },
+  "basis": "Same words; layout only."
+ },
+ {
+  "identifier": "IE-2013-act-26",
+  "cutoff": "2019-07-23",
+  "replaced": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/26/act_plain.pdf?versionId=o8RQfs3awwmSCgtOih2FEPFLbma4zGkI",
+   "catalog_date": "2019-07-23",
+   "sha256": "776dfca5c8af5577895b98c1ffe2a935386cfd3257a7bd603fee56e397cec014"
+  },
+  "corrected": {
+   "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/26/act_plain.pdf?versionId=b2l.FCUEk7i1rRV_WPyrqM.Y72Zxbmao",
+   "catalog_date": "2020-09-01",
+   "sha256": "68f8edb06d7a30d9a22e5512ce69492aa74be376be4fcad218db46e8d9c19312"
+  },
+  "basis": "Same words; layout only (one footnote moves)."
+ }
+]

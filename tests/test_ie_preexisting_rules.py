@@ -91,12 +91,14 @@ def test_verified_earlier_rules_preserve_all_dates_claims_and_provenance(record)
 
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])
 @pytest.mark.parametrize("changed", ["note", "provision"])
-def test_unverified_claims_are_not_silently_filtered(record, changed):
+def test_unverified_claims_are_listed_undated_not_filtered(record, changed):
     effects, notes, envelope = relations(record, changed=changed)
     assert len(effects) == len(record["relations"])
     assert notes == []
-    with pytest.raises(ValueError, match="predates the original publication"):
-        _parse_on(envelope, date(2026, 10, 13))
+    norm = _parse_on(envelope, date(2026, 10, 13))
+    undated = {u["source_id"] for u in json.loads(dict(norm.metadata.extra)["undated_amendments"])}
+    assert {e["source_id"] for e in effects} <= undated
+    assert not undated & {r.norm_id for r in norm.reforms}
 
 
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])
