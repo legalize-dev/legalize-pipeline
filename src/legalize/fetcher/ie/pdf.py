@@ -40,6 +40,15 @@ _MONTHS = (
 ).split()
 
 
+def _month_number(name: str) -> int:
+    """A full or three-letter month: some covers print "Updated to 8 Mar 2023"."""
+    name = name.lower()
+    matches = [i for i, month in enumerate(_MONTHS, 1) if len(name) >= 3 and month.startswith(name)]
+    if len(matches) != 1:
+        raise ValueError(f"unknown month {name!r}")
+    return matches[0]
+
+
 _PDF_PARSE_LOCK = Lock()
 
 # These exact official files omit an in-force provision from their bodies while
@@ -392,9 +401,7 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
                     match = _DATE.search(text)
                     if match:
                         try:
-                            found = date(
-                                int(match[3]), _MONTHS.index(match[2].lower()) + 1, int(match[1])
-                            )
+                            found = date(int(match[3]), _month_number(match[2]), int(match[1]))
                         except ValueError as exc:
                             raise UnsupportedPDF("Invalid Revised Act PDF cover date") from exc
                         if updated and found != updated:

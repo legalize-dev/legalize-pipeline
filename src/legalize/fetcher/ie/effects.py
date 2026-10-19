@@ -644,7 +644,8 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     return identifiers, correction
 
 
-def _effect_cells(doc, norm_id: str) -> list[list]:
+def _effect_cells(doc, norm_id: str) -> list[list] | None:
+    """Effects rows; None when an annual directory page omits this instrument."""
     headings = doc.xpath('//*[@id="effects"]')
     if headings:
         tables = headings[0].xpath("following-sibling::table[1]")
@@ -657,6 +658,14 @@ def _effect_cells(doc, norm_id: str) -> list[list]:
     anchor = f"a{number}_{year}"
     target = doc.xpath("//*[@id=$anchor or @name=$anchor]", anchor=anchor)
     if not target:
+        # Early annual pages list only some instruments, and later ones skip a few
+        # (1996 goes from 127 to 129). Only a page that lists that year's other
+        # instruments shows the omission; anything else is still an error.
+        if kind == "si" and any(
+            re.fullmatch(rf"a\d+_{year}", node.get("id") or node.get("name") or "")
+            for node in doc.xpath("//a[@id or @name]")
+        ):
+            return None
         raise ValueError(f"{norm_id}: annual Legislation Directory has no matching norm")
     start = target[0].xpath("ancestor::tr[1]")[0]
     first = start.xpath("./td")
@@ -669,6 +678,51 @@ def _effect_cells(doc, norm_id: str) -> list[list]:
         raise ValueError(f"{norm_id}: truncated annual directory group")
     rows.extend(row.xpath("./td") for row in siblings[: count - 1])
     return rows
+
+
+def _annual_footnotes(doc, norm_id: str) -> list[tuple[str, str, set[str]]]:
+    """(stars, text, cited instruments) of the "*See …" rows after an SI's annual group."""
+    year, kind, number = _parse_norm_id(norm_id)
+    target = doc.xpath("//*[@id=$anchor or @name=$anchor]", anchor=f"a{number}_{year}")
+    if kind != "si" or not target:
+        return []
+    start = target[0].xpath("ancestor::tr[1]")[0]
+    count = int(start.xpath("./td")[0].get("rowspan", "1"))
+    footnotes = []
+    for row in start.xpath("following-sibling::tr")[count - 1 :]:
+        cells = row.xpath("./td")
+        if len(cells) == 4 and not _text(cells[0]) and not cells[0].xpath(".//a[@id or @name]"):
+            continue  # a continuation row of the same group, written without rowspan
+        if len(cells) != 1:
+            break
+        if not (text := _text(cells[0])):
+            continue  # the <hr> separator rows
+        if not text.startswith("*"):
+            break
+        # One cell can hold several notes: "*See also 24/2004, s. 38 **See also …".
+        cell = deepcopy(cells[0])
+        content = cell.text_content()
+        starts = [match.start() for match in re.finditer(r"\*+(?=\s*See\b)", content)]
+        if not starts:
+            continue  # a starred note that cites nothing, e.g. a court judgment
+        for begin, end in zip(starts, starts[1:] + [len(content)], strict=True):
+            links = [
+                identifier
+                for link in cell.xpath(".//a[@href]")
+                if begin <= len("".join(link.xpath("preceding::text()"))) < end
+                and (identifier := norm_id_from_url(link.get("href")))
+            ]
+            segment = " ".join(content[begin:end].split())
+            if not links:
+                links = [
+                    f"IE-{year}-{'si' if instrument else 'act'}-{int(number)}"
+                    for instrument, number, year in re.findall(
+                        r"(S\.\s*I\.\s*)?No\.\s*(\d+)\s+of\s+(\d{4})", segment
+                    )
+                ] + [f"IE-{y}-act-{int(n)}" for n, y in re.findall(r"\b(\d+)/(\d{4})\b", segment)]
+            stars = re.match(r"\*+", segment)[0]
+            footnotes.append((stars, segment, set(links)))
+    return footnotes
 
 
 def _collective_citation(note: str) -> bool:
@@ -687,6 +741,19 @@ def parse_effects(
     """Preserve every resolvable effect, including continuation rows and pending changes."""
     doc = html.fromstring(data.decode("utf-8"))
     cells_by_row = _effect_cells(doc, norm_id)
+    if cells_by_row is None:
+        if editorial_notes is None:
+            raise ValueError(f"{norm_id}: directory omission requires a provenance sink")
+        editorial_notes.append(
+            {
+                "kind": "source_coverage_warning",
+                "note": "The annual Legislation Directory does not list this instrument; "
+                "this does not establish that it has never been amended or revoked.",
+                "source_sha256": sha256(data).hexdigest(),
+            }
+        )
+        return []
+    annual_footnotes = _annual_footnotes(doc, norm_id)
     footnotes = [
         _text(node)
         for node in doc.xpath('//*[@id="effects"]/following-sibling::*[not(self::table)]')
@@ -908,6 +975,7 @@ def parse_effects(
             and (
                 note == "Virt. Rep., Principal Act, Rep."
                 or re.fullmatch(r"Ceased in accordance with s\. \d+", note)
+                or re.fullmatch(r"Expired at (?:the )?end of .+", note)
             )
             and not provision
         ):
@@ -980,6 +1048,22 @@ def parse_effects(
                 re.I,
             ):
                 continue
+            # An instrument's own regulations, e.g. "Spent 31 Dec 2004 | Regs. 1(b), 3".
+            if re.fullmatch(
+                r"(?:regs?|arts?|rules?)\.?\s*\d+[a-z]?(?:\([0-9a-z]+\))*"
+                r"(?:\s*(?:,|and)\s*(?:\d+[a-z]?(?:\([0-9a-z]+\))*|sch(?:edule)?\.?))*\.?",
+                provision,
+                re.I,
+            ):
+                if re.match(r"(?:Spent|Expired|Ceased|Lapsed)\b", note, re.I):
+                    if editorial_notes is None:
+                        raise ValueError(
+                            f"{norm_id}: directory classification requires a provenance sink"
+                        )
+                    editorial_notes.append(
+                        {"kind": "directory_classification", "note": note, "provision": provision}
+                    )
+                continue
             raise ValueError(f"{norm_id}: unresolved affecting provision: {provision}")
         for identifier in sorted(ids - {norm_id}):
             effect = _effect(
@@ -991,6 +1075,15 @@ def parse_effects(
             )
             if correction:
                 effect["source_correction"] = correction
+            # Kept for fetch_effects, which can date an effect only once it knows the
+            # publication dates; these keys never reach the published text.
+            if cited := [
+                (text, sources)
+                for stars, text, sources in annual_footnotes
+                if marker and stars == marker[0]
+            ]:
+                effect["_footnotes"] = [text for text, _ in cited]
+                effect["_footnote_ids"] = sorted(set().union(*(s for _, s in cited)))
             if rent_amendment and identifier == "IE-2011-si-600":
                 effect["directory_source_id"] = "IE-1998-si-188"
                 effect["directory_footnotes"] = [
@@ -1215,7 +1308,10 @@ def fetch_effects(
     metadata = {}
     metadata_sources = {}
     dated_effects = []
+    original_date = None
     for effect in effects:
+        footnotes = effect.pop("_footnotes", [])
+        footnote_ids = effect.pop("_footnote_ids", [])
         source_id = effect["source_id"]
         if undatable := _UNDATABLE_SOURCES.get((norm_id, source_id)):
             if editorial_notes is None:
@@ -1351,6 +1447,45 @@ def fetch_effects(
                     },
                 }
             )
+        elif (
+            footnote_ids
+            and effect["publication_date"]
+            and date.fromisoformat(effect["publication_date"])
+            < (
+                original_date := original_date
+                or parser.parse(enacted_data, norm_id).publication_date
+            )
+        ):
+            # An instrument published before this one cannot have amended it on that
+            # date. Date the effect only from a later instrument the directory itself
+            # names; anything else still needs a verified rule.
+            later = set()
+            for candidate in footnote_ids:
+                if candidate not in metadata:
+                    metadata_sources[candidate] = client.get_metadata(candidate)
+                    metadata[candidate] = parser.parse(metadata_sources[candidate], candidate)
+                published = metadata[candidate].publication_date
+                if published and published >= original_date:
+                    later.add(candidate)
+            if len(later) > 1:
+                raise ValueError(
+                    f"{norm_id}: directory footnote names several later sources for {source_id}"
+                )
+            if later:
+                # "Revoked | 2/1995, s. 45*" with "*See Adoptive Leave Act 2005 (No. 25 of 2005)".
+                source = metadata[later_id := later.pop()]
+                effect.update(
+                    directory_source_id=source_id,
+                    directory_footnotes=footnotes,
+                    source_id=later_id,
+                    publication_date=source.publication_date.isoformat(),
+                    source_url=source.source,
+                    source_correction=source.source,
+                )
+                dated_effects.append(effect)
+                continue
+            # Unverified: history still refuses it until the relation is researched.
+            dated_effects.append(effect)
         else:
             dated_effects.append(effect)
     return dated_effects

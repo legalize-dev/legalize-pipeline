@@ -17,31 +17,37 @@ from legalize.storage import load_norma_from_json
 
 
 def fetch_dependencies(config: Config, identifiers: list[str]) -> list[str]:
-    """Close amendment references transitively, failing on any unavailable instrument."""
+    """Close amendment references transitively, failing on any unavailable instrument.
+
+    The walk goes on from every instrument that did load, so one run names every
+    failure at every depth instead of stopping after the first depth with one.
+    """
     cc = config.get_country("ie")
     json_dir = Path(cc.data_dir) / "json"
     seen = set(identifiers)
-    pending = list(identifiers)
+    loaded = list(identifiers)
+    failed = []
     with ThreadPoolExecutor(max_workers=cc.max_workers or 1) as pool:
-        while pending:
+        while loaded:
             references = set()
-            for identifier in pending:
+            for identifier in loaded:
                 norm = load_norma_from_json(json_dir / f"{identifier}.json")
                 references.update(
                     reform.norm_id for reform in norm.reforms if reform.norm_id.startswith("IE-")
                 )
             pending = sorted(references - seen)
-            if not pending:
-                break
             results = list(
                 pool.map(lambda key: generic_fetch_one(config, "ie", key) is not None, pending)
             )
-            failed = [key for key, succeeded in zip(pending, results, strict=True) if not succeeded]
-            if failed:
-                raise NothingPublished(
-                    f"Ireland amendment sources unavailable: {', '.join(failed)}"
-                )
             seen.update(pending)
+            failed += [
+                key for key, succeeded in zip(pending, results, strict=True) if not succeeded
+            ]
+            loaded = [key for key, succeeded in zip(pending, results, strict=True) if succeeded]
+    if failed:
+        raise NothingPublished(
+            f"Ireland amendment sources unavailable: {', '.join(sorted(failed))}"
+        )
     return sorted(seen)
 
 

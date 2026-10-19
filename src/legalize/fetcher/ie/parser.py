@@ -8,6 +8,7 @@ into NormMetadata.
 from __future__ import annotations
 
 import base64
+from copy import deepcopy
 import json
 import logging
 import re
@@ -808,8 +809,13 @@ class ISBTextParser(TextParser):
                 )
             elif match:
                 marker, body_text = match.groups()
+            elif not _html_text(node):
+                # An empty definition: the source tagged an exponent (mg/Nm³) as a
+                # footnote. Leaving its return anchor unregistered keeps the ^3.
+                footnote_nodes.add(node)
+                continue
             else:
-                raise ValueError("Malformed ISB HTML footnote definition")
+                marker, body_text = _loose_footnote_definition(act, node)
             if _html_inline_text(node).startswith(f"({marker})"):
                 for sibling in node.itersiblings():
                     if sibling not in footnote_nodes:
@@ -834,7 +840,15 @@ class ISBTextParser(TextParser):
                     body_text += "\n\n" + "\n".join(
                         "    " + line for line in paragraph.text.splitlines()
                     )
-            number = marker if marker.isdigit() else f"star{len(marker)}"
+            number = (
+                marker
+                if marker.isdigit()
+                else f"star{len(marker)}"
+                if set(marker) == {"*"}
+                else "hash"
+                if marker == "#"
+                else re.sub(r"\W+", "-", marker.lower()).strip("-")
+            )
             names = [
                 anchor.get("name", anchor.get("id", ""))
                 for anchor in node.iter("a")
@@ -864,6 +878,15 @@ class ISBTextParser(TextParser):
                     ):
                         # This source's sixth explicit return anchor is mislabelled "1".
                         source_marker = "1"
+                    if (
+                        re.match(r"S\.I\. No\. 79/2005\b", doc.findtext(".//title") or "")
+                        and name == "fn_18"
+                        and marker == "1"
+                        and body_text == "OJ L 229, 30.8.1980, p. 1."
+                    ):
+                        # Footnote 10 (Directive 89/106/EEC) is anchored to a copy of
+                        # footnote 1; the source has no definition 10. Keep ^10 unlinked.
+                        continue
                     ctx.footnote_anchors[f"ret_{name}"] = (number, source_marker)
             definitions[number] = body_text
             footnote_nodes.add(node)
@@ -1203,6 +1226,82 @@ def parse_revised_html(data: bytes) -> tuple[list[Paragraph], date | None]:
 _REVISED_BASE = "https://revisedacts.lawreform.ie"
 
 
+def _marker_core(marker: str) -> str:
+    """The visible footnote mark without bold, superscript, parentheses or full stop."""
+    marker = re.sub(r"^\*\*(.+)\*\*$", r"\1", marker.strip())
+    return re.sub(r"^\^?\(?\s*\^?(.+?)\s*\)?\.?$", r"\1", marker)
+
+
+def _return_marker(act, name: str) -> str | None:
+    """The mark a body reference prints immediately before its return anchor."""
+    anchors = act.xpath(f'.//a[@name="ret_{name}" or @id="ret_{name}"]')
+    if len(anchors) != 1:
+        return None
+    previous = anchors[0].getprevious()
+    if previous is not None and previous.tag == "sup":
+        return _html_inline_text(previous) or None
+    if (
+        previous is not None
+        and previous.tag in ("b", "strong")
+        and not (previous.tail or "").strip()
+    ):
+        return _html_text(previous)
+    before = (previous.tail if previous is not None else anchors[0].getparent().text) or ""
+    match = re.search(r"(\(\s*(?:\d+|\*+)\s*\)|\*+|#|\d+)\s*$", before)
+    return match[1] if match else None
+
+
+def _text_slots(elem):
+    yield elem, "text"
+    for child in elem:
+        if isinstance(child.tag, str):
+            yield from _text_slots(child)
+        yield child, "tail"
+
+
+def _loose_footnote_definition(act, node) -> tuple[str, str]:
+    """Read a definition whose mark (1., ^(1), (^1), *, (*), #, NOTE ONE…) varies by SI.
+
+    The return anchor ties each definition to the mark printed in the body, so that
+    mark decides; a different leading mark in the definition is a source conflict.
+    """
+    name = next(
+        anchor.get("name", anchor.get("id", ""))
+        for anchor in node.iter("a")
+        if re.fullmatch(r"fn_\d+", anchor.get("name", anchor.get("id", "")))
+    )
+    reference = _return_marker(act, name)
+    core = _marker_core(reference) if reference is not None else None
+    copy = deepcopy(node)
+    slots = list(_text_slots(copy))
+    plain = "".join(getattr(elem, attr) or "" for elem, attr in slots)
+    leading = re.match(r"\s*\(?\s*(\d+|\*+|#)\s*\)?\.?\s*(?=\S)", plain)
+    if leading and core is not None and leading[1] != core:
+        raise ValueError(f"ISB HTML footnote marker disagrees with its anchor: {reference}")
+    if not leading and core and plain.lstrip().startswith(core):
+        # A worded mark, e.g. <sup>NOTE ONE</sup>Surety must be…
+        leading = re.match(rf"\s*({re.escape(core)})\s*", plain)
+    if leading:
+        marker = leading[1]
+        remove = leading.end()
+        for elem, attr in slots:
+            value = getattr(elem, attr) or ""
+            cut = min(remove, len(value))
+            setattr(elem, attr, value[cut:])
+            remove -= cut
+            if not remove:
+                break
+    elif core:
+        # The definition prints no mark of its own ("OJ L 186…", "Note: …").
+        marker = core
+    else:
+        raise ValueError("Malformed ISB HTML footnote definition")
+    body = _html_inline_text(copy)
+    if not body:
+        raise ValueError("Malformed ISB HTML footnote definition")
+    return marker, body
+
+
 def _html_text(elem) -> str:
     """Extract plain text from an lxml.html element."""
     try:
@@ -1241,6 +1340,25 @@ def _html_inline_text(
                 text = ""
                 if re.search(rf"Note \({re.escape(marker)}\)\*\*\s*$", "".join(parts)):
                     text = f"[^{number}]"
+                previous = child.getprevious()
+                joined = "".join(parts).rstrip()
+                if (
+                    not text
+                    and not joined.endswith(f"[^{number}]")
+                    and (previous is None or previous.tag != "sup")
+                ):
+                    # The mark may be bold, parenthesised or glued to a word ("Schedule4");
+                    # the return anchor's position proves the reference either way.
+                    mark = re.escape(marker)
+                    bold = re.search(rf"\*\*\(?{mark}\)?\*\*$", joined)
+                    # Only the plain text right before the anchor: a closing ** of
+                    # bold text is not a two-star mark.
+                    glued = re.search(rf"(?:\({mark}\)|(?<![\d*]){mark})$", parts[-1].rstrip())
+                    if bold:
+                        parts[:] = [joined[: bold.start()]]
+                    elif glued:
+                        parts[-1] = parts[-1].rstrip()[: glued.start()]
+                    text = f"[^{number}]"
             elif tag == "br":
                 text = " "
             elif tag == "img":
@@ -1265,7 +1383,7 @@ def _html_inline_text(
                         else None
                     )
                     if target:
-                        if target[1] != number:
+                        if _marker_core(target[1]) != _marker_core(number):
                             raise ValueError(
                                 f"ISB HTML footnote marker disagrees with its anchor: {number}"
                             )
@@ -1527,8 +1645,9 @@ def _signature_dates(text: str) -> list[date]:
         re.I,
     )
     irish_matches = re.finditer(
-        r"ARNA THABHAIRT.{0,180}?(?:Sh(?:éa|eá)la Oifigiúil(?:\s+an (?:Aire Airgeadais|Taoisigh))?|láimh)[,]?\s*(?:an\s+)?"
-        r"(\d{1,2})ú?\s+l[áà] seo (?:de\s+|d['’])(\w+(?:\s+Fómhair)?),?\s*(\d{4})",
+        r"ARNA THABHAIRT.{0,180}?(?:Sh(?:éa|eá|ea)la Oifigi[uú]il(?:\s+an (?:Aire Airgeadais|Taoisigh))?|láimh)[,]?\s*(?:an\s+)?"
+        # I.R. 279/2001 prints "Meitheamh[illegible], 2001": day, month and year stay legible.
+        r"(\d{1,2})ú?\s+l[áà] seo (?:de\s+|d['’])(\w+(?:\s+Fómhair)?)(?:\[illegible\])?,?\s*(\d{4})",
         text,
         re.I,
     )
