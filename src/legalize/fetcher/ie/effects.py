@@ -226,6 +226,31 @@ _UNDATABLE_SOURCES = {
         None,
         "The directory cites S.I. No. 72 of 2026, but the 2026 annual index skips No. 72 and the official URL returns 404.",
     ),
+    # Verified on 2026-10-20 from the cache.
+    ("IE-2004-si-99", "IE-2016-act-23"): (
+        None,
+        "The directory cites 23/2016, but the 2016 annual index ends at Act No. 22 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-2015-si-136", "IE-2016-act-23"): (
+        None,
+        "The directory cites 23/2016, but the 2016 annual index ends at Act No. 22 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-2018-si-23", "IE-2016-act-23"): (
+        None,
+        "The directory cites 23/2016, but the 2016 annual index ends at Act No. 22 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-1995-si-136", "IE-3003-act-25"): (
+        None,
+        "The directory cites 25/3003, a year that does not exist, and the official URL returns 404.",
+    ),
+    ("IE-2000-si-185", "IE-2001-si-370"): (
+        None,
+        "The directory cites S.I. No. 370 of 2001, but the 2001 annual index skips No. 370 and the official URL returns 404.",
+    ),
+    ("IE-2007-si-142", "IE-2012-si-719"): (
+        None,
+        "The directory cites S.I. No. 719 of 2012, but the 2012 annual index ends at S.I. No. 593 and the official URL returns 404; the citation may be erroneous.",
+    ),
 }
 
 
@@ -256,7 +281,22 @@ _UNATTRIBUTED_ROWS = {
         "Friends of the Irish Environment Limited v. Minister for Communications, Climate "
         "Act and Environment and Others [2019] IEHC 646 para. 221 and [2019] IEHC 685 para. 11."
     },
+    "IE-2019-si-12": {
+        "Friends of the Irish Environment Limited v. Minister for Communications, Climate "
+        "Act and Environment and Others [2019] IEHC 646 para. 221 and [2019] IEHC 685 para. 11."
+    },
     "IE-2020-si-354": {"S.I. No. 413 of 202, regs. 1(2), 3"},
+}
+
+# Rows that name their amending Act in full but link to nothing, verified on 2026-10-20:
+# s. 3 of the Criminal Justice (Suspended Sentences of Imprisonment) Act 2017 (4/2017)
+# inserted the subsections of s. 99 of the 2006 Act these rules are construed by.
+_UNLINKED_AMENDERS = {
+    (norm_id, f"Criminal Justice (Suspended Sentences of Imprisonment) Act 2017, s. 3({part})"): (
+        "IE-2017-act-4"
+    )
+    for norm_id in ("IE-2008-si-25", "IE-2009-si-105", "IE-2010-si-260", "IE-2016-si-149")
+    for part in "ab"
 }
 
 
@@ -965,6 +1005,8 @@ def parse_effects(
         note = texts[0] or previous_note
         provision = texts[1]
         ids, correction = _affecting_ids(cells[1], provision, norm_id, note)
+        if not ids and (norm_id, provision) in _UNLINKED_AMENDERS:
+            ids = {_UNLINKED_AMENDERS[norm_id, provision]}
         if (
             not ids
             and _collective_citation(note)

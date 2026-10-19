@@ -610,9 +610,12 @@ _VOID_BY_NON_LEGISLATIVE_ACT = {
     "Vol. 969 No. 7",
     "IE-2018-si-355": "Making of instrument quashed: Sweetman v Minister for Culture, Heritage "
     "and the Gaeltacht and others, Meenan J., 5 Dec 2019, Case No. 2018 1009 JR",
-    "IE-2019-si-4": "Set aside as ultra vires 27/1972, s. 3: Friends of the Irish Environment "
-    "Limited v. Minister for Communications, Climate Act and Environment and Others [2019] "
-    "IEHC 646 para. 221 and [2019] IEHC 685 para. 11.",
+    **{
+        norm_id: "Set aside as ultra vires 27/1972, s. 3: Friends of the Irish Environment "
+        "Limited v. Minister for Communications, Climate Act and Environment and Others [2019] "
+        "IEHC 646 para. 221 and [2019] IEHC 685 para. 11."
+        for norm_id in ("IE-2019-si-4", "IE-2019-si-12")
+    },
 }
 
 

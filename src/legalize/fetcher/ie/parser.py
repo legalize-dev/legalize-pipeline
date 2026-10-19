@@ -14,6 +14,7 @@ from copy import deepcopy
 import json
 import logging
 import re
+import unicodedata
 from dataclasses import dataclass, field, replace
 from datetime import date
 from typing import Any
@@ -878,7 +879,9 @@ class ISBTextParser(TextParser):
                 if set(marker) == {"*"}
                 else "hash"
                 if marker == "#"
+                # A sign has no word characters: "†" is "dagger", "+" is "plus-sign".
                 else re.sub(r"\W+", "-", marker.lower()).strip("-")
+                or re.sub(r"\W+", "-", " ".join(map(unicodedata.name, marker.strip())).lower())
             )
             names = [
                 anchor.get("name", anchor.get("id", ""))
@@ -1319,6 +1322,13 @@ _LINKED_MARK_SOURCES = frozenset(
         "55608b3bb626c99c92b291fa29c39d642a9d70d8e6f18c8f988f7b1f9c52dcc4",  # IE-2007-si-190  # pragma: allowlist secret
         "74b09626d0a2994ee4f3ff8e9769179154acbe36e61c9b26c6cbc6811479d299",  # IE-2007-si-296  # pragma: allowlist secret
         "132aab2cc7920dd39fe8d1a564e7910cab2fb3c3aa4529efe3049310705556a9",  # IE-2001-si-342  # pragma: allowlist secret
+        # Form notes marked with a sign the body prints before its return anchor, or "2a".
+        "2968e0b5616e64c790dbb349dc568ba36b04669d0528283daeb8df5cdff7b719",  # IE-1999-si-286  # pragma: allowlist secret
+        "6607831a786d6f959e3e084b76bd620212611d0613bc4a12f865d88f1474fd03",  # IE-2000-si-166  # pragma: allowlist secret
+        "c00b06e16d86a43d7c30bac7e0e7de1b2d74aacd8bbad422c630707e0bce3e1d",  # IE-2006-si-5  # pragma: allowlist secret
+        "2237b3b10e0ed66f4bda88d56ed86d992d679b88bc9172d30dfab7b8f6c03f89",  # IE-2007-si-73  # pragma: allowlist secret
+        "5f8fe968df6f157269b30dd766d1267b581e15d57ff4572671032a61577c7234",  # IE-2009-si-174  # pragma: allowlist secret
+        "c9c3d237d52dfe164fd64ac2b2d2055d0a00edc36a5117fa9e66cdf855063c48",  # IE-2007-si-32  # pragma: allowlist secret
     }
 )
 

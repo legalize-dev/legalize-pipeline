@@ -72,6 +72,19 @@ def text_of(raw: bytes) -> str:
             "Personal signature.",
         ),
         ("Garda<sup>#</sup>", "<sup>#</sup> To be completed.", "Garda[^hash]", "To be completed."),
+        # A sign is named: an empty label would merge every sign-marked note into one.
+        (
+            "IMO Number<sup>&dagger; </sup>",
+            "&dagger; Refer to resolution A.600(15).",
+            "IMO Number[^dagger]",
+            "Refer to resolution A.600(15).",
+        ),
+        (
+            "Name<sup>+ </sup>",
+            "+ In accordance with the scheme.",
+            "Name[^plus-sign]",
+            "In accordance with the scheme.",
+        ),
         (
             "(name of Surety)<sup>NOTE ONE</sup>",
             "<sup>NOTE ONE</sup>Surety must be a member.",
