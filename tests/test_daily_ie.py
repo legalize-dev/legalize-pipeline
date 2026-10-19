@@ -688,3 +688,85 @@ def test_the_parser_revision_covers_every_module_a_parse_imports():
             r"legalize\.fetcher\.ie\.(\w+)", (directory / f"{name}.py").read_text()
         )
         assert set(imported) <= set(history.PARSE_MODULES), (name, imported)
+
+
+def test_a_refused_directory_page_waits_for_the_next_run(daily_config, monkeypatch):
+    import requests
+
+    pages = {f"2000_{n}.html": _directory("6 October 2026", f"<tr>{n}</tr>") for n in range(1, 4)}
+    published = {"IE-2000-act-1", "IE-2000-act-2", "IE-2000-act-3"}
+    source = _daily_sources(monkeypatch, pages=pages, published=published)
+    get, cc = source._get, daily_config.get_country("ie")
+
+    def refuse(url):
+        if url.endswith("/2000_2.html"):
+            raise requests.HTTPError("403 Client Error: Forbidden")
+        return get(url)
+
+    source._get = refuse
+    sources = ie_daily.Sources(cursor="old", pages=dict.fromkeys(pages, "x"))
+    ie_daily.find_changes(cc, sources, published, until=float("inf"))
+    assert sources.unswept == ["2000_2.html"]  # retried alone, refused again, kept
+    assert sources.pending == ["IE-2000-act-1", "IE-2000-act-3"]
+
+    calls = []
+
+    def refuse_after_the_probe(url):
+        calls.append(url)
+        if "/isbc/" in url and len([c for c in calls if "/isbc/" in c]) > 1:
+            raise requests.HTTPError("403 Client Error: Forbidden")
+        return get(url)
+
+    source._get = refuse_after_the_probe
+    sources = ie_daily.Sources(cursor="old", pages=dict.fromkeys(pages, "x"))
+    with pytest.raises(RuntimeError, match="refused every directory page"):
+        ie_daily.find_changes(cc, sources, published, until=float("inf"))
+
+
+def test_a_rebuilt_corpus_discards_the_state_of_the_history_it_replaced(
+    daily_config, monkeypatch, tmp_path
+):
+    import subprocess
+
+    repo = Path(daily_config.get_country("ie").repo_path)
+
+    def commit(message):
+        subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "-qm",
+                message,
+            ],
+            check=True,
+        )
+        return subprocess.check_output(
+            ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True
+        ).strip()
+
+    subprocess.run(["git", "-C", str(repo), "init", "-q", "-b", "main"], check=True)
+    (repo / "a.txt").write_text("old")
+    old = commit("old history")
+    ie_daily.Sources(tip=old, rebuild={"IE-2010-act-31": "gained an earlier event"}).save(
+        _sources_path(daily_config)
+    )
+    subprocess.run(["git", "-C", str(repo), "checkout", "-q", "--orphan", "rebuilt"], check=True)
+    (repo / "a.txt").write_text("new")
+    new = commit("rebuilt history")
+    baseline = tmp_path / "baseline.json"
+    ie_daily.Sources(cursor="6 October 2026 (Act No. 36 of 2026 and S.I. No. 512 of 2026)").save(
+        baseline
+    )
+    monkeypatch.setattr(ie_daily, "BASELINE", baseline)
+    _daily_sources(monkeypatch, pages={"si2026.html": _directory("6 October 2026")})
+    monkeypatch.setattr(ie_daily, "refresh_norms", Mock(return_value=(0, [])))
+    ie_daily.daily(daily_config)
+    saved = ie_daily.Sources.load(_sources_path(daily_config))
+    assert saved.rebuild == {} and saved.tip == new

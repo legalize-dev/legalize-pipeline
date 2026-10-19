@@ -30,6 +30,9 @@ from legalize.models import Paragraph
 
 _SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*(?:\.|(?=\(1\)))")
 # A section substituted twice prints both markers: "F22[ F23[22.—".
+# A label printed without its period, straight into the dash ("72A— Where an event
+# occurs", Road Traffic Act 1961): read leniently, and only for a listed, unseen label.
+_DASHED_SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)*(\d+[A-Z]*)(?=—)")
 _NESTED_SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)*(\d+[A-Z]*)\s*(?:\.|(?=\(1\)))")
 _DIVISION = re.compile(
     r"^(?:(?:F\d+)?\[)?(?:(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH) )?"
@@ -182,6 +185,57 @@ _KNOWN_UNNUMBERED_SECTIONS = {
         "F50[Revocation of licences under Musk Rats Act 1933",
         "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
     ),
+    # The later Animal Health and Welfare Act 2013 snapshots, each with its own mark and wrap.
+    "99607d467a9c960d555b24545769d06a6b8af43ad1b8f0bcf2cd805914cde7aa": (  # pragma: allowlist secret
+        "71M",
+        "F50[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "5e0ca07c6cb77d82e5e12af49aaf0a24d74e84ff382ed28c6d0d0d6986a1991e": (  # pragma: allowlist secret
+        "71M",
+        "F50[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "c84d4e4568125626ae40e43d15553c0400809368d1c5a3a182a788c0c1f6d8af": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "616d038251cccd5eb0556d668a3d08489f7312fb72dcef45f2c68d61b5ce60a5": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "6dd32ace5b956bc99d9d2364c003c36cd4460fc33e0c2ed62a6096d124abdc0e": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "38dea8df7b99e3663e6add7b2652ebc5571afe0f9fbbdda782519c9d204f31d0": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "29b4d19f893b9e6e46ea37c8d8b53e58200db5fa3d61f1df5ce47603d023b9b7": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "c2d989bae87bfe6b92dad9538064636e2d48dca1c26f4f30b91618c8c28f63f2": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date",
+    ),
+    "c10e76838c161e5757431f0591e3f48196b4b3e3a06ede35d7a2522fb6f1f27c": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date immediately",
+    ),
+    "f2b60c101fc7e850b1d19574649675b348ded9b0f14a0e785531dd9dfb6022d7": (  # pragma: allowlist secret
+        "71M",
+        "F51[Revocation of licences under Musk Rats Act 1933",
+        "All licences granted under the Musk Rats Act 1933 and subsisting on the date immediately",
+    ),
 }
 
 # Preserve verified source numbering defects verbatim, with visible warnings and exact counts.
@@ -235,6 +289,7 @@ _EMERGENCY_MEASURES_9A = {
 _PLANNING_105A = {
     "duplicates": {},
     "missing": frozenset({"105A"}),
+    "printed": frozenset({"105A1"}),
     "warning": (
         "This official Planning and Development Act 2000 consolidated PDF prints the label of "
         "section 105A ('Appointment of chairperson on interim basis', repealed) as '105A1'. Its "
@@ -253,6 +308,22 @@ _CIVIL_LIABILITY_17A = {
         "17A alone is ambiguous in this source."
     ),
 }
+
+_ANIMAL_HEALTH_69 = {
+    "duplicates": {"69": 2},
+    "missing": frozenset({"70"}),
+    "warning": (
+        "This official Animal Health and Welfare Act 2013 PDF prints section number 69 twice. "
+        "The second entry, 'Regulations in relation to animal marts', is numbered 70 in the "
+        "contents. Both body entries and their printed labels are preserved without "
+        "renumbering. Section 71M's body omits its number; its boundary is identified by the "
+        "contents and matching title without inserting a number into its body text. "
+        "Check the official legislation before relying on these section numbers."
+    ),
+}
+# The same defect in every later snapshot (2023-06-01 to 2025-12-29), each matched on
+# 2026-10-19 by its own 69/70 entries and its unnumbered 71M, as pinned below.
+
 
 _KNOWN_LABEL_DEFECTS = {
     "69987fceb7c4fbd8d7b5209f0f80bdee32739d2a0cbe1a61f62a4dd7826766c1": _CIVIL_REGISTRATION_30M,  # pragma: allowlist secret
@@ -280,24 +351,28 @@ _KNOWN_LABEL_DEFECTS = {
     "f7a06c43f9d43836e72baab191bc9ca6e84ec7a55d2f7e0a06df1d9b6d4218a3": _PLANNING_105A,  # pragma: allowlist secret
     "ce91e09f561e2ddbb3cd361305c16c9f7c4467c5524c467ece83ba53ca8237ac": _CIVIL_REGISTRATION_30M,  # pragma: allowlist secret
     "5fd11cf8114193dad43f7456783e534e94f99f2d4645c3b7d1e24a967014d0b6": _CIVIL_LIABILITY_17A,  # pragma: allowlist secret
-    "dbb963cf87485993227c9213345323a3d20a35e886e443db2fb413d252c6c7ff": {  # pragma: allowlist secret
-        "duplicates": {"69": 2},
-        "missing": frozenset({"70"}),
-        "warning": (
-            "This official Animal Health and Welfare Act 2013 PDF prints section number 69 twice. "
-            "The second entry, 'Regulations in relation to animal marts', is numbered 70 in the "
-            "contents. Both body entries and their printed labels are preserved without "
-            "renumbering. Section 71M's body omits its number; its boundary is identified by the "
-            "contents and matching title without inserting a number into its body text. "
-            "Check the official legislation before relying on these section numbers."
-        ),
-    },
+    "dbb963cf87485993227c9213345323a3d20a35e886e443db2fb413d252c6c7ff": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "99607d467a9c960d555b24545769d06a6b8af43ad1b8f0bcf2cd805914cde7aa": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "5e0ca07c6cb77d82e5e12af49aaf0a24d74e84ff382ed28c6d0d0d6986a1991e": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "c84d4e4568125626ae40e43d15553c0400809368d1c5a3a182a788c0c1f6d8af": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "616d038251cccd5eb0556d668a3d08489f7312fb72dcef45f2c68d61b5ce60a5": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "6dd32ace5b956bc99d9d2364c003c36cd4460fc33e0c2ed62a6096d124abdc0e": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "38dea8df7b99e3663e6add7b2652ebc5571afe0f9fbbdda782519c9d204f31d0": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "29b4d19f893b9e6e46ea37c8d8b53e58200db5fa3d61f1df5ce47603d023b9b7": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "c2d989bae87bfe6b92dad9538064636e2d48dca1c26f4f30b91618c8c28f63f2": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "c10e76838c161e5757431f0591e3f48196b4b3e3a06ede35d7a2522fb6f1f27c": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
+    "f2b60c101fc7e850b1d19574649675b348ded9b0f14a0e785531dd9dfb6022d7": _ANIMAL_HEALTH_69,  # pragma: allowlist secret
 }
 
 
 # Only these inspected appendices use the playbook's image-omission policy on whole pages.
 # Evidence: tests/fixtures/ie/pdf-scanned-appendices-evidence.json.
 _KNOWN_SCANNED_APPENDICES = {
+    # Criminal Justice (Mutual Recognition of Custodial Sentences) Act 2023: the Annex I
+    # certificate of Framework Decision 2008/909/JHA is printed as four scanned pages.
+    "b100a253b232b32e13d1c254b4e0ebe005fc7fa3477705e5fd3c3f2c74999348": (  # pragma: allowlist secret
+        frozenset(range(94, 98))
+    ),
     "6035778c7c01464c51791f87d68449e72fee7427ec1f02b1717f8c2950185a04": (  # pragma: allowlist secret
         frozenset(range(179, 185)) | frozenset(range(198, 208))
     ),
@@ -366,6 +441,14 @@ def source_warning(data: bytes) -> str | None:
             "The source body text is preserved without inserting a number into it."
         )
     return None
+
+
+class _Contents(set):
+    """The contents' section labels; ``listed`` counts a label the contents repeats."""
+
+    def __init__(self):
+        super().__init__()
+        self.listed: Counter[str] = Counter()
 
 
 class UnsupportedPDF(ValueError):
@@ -456,6 +539,14 @@ def _inline(line: _Line, *, emphasis: bool = True) -> str:
             (" " if text[:1].isspace() else "") + body + (" " if text[-1:].isspace() else "")
         )
     return "".join(result).strip()
+
+
+def _with_printed(pattern: re.Pattern, printed: frozenset[str]) -> re.Pattern:
+    """The section pattern, also accepting one file's verified misprinted labels."""
+    if not printed:
+        return pattern
+    labels = "|".join(re.escape(label) for label in sorted(printed, key=len, reverse=True))
+    return re.compile(pattern.pattern.replace(r"(\d+[A-Z]*)", rf"({labels}|\d+[A-Z]*)", 1))
 
 
 def _section_match(line: _Line, *, allow_plain: bool = False, pattern=_SECTION):
@@ -565,7 +656,7 @@ def _read(
     updated = None
     started = False
     contents = False
-    expected: set[str] = set()
+    expected = _Contents()
     verified_cutoff = _KNOWN_CUTOFF_CONFLICTS.get(sha256(data).hexdigest())
     scanned_appendices = _KNOWN_SCANNED_APPENDICES.get(sha256(data).hexdigest(), frozenset())
     with pdfplumber.open(io.BytesIO(data)) as pdf:
@@ -612,6 +703,7 @@ def _read(
                         )
                         if int(re.match(r"\d+", match[1])[0]) <= next_number:
                             expected.add(match[1])
+                            expected.listed[match[1]] += 1
                 if not started:
                     page.close()
                     continue
@@ -702,12 +794,24 @@ def parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
         try:
             return _parse_revised_pdf(data)
         except UnsupportedPDF as strict:
-            # Every file the strict reading accepts keeps its exact output. The lenient
-            # reading only runs where the strict one could not account for all text.
-            try:
-                return _parse_revised_pdf(data, lenient=True)
-            except UnsupportedPDF:
-                raise strict from None
+            # Every file a reading accepts keeps its exact output: each more lenient one
+            # only runs where every stricter one could not account for all the text, so
+            # adding a level changes nothing a previous level published.
+            for level in (1, 2):
+                try:
+                    return _parse_revised_pdf(data, lenient=level)
+                except UnsupportedPDF:
+                    continue
+            raise strict from None
+
+
+def _closing_quote_delta(text: str) -> int:
+    """Quote depth where a closing quote is printed as an opening one after a term.
+
+    "“Credit Reviewer“ has the meaning", "of “credit servicing“ in section 28"
+    (2017/22): the shared rule only repairs "“term“ means/includes". Level 2 only.
+    """
+    return _quote_delta(re.sub(r"(“[^“”\n]*[^\s“”])“(?=[\s,.;:)]|$)", r"\1”", text))
 
 
 def _lenient_margin_text(text: str) -> bool:
@@ -731,14 +835,15 @@ def _lenient_margin_text(text: str) -> bool:
     )
 
 
-def _parse_revised_pdf(
-    data: bytes, *, lenient: bool = False
-) -> tuple[list[Paragraph], date | None]:
+def _parse_revised_pdf(data: bytes, *, lenient: int = 0) -> tuple[list[Paragraph], date | None]:
     """Extract the actual dated legal text, preserving marginal section titles."""
     events, updated, expected = _read(data, lenient=lenient)
     missing_label = _KNOWN_UNNUMBERED_SECTIONS.get(sha256(data).hexdigest())
     label_defect = _KNOWN_LABEL_DEFECTS.get(sha256(data).hexdigest(), {})
     allowed_duplicates = label_defect.get("duplicates", {})
+    # A label printed wrong is kept as printed; the defect's warning says so.
+    printed = label_defect.get("printed", frozenset())
+    section = _with_printed(_SECTION, printed)
     footnotes = []
     body_events = []
     previous_note = None
@@ -781,7 +886,9 @@ def _parse_revised_pdf(
         candidate = _Line(
             [c for c in first.chars if c["x0"] >= char["x0"]], first.page, first.links
         )
-        if (match := _section_match(candidate, allow_plain=True)) and match[1] == "1":
+        if (match := _section_match(candidate, allow_plain=True, pattern=section)) and match[
+            1
+        ] == "1":
             first_label = candidate
             break
     if first_label is None:
@@ -833,10 +940,16 @@ def _parse_revised_pdf(
         ]
         if recovered_body:
             recovered = _Line(recovered_body, event.page, event.links)
-            if abs(recovered.x0 - first_label.x0) < 27 and _section_match(recovered):
+            if abs(recovered.x0 - first_label.x0) < 27 and _section_match(
+                recovered, pattern=section
+            ):
                 body = recovered_body
                 side = [c for c in event.chars if c not in body]
-        if side and body and _section_match(_Line(body, event.page, event.links)) is None:
+        if (
+            side
+            and body
+            and _section_match(_Line(body, event.page, event.links), pattern=section) is None
+        ):
             # Some XEP captions overlap the opening number horizontally. Their
             # glyph baselines remain distinct (even when the font sizes match).
             # Extend a caption only when this recovers a bold primary label at
@@ -859,7 +972,9 @@ def _parse_revised_pdf(
                 body = candidate
             elif candidate:
                 recovered = _Line(candidate, event.page, event.links)
-                if abs(recovered.x0 - first_label.x0) < 10 and _section_match(recovered):
+                if abs(recovered.x0 - first_label.x0) < 10 and _section_match(
+                    recovered, pattern=section
+                ):
                     side.extend(overflow)
                     body = candidate
         if side:
@@ -895,7 +1010,7 @@ def _parse_revised_pdf(
                 isinstance(line, _Line)
                 and line.page == start.page
                 and abs(line.top - start.top) < 6
-                and _section_match(line)
+                and _section_match(line, pattern=section)
                 for line in lines
             )
             # Companies captions indent their first line by 8.64pt. A quoted
@@ -905,7 +1020,7 @@ def _parse_revised_pdf(
                 and line.page == start.page
                 and abs(line.top - start.top) < 6
                 and abs(line.x0 - first_label.x0) < 20
-                and _section_match(line)
+                and _section_match(line, pattern=section)
                 for line in lines
             )
             if (
@@ -964,12 +1079,45 @@ def _parse_revised_pdf(
         i += 1
         quoted = quote_depth > 0
         if quote_depth or re.match(r"^(?:F\d+\[)?“", item.text):
-            quote_depth = max(0, quote_depth + _quote_delta(item.text))
+            delta = _closing_quote_delta if lenient > 1 else _quote_delta
+            quote_depth = max(0, quote_depth + delta(item.text))
         if isinstance(item, Paragraph):
             flush()
             paragraphs.append(item)
             previous = None
             continue
+        if lenient > 1 and marginal and not schedule:
+            # Level 2: a subsection's own marginal title, beside its "(4) …" line
+            # (Statute of Limitations 1957 s. 2(4)-(7)), kept whole and in place as
+            # source text. Any other unassigned marginal text still rejects the file.
+            pool = sorted(margins, key=lambda m: (m.page, m.top))
+            starts = [
+                i
+                for i, line in enumerate(pool)
+                if not i
+                or line.page != pool[i - 1].page
+                or not -2 < line.top - pool[i - 1].bottom < 4
+            ]
+            kept = []
+            for at, end_at in zip(starts, [*starts[1:], len(pool)][: len(starts)], strict=True):
+                group = pool[at:end_at]
+                text = " ".join(line.text for line in group)
+                subsection = (
+                    group[0].page == item.page
+                    and abs(group[0].top - item.top) < 6
+                    and re.match(r"^\(\w{1,4}\)\s", item.text)
+                    and text.endswith(".")
+                    and not re.match(r"^[\d(]", text)
+                )
+                if subsection:
+                    kept.append(group)
+            if kept:
+                flush()
+                for group in kept:
+                    paragraphs.append(Paragraph("parrafo", " ".join(map(_inline, group))))
+                taken = [line for group in kept for line in group]
+                margins = [m for m in margins if m not in taken]
+                captions = [c for c in captions if not any(m in taken for m in c)]
         if schedule:
             # Schedule captions describe their own clauses, never primary Act sections.
             remaining = [m for m in margins if (m.page, m.top) >= schedule_start]
@@ -1028,8 +1176,13 @@ def _parse_revised_pdf(
         match = _section_match(
             item,
             allow_plain=marginal and abs(item.x0 - primary_x) < 10,
-            pattern=_NESTED_SECTION if lenient else _SECTION,
+            pattern=_with_printed(_NESTED_SECTION if lenient else _SECTION, printed),
         )
+        if lenient > 1 and match is None and marginal:
+            dashed = _section_match(
+                item, allow_plain=abs(item.x0 - primary_x) < 10, pattern=_DASHED_SECTION
+            )
+            match = dashed if dashed and dashed[1] in expected and dashed[1] not in seen else None
         caption = (
             next(
                 (
@@ -1077,6 +1230,7 @@ def _parse_revised_pdf(
         if match and marginal_title:
             quote_depth = 0
         primary = match and not schedule and (not quoted or marginal_title)
+        aligned_title = False
         if marginal:
             # A compound opening label can hang farther right. Some otherwise
             # marginal PDFs also put individual bold titles above the text.
@@ -1093,7 +1247,7 @@ def _parse_revised_pdf(
                 match
                 and match[1] in expected
                 and abs(item.x0 - primary_x) < 2
-                and _section_match(item)
+                and _section_match(item, pattern=section)
             )
             primary = primary and (marginal_title or title_above or uncaptioned_label)
         else:
@@ -1112,7 +1266,32 @@ def _parse_revised_pdf(
                 and (not expected or match and match[1] in expected)
                 and item.top - previous.bottom < 25
             )
-            primary = primary and (abs(item.x0 - primary_x) < 2 or indented_label)
+            # Level 2: the next section the contents lists, under its title, where the
+            # source set that title in roman at the title column (Data Protection Act
+            # 2018 s. 137), or where an amendment's annotation mark hangs the inserted
+            # section out of the columns (DNA Database Act 2014 s. 99: title and label
+            # both left; 2021/50 s. 33B: title left, label one indent in).
+            aligned_title = bool(
+                lenient > 1
+                and match
+                and previous is not None
+                and previous.page == item.page
+                and pending
+                and len(pending) < 150
+                and item.top - previous.bottom < 25
+                and match[1] in expected
+                and match[1] not in seen
+                and int(re.match(r"\d+", match[1])[0])
+                >= max((int(re.match(r"\d+", n)[0]) for n in seen), default=0)
+                and (
+                    not pending_title
+                    and abs(previous.x0 - title_x) < 2
+                    and abs(item.x0 - title_x) < 2
+                    or re.match(r"^F\d+\**\[", pending)
+                    and (abs(item.x0 - previous.x0) < 2 or abs(item.x0 - primary_x) < 14)
+                )
+            )
+            primary = primary and (abs(item.x0 - primary_x) < 2 or indented_label or aligned_title)
         if (
             lenient
             and match
@@ -1137,7 +1316,10 @@ def _parse_revised_pdf(
             quote_depth = 0
         if primary:
             number = match[1]
-            if seen[number] >= allowed_duplicates.get(number, 1):
+            # Leniently, a number the contents lists twice is two sections: amending
+            # Acts can insert the same number twice (two sections 144A in 2021/50).
+            listed = getattr(expected, "listed", {}).get(number, 1) if lenient > 1 else 1
+            if seen[number] >= max(allowed_duplicates.get(number, 1), listed):
                 raise UnsupportedPDF(f"Duplicate primary section {number} in Revised Act PDF")
             seen[number] += 1
             title = ""
@@ -1148,7 +1330,12 @@ def _parse_revised_pdf(
                 captions.remove(caption)
             else:
                 # The preceding bold title was buffered as a paragraph.
-                if previous and previous.page == item.page and pending_title and pending:
+                if (
+                    previous
+                    and previous.page == item.page
+                    and (pending_title or aligned_title)
+                    and pending
+                ):
                     title, pending = re.sub(r"\*+", "", pending), ""
             flush()
             paragraphs.append(
@@ -1220,4 +1407,6 @@ def _parse_revised_pdf(
         ]
         paragraphs.append(Paragraph("h2", "Footnotes"))
         paragraphs.extend(footnotes)
-    return _legal_format(paragraphs), updated
+    return _legal_format(
+        paragraphs, quote_delta=_closing_quote_delta if lenient > 1 else _quote_delta
+    ), updated

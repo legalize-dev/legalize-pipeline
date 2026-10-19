@@ -8,6 +8,8 @@ into NormMetadata.
 from __future__ import annotations
 
 import base64
+import hashlib
+from contextvars import ContextVar
 from copy import deepcopy
 import json
 import logging
@@ -339,7 +341,7 @@ def _quote_delta(text: str) -> int:
     return delimiters.count("“") - len(re.findall(r"”|’’(?=\W|$)", delimiters))
 
 
-def _legal_format(paragraphs: list[Paragraph]) -> list[Paragraph]:
+def _legal_format(paragraphs: list[Paragraph], *, quote_delta=_quote_delta) -> list[Paragraph]:
     """Render explicit legal labels and quotation boundaries consistently.
 
     This pass is shared by XML, HTML and PDF. It does not guess quotation from
@@ -363,7 +365,7 @@ def _legal_format(paragraphs: list[Paragraph]) -> list[Paragraph]:
             continue
         plain = re.sub(r"\*+", "", text)
         leading = re.sub(r"^F\d+\[", "", plain)
-        delta = _quote_delta(plain)
+        delta = quote_delta(plain)
         complete_quote = (
             leading.startswith("“") and bool(re.search(r"(?:”|’’)[.,;:\s)\]]*(?:and|or)?$", plain))
         ) or (leading.startswith('"') and bool(re.search(r'"[.,;:\s)\]]*(?:and|or)?$', plain)))
@@ -443,6 +445,9 @@ def _is_xml_source(data: bytes) -> bool:
 class ISBTextParser(TextParser):
     """Parse ISB XML or HTML into Block objects."""
 
+    # Set by parse_text when the source's own marks had to be read by their links.
+    source_warning: str | None = None
+
     def parse_text(self, data: bytes, *, published_on: date | None = None) -> list[Any]:
         """Parse Act text into a list of Blocks.
 
@@ -459,7 +464,28 @@ class ISBTextParser(TextParser):
             return parse_text(data)
         if _is_xml_source(data):
             return self._parse_xml(data, published_on=published_on)
-        return self._parse_html(data, published_on=published_on)
+        try:
+            return self._parse_html(data, published_on=published_on)
+        except ValueError:
+            if hashlib.sha256(data).hexdigest() not in _LINKED_MARK_SOURCES:
+                raise
+        # A verified instrument the strict reading refused: marks are read whole ("8a",
+        # "1/"), and a mark that still differs from the note it links to follows the
+        # link, and the version says so.
+        followed: list[tuple[str, str]] = []
+        token = _FOLLOW_MARKS.set(followed)
+        try:
+            blocks = self._parse_html(data, published_on=published_on)
+        finally:
+            _FOLLOW_MARKS.reset(token)
+        if followed:
+            pairs = ", ".join(f"'{printed}' → note '{linked}'" for printed, linked in followed[:5])
+            self.source_warning = (
+                f"The official HTML prints footnote marks that differ from the notes they link "
+                f"to ({pairs}{', …' if len(followed) > 5 else ''}). Each footnote here follows "
+                "its link. Check the official text for the printed marks."
+            )
+        return blocks
 
     def extract_reforms(self, data: bytes):
         if data.lstrip().startswith(b"{") and json.loads(data).get("legalize_ie") == 1:
@@ -828,6 +854,10 @@ class ISBTextParser(TextParser):
                 depth = 0
                 for sibling in node.itersiblings():
                     if sibling.tag != "p" or sibling.xpath('.//a[starts-with(@name, "fn_")]'):
+                        if _FOLLOW_MARKS.get() is not None:
+                            # Re-reading: the quotation this note opens ends with the note
+                            # itself ("“10A OJ No. L198, 4.8.2000, p.41”;", 2001/342).
+                            break
                         raise ValueError("Unterminated quoted ISB HTML footnote")
                     text = _html_inline_text(sibling)
                     continuation.append(Paragraph("parrafo", text))
@@ -835,7 +865,7 @@ class ISBTextParser(TextParser):
                     depth += _quote_delta(text)
                     if depth == 0:
                         break
-                if depth:
+                if depth and _FOLLOW_MARKS.get() is None:
                     raise ValueError("Unterminated quoted ISB HTML footnote")
                 for paragraph in _legal_format(continuation):
                     body_text += "\n\n" + "\n".join(
@@ -1260,6 +1290,44 @@ def _text_slots(elem):
         yield child, "tail"
 
 
+# Instruments whose footnote marks the strict reading refuses and whose links were
+# checked note by note on 2026-10-19: each body mark links to the note the text means
+# (marks misprinted, or written "8a", "1/", "+", "Ø"). Only these bytes are re-read;
+# a mark that contradicts its note anywhere else still fails.
+_LINKED_MARK_SOURCES = frozenset(
+    {
+        "9881f6d040315dbbb974355014e6215eb73c6a51d99dccc2e36b5463442a0ee9",  # IE-2001-si-492  # pragma: allowlist secret
+        "eca414d111142fe7454ffdcbda8ab0acd70668e96527289e8f7e3543b38576d7",  # IE-2001-si-640  # pragma: allowlist secret
+        "9f55829097630aef2e7b41e3f4d752e9be7421cd28c830714807ddf24bbc2aa0",  # IE-2003-si-532  # pragma: allowlist secret
+        "6db741a39342b1aeee85b1e3f5475d22a7b0d6b180a625878d6042dbd13f8961",  # IE-2006-si-624  # pragma: allowlist secret
+        "588723aba8200f33e2b734a89d0e0c29d648afea1d9fa087a9908958f3d4eaea",  # IE-2006-si-74  # pragma: allowlist secret
+        "28e63abcc2a4be6a47b719efb3eca1aaec416ee704bc509f9dd180187cf4908e",  # IE-2007-si-850  # pragma: allowlist secret
+        "38b9d67282aab49a59518fcfdc81263a3ff86d9f9dcbaf0fbc83839a1534dce7",  # IE-2008-si-272  # pragma: allowlist secret
+        "b7de80184185a7402841717b0b7419dda00c098b7176a1f0ded5284628df718a",  # IE-2009-si-19  # pragma: allowlist secret
+        "c129c0324c3888a788d087894a35a8c7b721d6f7648d9203b8f20aa88dc80b18",  # IE-2009-si-229  # pragma: allowlist secret
+        "ef393f8948efcca6107b62f7e41efe181858ca6ee96dc7df40ca4df9d6ac9381",  # IE-2009-si-277  # pragma: allowlist secret
+        "3cf2ec3780f5edcaf8feb17e5d8ac538cdb2a2e81657761e2de570961fa5b417",  # IE-2009-si-566  # pragma: allowlist secret
+        "f1ec757667de6deb5535b0680ef9595f429bf7d4d6ef5a40aa4ca273cdae3813",  # IE-2010-si-182  # pragma: allowlist secret
+        "ebd157b149a889780c15b65d7dc6a415f3652a4641dc5d3e3c3679183417ba5d",  # IE-2011-si-8  # pragma: allowlist secret
+        "cf9c6b383b1fe12606e98da589fdf86c69fb164c499e79c5c2d113fcb63266e0",  # IE-2015-si-137  # pragma: allowlist secret
+        "8f34eac1cae25345bb37c3c66a947d48194e54e35ba8df5bc4ce212fdd2457f3",  # IE-2020-si-410  # pragma: allowlist secret
+        "8bf4e6f020fdb8a6c9b0fe4abdec3c9c08537ddfd5740237bc09036ffa1e9c9e",  # IE-2021-si-227  # pragma: allowlist secret
+        "e2c6342868a8c66e4a29e25d4faf13dfc98d2a592311f9ba371353a9ba1cb4d3",  # IE-2022-si-302  # pragma: allowlist secret
+        "9e2b6a1d7c4c36beed928ce0a3920d8178e2ba9fd933e35b8a1194512934abaa",  # IE-2023-si-29  # pragma: allowlist secret
+        "1afc7d214489c4011ffa2f6d4b4f9d5ddc967e6d16f6e6c680be387e12d155c8",  # IE-2025-si-193  # pragma: allowlist secret
+        "8d0f184b43d647fb3d342faaeba6d466807669e0209b377ed445fa659a9f38d2",  # IE-1999-si-12  # pragma: allowlist secret
+        "55608b3bb626c99c92b291fa29c39d642a9d70d8e6f18c8f988f7b1f9c52dcc4",  # IE-2007-si-190  # pragma: allowlist secret
+        "74b09626d0a2994ee4f3ff8e9769179154acbe36e61c9b26c6cbc6811479d299",  # IE-2007-si-296  # pragma: allowlist secret
+        "132aab2cc7920dd39fe8d1a564e7910cab2fb3c3aa4529efe3049310705556a9",  # IE-2001-si-342  # pragma: allowlist secret
+    }
+)
+
+# Set while re-reading an instrument whose marks the strict reading refused.
+_FOLLOW_MARKS: ContextVar[list[tuple[str, str]] | None] = ContextVar(
+    "ie_follow_footnote_marks", default=None
+)
+
+
 def _loose_footnote_definition(act, node) -> tuple[str, str]:
     """Read a definition whose mark (1., ^(1), (^1), *, (*), #, NOTE ONE…) varies by SI.
 
@@ -1277,8 +1345,17 @@ def _loose_footnote_definition(act, node) -> tuple[str, str]:
     slots = list(_text_slots(copy))
     plain = "".join(getattr(elem, attr) or "" for elem, attr in slots)
     leading = re.match(r"\s*\(?\s*(\d+|\*+|#)\s*\)?\.?\s*(?=\S)", plain)
+    followed = _FOLLOW_MARKS.get()
+    if followed is not None:
+        # Form notes mark themselves "8a", "1/", "+", "Ø", "†", "‡" or "§".
+        leading = (
+            re.match(r"\s*\(?\s*(\d+[A-Za-z]?/?|\*+|#|\+|Ø|†|‡|§)\s*\)?\.?\s*(?=\S)", plain)
+            or leading
+        )
     if leading and core is not None and leading[1] != core:
-        raise ValueError(f"ISB HTML footnote marker disagrees with its anchor: {reference}")
+        if followed is None:
+            raise ValueError(f"ISB HTML footnote marker disagrees with its anchor: {reference}")
+        followed.append((core, leading[1]))
     if not leading and core and plain.lstrip().startswith(core):
         # A worded mark, e.g. <sup>NOTE ONE</sup>Surety must be…
         leading = re.match(rf"\s*({re.escape(core)})\s*", plain)
@@ -1385,9 +1462,11 @@ def _html_inline_text(
                     )
                     if target:
                         if _marker_core(target[1]) != _marker_core(number):
-                            raise ValueError(
-                                f"ISB HTML footnote marker disagrees with its anchor: {number}"
-                            )
+                            if (followed := _FOLLOW_MARKS.get()) is None:
+                                raise ValueError(
+                                    f"ISB HTML footnote marker disagrees with its anchor: {number}"
+                                )
+                            followed.append((number, target[1]))
                         number = target[0]
                     text = (
                         f"[^{number}]"
@@ -1587,6 +1666,20 @@ _INSTRUMENT_DATE_EVIDENCE = {
         "https://www.irisoifigiuil.ie/archive/2003/november/2003%2011%2007%20IO%20Issue.PDF#page=2",
         ("2003-10-21",),
     ),
+    # The official signature, legible through a misprint the formulas cannot read:
+    # "this 13 September day of September, 2001" and "on the [ 6th ] [ October ] 2006".
+    ("424", "2001"): (
+        "2001-09-13",
+        "final_signature",
+        "https://www.irishstatutebook.ie/eli/2001/si/424/made/en/html",
+        ("2001-09-13",),
+    ),
+    ("517", "2006"): (
+        "2006-10-06",
+        "final_signature",
+        "https://www.irishstatutebook.ie/eli/2006/si/517/made/en/html",
+        ("2006-10-06",),
+    ),
 }
 
 
@@ -1600,7 +1693,21 @@ def _instrument_date(text: str, title: str) -> date | None:
         return published
     if evidence := _instrument_date_evidence(title):
         return date.fromisoformat(evidence[0])
-    return None
+    return _misprinted_signature_date(text)
+
+
+def _misprinted_signature_date(text: str) -> date | None:
+    """A signature the formulas above miss only for a misprint, read where nothing else dates.
+
+    "Official Sealof the Government this 28th day of August, 1997" (1997/364), "GIVEN
+    the 24 May 2002" (2002/219), "Arna thabhairt faoi mo láimh, 23 Samhain 2005"
+    (2005/735). Last, so no instrument dated by any other rule changes its date.
+    """
+    repaired = re.sub(r"\bGIVEN the (?=\d)", "GIVEN ", re.sub(r"\bSeal(?=of\b)", "Seal ", text))
+    if dates := _signature_dates(repaired):
+        return dates[-1]
+    match = re.search(r"ARNA THABHAIRT faoi mo láimh,?\s*(\d{1,2})\s+(\w+)\s+(\d{4})\b", text, re.I)
+    return _parse_date_from_parts(int(match[1]), match[2], int(match[3])) if match else None
 
 
 def _signature_dates(text: str) -> list[date]:

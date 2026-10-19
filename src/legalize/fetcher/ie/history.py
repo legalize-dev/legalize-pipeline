@@ -243,6 +243,17 @@ def fetch_text(client, norm_id: str, meta_data: bytes | None = None) -> bytes:
     ).encode("utf-8")
 
 
+def _legend_signs(paragraphs) -> set[str]:
+    """Signs the text defines itself: "In this list the sign [*] indicates a priority
+    habitat type" (2019/473-477, 522-527) is a legend, not a footnote."""
+    text = "\n".join(paragraph.text for paragraph in paragraphs)
+    return set(
+        re.findall(
+            r"\bthe sign\**\s*\[\^?([^\]\s]+)\]\s*\**\s*(?:indicates|denotes|means)\b", text, re.I
+        )
+    )
+
+
 def _missing_footnotes(paragraphs, *, source_html: bytes | None = None):
     text = "\n".join(paragraph.text for paragraph in paragraphs)
     references = set(re.findall(r"\[\^([^\]]+)\](?!:)", text))
@@ -392,8 +403,10 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
                 if count:
                     image_counts[record["url"]] = count
             if fmt == "enacted":
-                blocks = ISBTextParser().parse_text(raw, published_on=metadata.publication_date)
+                text_parser = ISBTextParser()
+                blocks = text_parser.parse_text(raw, published_on=metadata.publication_date)
                 paragraphs = tuple(p for block in blocks for p in block.versions[0].paragraphs)
+                warning = text_parser.source_warning
                 cutoff = metadata.publication_date
                 state = metadata.text_state or TextState.AS_ENACTED
                 source_id = norm_id
@@ -463,7 +476,7 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
                 )
             if not paragraphs:
                 raise ValueError(f"{norm_id}: empty {fmt} source body")
-            if missing := _missing_footnotes(paragraphs):
+            if missing := _missing_footnotes(paragraphs) - _legend_signs(paragraphs):
                 raise ValueError(
                     f"{norm_id}: {fmt} has undefined normative footnotes: {sorted(missing)}"
                 )
@@ -523,7 +536,9 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
     metadata = replace(
         metadata,
         # An undated repeal still counts today; it cannot be placed in the history.
-        status=_status_at(envelope["effects"], today),
+        status=NormStatus.REPEALED
+        if norm_id in _VOID_BY_NON_LEGISLATIVE_ACT
+        else _status_at(envelope["effects"], today),
         extra=metadata.extra
         + (
             (
@@ -585,6 +600,20 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
     return ParsedNorm(
         metadata, (Block("full-text", "document", "", tuple(versions)),), tuple(dated_reforms)
     )
+
+
+# Instruments the Legislation Directory records as quashed, set aside or annulled by
+# something that is not legislation, verified on 2026-10-19 against its rows. They are
+# no longer law; no commit dates that, because nothing in this corpus enacted it.
+_VOID_BY_NON_LEGISLATIVE_ACT = {
+    "IE-2018-si-89": "Annulled 29 May 2018: Dáil Éireann debate -Tuesday, 29 May 2018 "
+    "Vol. 969 No. 7",
+    "IE-2018-si-355": "Making of instrument quashed: Sweetman v Minister for Culture, Heritage "
+    "and the Gaeltacht and others, Meenan J., 5 Dec 2019, Case No. 2018 1009 JR",
+    "IE-2019-si-4": "Set aside as ultra vires 27/1972, s. 3: Friends of the Irish Environment "
+    "Limited v. Minister for Communications, Climate Act and Environment and Others [2019] "
+    "IEHC 646 para. 221 and [2019] IEHC 685 para. 11.",
+}
 
 
 def _gap(norm_id: str, record: dict, reason: str) -> dict:

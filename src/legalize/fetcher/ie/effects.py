@@ -169,6 +169,94 @@ _UNDATABLE_SOURCES = {
         "2f9405b4ae984cba49d94055c7515c09bf67a2914cdde2ee2f3359020546ba74",  # pragma: allowlist secret
         "The official text is truncated within its electoral-area table and has no signature.",
     ),
+    # Instruments cited by statutory instruments, verified on 2026-10-19 from the cache.
+    ("IE-2001-si-510", "IE-2026-si-156"): (
+        "7a7e573626cccf7188297866abf777d504e76fd5d78bee1774eae9e33e9a9ccd",  # pragma: allowlist secret
+        "eISB serves S.I. No. 155/2026 at the URL of S.I. No. 156/2026.",
+    ),
+    ("IE-2007-si-142", "IE-2026-si-397"): (
+        "c3895d0b9250f512634ffaa16609b3fa3a9b3dc64cced5f7a142b3e51b491ba4",  # pragma: allowlist secret
+        "eISB serves S.I. No. 377/2026 at the URL of S.I. No. 397/2026.",
+    ),
+    ("IE-1972-si-220", "IE-1975-si-127"): (
+        "ddd9f82f5bb1ca05050d47f676745879ca0c0b1a0b76091fc77857a253a35ab3",  # pragma: allowlist secret
+        "The official text has no signature date.",
+    ),
+    ("IE-1992-si-19", "IE-1993-si-206"): (
+        "157c7eb358ae04b1cf46fb71bb0756a9c8d2190b14a630d4fd56e03cf6a217f3",  # pragma: allowlist secret
+        "The official signature leaves the day blank: 'this day of June, 1993'.",
+    ),
+    ("IE-1994-si-417", "IE-1996-si-172"): (
+        "6cb8856a2998b13b27113aa81d098c6ada36c1d1ff3b6e5295030e6a4fc94c96",  # pragma: allowlist secret
+        "Both official signatures leave the day blank: 'this day of May, 1996'.",
+    ),
+    ("IE-2002-si-203", "IE-2002-si-225"): (
+        "7374a034e84d85cecafec403f8831ec9868c770150b35d2711afa4f29b716936",  # pragma: allowlist secret
+        "The official signature leaves the day blank: 'this day of March, 2002'.",
+    ),
+    ("IE-2000-si-109", "IE-2004-si-575"): (
+        "2a786bb2ff115353c5e683e91ac29b4e0919134eaeff5f1e2c21222e78623515",  # pragma: allowlist secret
+        "The official signature omits the year: 'this 29th day of September'.",
+    ),
+    ("IE-2011-si-560", "IE-2016-si-479"): (
+        "13fbc342e21134b10626a69cba8149c472eca99e95dd80b51bd8c686d232f585",  # pragma: allowlist secret
+        "The official text has no signature date.",
+    ),
+    ("IE-1976-si-115", "IE-2000-act-43"): (
+        None,
+        "The directory cites 43/2000, but the 2000 annual index ends at Act No. 42 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-1984-si-57", "IE-2000-act-43"): (
+        None,
+        "The directory cites 43/2000, but the 2000 annual index ends at Act No. 42 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-1994-si-360", "IE-2000-act-43"): (
+        None,
+        "The directory cites 43/2000, but the 2000 annual index ends at Act No. 42 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-2003-si-5", "IE-2016-act-23"): (
+        None,
+        "The directory cites 23/2016, but the 2016 annual index ends at Act No. 22 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-1996-si-179", "IE-2011-si-827"): (
+        None,
+        "The directory cites S.I. No. 827 of 2011, but the 2011 annual index ends at S.I. No. 741 and the official URL returns 404; the citation may be erroneous.",
+    ),
+    ("IE-2001-si-600", "IE-2026-si-72"): (
+        None,
+        "The directory cites S.I. No. 72 of 2026, but the 2026 annual index skips No. 72 and the official URL returns 404.",
+    ),
+}
+
+
+# Directory rows whose citing cell names no instrument to date them by, verified on
+# 2026-10-19 row by row: a judgment, a Dáil debate, a misprinted citation, a fragment of
+# a parenthesis split across rows, or an empty cell. Each is kept as printed, as an
+# editorial note, and never committed; any other such row still fails the norm.
+_UNATTRIBUTED_ROWS = {
+    "IE-1983-si-190": {"Sch., rls. 1, 2 amended", "Sch., rl. 2 amended"},
+    "IE-1994-si-395": {"Expired"},
+    "IE-1997-si-496": {"Part II application restricted"},
+    "IE-1997-si-93": {
+        "Sch. B, forms 34.37, 34.38 substituted",
+        "Sch. C, forms 40F.01, 40F.02, 40F.03 & 40F.04 inserted",
+    },
+    "IE-2015-si-209": {"N/A"},
+    "IE-2004-si-703": {"See"},
+    "IE-2013-si-135": {")"},
+    "IE-2013-si-323": {
+        "S.I. No. 539 of 2012, regs. 1(b), 3 and sch. as amended by regs. 1(c), 3, 4"
+    },
+    "IE-2018-si-355": {
+        "Sweetman v Minister for Culture, Heritage and the Gaeltacht and others, "
+        "Meenan J., 5 Dec 2019, Case No. 2018 1009 JR"
+    },
+    "IE-2018-si-89": {"Dáil Éireann debate -Tuesday, 29 May 2018Vol. 969 No. 7"},
+    "IE-2019-si-4": {
+        "Friends of the Irish Environment Limited v. Minister for Communications, Climate "
+        "Act and Environment and Others [2019] IEHC 646 para. 221 and [2019] IEHC 685 para. 11."
+    },
+    "IE-2020-si-354": {"S.I. No. 413 of 202, regs. 1(2), 3"},
 }
 
 
@@ -530,7 +618,11 @@ def _affecting_ids(cell, provision: str, norm_id: str, note: str) -> tuple[set[s
     }
     # Some directory links incorrectly use act/pub for explicitly labelled instruments.
     instruments = re.findall(
-        r"S[.,]?\s*I[.,]?\s*(?:Nol?\.?\s*)?(\d+),?\s*(?:(?:of\s+){1,2}|/)(\d{4})", provision, re.I
+        # "S.I .No. 494 of 2004" and "S.l. No. 90 of 2013" are directory misprints of S.I.
+        # "S.I. No. 157 of2004" drops the space.
+        r"S[.,]?\s*[Il][.,]?\s*[.,]?\s*(?:Nol?\.?\s*)?(\d+),?\s*(?:(?:of\s*){1,2}|/)(\d{4})",
+        provision,
+        re.I,
     )
     for series in re.findall(
         r"S[.,]?\s*I[.,]?\s*Nos\.?\s*(\d+\s+of\s+\d{4}"
@@ -717,6 +809,12 @@ def _effect_cells(doc, norm_id: str) -> list[list] | None:
         if kind == "si" and any(
             re.fullmatch(rf"a\d+_{year}", node.get("id") or node.get("name") or "")
             for node in doc.xpath("//a[@id or @name]")
+        ):
+            return None
+        # A year's index that links no range page covering this instrument (1941 skips
+        # 101-150; 1942 stops at 451-469): the directory has no page for it at all.
+        if kind == "si" and any(
+            re.search(rf"si{year}_\d+-\d+\.html", href) for href in doc.xpath("//a/@href")
         ):
             return None
         raise ValueError(f"{norm_id}: annual Legislation Directory has no matching norm")
@@ -1097,7 +1195,13 @@ def parse_effects(
             ):
                 scope = "" if note.lower() == "references construed" else note
                 continue
-            raise ValueError(f"{norm_id}: effect has no affecting provision: {note}")
+            if editorial_notes is None or note not in _UNATTRIBUTED_ROWS.get(norm_id, ()):
+                raise ValueError(f"{norm_id}: effect has no affecting provision: {note}")
+            editorial_notes.append(
+                {"kind": "unattributed_directory_effect", "note": note, "provision": ""}
+            )
+            previous_note = ""
+            continue
         if texts[0]:
             previous_note = note
         if not ids:
@@ -1125,7 +1229,12 @@ def parse_effects(
                         {"kind": "directory_classification", "note": note, "provision": provision}
                     )
                 continue
-            raise ValueError(f"{norm_id}: unresolved affecting provision: {provision}")
+            if editorial_notes is None or provision not in _UNATTRIBUTED_ROWS.get(norm_id, ()):
+                raise ValueError(f"{norm_id}: unresolved affecting provision: {provision}")
+            editorial_notes.append(
+                {"kind": "unattributed_directory_effect", "note": note, "provision": provision}
+            )
+            continue
         for identifier in sorted(ids - {norm_id}):
             effect = _effect(
                 f"{scope}: {note}" if scope else note,

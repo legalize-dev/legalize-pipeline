@@ -31,6 +31,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import date
 from pathlib import Path
 
+import requests
 from lxml import html
 
 from legalize.committer.git_ops import GitRepo
@@ -68,12 +69,17 @@ class Sources:
     pending: list[str] = field(default_factory=list)  # norms to refresh
     rebuild: dict[str, str] = field(default_factory=dict)  # norm -> why it cannot append
     next_status: dict[str, str] = field(default_factory=dict)  # norm -> status change date
+    tip: str = ""  # the corpus commit this state describes
 
     @classmethod
     def load(cls, path: Path) -> Sources:
         source = path if path.exists() else BASELINE
         data = json.loads(source.read_text(encoding="utf-8")) if source.exists() else {}
         return cls(**{key: data[key] for key in cls.__dataclass_fields__ if key in data})
+
+    @classmethod
+    def baseline(cls) -> Sources:
+        return cls.load(BASELINE)
 
     def save(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -161,17 +167,25 @@ def _excluded(repo_path: str) -> set[str]:
 
 
 def find_changes(cc, sources: Sources, published: set[str], until: float) -> list[str]:
-    """Queue the norms the three signals point at; return the discovered Acts."""
+    """Queue the norms the three signals point at; return the discovered Acts.
+
+    eISB refuses bursts with a 403 now and then. A directory page it refuses goes
+    back to the end of the queue for the next run; a whole batch refused stops the
+    sweep, and a sweep that read nothing at all is an error.
+    """
     queued: set[str] = set()
     workers = max(1, cc.max_workers or 1)
     local, lock, clients = threading.local(), threading.Lock(), ExitStack()
 
-    def get(page: str) -> bytes:
+    def get(page: str) -> bytes | Exception:
         # One client per worker: each paces itself, as the full fetch's workers do.
         if getattr(local, "client", None) is None:
             with lock:
                 local.client = clients.enter_context(ISBClient.create(cc))
-        return local.client._get(page_url(local.client, page))
+        try:
+            return local.client._get(page_url(local.client, page))
+        except requests.RequestException as exc:
+            return exc
 
     with ISBClient.create(cc) as client:
         for norm_id, rows in revised_catalog(client._get(REVISED_INDEX)).items():
@@ -192,17 +206,33 @@ def find_changes(cc, sources: Sources, published: set[str], until: float) -> lis
         sources.cursor, sources.unswept = cursor, sorted(sources.pages)
 
     index = _Published(published, sources.pages)
+    read, refused = 0, []
     try:
         with ThreadPoolExecutor(max_workers=workers) as pool:
             while sources.unswept and time.monotonic() < until:
                 batch = sources.unswept[: workers * 25]
+                del sources.unswept[: len(batch)]
+                failed = []
                 for page, data in zip(batch, pool.map(get, batch), strict=True):
-                    if (digest := content_digest(data)) != sources.pages.get(page):
+                    if isinstance(data, Exception):
+                        failed.append((page, data))
+                    elif (digest := content_digest(data)) != sources.pages.get(page):
                         queued |= index.on(page)
                         sources.pages[page] = digest
-                del sources.unswept[: len(batch)]
+                read += len(batch) - len(failed)
+                refused += failed
+                sources.unswept += [page for page, _ in failed]
+                if len(failed) == len(batch):
+                    break
     finally:
         clients.close()
+    if left := sorted({page for page, _ in refused} & set(sources.unswept)):
+        console.print(
+            f"[yellow]eISB refused {len(left)} directory page(s), left for the next run: "
+            f"{refused[-1][1]}[/yellow]"
+        )
+    if refused and not read:
+        raise RuntimeError(f"eISB refused every directory page read: {refused[0][1]}")
     sources.pending = sorted(set(sources.pending) | queued)
     console.print(
         f"[bold]Ireland — {len(queued)} norm(s) changed at the source, "
@@ -332,6 +362,19 @@ def _head(repo: GitRepo) -> str | None:
     return repo._run(["rev-parse", "--verify", "-q", "HEAD"], check=False).strip() or None
 
 
+def _descends(repo: GitRepo, commit: str) -> bool:
+    """HEAD contains ``commit``: false once a rebuild has force-pushed it away."""
+    import subprocess
+
+    return (
+        subprocess.run(
+            ["git", "-C", str(repo._path), "merge-base", "--is-ancestor", commit, "HEAD"],
+            capture_output=True,
+        ).returncode
+        == 0
+    )
+
+
 def daily(config: Config, target_date: date | None = None, dry_run: bool = False) -> int:
     """Commit the source's changes since the last run, within the run's time budget."""
     from legalize.coverage import update_report
@@ -351,6 +394,11 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     started = time.monotonic()
     _, published = _published(cc.repo_path)
     before = _head(repo)
+    if sources.tip and before and not _descends(repo, sources.tip):
+        # A local rebuild replaced the history this state was built against: its
+        # digests, queue and rebuild list describe a corpus that no longer exists.
+        console.print("[yellow]The corpus was rebuilt; starting from its baseline.[/yellow]")
+        sources = Sources.baseline()
     created, errors, discovered = 0, [], None
     with refresh_sources():
         try:
@@ -374,7 +422,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     # A run that could not read the signals keeps the last state: a digest advanced
     # without its norm queued would lose that change for good.
     if not dry_run and discovered is not None:
-        if before:
+        if before and (Path(cc.repo_path) / "coverage.json").exists():
             # coverage.json is written with every publication, a new exclusion included.
             report = update_report(
                 cc.repo_path, before, cc.data_dir, published=published, discovered=len(discovered)
@@ -382,6 +430,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
             write_repo_meta(config, "ie", coverage=report)
             if not created and _head(repo) != before:
                 created = 1  # the coverage commit alone still has to be pushed
+        sources.tip = _head(repo) or ""
         sources.save(sources_path)
     if not dry_run:
         for current_date in dates:
@@ -413,7 +462,7 @@ def write_baseline(config: Config, path: Path = BASELINE) -> Sources:
             raise FileNotFoundError(f"{url} is not in the local cache")
         return entry.content
 
-    sources = Sources()
+    sources = Sources(tip=_head(GitRepo(cc.repo_path, "", "")) or "")
     for norm_id in sorted(published):
         page = page_of(norm_id, get)
         if page and page not in sources.pages:
