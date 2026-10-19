@@ -64,3 +64,29 @@ def test_transient_is_network_trouble_not_an_absent_source():
 def test_only_a_country_with_coverage_declares_v05():
     assert spec_version_for("ie") == "0.5" and 'spec_version: "0.5"' in manifest("ie")
     assert spec_version_for("es") == "0.4" and 'spec_version: "0.4"' in manifest("es")
+
+
+def test_health_names_every_exclusion_a_full_run_cannot_ship(tmp_path):
+    import subprocess
+
+    from click.testing import CliRunner
+
+    from legalize.cli import cli
+
+    repo, data = tmp_path / "repo", tmp_path / "data"
+    (repo / "ie").mkdir(parents=True)
+    (repo / "ie/A.md").write_text(law("A"))
+    data.mkdir()
+    (data / "discovery_ids.txt").write_text("A\nB\nC\nD\n")
+    record_failure(data, "B", requests.ConnectionError("DNS"))
+    record_failure(data, "C", ValueError("Malformed footnote"))
+    (repo / "coverage.json").write_text(render(coverage_report(repo, data, "index")))
+    subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
+    config = tmp_path / "config.yaml"
+    config.write_text(f'countries:\n  ie:\n    repo_path: "{repo}"\n    data_dir: "{data}"\n')
+
+    output = CliRunner().invoke(cli, ["--config", str(config), "health", "-c", "ie"]).output
+    assert "1 published of 4 discovered, 3 excluded" in output, output
+    assert "1 exclusion(s) are network failures" in output
+    assert "1 exclusion(s) have no recorded reason" in output  # D
+    assert "neither published nor excluded" not in output

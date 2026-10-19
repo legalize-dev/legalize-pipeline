@@ -916,6 +916,14 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
                 issues.append(
                     ("ERROR", f"{len(transient)} exclusion(s) are network failures — retry first")
                 )
+            unexplained = [e["identifier"] for e in excluded if e.get("reason") == "not fetched"]
+            if unexplained:
+                issues.append(
+                    (
+                        "WARN",
+                        f"{len(unexplained)} exclusion(s) have no recorded reason (never fetched)",
+                    )
+                )
             index = data_dir / "discovery_ids.txt" if data_dir else None
             if index and index.exists():
                 discovered = {
