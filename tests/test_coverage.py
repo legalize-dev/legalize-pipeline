@@ -75,7 +75,7 @@ def test_health_names_every_exclusion_a_full_run_cannot_ship(tmp_path):
 
     repo, data = tmp_path / "repo", tmp_path / "data"
     (repo / "ie").mkdir(parents=True)
-    (repo / "ie/A.md").write_text(law("A"))
+    (repo / "ie/A.md").write_text(law("A", 'last_amendment: "C"\n'))
     data.mkdir()
     (data / "discovery_ids.txt").write_text("A\nB\nC\nD\n")
     record_failure(data, "B", requests.ConnectionError("DNS"))
@@ -85,8 +85,11 @@ def test_health_names_every_exclusion_a_full_run_cannot_ship(tmp_path):
     config = tmp_path / "config.yaml"
     config.write_text(f'countries:\n  ie:\n    repo_path: "{repo}"\n    data_dir: "{data}"\n')
 
-    output = CliRunner().invoke(cli, ["--config", str(config), "health", "-c", "ie"]).output
+    output = (
+        CliRunner().invoke(cli, ["--config", str(config), "health", "-c", "ie", "--deep"]).output
+    )
     assert "1 published of 4 discovered, 3 excluded" in output, output
     assert "1 exclusion(s) are network failures" in output
     assert "1 exclusion(s) have no recorded reason" in output  # D
     assert "neither published nor excluded" not in output
+    assert "name no law" not in output  # C is excluded, with its reason
