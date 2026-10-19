@@ -804,8 +804,9 @@ class ISBTextParser(TextParser):
             bracketed = re.match(r"^\[(\*+)", _html_text(node))
             if not match and bracketed:
                 marker = bracketed[1]
+                # An italic definition starts "*[^**": keep the emphasis, drop the mark.
                 body_text = re.sub(
-                    rf"^\[\^?{re.escape(marker)}", "[", _html_inline_text(node), count=1
+                    rf"^(\*?)\[\^?{re.escape(marker)}", r"\1[", _html_inline_text(node), count=1
                 )
             elif match:
                 marker, body_text = match.groups()

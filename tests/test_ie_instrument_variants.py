@@ -1,9 +1,12 @@
 """Statutory instrument shapes met while closing the dependency set of the Acts."""
 
+import base64
+import json
 from unittest.mock import Mock
 
 import pytest
 
+from legalize.fetcher.ie import history
 from legalize.fetcher.ie.effects import fetch_effects, parse_effects
 from legalize.fetcher.ie.parser import ISBTextParser, _signature_dates
 from legalize.fetcher.ie.pdf import _month_number
@@ -321,3 +324,96 @@ def test_footnote_after_continuation_rows_written_without_rowspan():
     )
     effects = parse_effects(directory, "IE-2004-si-667", editorial_notes=[])
     assert effects[0]["_footnote_ids"] == ["IE-2005-act-25"]
+
+
+def test_annual_group_without_rowspan_keeps_every_effect_row():
+    directory = annual_directory(
+        '<tr><td><a name="a667_2004"></a>667</td><td><i>Order 2004</i></td>'
+        "<td>Art. 2 amended</td><td>S.I. No. 1 of 2005, art. 2</td></tr>"
+        "<tr><td></td><td></td><td>Art. 4 revoked</td><td>S.I. No. 2 of 2005, art. 3</td></tr>"
+        '<tr><td colspan="4"><hr/></td></tr>'
+    )
+    effects = parse_effects(directory, "IE-2004-si-667", editorial_notes=[])
+    assert [(e["note"], e["source_id"]) for e in effects] == [
+        ("Art. 2 amended", "IE-2005-si-1"),
+        ("Art. 4 revoked", "IE-2005-si-2"),
+    ]
+
+
+def test_italic_bracketed_definition_drops_its_mark():
+    raw = instrument(
+        '<p>Fee payable<sup>**</sup> <a name="ret_fn_0"></a> on request.</p>'
+        '<p><a name="fn_0"></a> <i>[<sup>**</sup> Within the meaning of S.I. No. 312 of 1995]</i></p>'
+    )
+    text = text_of(raw)
+    assert "Fee payable[^star2]" in text
+    assert "[^star2]: *[ Within the meaning of S.I. No. 312 of 1995]*" in text
+
+
+def snapshot_envelope(rows):
+    sample = instrument("<p>1. Citation.</p>")
+    encoded = base64.b64encode(sample).decode()
+    versions = [
+        {
+            "format": "revised_html",
+            "url": url,
+            "catalog_date": catalogued,
+            "data": base64.b64encode(body.encode()).decode(),
+        }
+        for url, catalogued, body in rows
+    ]
+    return json.dumps(
+        {
+            "legalize_ie": 1,
+            "identifier": "IE-2000-si-1",
+            "metadata": encoded,
+            "versions": [{"format": "enacted", "url": f"{ISB}/si/1", "data": encoded}] + versions,
+            "effects": [],
+        }
+    ).encode()
+
+
+@pytest.mark.parametrize("overwritten_first", [True, False])
+def test_a_file_updated_past_its_catalogue_date_is_not_that_snapshot(
+    monkeypatch, overwritten_first
+):
+    from legalize.fetcher.ie import parser
+    from legalize.models import Paragraph
+
+    monkeypatch.setattr(
+        parser,
+        "parse_revised_html",
+        lambda raw: ([Paragraph("parrafo", raw.decode())], history.date(2022, 7, 12)),
+    )
+    rows = [
+        ("https://lrc.test/2012.pdf", "2012-11-02", f"overwritten {overwritten_first}"),
+        ("https://lrc.test/2022.html", "2022-07-12", f"catalogued {overwritten_first}"),
+    ]
+    parsed = history._parse(snapshot_envelope(rows if overwritten_first else rows[::-1]))
+    bodies = [p.text for v in parsed.blocks[0].versions for p in v.paragraphs]
+    assert f"catalogued {overwritten_first}" in bodies
+    assert f"overwritten {overwritten_first}" not in bodies
+    assert [r.date.isoformat() for r in parsed.reforms[1:]] == ["2022-07-12"]
+
+
+def test_dependency_closure_lists_unreadable_instruments_and_goes_on(monkeypatch, tmp_path):
+    from legalize.coverage import record_failure
+    from legalize.fetcher.ie import bootstrap
+
+    graph = {"root": ["bad", "good"], "good": [], "bad": []}
+    config = Mock()
+    config.get_country.return_value = Mock(data_dir=str(tmp_path), max_workers=2)
+    monkeypatch.setattr(
+        bootstrap,
+        "load_norma_from_json",
+        lambda path: Mock(reforms=[Mock(norm_id=f"IE-{key}") for key in graph[path.stem[3:]]]),
+    )
+
+    def fetch(_config, _country, key):
+        if key == "IE-bad":
+            record_failure(tmp_path, key, ValueError("Malformed footnote"))
+            return None
+        return object()
+
+    monkeypatch.setattr(bootstrap, "generic_fetch_one", fetch)
+    assert bootstrap.fetch_dependencies(config, ["IE-root"]) == ["IE-good", "IE-root"]

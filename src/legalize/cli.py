@@ -883,6 +883,57 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
                 ("ERROR", f"{len(json_stems)} JSON files but 0 Markdown — commit never ran?")
             )
 
+    # ── 2b. Coverage (spec v0.5): every discovered norm is published or excluded ──
+    from legalize.layout import spec_version_for
+
+    if tuple(map(int, spec_version_for(country).split("."))) >= (0, 5):
+        import json
+
+        coverage_path = repo / "coverage.json"
+        if not coverage_path.exists():
+            issues.append(
+                ("ERROR", "No coverage.json — a spec v0.5 repo must say what it left out")
+            )
+        else:
+            coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
+            excluded = coverage.get("excluded") or []
+            console.print(
+                f"  Coverage:       {coverage.get('published')} published of "
+                f"{coverage.get('discovered')} discovered, {len(excluded)} excluded, "
+                f"{coverage.get('version_gaps', 0)} version gap(s), "
+                f"{coverage.get('undated_amendments', 0)} undated amendment(s)"
+            )
+            if coverage.get("published") != len(md_files):
+                issues.append(
+                    (
+                        "ERROR",
+                        f"coverage.json says {coverage.get('published')} published; "
+                        f"the repo has {len(md_files)}",
+                    )
+                )
+            transient = [e["identifier"] for e in excluded if e.get("transient")]
+            if transient:
+                issues.append(
+                    ("ERROR", f"{len(transient)} exclusion(s) are network failures — retry first")
+                )
+            index = data_dir / "discovery_ids.txt" if data_dir else None
+            if index and index.exists():
+                discovered = {
+                    line.strip() for line in index.read_text().splitlines() if line.strip()
+                }
+                unaccounted = (
+                    discovered - {f.stem for f in md_files} - {e["identifier"] for e in excluded}
+                )
+                if unaccounted:
+                    issues.append(
+                        (
+                            "ERROR",
+                            f"{len(unaccounted)} discovered norm(s) neither published nor excluded",
+                        )
+                    )
+                    for name in sorted(unaccounted)[:5]:
+                        issues.append(("ERROR", f"  {name}"))
+
     # ── 3. Working tree ──
     status_out = _git("status", "--porcelain").stdout.strip()
     if status_out:

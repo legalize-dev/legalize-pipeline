@@ -29,6 +29,8 @@ from legalize.fetcher.ie.parser import _legal_format, _quote_delta
 from legalize.models import Paragraph
 
 _SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*(?:\.|(?=\(1\)))")
+# A section substituted twice prints both markers: "F22[ F23[22.—".
+_NESTED_SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)*(\d+[A-Z]*)\s*(?:\.|(?=\(1\)))")
 _DIVISION = re.compile(
     r"^(?:(?:F\d+)?\[)?(?:(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH) )?"
     r"(PART|CHAPTER|SCHEDULE)\s*(?:[\dIVXLCDM]+[A-Z]*)?$",
@@ -88,6 +90,83 @@ _KNOWN_CUTOFF_CONFLICTS = {
         date(2024, 8, 31),
         date(2023, 5, 3),
     ),
+    "ac398f66fdbe7e7eb1a859360ab4f46639be11c214bac56dd6d344c79d3a3ab1": (  # pragma: allowlist secret
+        date(2024, 9, 30),
+        date(2024, 9, 2),
+    ),
+    "433aa13833ebcceb8f830d3c7d04e0f164244fb52f6ddf43dfcc13a6100e32de": (  # pragma: allowlist secret
+        date(2023, 11, 30),
+        date(2023, 8, 31),
+    ),
+    "d3d3c63c2ad361522f1e55bfe8d07e1b885b20ee9d8b4e0209919013273d0381": (  # pragma: allowlist secret
+        date(2021, 7, 21),
+        date(2021, 3, 24),
+    ),
+    # Pinned from the 2026-10-19 survey; evidence: tests/fixtures/ie/pdf-cover-date-pins.json.
+    "2258a2660883739a686cb2574747b20277e572ef4a6869f6c567dc2cec1ff0de": (  # pragma: allowlist secret  IE-1964-act-16
+        date(2023, 3, 1),
+        date(2021, 12, 23),
+    ),
+    "2803a9de3ec2612c0c4676f7b4399c546d264c86d3a5380c265758c4dd9ff908": (  # pragma: allowlist secret  IE-1970-act-1
+        date(2020, 11, 1),
+        date(2020, 10, 27),
+    ),
+    "724cd90db7d9a955f34216ba0b5fe3305382f27eaf1ea1747030c54a29c58379": (  # pragma: allowlist secret  IE-1970-act-1
+        date(2023, 4, 17),
+        date(2023, 1, 1),
+    ),
+    "11de2291b281e7fcfdef46e058317c0314f601e1835b81db5aac372004949fa8": (  # pragma: allowlist secret  IE-1988-act-25
+        date(2018, 5, 25),
+        date(2018, 1, 1),
+    ),
+    "13d862868910e9c6489971b8aa32b4be7a30ba5ee83e4c2ba6b5b484efe82f0f": (  # pragma: allowlist secret  IE-1992-act-18
+        date(2022, 1, 4),
+        date(2019, 5, 1),
+    ),
+    "842bd2a69a759c7e6d439e56b2e7b0fa7bada8a1ae6e856be24fd23e38390ca7": (  # pragma: allowlist secret  IE-1992-act-18
+        date(2023, 3, 1),
+        date(2019, 5, 1),
+    ),
+    "b92bcbd51d168736734709845b587db24c7918d2d5622a9e150f5dc5e42f4b47": (  # pragma: allowlist secret  IE-1994-act-16
+        date(2023, 4, 1),
+        date(2023, 1, 1),
+    ),
+    "6439cfc37fdbab6ec0f25ffbe08dfb956d7aa2af83f07bd6ff8d3f47ec007d6f": (  # pragma: allowlist secret  IE-1996-act-10
+        date(2024, 1, 1),
+        date(2023, 9, 22),
+    ),
+    "64d003c81d9807732ed4ff07af879ad12ff37abf4b52ae79e33188c25ab350e7": (  # pragma: allowlist secret  IE-1999-act-23
+        date(2022, 2, 15),
+        date(2021, 2, 15),
+    ),
+    "0c021fbf8148b3ac598a53d1875de81cd4afe728b15f95d9ed196b6e9cb9a1fc": (  # pragma: allowlist secret  IE-2002-act-20
+        date(2022, 11, 29),
+        date(2022, 9, 6),
+    ),
+    "930b4258a669afa6aefac25f24972fdbc636d398f915a4cb3ec4d88a6808ae3d": (  # pragma: allowlist secret  IE-2004-act-1
+        date(2021, 7, 29),
+        date(2021, 1, 28),
+    ),
+    "c65e4a486014606bcff9d98410d62831edfec8c236c6beacd0d7e975f5e83f59": (  # pragma: allowlist secret  IE-2005-act-2
+        date(2023, 5, 11),
+        date(2023, 4, 5),
+    ),
+    "5f1d70814dd65e312c80eff11e54bc71a99dd44c54e0215e67a5129d40ede17a": (  # pragma: allowlist secret  IE-2005-act-21
+        date(2019, 9, 1),
+        date(2016, 10, 26),
+    ),
+    "45c0f75cce05b6b0413aaf74e35b7241d22ff7dd84f00761bd85c22f24f2a9c9": (  # pragma: allowlist secret  IE-2006-act-26
+        date(2023, 11, 1),
+        date(2023, 7, 19),
+    ),
+    "3aed0a97a25ef852208fc13b4c441195b7142639d6ba4815d6d4a81b6f87e751": (  # pragma: allowlist secret  IE-2006-act-8
+        date(2021, 1, 28),
+        date(2021, 2, 1),
+    ),
+    "51daaff6a1bbb691e72724bc6a8dca8510d8e1342e1dfc2d23c121137a31170a": (  # pragma: allowlist secret  IE-2009-act-18
+        date(2021, 7, 14),
+        date(2020, 11, 12),
+    ),
 }
 
 # The contents and title identify each section; the body omits only its number.
@@ -107,25 +186,100 @@ _KNOWN_UNNUMBERED_SECTIONS = {
 
 # Preserve verified source numbering defects verbatim, with visible warnings and exact counts.
 # Evidence: tests/fixtures/ie/pdf-label-defects-evidence.json.
+_CIVIL_REGISTRATION_30M = {  # pragma: allowlist secret
+    "duplicates": {"30M": 2},
+    "missing": frozenset(),
+    "warning": (
+        "This official Civil Registration Act 2004 PDF repeats section number 30M under "
+        "two Part 3C headings, for stillbirths and surrogacy. Both entries and their labels "
+        "are preserved as printed. A reference to section 30M alone is ambiguous in this source."
+    ),
+}
+_GARDA_33E = {  # pragma: allowlist secret
+    "duplicates": {},
+    "missing": frozenset({"33E"}),
+    "warning": (
+        "This official Garda Síochána Act 2005 consolidated PDF is incomplete: section 33E "
+        "is listed as repealed in its contents but absent from the body. Its text has not "
+        "been reconstructed. Check the original legislation for its text and repeal history."
+    ),
+}
+_REGISTRATION_OF_TITLE_124A = {
+    "duplicates": {},
+    "missing": frozenset({"124A"}),
+    "warning": (
+        "This official Registration of Title Act 1964 consolidated PDF is incomplete: section "
+        "124A ('Evidence in proceedings') is listed in its contents but absent from the body. "
+        "Its text has not been reconstructed. Check the original legislation for its text."
+    ),
+}
+_COMPETITION_15AU = {
+    "duplicates": {},
+    "missing": frozenset({"15AU"}),
+    "warning": (
+        "This official Competition Act 2002 consolidated PDF lists section 15AU in its contents "
+        "without a title, and its body has no section 15AU. Nothing has been reconstructed. "
+        "Check the original legislation before relying on this snapshot."
+    ),
+}
+_EMERGENCY_MEASURES_9A = {
+    "duplicates": {},
+    "missing": frozenset({"9A"}),
+    "warning": (
+        "This official Financial Emergency Measures in the Public Interest (No. 2) Act 2009 "
+        "consolidated PDF is incomplete: section 9A ('Restriction on application of direction "
+        "given by Minister') is listed in its contents but absent from the body. Its text has "
+        "not been reconstructed. Check the original legislation for its text."
+    ),
+}
+_PLANNING_105A = {
+    "duplicates": {},
+    "missing": frozenset({"105A"}),
+    "warning": (
+        "This official Planning and Development Act 2000 consolidated PDF prints the label of "
+        "section 105A ('Appointment of chairperson on interim basis', repealed) as '105A1'. Its "
+        "repealed placeholder is kept as printed, after section 105; section 105A cannot be "
+        "located by its label in this source."
+    ),
+}
+_CIVIL_LIABILITY_17A = {
+    "duplicates": {"17A": 2},
+    "missing": frozenset(),
+    "warning": (
+        "This official Civil Liability and Courts Act 2004 PDF prints two different sections "
+        "numbered 17A ('Pre-action offers to settle clinical negligence claims' and 'Pre-action "
+        "offers of settlement in clinical negligence claims'), inserted by separate amending "
+        "Acts. Both entries and their labels are preserved as printed. A reference to section "
+        "17A alone is ambiguous in this source."
+    ),
+}
+
 _KNOWN_LABEL_DEFECTS = {
-    "69987fceb7c4fbd8d7b5209f0f80bdee32739d2a0cbe1a61f62a4dd7826766c1": {  # pragma: allowlist secret
-        "duplicates": {"30M": 2},
-        "missing": frozenset(),
-        "warning": (
-            "This official Civil Registration Act 2004 PDF repeats section number 30M under "
-            "two Part 3C headings, for stillbirths and surrogacy. Both entries and their labels "
-            "are preserved as printed. A reference to section 30M alone is ambiguous in this source."
-        ),
-    },
-    "3f40f0dd15295f18d710fa9f397d6cd8664095a5947fe377e1de803de8f670db": {  # pragma: allowlist secret
-        "duplicates": {},
-        "missing": frozenset({"33E"}),
-        "warning": (
-            "This official Garda Síochána Act 2005 consolidated PDF is incomplete: section 33E "
-            "is listed as repealed in its contents but absent from the body. Its text has not "
-            "been reconstructed. Check the original legislation for its text and repeal history."
-        ),
-    },
+    "69987fceb7c4fbd8d7b5209f0f80bdee32739d2a0cbe1a61f62a4dd7826766c1": _CIVIL_REGISTRATION_30M,  # pragma: allowlist secret
+    "3f40f0dd15295f18d710fa9f397d6cd8664095a5947fe377e1de803de8f670db": _GARDA_33E,  # pragma: allowlist secret
+    # The same defects in later snapshots, matched on 2026-10-19 by the defect each raises.
+    "0ae69d58bc9806a81c6abc4ae41325cbb67655de328632404c9ddd9ab37eec4d": _GARDA_33E,  # pragma: allowlist secret
+    "364a307e7e5cca3572aa628719def5d7e4cc56d9238713f85ff7dd04d2480eaa": _GARDA_33E,  # pragma: allowlist secret
+    "51b37169677025ddd9987450cab922610a715af978fa54a3e0772c1d58af3f05": _GARDA_33E,  # pragma: allowlist secret
+    "872c0cd81106c247ab4a745a606b91bae26d4ec5b59225bee696c17de1b9f9c4": _GARDA_33E,  # pragma: allowlist secret
+    "92a3126946496a7d1fdcd3f79bfe83220e41bfe7e40be2e186cb7bb607c56ba3": _GARDA_33E,  # pragma: allowlist secret
+    "975bdd11a57d656c386408f53e6dd74f6217a8dbdf7cd4adc9141aaa573d241b": _GARDA_33E,  # pragma: allowlist secret
+    "b07c90147701b2460627f054778d8aa704be5bfe103d2c38e62537a3d1b65b3d": _GARDA_33E,  # pragma: allowlist secret
+    "c9d62bd9f7f074ff0d4be997d15bdc8f6081feb63caa24e4f59153548bcdad11": _GARDA_33E,  # pragma: allowlist secret
+    "2258a2660883739a686cb2574747b20277e572ef4a6869f6c567dc2cec1ff0de": _REGISTRATION_OF_TITLE_124A,  # pragma: allowlist secret
+    "327415c90475b0203f7bdf81e8f9f8637d779120f8307a1e22ac5cfab8c1fc6f": _REGISTRATION_OF_TITLE_124A,  # pragma: allowlist secret
+    "c1aa425fd404bd7f5d0d1fd8f16f7722ca520cd1e96cdb8ceaa15854a99ffdbe": _REGISTRATION_OF_TITLE_124A,  # pragma: allowlist secret
+    "a55241e60e2b3e7fbaaa70f95d0e0852de60010c08bb4acc28f7fbb81fb4c423": _COMPETITION_15AU,  # pragma: allowlist secret
+    "7aaee19dc15d70c1f38be779905a7f8689daf7a61f6e7392df8983e168a97ac2": _EMERGENCY_MEASURES_9A,  # pragma: allowlist secret
+    "414848ee8a8158ff5ca3d316f2d4b355872dacaaa43ff29601d965ddde498fc3": _PLANNING_105A,  # pragma: allowlist secret
+    "53e561416195e572907c31d162faea79ea41353fbcbb81be9926bc3350a17d21": _PLANNING_105A,  # pragma: allowlist secret
+    "a7be62112d38ffecde3b1e09c3c70e9d2ab13bce3d3f190e853b8a96fcc8769c": _PLANNING_105A,  # pragma: allowlist secret
+    "b9b76cb50e52d467ac76be78cc02985cc5ccc930a3f819ea195e40c2e37fe31b": _PLANNING_105A,  # pragma: allowlist secret
+    "cad7814f81a4184b3ef25bc0d9d2f28be7e0afd932228bdecf595b615777c647": _PLANNING_105A,  # pragma: allowlist secret
+    "e411effc12b6193d93d652db6a973773a8eb7a45c4463db85267f4f52f03fb29": _PLANNING_105A,  # pragma: allowlist secret
+    "f7a06c43f9d43836e72baab191bc9ca6e84ec7a55d2f7e0a06df1d9b6d4218a3": _PLANNING_105A,  # pragma: allowlist secret
+    "ce91e09f561e2ddbb3cd361305c16c9f7c4467c5524c467ece83ba53ca8237ac": _CIVIL_REGISTRATION_30M,  # pragma: allowlist secret
+    "5fd11cf8114193dad43f7456783e534e94f99f2d4645c3b7d1e24a967014d0b6": _CIVIL_LIABILITY_17A,  # pragma: allowlist secret
     "dbb963cf87485993227c9213345323a3d20a35e886e443db2fb413d252c6c7ff": {  # pragma: allowlist secret
         "duplicates": {"69": 2},
         "missing": frozenset({"70"}),
@@ -148,6 +302,34 @@ _KNOWN_SCANNED_APPENDICES = {
         frozenset(range(179, 185)) | frozenset(range(198, 208))
     ),
     "1fa4abf009589948ff0ce1889a62ae35e404fd9f55b46284e92293d323c3baea": frozenset({116, 117}),
+    # Later Criminal Justice (Mutual Assistance) Act 2008 snapshots: the same two scanned forms.
+    "3b63bb91f136622bf67641fffbb5c01e11eaded83e5fed7ee4e58769f8dd9bad": (  # pragma: allowlist secret
+        frozenset(range(183, 189)) | frozenset(range(202, 212))
+    ),
+    "8fa52d1c03d1d32fb8def956170f9d341b324ae1d37aeb857d340554ef80e12d": (  # pragma: allowlist secret
+        frozenset(range(183, 189)) | frozenset(range(202, 212))
+    ),
+    "99f468f282d6913064dd6d057dc075556644ced41f6784413960aea2100dfd8d": (  # pragma: allowlist secret
+        frozenset(range(179, 185)) | frozenset(range(198, 208))
+    ),
+    "a678f5d878a1187d25e03dc0d97992c67ce78415430b4de51b9d72b09fb95194": (  # pragma: allowlist secret
+        frozenset(range(185, 191)) | frozenset(range(204, 214))
+    ),
+    "c7acd91474658146d27e2cbb28186a68cf092c22020707ee3618e6aa41884650": (  # pragma: allowlist secret
+        frozenset(range(183, 189)) | frozenset(range(202, 212))
+    ),
+    "cdf64e1a0f85f320caa2a4b48293f046c35c74ec9bcdebe8825c189e305e8fe1": (  # pragma: allowlist secret
+        frozenset(range(197, 203)) | frozenset(range(216, 226))
+    ),
+    "e1ef94da2f7381c64e8b6b2df8d7e593618dc5423b019669509dd51e173086fd": (  # pragma: allowlist secret
+        frozenset(range(197, 203)) | frozenset(range(216, 226))
+    ),
+    "e2b99062235d3333f88a53e45d9229418290dc83f96194654ad6e89f8f9c09ad": (  # pragma: allowlist secret
+        frozenset(range(185, 191)) | frozenset(range(204, 214))
+    ),
+    "f3b9e6ecf12d4e1004eafb7f12eae255e216f0b49e27004476ac50917c155b1d": (  # pragma: allowlist secret
+        frozenset(range(197, 203)) | frozenset(range(216, 226))
+    ),
 }
 
 
@@ -276,13 +458,13 @@ def _inline(line: _Line, *, emphasis: bool = True) -> str:
     return "".join(result).strip()
 
 
-def _section_match(line: _Line, *, allow_plain: bool = False):
+def _section_match(line: _Line, *, allow_plain: bool = False, pattern=_SECTION):
     """Captioned labels can be plain; an italic citation can also wrap as ``366.``."""
-    match = _SECTION.match(line.text)
+    match = pattern.match(line.text)
     if match is None:
         return None
     chars = sorted(line.chars, key=lambda char: char["x0"])
-    number = _SECTION.match("".join(char["text"] for char in chars))
+    number = pattern.match("".join(char["text"] for char in chars))
     if number is None:
         return None
     offset = 0
@@ -320,7 +502,7 @@ def _inside(char: dict, box: tuple) -> bool:
     )
 
 
-def _table(page, table, number: int) -> str:
+def _table(page, table, number: int, *, lenient: bool = False) -> str:
     """Recover ruled cells and paragraph-separated rows within open columns."""
     element = etree.Element("table")
     for row_index, row in enumerate(table.rows):
@@ -356,7 +538,11 @@ def _table(page, table, number: int) -> str:
                 _inside(c, table.bbox) and c["top"] + 0.1 < cut < c["bottom"] - 0.1
                 for c in page.chars
             ):
-                raise UnsupportedPDF("Ambiguous row boundaries in Revised Act PDF table")
+                if not lenient:
+                    raise UnsupportedPDF("Ambiguous row boundaries in Revised Act PDF table")
+                # Keep the ruled source row whole rather than guess where its rows split.
+                cuts = [top, bottom]
+                break
         for start, end in zip(cuts, cuts[1:], strict=False):
             tr = etree.SubElement(element, "tr")
             for box in cells:
@@ -372,7 +558,9 @@ def _table(page, table, number: int) -> str:
     return render_table(element, lambda cell: cell.text or "")
 
 
-def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
+def _read(
+    data: bytes, *, lenient: bool = False
+) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
     events: list[_Line | Paragraph] = []
     updated = None
     started = False
@@ -476,7 +664,7 @@ def _read(data: bytes) -> tuple[list[_Line | Paragraph], date | None, set[str]]:
                 (image["top"], Paragraph("parrafo", "[image omitted]")) for image in body_images
             ]
             for table in tables:
-                text = _table(page, table, number)
+                text = _table(page, table, number, lenient=lenient)
                 if not text:
                     raise UnsupportedPDF("Empty Revised Act PDF table")
                 page_events.append((table.bbox[1], Paragraph("table", text)))
@@ -511,12 +699,43 @@ def parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
     This bounds concurrent PDF glyph collections, not the surrounding envelopes.
     """
     with _PDF_PARSE_LOCK:
-        return _parse_revised_pdf(data)
+        try:
+            return _parse_revised_pdf(data)
+        except UnsupportedPDF as strict:
+            # Every file the strict reading accepts keeps its exact output. The lenient
+            # reading only runs where the strict one could not account for all text.
+            try:
+                return _parse_revised_pdf(data, lenient=True)
+            except UnsupportedPDF:
+                raise strict from None
 
 
-def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
+def _lenient_margin_text(text: str) -> bool:
+    """Marginal text that is not a caption: notes on a derivation, or legal text."""
+    return bool(
+        # "[Hague Convention, …]" or '[Cf. "dwelling" in 1960 …]' wrapped over lines.
+        re.match(r"^\[(?:Cf\. [\"“]|Hague Conven)", text, re.I)
+        # Consolidation sources by abbreviation: "[VATA s. 44]", "[… and FA 2010 s. 165(4)]".
+        or re.fullmatch(
+            r"\[[A-Z]{2,}[A-Za-z()]*\s+(?:[Ss]s?|[Ss]ch|[Aa]rt|[Pp]ara|[Rr]eg)\.\s*\d[^\[\]]*\]",
+            text,
+        )
+        # Parenthesised derivation notes: "(New)", "(cf. 1857, s.281)", "(33/1963, s. 345 (8))".
+        or (
+            re.fullmatch(r"(?:\((?:[^()]|\([^()]*\))*\)\.?\s*)+", text)
+            and re.search(r"\bNew\b|\b(?:1[6-9]|20)\d\d\b", text)
+        )
+        # A table cell in the margin column ("(5) A special order made…", "6.—(1) Upon an
+        # application…") or the caption of a quoted section ("“ Supervisory authority.").
+        or re.match(r"^(?:\((?:\d+[A-Z]*|[a-z]{1,4})\)\s|\d+[A-Z]*\.—|“)", text)
+    )
+
+
+def _parse_revised_pdf(
+    data: bytes, *, lenient: bool = False
+) -> tuple[list[Paragraph], date | None]:
     """Extract the actual dated legal text, preserving marginal section titles."""
-    events, updated, expected = _read(data)
+    events, updated, expected = _read(data, lenient=lenient)
     missing_label = _KNOWN_UNNUMBERED_SECTIONS.get(sha256(data).hexdigest())
     label_defect = _KNOWN_LABEL_DEFECTS.get(sha256(data).hexdigest(), {})
     allowed_duplicates = label_defect.get("duplicates", {})
@@ -700,6 +919,7 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 )
                 or re.match(r"^(?:S\.R\. & O\.|S\.I\.) No\. \d+", start.text)
                 or (min(line.x0 for line in group) > margin_x + 12 and not aligned_label)
+                or (lenient and _lenient_margin_text(" ".join(line.text for line in group)))
             ):
                 text = ""
                 for line in group:
@@ -805,7 +1025,11 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
             )
             previous = None
             continue
-        match = _section_match(item, allow_plain=marginal and abs(item.x0 - primary_x) < 10)
+        match = _section_match(
+            item,
+            allow_plain=marginal and abs(item.x0 - primary_x) < 10,
+            pattern=_NESTED_SECTION if lenient else _SECTION,
+        )
         caption = (
             next(
                 (
@@ -817,8 +1041,22 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                         or (abs(item.x0 - primary_x) < 2 and 0 < group[0].top - item.top < 16)
                     )
                 ),
-                [],
+                None,
             )
+            # A three-line caption centred on its label starts one line above it.
+            or lenient
+            and next(
+                (
+                    group
+                    for group in captions
+                    if group[0].page == item.page
+                    and abs(item.x0 - primary_x) < 2
+                    and -12 < group[0].top - item.top < 0
+                    and group[-1].bottom >= item.top
+                ),
+                None,
+            )
+            or []
             if (match or missing_label) and not schedule
             else []
         )
@@ -875,6 +1113,28 @@ def _parse_revised_pdf(data: bytes) -> tuple[list[Paragraph], date | None]:
                 and item.top - previous.bottom < 25
             )
             primary = primary and (abs(item.x0 - primary_x) < 2 or indented_label)
+        if (
+            lenient
+            and match
+            and quoted
+            and not primary
+            and not schedule
+            and abs(item.x0 - primary_x) < 2
+            and previous is not None
+            and previous.page == item.page
+            and pending_title
+            and pending
+            and item.top - previous.bottom < 25
+            and match[1] in expected
+            and match[1] not in seen
+            and int(re.match(r"\d+", match[1])[0])
+            >= max((int(re.match(r"\d+", n)[0]) for n in seen), default=0)
+        ):
+            # A bold title over the next section listed in the contents ends a quote the
+            # source left open ("“ ‘Act of 2010’" in the 2015 Children and Family
+            # Relationships Act), as a primary marginal caption already does.
+            primary = match
+            quote_depth = 0
         if primary:
             number = match[1]
             if seen[number] >= allowed_duplicates.get(number, 1):

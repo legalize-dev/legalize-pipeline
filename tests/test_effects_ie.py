@@ -1,6 +1,7 @@
 import re
 from datetime import date
 
+import json
 import pytest
 
 from legalize.fetcher.ie.effects import norm_id_from_url, parse_effects, source_date
@@ -500,14 +501,16 @@ def test_inherited_airport_application_is_preserved_without_antedated_reforms():
 
 
 @pytest.mark.parametrize("missing", ["directory_note", "re_enactment"])
-def test_older_effect_without_verified_continuity_still_fails(missing):
+def test_older_effect_without_verified_continuity_is_listed_undated(missing):
     from legalize.fetcher.ie import history
 
     effects, notes, envelope = _airport_application_relations(**{missing: False})
     assert len(effects) == 2
     assert notes == []
-    with pytest.raises(ValueError, match="effect IE-1947-si-115 predates the original publication"):
-        history._parse_on(envelope, date(2026, 10, 8))
+    norm = history._parse_on(envelope, date(2026, 10, 8))
+    undated = {u["source_id"] for u in json.loads(dict(norm.metadata.extra)["undated_amendments"])}
+    assert {"IE-1947-si-115"} <= undated
+    assert not undated & {r.norm_id for r in norm.reforms}
 
 
 def _planning_directory_client(metadata):

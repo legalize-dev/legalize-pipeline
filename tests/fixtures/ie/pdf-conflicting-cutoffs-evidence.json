@@ -1,92 +1,146 @@
 [
-  {
-    "identifier": "IE-1961-act-41",
-    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/41/act_plain.pdf?versionId=null",
-    "sha256": "3b4981e780e5873409b7820577f0cbcef10e69fed313c526379af9e2557abee8",
-    "file": "archive-ie-1961-act-41-conflicting-cutoff.pdf",
-    "cutoff": "2018-10-01",
-    "printed_dates": [
-      "1 October 2018",
-      "22 November 2017"
-    ],
-    "catalogue": {
-      "url": "https://revisedacts.lawreform.ie/revacts/chron",
-      "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
-      "excerpt_file": "archive-ie-1961-act-41-cutoff-catalogue.html",
-      "excerpt_sha256": "1ad51cdc99bd11cbd901a20dba7adc9739468979c6853418f7e67dfacaa1e581"
-    },
-    "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+ {
+  "identifier": "IE-1961-act-41",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/41/act_plain.pdf?versionId=null",
+  "sha256": "3b4981e780e5873409b7820577f0cbcef10e69fed313c526379af9e2557abee8",
+  "file": "archive-ie-1961-act-41-conflicting-cutoff.pdf",
+  "cutoff": "2018-10-01",
+  "printed_dates": [
+   "1 October 2018",
+   "22 November 2017"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
+   "excerpt_file": "archive-ie-1961-act-41-cutoff-catalogue.html",
+   "excerpt_sha256": "1ad51cdc99bd11cbd901a20dba7adc9739468979c6853418f7e67dfacaa1e581"
   },
-  {
-    "identifier": "IE-1991-act-27",
-    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1991/27/act_new_plain.pdf?versionId=JqzfH1tcSC9RLj2zoLVzQRFg6PQnEMac",
-    "sha256": "0d7d721b32e0dcaa879d7aa0a5d4aa5611e7be50a1f26777f4f7045a30afe237",
-    "file": "archive-ie-1991-act-27-conflicting-cutoff.pdf",
-    "cutoff": "2024-05-22",
-    "printed_dates": [
-      "22 May 2024",
-      "23 February 2024"
-    ],
-    "catalogue": {
-      "url": "https://revisedacts.lawreform.ie/revacts/chron",
-      "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
-      "excerpt_file": "archive-ie-1991-act-27-cutoff-catalogue.html",
-      "excerpt_sha256": "83704187673b17a71e914002eb84d4b3081fb6e94d250cdefffe6111b030765b"
-    },
-    "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+  "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+ },
+ {
+  "identifier": "IE-1991-act-27",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1991/27/act_new_plain.pdf?versionId=JqzfH1tcSC9RLj2zoLVzQRFg6PQnEMac",
+  "sha256": "0d7d721b32e0dcaa879d7aa0a5d4aa5611e7be50a1f26777f4f7045a30afe237",
+  "file": "archive-ie-1991-act-27-conflicting-cutoff.pdf",
+  "cutoff": "2024-05-22",
+  "printed_dates": [
+   "22 May 2024",
+   "23 February 2024"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
+   "excerpt_file": "archive-ie-1991-act-27-cutoff-catalogue.html",
+   "excerpt_sha256": "83704187673b17a71e914002eb84d4b3081fb6e94d250cdefffe6111b030765b"
   },
-  {
-    "identifier": "IE-2002-act-6",
-    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2002/6/act_new_plain.pdf?versionId=GWfjqD7ke7GTtbxsooXeOjColD9n1oCX",
-    "sha256": "e2d91d53fc254a5053b4ec26b6ec3d184202707c49f5b1b525a6e260e77213a1",
-    "file": "archive-ie-2002-act-6-conflicting-cutoff.pdf",
-    "cutoff": "2024-12-17",
-    "printed_dates": [
-      "17 December 2024",
-      "23 September 2024"
-    ],
-    "catalogue": {
-      "url": "https://revisedacts.lawreform.ie/revacts/chron",
-      "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
-      "excerpt_file": "archive-ie-2002-act-6-cutoff-catalogue.html",
-      "excerpt_sha256": "e3bfbf766dd56aafebf991cc1629f263946d26e2e35adae235445160c4e2c6d8"
-    },
-    "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+  "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+ },
+ {
+  "identifier": "IE-2002-act-6",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2002/6/act_new_plain.pdf?versionId=GWfjqD7ke7GTtbxsooXeOjColD9n1oCX",
+  "sha256": "e2d91d53fc254a5053b4ec26b6ec3d184202707c49f5b1b525a6e260e77213a1",
+  "file": "archive-ie-2002-act-6-conflicting-cutoff.pdf",
+  "cutoff": "2024-12-17",
+  "printed_dates": [
+   "17 December 2024",
+   "23 September 2024"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
+   "excerpt_file": "archive-ie-2002-act-6-cutoff-catalogue.html",
+   "excerpt_sha256": "e3bfbf766dd56aafebf991cc1629f263946d26e2e35adae235445160c4e2c6d8"
   },
-  {
-    "identifier": "IE-2003-act-23",
-    "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2003/23/act_new_plain.pdf?versionId=00sX6qOHK7srzT_ev2N33OB.PZ9wJgOe",
-    "sha256": "c872335450cb627400c0a81f3847fe8d1a686446ae7c9033a5d2c29d97e853d3",
-    "file": "archive-ie-2003-act-23-conflicting-cutoff.pdf",
-    "cutoff": "2023-03-08",
-    "printed_dates": [
-      "28 September 2021",
-      "8 March 2023"
-    ],
-    "catalogue": {
-      "url": "https://revisedacts.lawreform.ie/revacts/chron",
-      "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
-      "excerpt_file": "archive-ie-2003-act-23-cutoff-catalogue.html",
-      "excerpt_sha256": "c7af045aea8ba1d772bdf9005f7b38473e0f0c60aef2d1496d3fbe3826228086"
-    },
-    "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+  "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+ },
+ {
+  "identifier": "IE-2003-act-23",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2003/23/act_new_plain.pdf?versionId=00sX6qOHK7srzT_ev2N33OB.PZ9wJgOe",
+  "sha256": "c872335450cb627400c0a81f3847fe8d1a686446ae7c9033a5d2c29d97e853d3",
+  "file": "archive-ie-2003-act-23-conflicting-cutoff.pdf",
+  "cutoff": "2023-03-08",
+  "printed_dates": [
+   "28 September 2021",
+   "8 March 2023"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
+   "excerpt_file": "archive-ie-2003-act-23-cutoff-catalogue.html",
+   "excerpt_sha256": "c7af045aea8ba1d772bdf9005f7b38473e0f0c60aef2d1496d3fbe3826228086"
   },
-  {
-    "identifier": "IE-2017-act-2",
-    "url": "https://revisedacts.lawreform.ie/eli/2017/act/2/revised/en/pdf?annotations=false",
-    "sha256": "3470a02b341db79ad2bab7405b500de47224c0e3076cb6961f93a2841027a24e",
-    "file": "archive-ie-2017-act-2-conflicting-cutoff.pdf",
-    "cutoff": "2024-08-31",
-    "printed_dates": [
-      "3 May 2023",
-      "31 August 2024"
-    ],
-    "catalogue": {
-      "url": "https://revisedacts.lawreform.ie/revacts/chron",
-      "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
-      "excerpt_file": "archive-ie-2017-act-2-cutoff-catalogue.html",
-      "excerpt_sha256": "204c6e6703d66ca410bbbdb9fb8e484d1863c022408d297d68ab421a0932d5eb"
-    },
-    "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
-  }
+  "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+ },
+ {
+  "identifier": "IE-2017-act-2",
+  "url": "https://revisedacts.lawreform.ie/eli/2017/act/2/revised/en/pdf?annotations=false",
+  "sha256": "3470a02b341db79ad2bab7405b500de47224c0e3076cb6961f93a2841027a24e",
+  "file": "archive-ie-2017-act-2-conflicting-cutoff.pdf",
+  "cutoff": "2024-08-31",
+  "printed_dates": [
+   "3 May 2023",
+   "31 August 2024"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "16439374ed843ef98077ea100703394b27f12e068714f1ab32a825737aa9d849",
+   "excerpt_file": "archive-ie-2017-act-2-cutoff-catalogue.html",
+   "excerpt_sha256": "204c6e6703d66ca410bbbdb9fb8e484d1863c022408d297d68ab421a0932d5eb"
+  },
+  "date_basis": "The front cover and the matching official LRC catalogue record agree; older introductory/body headings conflict. All dates are preserved in the source warning."
+ },
+ {
+  "identifier": "IE-2018-act-11",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/11/act_new_plain.pdf?versionId=jg_.z79vdNoJOwDzhNujbRct3ck3XfU9",
+  "sha256": "ac398f66fdbe7e7eb1a859360ab4f46639be11c214bac56dd6d344c79d3a3ab1",
+  "file": "archive-2018-act-11-conflicting-cutoff.pdf.gz",
+  "cutoff": "2024-09-30",
+  "printed_dates": [
+   "30 September 2024",
+   "2 September 2024"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "ef1e27a016eec6bdc54ccaa76c661abae2c552e069cf8f4728e1f06844806404",
+   "excerpt_file": "archive-2018-act-11-cutoff-catalogue.html",
+   "excerpt_sha256": "b3ceb28948187aead2dd7101e1214de29f0898c43d0a49abde6e7f418e2fe720"
+  },
+  "date_basis": "The front and back covers and the matching official LRC catalogue record agree; one internal heading keeps an older date. All dates are preserved in the source warning."
+ },
+ {
+  "identifier": "IE-2004-act-27",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2004/27/act_new_plain.pdf?versionId=T.QO7LJXAdPYH3yexVpXS009bDh9y7rw",
+  "sha256": "433aa13833ebcceb8f830d3c7d04e0f164244fb52f6ddf43dfcc13a6100e32de",
+  "file": "archive-2004-act-27-conflicting-cutoff.pdf.gz",
+  "cutoff": "2023-11-30",
+  "printed_dates": [
+   "30 November 2023",
+   "31 August 2023"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "ef1e27a016eec6bdc54ccaa76c661abae2c552e069cf8f4728e1f06844806404",
+   "excerpt_file": "archive-2004-act-27-cutoff-catalogue.html",
+   "excerpt_sha256": "2e2c2b7dfe7848222257feaf29bb30701da63f1fdd2747e9c406a7224194ea37"
+  },
+  "date_basis": "The front and back covers and the matching official LRC catalogue record agree; one internal heading keeps an older date. All dates are preserved in the source warning."
+ },
+ {
+  "identifier": "IE-2005-act-27",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/27/act_plain.pdf?versionId=SmYMeIfM5IGCaVXJaEY6QKIoHvmAyrug",
+  "sha256": "d3d3c63c2ad361522f1e55bfe8d07e1b885b20ee9d8b4e0209919013273d0381",
+  "file": "archive-2005-act-27-conflicting-cutoff.pdf.gz",
+  "cutoff": "2021-07-21",
+  "printed_dates": [
+   "21 July 2021",
+   "24 March 2021"
+  ],
+  "catalogue": {
+   "url": "https://revisedacts.lawreform.ie/revacts/chron",
+   "source_sha256": "ef1e27a016eec6bdc54ccaa76c661abae2c552e069cf8f4728e1f06844806404",
+   "excerpt_file": "archive-2005-act-27-cutoff-catalogue.html",
+   "excerpt_sha256": "32a826406a523419fc27d5ccdf8793b8a87b6e1729308a9461133c73b1701f20"
+  },
+  "date_basis": "The front and back covers and the matching official LRC catalogue record agree; one internal heading keeps an older date. All dates are preserved in the source warning."
+ }
 ]

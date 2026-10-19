@@ -1,0 +1,86 @@
+[
+ {
+  "identifier": "IE-2015-act-2",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2015/2/act_plain.pdf?versionId=null",
+  "sha256": "d9902690b6d78507e5e4a2969d7f7b40db4421996efef3daa7849c134154f59f",
+  "pages": [
+   1,
+   14,
+   106
+  ],
+  "file": "archive-ie-2015-act-2-margin-variant.pdf",
+  "fixture_sha256": "ecd6f2465ad17d6513b566e9c12d856cb25f53160cbf5610df82c1823b4cbd89",
+  "phrase": "189. **Amendments of Central Bank Act 1942**",
+  "css_class": "articulo"
+ },
+ {
+  "identifier": "IE-1999-act-23",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1999/23/act_plain.pdf?versionId=null",
+  "sha256": "836d4155da1dc838cf6496cb89e2ad9505ec9475bd6655592faad3b9f162dd60",
+  "pages": [
+   1,
+   12,
+   128
+  ],
+  "file": "archive-ie-1999-act-23-margin-variant.pdf",
+  "fixture_sha256": "d4cf4afa5c51fce534ae810325e98aaae32c528f118322ef418280dd60a38884",
+  "phrase": "(5) A special order made under this section may incorpo-rate\u2014",
+  "css_class": "parrafo"
+ },
+ {
+  "identifier": "IE-1997-act-8",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1997/8/act_plain.pdf?versionId=x9GGscpoHaXH9_NNA1JypE2L_WsAiAba",
+  "sha256": "aa3b478fb464b5b05d62531443150c0d5d117fddd912297e3ccf4161b38e70a0",
+  "pages": [
+   1,
+   12,
+   51
+  ],
+  "file": "archive-ie-1997-act-8-margin-variant.pdf",
+  "fixture_sha256": "45505b62194ec5a298691eb361176eef5d176804bd2e7e2613fb6ee9d27eb610",
+  "phrase": "\u201c Supervisory authority.",
+  "css_class": "legal_quote"
+ },
+ {
+  "identifier": "IE-1988-act-27",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1988/27/act_new_plain.pdf?versionId=.LJaPe_OLLBQGVwglwCR6RG83O9RI42i",
+  "sha256": "eb727ada0675cb4fdcf43fe8969029a4893797ba7171a93f3970b86972ee2933",
+  "pages": [
+   1,
+   9,
+   11
+  ],
+  "file": "archive-ie-1988-act-27-margin-variant.pdf",
+  "fixture_sha256": "434759f4783972abbbd8807192bd87273a2abc5dd3ab33a1c6bc327782d5fa43",
+  "phrase": "(1872, s. 21 in pt.)",
+  "css_class": "parrafo"
+ },
+ {
+  "identifier": "IE-1965-act-27",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1965/27/act_new_plain.pdf?versionId=zrLH9pZIM7gPHAQ5qKEVzRFO8fjHExVr",
+  "sha256": "384c09d0a5051f5064b67098ed58a34595b3c026ebf5564d8af3fedf5fb869b3",
+  "pages": [
+   1,
+   8,
+   29
+  ],
+  "file": "archive-ie-1965-act-27-margin-variant.pdf",
+  "fixture_sha256": "19716094f06c93db8fbe669f3c8b41dbef2be0b0706dcf23785b6d820679dce4",
+  "phrase": "[Cf. \"dwelling\" in 1960 (No. 42) s. 2 (1)]",
+  "css_class": "parrafo"
+ },
+ {
+  "identifier": "IE-1976-act-11",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1976/11/act_plain.pdf?versionId=null",
+  "sha256": "2b765e0e65eec4a8513572b6673e0a16917f7cba86d06902e2746a87b19dd915",
+  "pages": [
+   1,
+   8,
+   31
+  ],
+  "file": "archive-ie-1976-act-11-margin-variant.pdf",
+  "fixture_sha256": "941cf848dbf238a9c3e1c3bbb12bc47beb464847f547970bea622447ac3e2051",
+  "phrase": "6.\u2014(1) Upon an application under this section",
+  "css_class": "parrafo"
+ }
+]

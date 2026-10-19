@@ -1,0 +1,422 @@
+[
+ {
+  "identifier": "IE-1964-act-16",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1964/16/act_new_plain.pdf?versionId=XQgKQ7YyY8Y1Ys7u2KN85.jmfxY52_jy",
+  "sha256": "2258a2660883739a686cb2574747b20277e572ef4a6869f6c567dc2cec1ff0de",
+  "cutoff": "2023-03-01",
+  "other_date": "2021-12-23",
+  "pages": [
+   [
+    0,
+    "2023-03-01"
+   ],
+   [
+    1,
+    "2023-03-01"
+   ],
+   [
+    6,
+    "2021-12-23"
+   ],
+   [
+    44,
+    "2023-03-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1970-act-1",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1970/1/act_plain.pdf?versionId=iNPE9YrBJU0_ckjMtw1f50gzwbHGNOBe",
+  "sha256": "2803a9de3ec2612c0c4676f7b4399c546d264c86d3a5380c265758c4dd9ff908",
+  "cutoff": "2020-11-01",
+  "other_date": "2020-10-27",
+  "pages": [
+   [
+    0,
+    "2020-11-01"
+   ],
+   [
+    2,
+    "2020-11-01"
+   ],
+   [
+    4,
+    "2020-11-01"
+   ],
+   [
+    10,
+    "2020-10-27"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1970-act-1",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1970/1/act_new_plain.pdf?versionId=jVlhcK7FcT6hTiZV.k3FlOOb2DJKg9NP",
+  "sha256": "724cd90db7d9a955f34216ba0b5fe3305382f27eaf1ea1747030c54a29c58379",
+  "cutoff": "2023-04-17",
+  "other_date": "2023-01-01",
+  "pages": [
+   [
+    0,
+    "2023-04-17"
+   ],
+   [
+    1,
+    "2023-04-17"
+   ],
+   [
+    7,
+    "2023-01-01"
+   ],
+   [
+    54,
+    "2023-04-17"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1988-act-25",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1988/25/act_plain.pdf?versionId=null",
+  "sha256": "11de2291b281e7fcfdef46e058317c0314f601e1835b81db5aac372004949fa8",
+  "cutoff": "2018-05-25",
+  "other_date": "2018-01-01",
+  "pages": [
+   [
+    0,
+    "2018-05-25"
+   ],
+   [
+    2,
+    "2018-05-25"
+   ],
+   [
+    4,
+    "2018-01-01"
+   ],
+   [
+    7,
+    "2018-01-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1992-act-18",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1992/18/act_new_plain.pdf?versionId=EwKlDEuwFMivIJxw8.smXzlzrjqGgBlP",
+  "sha256": "13d862868910e9c6489971b8aa32b4be7a30ba5ee83e4c2ba6b5b484efe82f0f",
+  "cutoff": "2022-01-04",
+  "other_date": "2019-05-01",
+  "pages": [
+   [
+    0,
+    "2022-01-04"
+   ],
+   [
+    1,
+    "2022-01-04"
+   ],
+   [
+    4,
+    "2019-05-01"
+   ],
+   [
+    37,
+    "2022-01-04"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1992-act-18",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1992/18/act_new_plain.pdf?versionId=l3Z6VmpOrZWja4jWu4bTWGkTazK4.fbV",
+  "sha256": "842bd2a69a759c7e6d439e56b2e7b0fa7bada8a1ae6e856be24fd23e38390ca7",
+  "cutoff": "2023-03-01",
+  "other_date": "2019-05-01",
+  "pages": [
+   [
+    0,
+    "2023-03-01"
+   ],
+   [
+    1,
+    "2023-03-01"
+   ],
+   [
+    4,
+    "2019-05-01"
+   ],
+   [
+    37,
+    "2023-03-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1994-act-16",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1994/16/act_new_plain.pdf?versionId=zT.5F_bEQ.liJKEsu5vPvzJjXSKvtKwo",
+  "sha256": "b92bcbd51d168736734709845b587db24c7918d2d5622a9e150f5dc5e42f4b47",
+  "cutoff": "2023-04-01",
+  "other_date": "2023-01-01",
+  "pages": [
+   [
+    0,
+    "2023-04-01"
+   ],
+   [
+    1,
+    "2023-04-01"
+   ],
+   [
+    5,
+    "2023-01-01"
+   ],
+   [
+    76,
+    "2023-04-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1996-act-10",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1996/10/act_new_plain.pdf?versionId=VO190AYWMd1WQ3mV2R7o.AZEwzpCPfbS",
+  "sha256": "6439cfc37fdbab6ec0f25ffbe08dfb956d7aa2af83f07bd6ff8d3f47ec007d6f",
+  "cutoff": "2024-01-01",
+  "other_date": "2023-09-22",
+  "pages": [
+   [
+    0,
+    "2024-01-01"
+   ],
+   [
+    1,
+    "2024-01-01"
+   ],
+   [
+    6,
+    "2023-09-22"
+   ],
+   [
+    169,
+    "2024-01-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-1999-act-23",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1999/23/act_new_plain.pdf?versionId=BVTV1zautDYMJrBwq43exAwpBfBdJFNP",
+  "sha256": "64d003c81d9807732ed4ff07af879ad12ff37abf4b52ae79e33188c25ab350e7",
+  "cutoff": "2022-02-15",
+  "other_date": "2021-02-15",
+  "pages": [
+   [
+    0,
+    "2022-02-15"
+   ],
+   [
+    1,
+    "2021-02-15"
+   ],
+   [
+    8,
+    "2022-02-15"
+   ],
+   [
+    160,
+    "2022-02-15"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-2002-act-20",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2002/20/act_new_plain.pdf?versionId=tGtGHFvHdfi2MWUakEvqx20LY938gf3l",
+  "sha256": "0c021fbf8148b3ac598a53d1875de81cd4afe728b15f95d9ed196b6e9cb9a1fc",
+  "cutoff": "2022-11-29",
+  "other_date": "2022-09-06",
+  "pages": [
+   [
+    0,
+    "2022-11-29"
+   ],
+   [
+    1,
+    "2022-11-29"
+   ],
+   [
+    7,
+    "2022-09-06"
+   ],
+   [
+    66,
+    "2022-11-29"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-2004-act-1",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2004/1/act_plain.pdf?versionId=pwbdcqQN3xgr.nT.gr_54eO4AJhI2yg5",
+  "sha256": "930b4258a669afa6aefac25f24972fdbc636d398f915a4cb3ec4d88a6808ae3d",
+  "cutoff": "2021-07-29",
+  "other_date": "2021-01-28",
+  "pages": [
+   [
+    0,
+    "2021-07-29"
+   ],
+   [
+    2,
+    "2021-07-29"
+   ],
+   [
+    4,
+    "2021-07-29"
+   ],
+   [
+    6,
+    "2021-01-28"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-2005-act-2",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/2/act_new_plain.pdf?versionId=527rsLl9F6NmNs1M4LHAZxo6r6CUFyH5",
+  "sha256": "c65e4a486014606bcff9d98410d62831edfec8c236c6beacd0d7e975f5e83f59",
+  "cutoff": "2023-05-11",
+  "other_date": "2023-04-05",
+  "pages": [
+   [
+    0,
+    "2023-05-11"
+   ],
+   [
+    1,
+    "2023-04-05"
+   ],
+   [
+    7,
+    "2023-05-11"
+   ],
+   [
+    129,
+    "2023-05-11"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-2005-act-21",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2005/21/act_plain.pdf?versionId=Zn9dZ8HGrbcwNpmpJaDfIF6Tm1PsBIm2",
+  "sha256": "5f1d70814dd65e312c80eff11e54bc71a99dd44c54e0215e67a5129d40ede17a",
+  "cutoff": "2019-09-01",
+  "other_date": "2016-10-26",
+  "pages": [
+   [
+    0,
+    "2019-09-01"
+   ],
+   [
+    2,
+    "2019-09-01"
+   ],
+   [
+    4,
+    "2019-09-01"
+   ],
+   [
+    7,
+    "2016-10-26"
+   ],
+   [
+    7,
+    "2019-09-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-2006-act-26",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2006/26/act_new_plain.pdf?versionId=tSNkf.Bi9FtdNc_mBXkedZMf2Ao1ZdQS",
+  "sha256": "45c0f75cce05b6b0413aaf74e35b7241d22ff7dd84f00761bd85c22f24f2a9c9",
+  "cutoff": "2023-11-01",
+  "other_date": "2023-07-19",
+  "pages": [
+   [
+    0,
+    "2023-11-01"
+   ],
+   [
+    1,
+    "2023-07-19"
+   ],
+   [
+    11,
+    "2023-07-19"
+   ],
+   [
+    146,
+    "2023-11-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ },
+ {
+  "identifier": "IE-2006-act-8",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2006/8/act_plain.pdf?versionId=YMhCTFJfVZVQGOM954PjrhA5_3GibhTo",
+  "sha256": "3aed0a97a25ef852208fc13b4c441195b7142639d6ba4815d6d4a81b6f87e751",
+  "cutoff": "2021-01-28",
+  "other_date": "2021-02-01",
+  "pages": [
+   [
+    0,
+    "2021-01-28"
+   ],
+   [
+    2,
+    "2021-01-28"
+   ],
+   [
+    6,
+    "2021-01-28"
+   ],
+   [
+    13,
+    "2021-02-01"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree on 28 January 2021; the title page prints 1 February 2021, and the directory lists no effect between the two dates."
+ },
+ {
+  "identifier": "IE-2009-act-18",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2009/18/act_new_plain.pdf?versionId=q1ju3GD1Q1WwIp5sts.q0NaeMewCbji8",
+  "sha256": "51daaff6a1bbb691e72724bc6a8dca8510d8e1342e1dfc2d23c121137a31170a",
+  "cutoff": "2021-07-14",
+  "other_date": "2020-11-12",
+  "pages": [
+   [
+    0,
+    "2021-07-14"
+   ],
+   [
+    1,
+    "2021-07-14"
+   ],
+   [
+    10,
+    "2020-11-12"
+   ],
+   [
+    153,
+    "2021-07-14"
+   ]
+  ],
+  "basis": "The front cover and the matching official LRC catalogue record agree; another page keeps an older date."
+ }
+]

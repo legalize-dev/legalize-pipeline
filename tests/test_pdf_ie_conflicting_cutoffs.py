@@ -1,6 +1,7 @@
 """Only byte-verified catalogue/cover dates can resolve contradictory PDF headings."""
 
 from datetime import date
+import gzip
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -15,9 +16,14 @@ FIXTURES = Path(__file__).parent / "fixtures/ie"
 EVIDENCE = json.loads((FIXTURES / "pdf-conflicting-cutoffs-evidence.json").read_text())
 
 
+def pdf_bytes(record):
+    raw = (FIXTURES / record["file"]).read_bytes()
+    return gzip.decompress(raw) if record["file"].endswith(".gz") else raw
+
+
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])
 def test_verified_cover_and_catalogue_cutoff_preserves_the_conflict(record):
-    raw = (FIXTURES / record["file"]).read_bytes()
+    raw = pdf_bytes(record)
     assert sha256(raw).hexdigest() == record["sha256"]
     catalogue = record["catalogue"]
     excerpt = (FIXTURES / catalogue["excerpt_file"]).read_bytes()
@@ -39,7 +45,21 @@ def test_verified_cover_and_catalogue_cutoff_preserves_the_conflict(record):
 
 @pytest.mark.parametrize("record", EVIDENCE, ids=lambda r: r["identifier"])
 def test_an_unverified_pdf_cannot_inherit_another_files_cutoff(record):
-    raw = (FIXTURES / record["file"]).read_bytes() + b"\n"
+    raw = pdf_bytes(record) + b"\n"
     assert source_warning(raw) is None
     with pytest.raises(UnsupportedPDF, match="Conflicting Revised Act PDF cover dates"):
         parse_revised_pdf(raw)
+
+
+def test_each_surveyed_cover_date_pin_matches_its_evidence():
+    from legalize.fetcher.ie.pdf import _KNOWN_CUTOFF_CONFLICTS
+
+    pins = json.loads((FIXTURES / "pdf-cover-date-pins.json").read_text())
+    for pin in pins:
+        assert _KNOWN_CUTOFF_CONFLICTS[pin["sha256"]] == (
+            date.fromisoformat(pin["cutoff"]),
+            date.fromisoformat(pin["other_date"]),
+        )
+        # The corroborated date is the front cover's and the catalogue row's.
+        assert [d for page, d in pin["pages"] if page == 0] == [pin["cutoff"]]
+        assert {d for _, d in pin["pages"]} == {pin["cutoff"], pin["other_date"]}

@@ -96,6 +96,36 @@ _PRE_EXISTING_RULES = {
         "and instruments. The directory's separate S.I. 600/2011 amendment is retained.",
         "https://www.irishstatutebook.ie/eli/2005/act/26/section/361/enacted/en/html",
     ),
+    ("IE-2018-act-11", "Data Protection Act 2018 (7/2018), ss. 9, 14(2), (4)"): (
+        "S. 24 references to Data Protection Commissioner construed",
+        "Section 14(2) is an earlier general rule: from the establishment day a reference "
+        "in any enactment to the Data Protection Commissioner is construed as one to the "
+        "Commission. The Childcare Support Act 2018 names the Commissioner; this is not a "
+        "later amendment of it.",
+        "https://www.irishstatutebook.ie/eli/2018/act/7/section/14/enacted/en/html",
+    ),
+    ("IE-1999-si-189", "32/1998, s. 4(4), (5)"): (
+        "Rendered spent by expiry of enabling Act",
+        "Section 4(4) ends the 1998 Act 12 months after its passing and section 4(5) allows "
+        "one continuance of at most 12 months, which this order makes. The order is spent "
+        "when that period ends: an earlier limit, not a later amendment.",
+        "https://www.irishstatutebook.ie/eli/1998/act/32/section/4/enacted/en/html",
+    ),
+    ("IE-2002-si-355", "Mental Health Act 2001 (25/2001), ss. 1(3), 6, schedule"): (
+        "Rendered obsolete by repeal of enabling provision",
+        "The order was made under sections 162, 165 and 166 of the Mental Treatment Act "
+        "1945 (Part XIV). Section 6 and the Schedule of the 2001 Act repeal the 1945 Act "
+        "other than Part VIII and four sections, from a day fixed under section 1(3). The "
+        "directory states no date, so none is assigned; this is not a 2001 amendment.",
+        "https://www.irishstatutebook.ie/eli/2001/act/25/section/6/enacted/en/html",
+    ),
+    ("IE-2005-si-512", "11/2005, ss. 1(1), 47(3)"): (
+        "Continued in force",
+        "Section 47(3) continues regulations made under sections 18, 19, 20 and 27 of the "
+        "1992 Act before its commencement. This instrument was made later, under section 27 "
+        "as inserted by section 47(2); the 2005 provision is earlier, not an amendment of it.",
+        "https://www.irishstatutebook.ie/eli/2005/act/11/section/47/enacted/en/html",
+    ),
 }
 
 # Official instruments whose own text cannot date them. The owner decided to publish
@@ -205,6 +235,18 @@ _DIRECTORY_CONTEXT = {
         "of the Finance Act 1981. The cessation comes from section 152(1) of the "
         "Finance Act 1992, retained as a separate directory effect.",
         "https://www.irishstatutebook.ie/eli/1992/act/9/section/152/enacted/en/html",
+    ),
+    (
+        "IE-1996-si-292",
+        "IE-1970-act-1",
+        "Continued in force under Health Act 1970 (1/1970)",
+        "Health Act 1970 (1/1970), s. 72(3)",
+    ): (
+        "directory_citation_error",
+        "Section 72(3) continues regulations made under the Health Act 1953. This order "
+        "was made in 1996 under sections 162, 165, 166 and 184 of the Mental Treatment Act "
+        "1945; the 1970 provision predates it and does not concern it.",
+        "https://www.irishstatutebook.ie/eli/1996/si/292/made/en/html",
     ),
 }
 
@@ -381,6 +423,17 @@ _VERIFIED_EFFECT_SOURCES = {
         "2014/act/1/section/21",
         "1 June 2014",
         "2014/si/214",
+    ),
+    # Section 2A(2)(a) of the 1930 Act names both orders; section 3 of 22/2004 inserted it.
+    ("IE-2002-si-302", "2/1930, s. 2A(2)(a)(i)-(ii).", "IE-1930-act-2"): (
+        "2004/act/22/section/3",
+        None,
+        None,
+    ),
+    ("IE-2002-si-358", "2/1930, s. 2A(2)(a)(i)-(ii).", "IE-1930-act-2"): (
+        "2004/act/22/section/3",
+        None,
+        None,
     ),
 }
 
@@ -677,6 +730,14 @@ def _effect_cells(doc, norm_id: str) -> list[list] | None:
     if len(siblings) < count - 1:
         raise ValueError(f"{norm_id}: truncated annual directory group")
     rows.extend(row.xpath("./td") for row in siblings[: count - 1])
+    if first[0].get("rowspan") is None:
+        # Some pages write a group without rowspan: its further rows leave the number
+        # and title cells empty ("Art. 4 revoked" under S.I. 30/2001).
+        for row in siblings:
+            cells = row.xpath("./td")
+            if len(cells) != 4 or any(_text(cell) for cell in cells[:2]) or cells[0].xpath(".//a"):
+                break
+            rows.append(cells[2:])
     return rows
 
 
@@ -1282,6 +1343,12 @@ def fetch_effects(
                 "the references to provisions of the Act of 1958 were to the corresponding "
                 "provisions of this Act.",
             ),
+            "IE-1981-act-1": (
+                "311",
+                "The continuity of the operation of the law relating to the matters provided "
+                "for in the repealed enactments shall not be affected by the substitution of "
+                "this Act for those enactments",
+            ),
         }.get(norm_id)
         if continuity:
             continuity_section, continuation = continuity
@@ -1410,7 +1477,7 @@ def fetch_effects(
                 continue
         continuity_note = None
         if continuity_notes:
-            if norm_id == "IE-1980-act-10":
+            if norm_id in {"IE-1980-act-10", "IE-1981-act-1"}:
                 continuity_note = continuity_notes.get(re.sub(r"[ *]", "", effect["provision"]))
             elif effect["note"] == "Excl. provns. ext. to Customs-free Airport. *" and (
                 source_id,

@@ -62,7 +62,7 @@ def test_uncaptioned_or_periodless_labels_still_require_nonitalic_bold_digits(
         assert c["text"].isdigit()
         c["fontname"] = font
     events[index] = replace(events[index], chars=chars)
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected))
     with pytest.raises(
         pdf.UnsupportedPDF, match=f"missing sections listed in its contents: {number}$"
     ):
@@ -73,7 +73,7 @@ def test_uncaptioned_label_requires_its_contents_entry(monkeypatch):
     raw = source("IE-2012-act-26")
     events, cutoff, expected = pdf._read(raw)
     expected.remove("5")
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected))
     paragraphs, _ = pdf.parse_revised_pdf(raw)
     assert not any(p.css_class == "articulo" and p.text == "5." for p in paragraphs)
     assert any("make a scheme or schemes" in p.text for p in paragraphs)
@@ -95,6 +95,6 @@ def test_known_bytes_still_require_the_verified_heading_and_body(monkeypatch, mi
     chars = deepcopy(events[index].chars)
     chars[0]["text"] = "X"
     events[index] = replace(events[index], chars=chars)
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected))
     with pytest.raises(pdf.UnsupportedPDF, match="missing sections listed in its contents: 14$"):
         pdf.parse_revised_pdf(raw)

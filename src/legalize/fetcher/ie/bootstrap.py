@@ -4,9 +4,11 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from legalize.config import Config
+from legalize.coverage import unresolved
 from legalize.pipeline import (
     NothingPublished,
     commit_all_fast,
+    console,
     discover_norm_ids,
     generic_fetch_all,
     generic_fetch_one,
@@ -17,10 +19,13 @@ from legalize.storage import load_norma_from_json
 
 
 def fetch_dependencies(config: Config, identifiers: list[str]) -> list[str]:
-    """Close amendment references transitively, failing on any unavailable instrument.
+    """Close amendment references transitively; return the instruments that loaded.
 
     The walk goes on from every instrument that did load, so one run names every
-    failure at every depth instead of stopping after the first depth with one.
+    failure at every depth. Spec v0.5 §Coverage: an instrument that cannot be read
+    is recorded with its reason (coverage.json lists it) and the corpus is published
+    without it; a network failure stops the run instead, because a retry may succeed
+    and a gap must never stand in for one.
     """
     cc = config.get_country("ie")
     json_dir = Path(cc.data_dir) / "json"
@@ -44,20 +49,23 @@ def fetch_dependencies(config: Config, identifiers: list[str]) -> list[str]:
                 key for key, succeeded in zip(pending, results, strict=True) if not succeeded
             ]
             loaded = [key for key, succeeded in zip(pending, results, strict=True) if succeeded]
+    if retry := unresolved(cc.data_dir, failed):
+        raise NothingPublished(f"Ireland amendment sources unavailable: {', '.join(sorted(retry))}")
     if failed:
-        raise NothingPublished(
-            f"Ireland amendment sources unavailable: {', '.join(sorted(failed))}"
+        console.print(
+            f"[yellow]{len(failed)} cited instrument(s) unreadable; listed in coverage.json[/yellow]"
         )
-    return sorted(seen)
+    return sorted(seen - set(failed))
 
 
 def bootstrap(config: Config, dry_run: bool = False, limit: int | None = None) -> int:
     """Use the shared fetch/commit pipeline with a complete, verified source closure."""
+    cc = config.get_country("ie")
     expected = set(discover_norm_ids(config, "ie", limit=limit))
     fetched = generic_fetch_all(config, "ie", limit=limit)
     missing = expected - set(fetched)
-    if missing:
-        raise NothingPublished(f"Ireland Acts unavailable: {', '.join(sorted(missing))}")
+    if retry := unresolved(cc.data_dir, missing):
+        raise NothingPublished(f"Ireland Acts unavailable: {', '.join(sorted(retry))}")
     closure = fetch_dependencies(config, fetched)
     total = commit_all_fast(config, "ie", dry_run=dry_run, norm_ids=set(closure))
     if not dry_run:

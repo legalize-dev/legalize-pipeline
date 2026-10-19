@@ -45,4 +45,8 @@ def test_unverified_column_labels_do_not_bypass_ambiguous_row_guard(monkeypatch)
 
     monkeypatch.setattr(pdf.pdfplumber, "open", changed_header)
     with pytest.raises(pdf.UnsupportedPDF, match="Ambiguous row boundaries"):
-        pdf.parse_revised_pdf(source())
+        pdf._parse_revised_pdf(source())
+    # The fallback reading keeps the ruled header row whole: no row is invented.
+    paragraphs, _ = pdf.parse_revised_pdf(source())
+    header = [p.text for p in paragraphs if p.css_class == "table"][2].splitlines()[2]
+    assert header == "| Item (1) | Provision affected (9) | Amendment (3) |"

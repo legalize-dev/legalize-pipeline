@@ -362,7 +362,7 @@ def _incomplete_source_events(monkeypatch, *, additional_missing=()):
     # Limit the contents metadata to the sections represented by the original
     # excerpt pages. The full-source hash is patched separately, never the bytes.
     expected = {"1", "2", "1384", "1384A", "1385", "1386", *additional_missing}
-    monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected))
+    monkeypatch.setattr(parser, "_read", lambda _, **_kw: (events, cutoff, expected))
     return data
 
 
@@ -508,7 +508,9 @@ def test_indented_quoted_titles_do_not_become_primary_sections(monkeypatch):
                 event.page,
                 event.links,
             )
-    monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected | {"890A", "934"}))
+    monkeypatch.setattr(
+        parser, "_read", lambda _, **_kw: (events, cutoff, expected | {"890A", "934"})
+    )
     with pytest.raises(UnsupportedPDF, match="missing sections listed in its contents: 890A, 934"):
         parse_revised_pdf(data)
 
@@ -567,7 +569,7 @@ def test_further_indented_titles_and_labels_are_not_promoted(monkeypatch):
                 event.page,
                 event.links,
             )
-    monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected | {"6A"}))
+    monkeypatch.setattr(parser, "_read", lambda _, **_kw: (events, cutoff, expected | {"6A"}))
     with pytest.raises(UnsupportedPDF, match="missing sections listed in its contents: 6A"):
         parse_revised_pdf(data)
 
@@ -743,7 +745,7 @@ def test_primary_marginal_caption_closes_a_source_quote_with_a_missing_delimiter
     events.insert(
         index, Paragraph("parrafo", "“A source definition without its closing delimiter;")
     )
-    monkeypatch.setattr(parser, "_read", lambda _: (events, cutoff, expected | {"1", "2"}))
+    monkeypatch.setattr(parser, "_read", lambda _, **_kw: (events, cutoff, expected | {"1", "2"}))
     paragraphs, _ = parser.parse_revised_pdf(raw)
     assert "2. **Interpretation**" in [p.text for p in paragraphs if p.css_class == "articulo"]
 

@@ -68,7 +68,7 @@ def test_unknown_bytes_never_inherit_numbering_or_omission_exceptions(record):
 def test_known_bytes_do_not_allow_other_missing_sections(monkeypatch, record):
     raw = source(record)
     events, cutoff, expected = pdf._read(raw)
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected | {"9999"}))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected | {"9999"}))
     with pytest.raises(pdf.UnsupportedPDF, match="9999"):
         pdf.parse_revised_pdf(raw)
 
@@ -80,7 +80,7 @@ def test_a_verified_duplicate_cannot_hide_the_loss_of_one_entry(monkeypatch, ide
     indices = [i for i, e in enumerate(events) if re.search(rf"\b{number}\.\s*—", e.text)]
     assert len(indices) == 2
     del events[indices[0] : indices[1]]
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected))
     with pytest.raises(
         pdf.UnsupportedPDF, match="duplicate section entries were not fully preserved"
     ):
@@ -95,6 +95,6 @@ def test_unnumbered_marginal_section_requires_its_verified_body(monkeypatch):
     first = next(c for c in chars if c["text"] == "A" and c["x0"] > 140)
     first["text"] = "X"
     events[index] = replace(events[index], chars=chars)
-    monkeypatch.setattr(pdf, "_read", lambda _: (events, cutoff, expected))
+    monkeypatch.setattr(pdf, "_read", lambda _, **_kw: (events, cutoff, expected))
     with pytest.raises(pdf.UnsupportedPDF, match="71M"):
         pdf.parse_revised_pdf(raw)

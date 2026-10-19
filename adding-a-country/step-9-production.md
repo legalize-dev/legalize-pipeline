@@ -178,6 +178,13 @@ manifest declares from each law's own frontmatter and compares it to where the
 file actually is. A repo that fails it serves every law's metadata and 404s every
 body — the hardest failure here to notice, because the pages look fine.
 
+A country that declares spec v0.5 (`layout.SPEC_VERSIONS`) also writes
+`coverage.json`, and `health` fails unless every discovered norm is published or
+excluded with a reason, and no exclusion is a network failure — those are retried
+before pushing, never published as gaps. Read the file before pushing: its
+exclusions and gaps are what the corpus does not hold, and each kind new to this
+run gets reviewed, not accepted by default.
+
 **Every issue reported must be zero before pushing.** `health` exits non-zero when
 there are errors, so it can gate a script.
 
