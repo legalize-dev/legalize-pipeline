@@ -160,3 +160,12 @@ def test_instruments_voided_by_non_legislation_are_recorded_as_printed():
             "Making of instrument quashed",
             "Set aside as ultra vires 27/1972, s. 3",
         }
+
+
+def test_glyph_elements_are_kept_as_printed():
+    from lxml import etree
+
+    cell = etree.fromstring(
+        "<p>exceed <pound/>52<nbsp/>10s. but<nbsp/>do, subsection 5<degree/><dagger/></p>"
+    )
+    assert parser._inline_text(cell) == "exceed £52 10s. but do, subsection 5°†"

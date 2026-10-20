@@ -111,6 +111,11 @@ _ENTITY_MAP: dict[str, str] = {
     "osq": "\u2018",  # '
     "csq": "\u2019",  # '
     "bull": "\u2022",  # •
+    # Dropping these glued "£52<nbsp/>10s." into "£5210s." and cut "5°" to "5".
+    "nbsp": " ",
+    "degree": "\u00b0",  # °
+    "dagger": "\u2020",  # †
+    "ddagger": "\u2021",  # ‡
 }
 
 # Tags to skip entirely (decorative or binary).
