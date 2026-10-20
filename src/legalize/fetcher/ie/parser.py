@@ -70,7 +70,8 @@ def _strip_repeated_marker(body: str, num: str) -> str:
     The number sits twice in the source — once in <marker>, once as a <su> that
     opens the body — so the definition came out as "[^1]: ^1 OJ L2023/2831".
     """
-    return body.removeprefix(f"^{num}").lstrip(" ,").strip() or body
+    stripped = body.removeprefix(f"^{_escaped_sign(num)}").removeprefix(f"^{num}")
+    return stripped.lstrip(" ,").strip() or body
 
 
 def _section_heading_text(sect: etree._Element) -> str:
@@ -163,6 +164,20 @@ def _spaced(raw: str, opening: str = "", closing: str = "") -> str:
     )
 
 
+def _escaped_sign(text: str) -> str:
+    """Escape the asterisks a superscript prints first, which Markdown would pair as emphasis.
+
+    "^*[*insert other reason*]" rendered as "^<em>[</em>insert other reason*]", and
+    "120^*1 115^*2" as "120^<em>1 115^</em>2". Call it only when the element's own text
+    starts with them: "^**1**" is a bold superscript.
+    """
+    return re.sub(r"^(\s*)(\*+)", lambda m: m[1] + m[2].replace("*", "\\*"), text)
+
+
+def _prints_asterisk(elem: etree._Element) -> bool:
+    return (elem.text or "").lstrip().startswith("*")
+
+
 def _inline_raw(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
     """The text of ``elem`` before its whitespace is collapsed, so a parent sees its edges.
 
@@ -237,7 +252,8 @@ def _inline_raw(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
 
         # Superscript
         if tag == "su":
-            parts.append(_spaced(_inline_raw(child, ctx), "^"))
+            raw = _inline_raw(child, ctx)
+            parts.append(_spaced(_escaped_sign(raw) if _prints_asterisk(child) else raw, "^"))
             if child.tail:
                 parts.append(child.tail)
             continue
@@ -271,7 +287,8 @@ def _inline_raw(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
         if tag == "fn":
             marker = child.find(".//marker")
             if marker is not None:
-                num = _inline_text(marker).strip().lstrip("^")
+                # The label is the mark itself, not the escaped sign the body prints.
+                num = _inline_text(marker).strip().lstrip("^").replace("\\*", "*")
                 parts.append(f"[^{num}]")
                 if ctx is not None:
                     body_parts = [
@@ -1499,7 +1516,10 @@ def _html_inline_text(
                     text = (
                         f"[^{number}]"
                         if ctx and any(n == number for n, _ in ctx.footnotes)
-                        else f"^{number}"
+                        # Only the body is escaped: the footnote marks are compared, without
+                        # a context, against the raw marks of their definitions.
+                        else "^"
+                        + (_escaped_sign(number) if ctx and _prints_asterisk(child) else number)
                     )
                     # "the sign [<sup>*</sup>] indicates" prints its brackets; unescaped,
                     # "[^*]" would read as a footnote reference with no definition.

@@ -119,11 +119,33 @@ def test_a_sign_the_text_defines_is_a_legend_not_a_footnote():
     legend = html.fromstring(
         "<p><i>In this list the sign</i> [<sup>*</sup>] <i>indicates a priority habitat type.</i></p>"
     )
-    text = parser._html_inline_text(legend)
-    assert text == "*In this list the sign* \\[^*] *indicates a priority habitat type.*"
+    text = parser._html_inline_text(legend, parser._ParseContext())
+    assert text == "*In this list the sign* \\[^\\*] *indicates a priority habitat type.*"
     entry = Paragraph("parrafo", "| 7130 | Blanket bogs (^* if active bog) |")
     assert history._missing_footnotes([Paragraph("parrafo", text), entry]) == set()
     assert history._missing_footnotes([Paragraph("parrafo", "Dunes[^*]")]) == {"*"}
+
+
+def test_an_asterisk_sign_is_not_paired_as_emphasis():
+    from lxml import etree, html
+
+    order = html.fromstring("<p>the order <sup>*</sup>[<i>insert other reason</i>] DIRECTS</p>")
+    body = parser._ParseContext()
+    assert parser._html_inline_text(order, body) == "the order ^\\*[*insert other reason*] DIRECTS"
+    assert parser._html_inline_text(order) == "the order ^*[*insert other reason*] DIRECTS"
+    note = etree.fromstring("<p>Notes for Pawner<su>**</su></p>")
+    assert parser._inline_text(note) == "Notes for Pawner^\\*\\*"
+    rates = html.fromstring(
+        "<p>120<sup>*1</sup> 115<sup>*2</sup> and 17 April 2019<sup><b>1</b></sup></p>"
+    )
+    assert parser._html_inline_text(rates, body) == "120^\\*1 115^\\*2 and 17 April 2019^**1**"
+    # A footnote marked with the sign keeps its plain label, and its body loses the repeat.
+    cited = etree.fromstring(
+        "<p>of 12 March 1985<fn><marker><su>*</su></marker><p><su>*</su> OJ No. L93</p></fn>, or</p>"
+    )
+    ctx = parser._ParseContext()
+    assert parser._inline_text(cited, ctx) == "of 12 March 1985[^*], or"
+    assert ctx.footnotes == [("*", "OJ No. L93")]
 
 
 def test_directory_misprints_of_si_are_read_as_instruments():
