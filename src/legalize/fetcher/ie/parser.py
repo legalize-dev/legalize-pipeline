@@ -1501,6 +1501,14 @@ def _html_inline_text(
                         if ctx and any(n == number for n, _ in ctx.footnotes)
                         else f"^{number}"
                     )
+                    # "the sign [<sup>*</sup>] indicates" prints its brackets; unescaped,
+                    # "[^*]" would read as a footnote reference with no definition.
+                    if (
+                        text.startswith("^")
+                        and parts[-1].endswith("[")
+                        and (child.tail or "").startswith("]")
+                    ):
+                        parts[-1] = parts[-1][:-1] + "\\["
                 elif tag == "a" and text.strip():
                     href = child.get("href", "")
                     if href.startswith("#"):

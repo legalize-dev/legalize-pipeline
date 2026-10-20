@@ -112,14 +112,18 @@ def test_a_signature_misprint_dates_an_instrument_only_when_nothing_else_does(te
 
 
 def test_a_sign_the_text_defines_is_a_legend_not_a_footnote():
+    from lxml import html
+
     from legalize.models import Paragraph
 
-    paragraphs = [
-        Paragraph("parrafo", "*In this list the sign* [^*] *indicates a priority habitat type*."),
-        Paragraph("parrafo", "| 2130 | Fixed coastal dunes (grey dunes)[^*] |"),
-    ]
-    assert history._missing_footnotes(paragraphs) == {"*"}
-    assert history._legend_signs(paragraphs) == {"*"}
+    legend = html.fromstring(
+        "<p><i>In this list the sign</i> [<sup>*</sup>] <i>indicates a priority habitat type.</i></p>"
+    )
+    text = parser._html_inline_text(legend)
+    assert text == "*In this list the sign* \\[^*] *indicates a priority habitat type.*"
+    entry = Paragraph("parrafo", "| 7130 | Blanket bogs (^* if active bog) |")
+    assert history._missing_footnotes([Paragraph("parrafo", text), entry]) == set()
+    assert history._missing_footnotes([Paragraph("parrafo", "Dunes[^*]")]) == {"*"}
 
 
 def test_directory_misprints_of_si_are_read_as_instruments():

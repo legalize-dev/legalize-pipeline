@@ -243,20 +243,9 @@ def fetch_text(client, norm_id: str, meta_data: bytes | None = None) -> bytes:
     ).encode("utf-8")
 
 
-def _legend_signs(paragraphs) -> set[str]:
-    """Signs the text defines itself: "In this list the sign [*] indicates a priority
-    habitat type" (2019/473-477, 522-527) is a legend, not a footnote."""
-    text = "\n".join(paragraph.text for paragraph in paragraphs)
-    return set(
-        re.findall(
-            r"\bthe sign\**\s*\[\^?([^\]\s]+)\]\s*\**\s*(?:indicates|denotes|means)\b", text, re.I
-        )
-    )
-
-
 def _missing_footnotes(paragraphs, *, source_html: bytes | None = None):
     text = "\n".join(paragraph.text for paragraph in paragraphs)
-    references = set(re.findall(r"\[\^([^\]]+)\](?!:)", text))
+    references = set(re.findall(r"(?<!\\)\[\^([^\]]+)\](?!:)", text))
     definitions = set(re.findall(r"^\[\^([^\]]+)\]:", text, re.M))
     if source_html is not None:
         # Revised HTML has bare numeric superscripts: no link or semantic class
@@ -476,7 +465,7 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
                 )
             if not paragraphs:
                 raise ValueError(f"{norm_id}: empty {fmt} source body")
-            if missing := _missing_footnotes(paragraphs) - _legend_signs(paragraphs):
+            if missing := _missing_footnotes(paragraphs):
                 raise ValueError(
                     f"{norm_id}: {fmt} has undefined normative footnotes: {sorted(missing)}"
                 )
