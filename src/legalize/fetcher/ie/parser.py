@@ -142,7 +142,29 @@ def _title_text(title: etree._Element, ctx: _ParseContext | None) -> str:
 
 
 def _inline_text(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
-    """Extract text from an element, resolving ISB entities and inline formatting.
+    """Extract text from an element, resolving ISB entities and inline formatting."""
+    return re.sub(r"\s+", " ", strip_control(_inline_raw(elem, ctx))).strip()
+
+
+def _spaced(raw: str, opening: str = "", closing: str = "") -> str:
+    """Mark up a nested element's text, keeping a space set at its edges outside the marks.
+
+    eISB sometimes sets the space between two words inside an element:
+    "months<i> </i>or" read "monthsor", and "<b>2. </b>(1)" read "**2.**(1)". Its own
+    HTML keeps both. A line break at an edge is the XML's layout and not a space: the
+    HTML prints "<font>\nassociated debtor\n</font>" as "associated debtor".
+    """
+    inner = raw.strip()
+    leading, trailing = raw[: len(raw) - len(raw.lstrip())], raw[len(raw.rstrip()) :]
+    return (
+        (" " if leading and "\n" not in leading else "")
+        + (f"{opening}{inner}{closing}" if inner else "")
+        + (" " if trailing and "\n" not in trailing else "")
+    )
+
+
+def _inline_raw(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
+    """The text of ``elem`` before its whitespace is collapsed, so a parent sees its edges.
 
     Walks child nodes recursively:
     - <b>/<strong> → **text**
@@ -201,34 +223,28 @@ def _inline_text(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
 
         # Bold
         if tag in ("b", "strong"):
-            inner = _inline_text(child, ctx).strip()
-            if inner:
-                parts.append(f"**{inner}**")
+            parts.append(_spaced(_inline_raw(child, ctx), "**", "**"))
             if child.tail:
                 parts.append(child.tail)
             continue
 
         # Italic
         if tag in ("i", "em"):
-            inner = _inline_text(child, ctx).strip()
-            if inner:
-                parts.append(f"*{inner}*")
+            parts.append(_spaced(_inline_raw(child, ctx), "*", "*"))
             if child.tail:
                 parts.append(child.tail)
             continue
 
         # Superscript
         if tag == "su":
-            inner = _inline_text(child, ctx).strip()
-            if inner:
-                parts.append(f"^{inner}")
+            parts.append(_spaced(_inline_raw(child, ctx), "^"))
             if child.tail:
                 parts.append(child.tail)
             continue
 
         # Subscript (no MD equivalent, keep as-is)
         if tag == "sb":
-            parts.append(_inline_text(child, ctx))
+            parts.append(_spaced(_inline_raw(child, ctx)))
             if child.tail:
                 parts.append(child.tail)
             continue
@@ -241,11 +257,11 @@ def _inline_text(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
         # another act, an id we never emitted a heading for — stays plain text.
         # A link that goes nowhere is worse than no link.
         if tag == "xref":
-            inner = _inline_text(child, ctx).strip()
             target = None
             if ctx is not None:
                 target = ctx.anchors.get(child.get("href", "").lstrip("#"))
-            parts.append(f"[{inner}](#{target})" if inner and target else inner)
+            raw = _inline_raw(child, ctx)
+            parts.append(_spaced(raw, "[", f"](#{target})") if target else _spaced(raw))
             if child.tail:
                 parts.append(child.tail)
             continue
@@ -275,7 +291,7 @@ def _inline_text(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
 
         # Font tags: recurse
         if tag == "font":
-            parts.append(_inline_text(child, ctx))
+            parts.append(_spaced(_inline_raw(child, ctx)))
             if child.tail:
                 parts.append(child.tail)
             continue
@@ -287,14 +303,11 @@ def _inline_text(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
             continue
 
         # Fallback: recurse into unknown tags
-        parts.append(_inline_text(child, ctx))
+        parts.append(_spaced(_inline_raw(child, ctx)))
         if child.tail:
             parts.append(child.tail)
 
-    text = "".join(parts)
-    text = strip_control(text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+    return "".join(parts)
 
 
 # ── Table conversion ────────────────────────────────────────────────

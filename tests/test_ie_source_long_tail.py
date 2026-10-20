@@ -169,3 +169,26 @@ def test_glyph_elements_are_kept_as_printed():
         "<p>exceed <pound/>52<nbsp/>10s. but<nbsp/>do, subsection 5<degree/><dagger/></p>"
     )
     assert parser._inline_text(cell) == "exceed £52 10s. but do, subsection 5°†"
+
+
+def test_spaces_set_inside_inline_elements_still_separate_words():
+    from lxml import etree
+
+    cell = etree.fromstring(
+        "<p><b>2. </b>(1) of 2 calendar months<i> </i>or<font> such</font> period "
+        "<xref href='#S'>section 7 </xref>applies</p>"
+    )
+    assert (
+        parser._inline_text(cell)
+        == "**2.** (1) of 2 calendar months or such period section 7 applies"
+    )
+    # A glyph at an element's edge is not a space, though the element's own text ends in one.
+    title = etree.fromstring(
+        "<p><font>Meaning of <odq/></font><font>false</font><font><cdq/>.</font></p>"
+    )
+    assert parser._inline_text(title) == "Meaning of “false”."
+    # A line break at an edge is layout: eISB's own HTML prints this without spaces.
+    title = etree.fromstring(
+        "<p><font>Meaning of <odq/></font><font>\nassociated debtor\n</font><font><cdq/> in</font></p>"
+    )
+    assert parser._inline_text(title) == "Meaning of “associated debtor” in"
