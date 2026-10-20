@@ -25,7 +25,7 @@ from pdfplumber.utils import extract_text
 
 from legalize.fetcher._tables import render_table
 from legalize.fetcher._text import strip_control
-from legalize.fetcher.ie.parser import _legal_format, _quote_delta
+from legalize.fetcher.ie.parser import _escaped_sign, _legal_format, _quote_delta
 from legalize.models import Paragraph
 
 _SECTION = re.compile(r"^(?:(?:F\d+)?\[\s*)?(\d+[A-Z]*)\s*(?:\.|(?=\(1\)))")
@@ -527,6 +527,8 @@ def _inline(line: _Line, *, emphasis: bool = True) -> str:
             result.append(text)
             continue
         if emphasis:
+            if sup:
+                body = _escaped_sign(body)  # still the printed text: no marks yet
             if bold and body not in ("[", "]"):
                 body = f"**{body}**"
             if italic:

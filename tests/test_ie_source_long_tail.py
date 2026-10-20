@@ -119,7 +119,7 @@ def test_a_sign_the_text_defines_is_a_legend_not_a_footnote():
     legend = html.fromstring(
         "<p><i>In this list the sign</i> [<sup>*</sup>] <i>indicates a priority habitat type.</i></p>"
     )
-    text = parser._html_inline_text(legend, parser._ParseContext())
+    text = parser._html_inline_text(legend, escape_signs=True)
     assert text == "*In this list the sign* \\[^\\*] *indicates a priority habitat type.*"
     entry = Paragraph("parrafo", "| 7130 | Blanket bogs (^* if active bog) |")
     assert history._missing_footnotes([Paragraph("parrafo", text), entry]) == set()
@@ -130,15 +130,22 @@ def test_an_asterisk_sign_is_not_paired_as_emphasis():
     from lxml import etree, html
 
     order = html.fromstring("<p>the order <sup>*</sup>[<i>insert other reason</i>] DIRECTS</p>")
-    body = parser._ParseContext()
-    assert parser._html_inline_text(order, body) == "the order ^\\*[*insert other reason*] DIRECTS"
+    assert (
+        parser._html_inline_text(order, escape_signs=True)
+        == "the order ^\\*[*insert other reason*] DIRECTS"
+    )
     assert parser._html_inline_text(order) == "the order ^*[*insert other reason*] DIRECTS"
+    glyph = etree.fromstring('<p>25 July 1985<su><unicode ch="002A"/></su> on the</p>')
+    assert parser._inline_text(glyph) == "25 July 1985^\\* on the"
     note = etree.fromstring("<p>Notes for Pawner<su>**</su></p>")
     assert parser._inline_text(note) == "Notes for Pawner^\\*\\*"
     rates = html.fromstring(
         "<p>120<sup>*1</sup> 115<sup>*2</sup> and 17 April 2019<sup><b>1</b></sup></p>"
     )
-    assert parser._html_inline_text(rates, body) == "120^\\*1 115^\\*2 and 17 April 2019^**1**"
+    assert (
+        parser._html_inline_text(rates, escape_signs=True)
+        == "120^\\*1 115^\\*2 and 17 April 2019^**1**"
+    )
     # A footnote marked with the sign keeps its plain label, and its body loses the repeat.
     cited = etree.fromstring(
         "<p>of 12 March 1985<fn><marker><su>*</su></marker><p><su>*</su> OJ No. L93</p></fn>, or</p>"

@@ -175,7 +175,11 @@ def _escaped_sign(text: str) -> str:
 
 
 def _prints_asterisk(elem: etree._Element) -> bool:
-    return (elem.text or "").lstrip().startswith("*")
+    """Whether the element's own content opens with an asterisk, not with markup."""
+    if (text := (elem.text or "").strip()) or not len(elem):
+        return text.startswith("*")
+    first = elem[0]  # "<su><unicode ch="002A"/></su>" (1990/10)
+    return first.tag == "unicode" and first.get("ch", "").upper().lstrip("0") == "2A"
 
 
 def _inline_raw(elem: etree._Element, ctx: _ParseContext | None = None) -> str:
@@ -998,12 +1002,14 @@ class ISBTextParser(TextParser):
             if node.tag == "table":
                 if in_body:
                     flush()
-                    text = render_table(node, lambda cell: _html_inline_text(cell, ctx))
+                    text = render_table(
+                        node, lambda cell: _html_inline_text(cell, ctx, escape_signs=True)
+                    )
                     if text:
                         paragraphs.append(Paragraph(css_class="table", text=text))
                 continue
             plain = _html_text(node)
-            text = _html_inline_text(node, ctx)
+            text = _html_inline_text(node, ctx, escape_signs=True)
             if not plain:
                 continue
             if not in_body:
@@ -1099,7 +1105,7 @@ class ISBTextParser(TextParser):
                 for e in (element, *element.iterancestors())
             ):
                 continue
-            text = _html_inline_text(element)
+            text = _html_inline_text(element, escape_signs=True)
             plain = _html_text(element)
             if in_body and plain == "INDEX":
                 break
@@ -1202,7 +1208,7 @@ def parse_revised_html(data: bytes) -> tuple[list[Paragraph], date | None]:
             for paragraph in footer.iter("p"):
                 marker = paragraph.find(".//sup")
                 if marker is not None and (number := _html_text(marker)).isdigit():
-                    text = _html_inline_text(paragraph, base_url=_REVISED_BASE)
+                    text = _html_inline_text(paragraph, base_url=_REVISED_BASE, escape_signs=True)
                     ctx.footnotes.append((number, _strip_repeated_marker(text, number)))
     seen: set[str] = set()
     for root in roots:
@@ -1251,7 +1257,8 @@ def parse_revised_html(data: bytes) -> tuple[list[Paragraph], date | None]:
             if in_preamble and plain:
                 paragraphs.append(
                     Paragraph(
-                        css_class="parrafo", text=_html_inline_text(paragraph, ctx, _REVISED_BASE)
+                        css_class="parrafo",
+                        text=_html_inline_text(paragraph, ctx, _REVISED_BASE, escape_signs=True),
                     )
                 )
 
@@ -1263,12 +1270,14 @@ def parse_revised_html(data: bytes) -> tuple[list[Paragraph], date | None]:
             css, heading = headings[element]
             paragraphs.append(Paragraph(css_class=css, text=heading))
         if element.tag == "table":
-            text = render_table(element, lambda cell: _html_inline_text(cell, ctx, _REVISED_BASE))
+            text = render_table(
+                element, lambda cell: _html_inline_text(cell, ctx, _REVISED_BASE, escape_signs=True)
+            )
             if text:
                 paragraphs.append(Paragraph(css_class="table", text=text))
             return
         if element.tag == "p":
-            text = _html_inline_text(element, ctx, _REVISED_BASE)
+            text = _html_inline_text(element, ctx, _REVISED_BASE, escape_signs=True)
             if text:
                 paragraphs.append(Paragraph(css_class="parrafo", text=text))
             return
@@ -1439,8 +1448,14 @@ def _html_inline_text(
     elem,
     ctx: _ParseContext | None = None,
     base_url: str = "https://www.irishstatutebook.ie",
+    *,
+    escape_signs: bool = False,
 ) -> str:
-    """Preserve nested emphasis, links and separators without dropping text tails."""
+    """Preserve nested emphasis, links and separators without dropping text tails.
+
+    ``escape_signs`` is for body text. Footnote definitions and the marks compared with
+    them are read with the plain sign.
+    """
 
     def inline(node):
         parts = [node.text or ""]
@@ -1516,10 +1531,12 @@ def _html_inline_text(
                     text = (
                         f"[^{number}]"
                         if ctx and any(n == number for n, _ in ctx.footnotes)
-                        # Only the body is escaped: the footnote marks are compared, without
-                        # a context, against the raw marks of their definitions.
                         else "^"
-                        + (_escaped_sign(number) if ctx and _prints_asterisk(child) else number)
+                        + (
+                            _escaped_sign(number)
+                            if escape_signs and _prints_asterisk(child)
+                            else number
+                        )
                     )
                     # "the sign [<sup>*</sup>] indicates" prints its brackets; unescaped,
                     # "[^*]" would read as a footnote reference with no definition.
