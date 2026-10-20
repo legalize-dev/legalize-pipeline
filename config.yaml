@@ -406,7 +406,9 @@ countries:
       isb_base_url: "https://www.irishstatutebook.ie"
       api_base_url: "https://api.oireachtas.ie"
       request_timeout: 45
-      max_retries: 3
+      # eISB answers bursts with a 403 that clears in seconds; 1+2+4+8 s of backoff
+      # rides it out where three attempts (1+2 s) did not.
+      max_retries: 5
       requests_per_second: 1.0
 
   ua:

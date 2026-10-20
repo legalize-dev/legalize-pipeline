@@ -1595,7 +1595,7 @@ def write_country_meta(config: Config, country: str) -> None:
     console.print(f"  [dim]Wrote {meta_path}[/dim]")
 
 
-def write_repo_meta(config: Config, country: str) -> None:
+def write_repo_meta(config: Config, country: str, *, coverage: dict | None = None) -> None:
     """Write repo-level meta files (.github/FUNDING.yml, ...) into the country repo.
 
     These are project metadata, not legislative records. They are committed as a
@@ -1621,10 +1621,11 @@ def write_repo_meta(config: Config, country: str) -> None:
 
     files = repo_meta_files(country)
     if tuple(map(int, spec_version_for(country).split("."))) >= (0, 5):
-        # §Coverage: measured from the repo and the discovery index at publication.
+        # §Coverage: measured from the repo and the discovery index at publication,
+        # unless a daily, which holds neither, carries the last report forward.
         previous = repo_dir / "coverage.json"
         files["coverage.json"] = render_coverage(
-            coverage_report(repo_dir, cc.data_dir, SOURCE_INDEX[country]),
+            coverage or coverage_report(repo_dir, cc.data_dir, SOURCE_INDEX[country]),
             previous.read_text(encoding="utf-8") if previous.exists() else None,
         )
     changed = [

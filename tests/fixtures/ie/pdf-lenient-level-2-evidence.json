@@ -1,0 +1,23 @@
+[
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2026-07-16",
+  "url": "https://revisedacts.lawreform.ie/eli/2018/act/7/revised/en/pdf?annotations=false",
+  "sha256": "27873a691026886c402a53e3d6e17d945c2c294d7a1f00044b5055839d23b6fa",
+  "file": "archive-ie-2018-act-7-roman-title.pdf.gz"
+ },
+ {
+  "identifier": "IE-1957-act-6",
+  "date": "2025-12-09",
+  "url": "https://revisedacts.lawreform.ie/eli/1957/act/6/revised/en/pdf?annotations=false",
+  "sha256": "b8af1c77dda4feb76df1da89234e80939f4e86e3aa337cb2c84da539b3ed93d1",
+  "file": "archive-ie-1957-act-6-subsection-captions.pdf.gz"
+ },
+ {
+  "identifier": "IE-2017-act-22",
+  "date": "2026-02-03",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2017/22/act_new_plain.pdf?versionId=b6ORB9C.cNn8YdHQWN8QemQwZgvYL7Hc",
+  "sha256": "93889177538fa7caa3313391b7c1a90251ad0ff655a2a817cc346e21c8e5b6f9",
+  "file": "archive-ie-2017-act-22-misprinted-quotes.pdf.gz"
+ }
+]

@@ -37,6 +37,7 @@ on:
   workflow_run:
     workflows:
       - "Daily update"
+      - "Daily update (Ireland)"
       - "Monthly update (Argentina)"
       - "Monthly update (Switzerland)"
       - "Monthly update (Colombia)"

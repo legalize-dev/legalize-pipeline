@@ -1,0 +1,103 @@
+name: Daily update (Ireland)
+
+# Ireland is not on daily-update.yml's matrix. That matrix caps a job at 55
+# minutes because its App token, minted at job start, lives about an hour.
+# The Irish daily refreshes only the norms whose sources changed (see
+# src/legalize/fetcher/ie/daily.py), but refreshing one Act re-reads all of its
+# Law Reform Commission versions, and for the largest that is minutes of PDF
+# parsing each. So this job works to a four-hour budget, carries the rest to
+# the next run, and mints its push token only at the end.
+
+on:
+  schedule:
+    # Mon-Sat at 10:30 UTC, after the matrix
+    - cron: "30 10 * * 1-6"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-update-ie
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    # The pipeline stops starting work at `daily_minutes` (240) and pushes in
+    # the hour left, so the job never reaches this limit with commits unpushed.
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      # The corpus is public: reading it needs no token. Treeless and sparse,
+      # like the matrix (see daily-update.yml): the run reads the commit graph
+      # and opens only the directories it writes to.
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          repository: legalize-dev/legalize-ie
+          path: repos/ie
+          fetch-depth: 0
+          filter: tree:0
+          sparse-checkout: .github
+          sparse-checkout-cone-mode: true
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      # .pipeline/ie holds the run state and sources.json: which directory pages
+      # were read under the current cursor, and the norms still to refresh. A
+      # missing cache falls back to the baseline committed with the code.
+      - name: Restore the daily's state
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: .pipeline/ie
+          key: daily-state-ie-${{ github.run_id }}
+          restore-keys: daily-state-ie-
+
+      - name: Run daily pipeline
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          legalize -o countries.ie.source.daily_minutes=240 \
+            daily -c ie --repo-path repos/ie
+
+      # Saved even when the run ends red: a law that cannot be appended to is
+      # recorded once for a local rebuild, not retried and reported every day.
+      - name: Save the daily's state
+        if: always()
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: .pipeline/ie
+          key: daily-state-ie-${{ github.run_id }}
+
+      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        id: app-token
+        if: always()
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-ie
+
+      - name: Push
+        if: always()
+        working-directory: repos/ie
+        env:
+          PUSH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          if [ -z "$(git rev-list origin/main..HEAD)" ]; then
+            echo "No new commits to push."
+          else
+            git push "https://x-access-token:${PUSH_TOKEN}@github.com/legalize-dev/legalize-ie.git" HEAD:main
+          fi
+
+      - name: Fail explicitly on cancellation
+        if: cancelled()
+        run: |
+          echo "::error::Job was cancelled — failing explicitly so it can't hide as a soft grey status."
+          exit 1

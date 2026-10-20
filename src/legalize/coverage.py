@@ -74,18 +74,31 @@ def unresolved(data_dir: str | Path, norm_ids) -> list[str]:
 
 
 def _frontmatter(path: Path) -> dict:
-    lines = []
     with path.open(encoding="utf-8") as handle:
-        if handle.readline().strip() != "---":
-            return {}
-        for line in handle:
-            if line.strip() == "---":
-                break
-            lines.append(line)
+        return _frontmatter_of(handle)
+
+
+def _frontmatter_of(lines) -> dict:
+    lines = iter(lines)
+    if next(lines, "").strip() != "---":
+        return {}
+    block = []
+    for line in lines:
+        if line.strip() == "---":
+            break
+        block.append(line if line.endswith("\n") else line + "\n")
     try:
-        return yaml.safe_load("".join(lines)) or {}
+        return yaml.safe_load("".join(block)) or {}
     except yaml.YAMLError:
         return {}
+
+
+def _gaps(front: dict) -> dict[str, int]:
+    counts = {}
+    for field, total in GAP_FIELDS.items():
+        raw = front.get(field)
+        counts[total] = len(json.loads(raw) if isinstance(raw, str) else raw) if raw else 0
+    return counts
 
 
 def coverage_report(repo_dir: str | Path, data_dir: str | Path, source_index: str) -> dict:
@@ -100,12 +113,9 @@ def coverage_report(repo_dir: str | Path, data_dir: str | Path, source_index: st
     published = {path.stem for path in laws}
     counts = {key: 0 for total in GAP_FIELDS.values() for key in (total, f"laws_with_{total}")}
     for path in laws:
-        front = _frontmatter(path)
-        for field, total in GAP_FIELDS.items():
-            if raw := front.get(field):
-                items = json.loads(raw) if isinstance(raw, str) else raw
-                counts[total] += len(items)
-                counts[f"laws_with_{total}"] += 1
+        for total, items in _gaps(_frontmatter(path)).items():
+            counts[total] += items
+            counts[f"laws_with_{total}"] += bool(items)
     index = data / "discovery_ids.txt"
     discovered = (
         [line.strip() for line in index.read_text().splitlines() if line.strip()]
@@ -137,6 +147,69 @@ def coverage_report(repo_dir: str | Path, data_dir: str | Path, source_index: st
         "laws_with_undated_amendments": counts["laws_with_undated_amendments"],
         "undated_amendments": counts["undated_amendments"],
     }
+
+
+def update_report(
+    repo_dir: str | Path,
+    before: str,
+    data_dir: str | Path,
+    *,
+    published: set[str],
+    discovered: int | None = None,
+) -> dict:
+    """The last ``coverage.json`` carried forward by what a daily changed since ``before``.
+
+    A daily works on a sparse checkout without the discovery index, so it cannot
+    measure the repo again. What it knows exactly is what it changed: the law files
+    between ``before`` and HEAD, and the failures it recorded in ``data_dir``.
+    ``published`` is every norm the repo holds now.
+    """
+    import subprocess
+
+    repo = Path(repo_dir)
+
+    def git(*args: str) -> str:
+        return subprocess.run(
+            ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True
+        ).stdout
+
+    report = json.loads(git("show", f"{before}:coverage.json"))
+    report["as_of"] = date.today().isoformat()
+    changes = [
+        line.split("\t", 1)
+        for line in git("diff", "--name-status", "--no-renames", before, "HEAD").splitlines()
+    ]
+    for status, path in changes:
+        if "/" not in path or path.startswith(".") or not path.endswith(".md"):
+            continue
+        old = (
+            _gaps(_frontmatter_of(git("show", f"{before}:{path}").splitlines()))
+            if status != "A"
+            else {}
+        )
+        new = (
+            _gaps(_frontmatter_of(git("show", f"HEAD:{path}").splitlines()))
+            if status != "D"
+            else {}
+        )
+        report["published"] += {"A": 1, "D": -1}.get(status, 0)
+        for total in GAP_FIELDS.values():
+            report[total] += new.get(total, 0) - old.get(total, 0)
+            report[f"laws_with_{total}"] += bool(new.get(total)) - bool(old.get(total))
+    excluded = {e["identifier"]: e for e in report["excluded"] if e["identifier"] not in published}
+    failures = Path(data_dir) / "failures"
+    for path in sorted(failures.glob("*.json")) if failures.exists() else []:
+        record = json.loads(path.read_text(encoding="utf-8"))
+        if record["identifier"] not in published:
+            excluded[record["identifier"]] = {
+                "identifier": record["identifier"],
+                "reason": record["reason"],
+                **({"transient": True} if record.get("transient") else {}),
+            }
+    report["excluded"] = [excluded[key] for key in sorted(excluded)]
+    if discovered is not None:
+        report["discovered"] = discovered
+    return report
 
 
 def render(report: dict, previous: str | None = None) -> str:

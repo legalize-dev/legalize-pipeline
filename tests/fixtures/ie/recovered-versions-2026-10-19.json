@@ -1,0 +1,338 @@
+[
+ {
+  "identifier": "IE-1957-act-6",
+  "date": "2018-06-09",
+  "sha256": "07a12cfba4349d0992e8f48fc907a93d41e4eb4ee62f44c97bfaab9d7bfdc460",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1957/6/act_new_plain.pdf?versionId=x.JXIIq708MJLrSBgjE9pI49j.21O6MR",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-1957-act-6",
+  "date": "2025-12-09",
+  "sha256": "b8af1c77dda4feb76df1da89234e80939f4e86e3aa337cb2c84da539b3ed93d1",
+  "url": "https://revisedacts.lawreform.ie/eli/1957/act/6/revised/en/pdf?annotations=false",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2019-01-21",
+  "sha256": "92cb924ddad0b41b7dc7257c748a209edf036e5b6a6c64a5552148a07d032629",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=null",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2019-05-30",
+  "sha256": "338211ec9ab294c0f4c06e9da0075009a0d7dc131cdc7ba70fe070bf5a4f06df",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=aszH1Wgby9DbEFdllX4FjlQgt7Psnhu4",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2019-11-25",
+  "sha256": "cc3b256028b87df14c5d165f54a2e4f134e4d367f8acd111ac65f99e2ba16f35",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=oHVPIxNap8ij4jvZyTI1zbRWCY2CnyqO",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2020-03-20",
+  "sha256": "0e6a71c087348c114af043d64cab93c1bb0a3cb9a549a2ca6c3fc2524c858815",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=ColLPkwEmlRYsk7RG.xkzqkuNcczFIBa",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2020-07-29",
+  "sha256": "8c58d2f3c9de70ac0623f68e8d0938668e3dc4f265a3acda872f5e3be55c92ad",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=LDolbJWLusbWraPxT2JpFYVESsuPsHPp",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2020-10-01",
+  "sha256": "23437f0ce78ed55a7d46997fa13cebe8c080910435ad2e03b847882e5ad2e90f",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=P.WZr29VPmetSQRYB8fFe.WMEZOLFbpW",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2020-11-09",
+  "sha256": "fb2dc753f719cd3bdb9c8f3de541040aa8da679fc41b7c4f1699e312fd818f14",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=52e7XyGVTVeaLWOSduDZuFULaL.n_RSH",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2020-11-30",
+  "sha256": "4726019be426091d75f63dbbfc76be949b4c10dc609eda9de953925938af862f",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=ZmDI6375XHVDk9tHNSZOdULD4ChzMU4D",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-1961-act-24",
+  "date": "2021-06-24",
+  "sha256": "f9621ef9b2a53785344b624b9dff045fd3560b660f63f89a7214ac9abda4f8b7",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/1961/24/act_plain.pdf?versionId=k45H0lYjmtRGXCUjSGY_Zocxw5oKbrz2",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 72A"
+ },
+ {
+  "identifier": "IE-2000-act-30",
+  "date": "2025-06-19",
+  "sha256": "e411effc12b6193d93d652db6a973773a8eb7a45c4463db85267f4f52f03fb29",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2000/30/act_new_plain.pdf?versionId=hTwmNGuQdXof4.eHeNcNUiUb4b3p_Jgw",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2000-act-30",
+  "date": "2025-08-06",
+  "sha256": "414848ee8a8158ff5ca3d316f2d4b355872dacaaa43ff29601d965ddde498fc3",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2000/30/act_new_plain.pdf?versionId=DpH4RMABvNLr75Qoq4Y_gS5ZXblFXIBZ",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2000-act-30",
+  "date": "2025-10-02",
+  "sha256": "b9b76cb50e52d467ac76be78cc02985cc5ccc930a3f819ea195e40c2e37fe31b",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2000/30/act_new_plain.pdf?versionId=WHNCbSAv9pKOhDjLp_vFE7aftNbmAANi",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2000-act-30",
+  "date": "2025-11-12",
+  "sha256": "cad7814f81a4184b3ef25bc0d9d2f28be7e0afd932228bdecf595b615777c647",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2000/30/act_new_plain.pdf?versionId=Gn6m9CpCyulZyVapGsTGWZHJ1LdO_Ggq",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2000-act-30",
+  "date": "2025-12-31",
+  "sha256": "a7be62112d38ffecde3b1e09c3c70e9d2ab13bce3d3f190e853b8a96fcc8769c",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2000/30/act_new_plain.pdf?versionId=8kwfBXmB.uD62Tvi6qJBn.XZP5CbJWlf",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2000-act-30",
+  "date": "2026-04-04",
+  "sha256": "53e561416195e572907c31d162faea79ea41353fbcbb81be9926bc3350a17d21",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2000/30/act_new_plain.pdf?versionId=KSa1COdeBPyPek8f8yfyKPVCEsPB3vaM",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2000-act-30",
+  "date": "2026-05-26",
+  "sha256": "f7a06c43f9d43836e72baab191bc9ca6e84ec7a55d2f7e0a06df1d9b6d4218a3",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2000/30/act_new_plain.pdf?versionId=U01LSQNm.9MS.HiSiYHXrlZYITZMJkIO",
+  "published_gap_reason": "Unassigned marginal text in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2023-06-01",
+  "sha256": "99607d467a9c960d555b24545769d06a6b8af43ad1b8f0bcf2cd805914cde7aa",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=kNDvs6RyBOUY_bexoyzEqFRkwxIyn7UN",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2023-09-01",
+  "sha256": "5e0ca07c6cb77d82e5e12af49aaf0a24d74e84ff382ed28c6d0d0d6986a1991e",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=epRDPpFvFRk3nB2TPkvgHvulBG29vc2w",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2024-06-28",
+  "sha256": "c84d4e4568125626ae40e43d15553c0400809368d1c5a3a182a788c0c1f6d8af",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=BvlnXF6aMOxv5RVuf.F3w6aETdSwF2_i",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2024-12-06",
+  "sha256": "616d038251cccd5eb0556d668a3d08489f7312fb72dcef45f2c68d61b5ce60a5",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=VjOhgodxqeFzV07pa5LmIYQMdHoMO1R8",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2025-02-17",
+  "sha256": "6dd32ace5b956bc99d9d2364c003c36cd4460fc33e0c2ed62a6096d124abdc0e",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=RB08SUYU2DPu3BXemmUp_mX.LpF.rFDK",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2025-05-10",
+  "sha256": "38dea8df7b99e3663e6add7b2652ebc5571afe0f9fbbdda782519c9d204f31d0",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=zNaYwy_WNJpRDe90B8pUIqiOHy_56JYi",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2025-05-21",
+  "sha256": "29b4d19f893b9e6e46ea37c8d8b53e58200db5fa3d61f1df5ce47603d023b9b7",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=9Gx35OeebXbClZfkr51Lzj7fGR8MjbM1",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2025-12-05",
+  "sha256": "c2d989bae87bfe6b92dad9538064636e2d48dca1c26f4f30b91618c8c28f63f2",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=yWRWoVY26jvJF3IloBNTDHFDQXL1fCpa",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2025-12-14",
+  "sha256": "c10e76838c161e5757431f0591e3f48196b4b3e3a06ede35d7a2522fb6f1f27c",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=.5S_OKDG56xP.vSIXKtgWJ59FMIuIEi5",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2013-act-15",
+  "date": "2025-12-29",
+  "sha256": "f2b60c101fc7e850b1d19574649675b348ded9b0f14a0e785531dd9dfb6022d7",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2013/15/act_new_plain.pdf?versionId=2pbsekIuGv7efFWrgSXXmhAxBAA9_5h0",
+  "published_gap_reason": "Duplicate primary section 69 in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2014-act-11",
+  "date": "2025-04-02",
+  "sha256": "d34b1f41d6a06378d23be4b3bd90020e8afa863a0483e65780a34612bb636c74",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/11/act_new_plain.pdf?versionId=DKxz6LdkyKthiKSPr4cA_ZrFYqE_K7aC",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 99"
+ },
+ {
+  "identifier": "IE-2014-act-11",
+  "date": "2026-03-26",
+  "sha256": "1a741bf82276b11720dfffb912be65c4524eafcc50d98affc58652d1ae4203b2",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2014/11/act_new_plain.pdf?versionId=5MYnae7eUZYqkm7VZO8wSrmfwDSSCGQx",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 99"
+ },
+ {
+  "identifier": "IE-2017-act-22",
+  "date": "2025-05-09",
+  "sha256": "cb95a61531e117557f8b542e4d7b5aee76b0be140fee56679dcb7d39c7bc56ca",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2017/22/act_new_plain.pdf?versionId=sJp8ag60TvZGaFnZQ0YJqiUVG4V8ZYlQ",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 3, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 4, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 6, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 7, 70, 71, 72, 73, 74, 75, 76, 77, 8, 9"
+ },
+ {
+  "identifier": "IE-2017-act-22",
+  "date": "2026-02-03",
+  "sha256": "93889177538fa7caa3313391b7c1a90251ad0ff655a2a817cc346e21c8e5b6f9",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2017/22/act_new_plain.pdf?versionId=b6ORB9C.cNn8YdHQWN8QemQwZgvYL7Hc",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 3, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 4, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 6, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 7, 70, 71, 72, 73, 74, 75, 76, 77, 8, 9"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2023-07-31",
+  "sha256": "65ff5fd0cfc2b8e748bcfe6b025a2c3b4cba61b5652665208270a70191a52239",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=ZI7b.kxdroYok7KuhZvorxq3b1iDCbZD",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2024-04-30",
+  "sha256": "6798c39f8fa72e5e01247f49067eeabc15f6a6a50ac9f853fa2c19f375a60e12",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=zP.R8Z2qjCdqzK5gDh42y560CvFGJaCe",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2024-11-07",
+  "sha256": "6f09060f282eb9cdcbdc122483f08daf0eaf255e1b5121e205a960b528d45922",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=DCwQ3Kh9PZilIc.RLC6sRvO1ESgVXWvI",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2024-12-23",
+  "sha256": "10248aeec85a13fbc0e0f397e45aabebfcd6884098722ef7856fd5ebd0f86410",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=v0gq9fV586knGs1gXHxB4aPHhr4caymH",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2025-07-21",
+  "sha256": "825191602d750f96184d0b60608c66d5f72d8821ab2605fc23624ad9aba32cc3",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=UeX.eIwrQ.k2g3r3dbpPydymyRZsFj7U",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2026-02-04",
+  "sha256": "3a411a148c6fa1cff6d5ebba8f4c495138cc188d4bbffecc3b3e117bd8d7f07e",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=5GKxXKomiLHxo5lgGbO2vYEPGO2lYUeF",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2026-04-09",
+  "sha256": "8cf13e83991a59600ea00a0b4e84dc28ff3cf9daadf667629ea6d217d2eda733",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=RFFSx1gDkmdUo_TDC22jxbyDfXwp7RCe",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2026-06-12",
+  "sha256": "4515bd8e4e935533bcab3e44e00285efe2eedc3d09c23294e6b56795956de7b5",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=EtKHDkRxopet8deRgkpJ8QY9ZLiFqRQX",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2026-06-25",
+  "sha256": "691cb01c84691140d408d07ad0440e37edc02408faa985c2afb1f1f657b19df6",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2018/7/act_new_plain.pdf?versionId=eqLJ8XbPGEOGvVsValQYrGWDpf5NuI5T",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2018-act-7",
+  "date": "2026-07-16",
+  "sha256": "27873a691026886c402a53e3d6e17d945c2c294d7a1f00044b5055839d23b6fa",
+  "url": "https://revisedacts.lawreform.ie/eli/2018/act/7/revised/en/pdf?annotations=false",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 137"
+ },
+ {
+  "identifier": "IE-2021-act-50",
+  "date": "2023-12-31",
+  "sha256": "4bdefd976f31c3d48b1526a5e26c395a71c030977f33897c8ec65a5eeb0dfcc2",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2021/50/act_new_plain.pdf?versionId=PO6zwejGZRRlYRv25lgBfQdYQ3EicmgX",
+  "published_gap_reason": "Duplicate primary section 144A in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2021-act-50",
+  "date": "2024-05-14",
+  "sha256": "2749b2dddbe86246dca1b0a58300c69e01518ea993b56df980ec82414596b210",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2021/50/act_new_plain.pdf?versionId=_wXBbPviK_v70O3Pi45hyPtrFujWleoa",
+  "published_gap_reason": "Duplicate primary section 144A in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2021-act-50",
+  "date": "2025-10-02",
+  "sha256": "02f91041c6a5a47f07238d6d1499b61baeb06e4bbefe2ec5b314cb919e5b1ae4",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2021/50/act_new_plain.pdf?versionId=LGm.reRzjHn6r3TBvBOdgkREKM_wVCnD",
+  "published_gap_reason": "Duplicate primary section 144A in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2021-act-50",
+  "date": "2026-03-13",
+  "sha256": "fe37931eb85968763d8be1da823551dbcb99b61848578b7918207bc88d0a8b84",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2021/50/act_new_plain.pdf?versionId=wHD.U_g31CuRth2YnbIAVJKg_lfWeXBO",
+  "published_gap_reason": "Duplicate primary section 144A in Revised Act PDF"
+ },
+ {
+  "identifier": "IE-2021-act-50",
+  "date": "2026-06-16",
+  "sha256": "913c5ca7831846476ca8864dc8153ac05262c4e80783f3822ca24f2494f33da2",
+  "url": "https://rev-acts.s3.eu-west-1.amazonaws.com/2021/50/act_new_plain.pdf?versionId=nNY9nPH69eNYCXRe78Ih9ZhB8dhwM1NZ",
+  "published_gap_reason": "Revised Act PDF is missing sections listed in its contents: 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 143A, 143B, 143C, 143D, 144, 144A, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 166A, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 33B, 96, 97, 98, 99"
+ },
+ {
+  "identifier": "IE-2023-act-3",
+  "date": "2024-07-23",
+  "sha256": "b100a253b232b32e13d1c254b4e0ebe005fc7fa3477705e5fd3c3f2c74999348",
+  "url": "https://revisedacts.lawreform.ie/eli/2023/act/3/revised/en/pdf?annotations=false",
+  "published_gap_reason": "Image-only Revised Act PDF body page: 94"
+ }
+]

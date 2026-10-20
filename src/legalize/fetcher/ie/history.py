@@ -72,11 +72,17 @@ _OMITTED_SNAPSHOTS = {
 }
 
 
+# The modules a parse reads. Orchestration (bootstrap, daily, discovery, revised) and
+# the package's re-exports are left out: changing how a run is scheduled must not
+# mark every stored result stale.
+PARSE_MODULES = ("client", "effects", "history", "parser", "pdf")
+
+
 @lru_cache(maxsize=1)
 def _parser_revision() -> str:
     directory = Path(__file__).parent
     return hashlib.sha256(
-        b"".join(path.read_bytes() for path in sorted(directory.glob("*.py")))
+        b"".join((directory / f"{name}.py").read_bytes() for name in PARSE_MODULES)
     ).hexdigest()
 
 
@@ -239,7 +245,7 @@ def fetch_text(client, norm_id: str, meta_data: bytes | None = None) -> bytes:
 
 def _missing_footnotes(paragraphs, *, source_html: bytes | None = None):
     text = "\n".join(paragraph.text for paragraph in paragraphs)
-    references = set(re.findall(r"\[\^([^\]]+)\](?!:)", text))
+    references = set(re.findall(r"(?<!\\)\[\^([^\]]+)\](?!:)", text))
     definitions = set(re.findall(r"^\[\^([^\]]+)\]:", text, re.M))
     if source_html is not None:
         # Revised HTML has bare numeric superscripts: no link or semantic class
@@ -386,8 +392,10 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
                 if count:
                     image_counts[record["url"]] = count
             if fmt == "enacted":
-                blocks = ISBTextParser().parse_text(raw, published_on=metadata.publication_date)
+                text_parser = ISBTextParser()
+                blocks = text_parser.parse_text(raw, published_on=metadata.publication_date)
                 paragraphs = tuple(p for block in blocks for p in block.versions[0].paragraphs)
+                warning = text_parser.source_warning
                 cutoff = metadata.publication_date
                 state = metadata.text_state or TextState.AS_ENACTED
                 source_id = norm_id
@@ -517,7 +525,9 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
     metadata = replace(
         metadata,
         # An undated repeal still counts today; it cannot be placed in the history.
-        status=_status_at(envelope["effects"], today),
+        status=NormStatus.REPEALED
+        if norm_id in _VOID_BY_NON_LEGISLATIVE_ACT
+        else _status_at(envelope["effects"], today),
         extra=metadata.extra
         + (
             (
@@ -579,6 +589,23 @@ def _parse_on(data: bytes, today: date) -> ParsedNorm:
     return ParsedNorm(
         metadata, (Block("full-text", "document", "", tuple(versions)),), tuple(dated_reforms)
     )
+
+
+# Instruments the Legislation Directory records as quashed, set aside or annulled by
+# something that is not legislation, verified on 2026-10-19 against its rows. They are
+# no longer law; no commit dates that, because nothing in this corpus enacted it.
+_VOID_BY_NON_LEGISLATIVE_ACT = {
+    "IE-2018-si-89": "Annulled 29 May 2018: Dáil Éireann debate -Tuesday, 29 May 2018 "
+    "Vol. 969 No. 7",
+    "IE-2018-si-355": "Making of instrument quashed: Sweetman v Minister for Culture, Heritage "
+    "and the Gaeltacht and others, Meenan J., 5 Dec 2019, Case No. 2018 1009 JR",
+    **{
+        norm_id: "Set aside as ultra vires 27/1972, s. 3: Friends of the Irish Environment "
+        "Limited v. Minister for Communications, Climate Act and Environment and Others [2019] "
+        "IEHC 646 para. 221 and [2019] IEHC 685 para. 11."
+        for norm_id in ("IE-2019-si-4", "IE-2019-si-12")
+    },
+}
 
 
 def _gap(norm_id: str, record: dict, reason: str) -> dict:
