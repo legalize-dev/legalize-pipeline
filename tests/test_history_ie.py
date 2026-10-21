@@ -711,3 +711,57 @@ def test_each_pinned_layout_correction_has_its_evidence():
         assert record["replaced"]["catalog_date"] == record["cutoff"]
         assert record["corrected"]["catalog_date"] > record["cutoff"]
         assert record["basis"]
+
+
+@pytest.mark.parametrize("committer", [commit_one, commit_all_fast])
+def test_a_consolidation_moved_to_the_archive_keeps_its_published_reading(tmp_path, committer):
+    # The LRC's HTML page serves only its latest consolidation. A newer one moves the
+    # previous one to an archived PDF under the same date, and the PDF reads differently.
+    from legalize.pipeline import HistoryMismatch
+
+    metadata = ISBMetadataParser().parse(
+        (FIXTURES / "sample-environment-2015.xml").read_bytes(), IDENTIFIER
+    )
+    enacted, older, newer = metadata.publication_date, date(2024, 12, 31), date(2026, 8, 10)
+    older_id, newer_id = f"revised-{IDENTIFIER}@{older}", f"revised-{IDENTIFIER}@{newer}"
+    page = "https://revisedacts.lawreform.ie/eli/2015/act/29/revised/en/html"
+
+    def version(norm_id, day, text, state, source):
+        paragraphs = (Paragraph("parrafo", text),)
+        return Version(norm_id, enacted, day, paragraphs, text_state=state, source=source)
+
+    original = version(IDENTIFIER, enacted, "Original text", TextState.AS_ENACTED, metadata.source)
+    reforms = (
+        Reform(enacted, IDENTIFIER, ("full-text",)),
+        Reform(older, older_id, ("full-text",), has_source_date=False),
+        Reform(date(2026, 7, 23), "IE-2026-act-34", ()),
+    )
+    data, repo = tmp_path / "data", tmp_path / "repo"
+    config = Config(countries={"ie": CountryConfig(data_dir=str(data), repo_path=str(repo))})
+
+    def commit(versions, reforms):
+        block = Block("full-text", "document", "", versions)
+        save_structured_json(data, ParsedNorm(metadata, (block,), reforms))
+        if committer is commit_one:
+            return committer(config, "ie", IDENTIFIER)
+        return committer(config, "ie")
+
+    html_reading = version(older_id, older, "HTML reading", TextState.CURRENT, page)
+    assert commit((original, html_reading), reforms) == 3
+    path = next((repo / "ie").rglob("*.md"))
+    published = path.read_text()
+
+    pdf = "https://rev-acts.s3.test/act_new_plain.pdf?versionId=1"
+    moved = (original, version(older_id, older, "PDF reading", TextState.POINT_IN_TIME, pdf))
+    # An effect rendered from the archived copy would publish its reading under its name.
+    with pytest.raises(HistoryMismatch, match="archived copy"):
+        commit(moved, reforms + (Reform(date(2026, 8, 1), "IE-2026-act-40", ()),))
+    assert path.read_text() == published
+
+    newest = version(newer_id, newer, "New consolidation", TextState.CURRENT, page)
+    appended = Reform(newer, newer_id, ("full-text",), has_source_date=False)
+    commit((*moved, newest), (*reforms, appended))
+    assert "New consolidation" in path.read_text()
+    history_text = subprocess.check_output(["git", "-C", str(repo), "log", "-p"], text=True)
+    assert history_text.count("\ncommit ") + 1 == 4
+    assert "HTML reading" in history_text and "PDF reading" not in history_text

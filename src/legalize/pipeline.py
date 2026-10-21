@@ -807,6 +807,12 @@ def _validate_ie_published_history(
     Batch-check is the fast path. If current supplementary metadata changed,
     stream one historical blob at a time through one cat-file process and still
     compare every legal field, source warning and body byte exactly.
+
+    One exception: the LRC's HTML page serves only its latest consolidation. When a
+    newer one comes out, the previous one moves to an archived PDF under the same
+    catalogue date, and the PDF reads differently. It is the same consolidation, so
+    the published reading stands, and so do the published events rendered from it.
+    A new event is appended only if it does not render that reading itself.
     """
     metadata = norm.metadata
     if records is None:
@@ -815,6 +821,15 @@ def _validate_ie_published_history(
         records = histories.get(metadata.identifier, [])
     if not records:
         return set()
+    versions = {version.norm_id: version for block in norm.blocks for version in block.versions}
+    archived = {
+        trailers["Source-Id"]
+        for _, message, trailers in records
+        if (version := versions.get(trailers["Source-Id"])) is not None
+        and (source := re.search(r"^Source: (\S+)$", message, re.M)) is not None
+        and source[1].endswith("/revised/en/html")
+        and version.source != source[1]
+    }
 
     for index, (_, _, trailers) in enumerate(records):
         if index >= len(reforms) or trailers["Source-Id"] != reforms[index].norm_id:
@@ -851,10 +866,15 @@ def _validate_ie_published_history(
         raise HistoryMismatch(
             f"{metadata.identifier}: HEAD differs from its published history; rebuild locally"
         )
+    reading = None  # the version the event renders: the latest one published by then
     with ExitStack() as stack:
         blobs = None
         for index, (_, message, _) in enumerate(records):
             reform = reforms[index]
+            if reform.norm_id in versions:
+                reading = reform.norm_id
+            if reading in archived:
+                continue
             markdown = render_norm_at_date(
                 _with_last_amendment(metadata, reform, reforms),
                 norm.blocks,
@@ -903,6 +923,13 @@ def _validate_ie_published_history(
                     f"{metadata.identifier}: source history changed for published event "
                     f"{reform.norm_id}; rebuild locally before publication"
                 )
+    if reading in archived and len(reforms) > len(records):
+        if (following := reforms[len(records)]).norm_id not in versions:
+            # It would swap the published reading for the archived one under its name.
+            raise HistoryMismatch(
+                f"{metadata.identifier}: {following.norm_id} would render {reading} from its "
+                "archived copy, which reads differently; rebuild locally before publication"
+            )
     return {trailers["Source-Id"] for _, _, trailers in records}
 
 
