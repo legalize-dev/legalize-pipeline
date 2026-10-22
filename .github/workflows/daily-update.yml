@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       country:
-        description: "Country code (es, at, de, se, pt, lv, ad, lt, ee, pl, gr, nl, be, cz, fi, it, lu, eu, uk) — not fr, see the matrix comment below"
+        description: "Country code (es, at, se, pt, lv, ad, lt, ee, pl, gr, nl, be, cz, fi, it, lu, eu, uk) — not fr or de, see the matrix comment below"
         required: false
         type: string
         default: ""
@@ -49,7 +49,15 @@ jobs:
         #       still, inside `_repo_scope`, before it would even reach the LEGI
         #       read. While fr stays out, its known-broken state can't hide a
         #       real regression in the other 20 countries under `fail-fast: false`.
-        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","at","de","se","pt","lv","ad","lt","ee","pl","gr","nl","be","cz","fi","it","lu","eu","uk"]') }}
+        #   de: cannot run in CI. Since 2026-09-30 www.gesetze-im-internet.de
+        #       drops datacenter traffic: TCP connect times out from GitHub
+        #       runners and from Google Cloud alike, on 443 and 80, while it
+        #       answers from outside them, and its robots.txt allows everything
+        #       (#109, #169). Run it from a maintainer's machine instead:
+        #       `legalize daily -c de --push`, or `--since YYYY-MM-DD` after a
+        #       gap longer than the ten-day cap. Re-add when the source answers
+        #       from CI again or Germany moves to NeuRIS (#169).
+        country: ${{ fromJson(inputs.country && format('["{0}"]', inputs.country) || '["es","at","se","pt","lv","ad","lt","ee","pl","gr","nl","be","cz","fi","it","lu","eu","uk"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
