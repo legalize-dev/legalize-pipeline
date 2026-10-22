@@ -473,6 +473,12 @@ def bootstrap(
 @cli.command()
 @_country_option()
 @click.option("--date", "target_date", default=None, help="Date to process (YYYY-MM-DD).")
+@click.option(
+    "--since",
+    default=None,
+    help="Process every day from this one to today (YYYY-MM-DD), past the usual lookback cap."
+    " Generic dailies only: the way back after an outage longer than the cap.",
+)
 @click.option("--repo-path", default=None, help="Override output repo directory.")
 @click.option("--data-dir", default=None, help="Override data directory.")
 @click.option("--legi-dir", default=None, help="France only: path to LEGI dump directory.")
@@ -483,6 +489,7 @@ def daily(
     ctx: click.Context,
     country: str,
     target_date: str | None,
+    since: str | None,
     repo_path: str | None,
     data_dir: str | None,
     legi_dir: str | None,
@@ -524,12 +531,15 @@ def daily(
     except ImportError:
         module = None
 
+    parsed_since = date.fromisoformat(since) if since else None
     if module is not None and hasattr(module, "daily"):
+        if parsed_since:
+            raise click.UsageError(f"--since is for generic dailies; {country} has its own.")
         module.daily(config, target_date=parsed_date, dry_run=dry_run)
     else:
         from legalize.pipeline import generic_daily
 
-        generic_daily(config, country, target_date=parsed_date, dry_run=dry_run)
+        generic_daily(config, country, target_date=parsed_date, since=parsed_since, dry_run=dry_run)
 
 
 # ─────────────────────────────────────────────

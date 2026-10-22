@@ -271,3 +271,13 @@ class TestTwoCursors:
         dates = resolve_dates_to_process(state, str(repo), None)
 
         assert dates[0] == TODAY - timedelta(days=1)
+
+
+def test_since_starts_on_the_named_day_past_the_lookback_cap(tmp_path):
+    """The way back after an outage longer than the cap: Germany's daily could
+    not reach its source from 2026-09-30, three weeks past the ten-day cap."""
+    state = StateStore(str(tmp_path / "state.json"))
+    since = date.today() - timedelta(days=MAX_LOOKBACK_DAYS + 13)
+    dates = resolve_dates_to_process(state, str(tmp_path), None, since=since)
+    assert dates[0] == since and dates[-1] == date.today()
+    assert len(dates) == MAX_LOOKBACK_DAYS + 14

@@ -226,6 +226,7 @@ def generic_daily(
     country: str,
     target_date: date | None = None,
     dry_run: bool = False,
+    since: date | None = None,
 ) -> int:
     """Daily incremental update for any country using the standard interfaces.
 
@@ -250,6 +251,7 @@ def generic_daily(
         cc.repo_path,
         target_date,
         skip_weekdays=skip,
+        since=since,
     )
     if dates_to_process is None:
         console.print("[yellow]No last date found. Use --date or run bootstrap.[/yellow]")
