@@ -11,7 +11,7 @@ from legalize.fetcher.de.parser import (
     GIITextParser,
     _infer_rank,
 )
-from legalize.models import NormMetadata, NormStatus
+from legalize.models import NormMetadata, NormStatus, Reform
 from legalize.transformer.slug import norm_to_filepath
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -96,12 +96,14 @@ class TestGIITextParser:
         content_para = art1.versions[0].paragraphs[1]
         assert "Würde des Menschen" in content_para.text
 
-    def test_extract_reforms(self):
+    def test_reforms_are_reform_records(self):
+        """The parser used to override extract_reforms with {"note": ...}
+        dicts, which the pipeline cannot store: `legalize fetch -c de`
+        crashed on every law. The generic extraction dates the text by the
+        versions it carries."""
         xml = (FIXTURES / "gii-gg.xml").read_bytes()
         reforms = self.parser.extract_reforms(xml)
-        assert isinstance(reforms, list)
-        assert len(reforms) >= 1
-        assert "note" in reforms[0]
+        assert reforms and all(isinstance(r, Reform) for r in reforms)
 
     def test_versions_are_dated_by_the_builddate_timestamp(self):
         """The source writes builddate with a time ("20260928220002"). Read

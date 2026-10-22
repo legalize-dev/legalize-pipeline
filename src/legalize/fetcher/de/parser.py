@@ -278,22 +278,6 @@ class GIITextParser(TextParser):
 
         return blocks
 
-    def extract_reforms(self, data: bytes) -> list[Any]:
-        """Extract reform info from standangabe metadata."""
-        root = ET.fromstring(data)
-        norms = root.findall(".//norm")
-        reforms = []
-
-        if norms:
-            meta = norms[0].find("metadaten")
-            if meta is not None:
-                for stand in meta.findall("standangabe"):
-                    kommentar = stand.find("standkommentar")
-                    if kommentar is not None and kommentar.text:
-                        reforms.append({"note": kommentar.text.strip()})
-
-        return reforms
-
     def _parse_section(
         self, gliederung: ET.Element, norm: ET.Element, pub_date: date
     ) -> Block | None:
