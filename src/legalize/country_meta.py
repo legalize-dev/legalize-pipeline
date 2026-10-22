@@ -45,8 +45,8 @@ class CountryMeta:
     name: str  # country name in its own language
     language: str  # native language code (es, fr, de, ...)
     source_name: str
+    data_license: str
     source_urls: tuple[str, ...] = ()  # pre-formatted "Label: url" lines
-    data_license: str = "Dominio público"
     scope: str = ""  # one-paragraph scope summary
     norm_types: tuple[NormType, ...] = field(default_factory=tuple)
     attribution: str = ""  # optional blockquote Markdown
@@ -64,7 +64,7 @@ def _build(code: str, d: dict) -> CountryMeta:
         language=d["language"],
         source_name=d["source_name"],
         source_urls=tuple(d.get("source_urls", ())),
-        data_license=d.get("data_license", "Dominio público"),
+        data_license=d["data_license"],
         scope=d.get("scope", ""),
         norm_types=tuple(
             NormType(
