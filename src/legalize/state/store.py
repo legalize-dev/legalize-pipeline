@@ -34,6 +34,7 @@ def resolve_dates_to_process(
     target_date: date | None = None,
     *,
     skip_weekdays: set[int] | None = None,
+    since: date | None = None,
 ) -> list[date] | None:
     """Determine which dates need processing for a daily run.
 
@@ -46,6 +47,9 @@ def resolve_dates_to_process(
         state: Loaded StateStore for the country.
         repo_path: Path to the country git repo (for git-based inference).
         target_date: Explicit date from ``--date`` CLI flag, or None.
+        since: First day to process, from ``--since``. Replaces both cursors
+            and the lookback cap: the cap guards against an accidental months-long
+            run, and naming the day is not an accident.
         skip_weekdays: Set of ``date.weekday()`` values to exclude.
             Common values: ``{6}`` (skip Sunday = Mon-Sat schedule),
             ``{5, 6}`` (skip Sat+Sun = Mon-Fri schedule).
@@ -65,24 +69,26 @@ def resolve_dates_to_process(
     # finished clean (see StateStore.finish_day) but does not exist on a fresh CI
     # runner unless the workflow restored it. Each covers the other's blind spot;
     # with no state, git alone decides, as it always did.
-    start = state.last_summary_date
-    if start is None:
-        start = infer_last_date_from_git(repo_path)
-    else:
-        from_git = latest_source_date(repo_path)
-        if from_git is not None:
-            start = min(start, from_git)
-    if start is None:
-        return None
-
-    start = start + timedelta(days=1)
     end = date.today()
+    if since:
+        start = since
+    else:
+        start = state.last_summary_date
+        if start is None:
+            start = infer_last_date_from_git(repo_path)
+        else:
+            from_git = latest_source_date(repo_path)
+            if from_git is not None:
+                start = min(start, from_git)
+        if start is None:
+            return None
+        start = start + timedelta(days=1)
 
     # Safety cap: without an explicit --date, limit automatic lookback
     # to avoid processing months of history by accident
     # (e.g., first CI run after setup, or after a long outage).
     max_lookback = end - timedelta(days=MAX_LOOKBACK_DAYS)
-    if start < max_lookback:
+    if not since and start < max_lookback:
         logger.warning(
             "Clamping start from %s to %s (max %d days)",
             start,
