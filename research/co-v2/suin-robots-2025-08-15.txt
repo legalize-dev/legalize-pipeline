@@ -1,0 +1,37 @@
+User-agent:*
+Disallow: /estad468/
+Allow: /viewDocument.asp?ruta=*/*
+Allow: /viewDocument.asp?id=*
+Sitemap: https://www.suin-juriscol.gov.co/sitemap.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapactoslegislativos.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapactoslegislativossin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapacuerdo.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapacuerdosin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapcconstitucional.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapcconstitucionalsin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapcircular.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapconsejoestado.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapconsejoestadosin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapconstituciones.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapcsuprema.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapdecreto1.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapdecreto2.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapdecreto1sin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapdecreto2sin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapdpresidenciales.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapdpresidencialessin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapinstruccion.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapleyes.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapleyessin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapresoluciones.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapresolucionessin.xml
+Sitemap: https://www.suin-juriscol.gov.co/sitemapvideos.xml
+
+
+
+
+
+
+
+
+ 

@@ -1,0 +1,10 @@
+# §3.1 — el campo in-force: true / false / ausente (REG*, sin corrigenda)
+PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+SELECT ?state (COUNT(DISTINCT ?work) AS ?n) WHERE {
+  ?work cdm:work_has_resource-type ?rtype .
+  ?work cdm:resource_legal_id_celex ?celex .
+  FILTER(?rtype IN (<http://publications.europa.eu/resource/authority/resource-type/REG>, <http://publications.europa.eu/resource/authority/resource-type/REG_IMPL>, <http://publications.europa.eu/resource/authority/resource-type/REG_DEL>, <http://publications.europa.eu/resource/authority/resource-type/REG_FINANC>))
+  FILTER NOT EXISTS { ?work cdm:work_has_resource-type <http://publications.europa.eu/resource/authority/resource-type/CORRIGENDUM> . }
+  OPTIONAL { ?work cdm:resource_legal_in-force ?f . }
+  BIND(COALESCE(STR(?f), "SIN-TRIPLE") AS ?state)
+} GROUP BY ?state ORDER BY DESC(?n)

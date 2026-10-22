@@ -1,0 +1,18 @@
+# §4.4 — cuantas decisiones llevan "Only the X text is authentic", es decir,
+# cuantas NO son autenticas en ingles. Cambiar el tipo para comparar.
+#   DEC_ENTSCHEID          -> 10.789 de 21.150 (51 %)
+#   DEC + DEC_IMPL/DEC_DEL ->    487 de 21.573 (2,3 %)
+PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+SELECT ?clase (COUNT(DISTINCT ?work) AS ?n) WHERE {
+  ?work cdm:work_has_resource-type <http://publications.europa.eu/resource/authority/resource-type/DEC_ENTSCHEID> .
+  ?work cdm:resource_legal_id_celex ?celex .
+  ?work cdm:resource_legal_in-force ?f .
+  ?expr cdm:expression_belongs_to_work ?work .
+  ?expr cdm:expression_uses_language <http://publications.europa.eu/resource/authority/language/ENG> .
+  ?expr cdm:expression_title ?t .
+  ?manifest cdm:manifestation_manifests_expression ?expr .
+  ?manifest cdm:manifestation_type ?mtype .
+  FILTER(STR(?mtype) IN ("xhtml","html"))
+  BIND(IF(CONTAINS(?t, "text is authentic") || CONTAINS(?t, "texts are authentic"),
+          "EN-no-autentico", "EN-autentico") AS ?clase)
+} GROUP BY ?clase

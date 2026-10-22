@@ -1,0 +1,23 @@
+catalogue rows        : 89,366
+published .md files   : 71,900
+MISSING (in catalogue, no file) : 17,087  (19.1% of the catalogue)
+orphans (file, no catalogue row): 25  (0.03% of the corpus)   ← must stay near zero, else the join key is wrong
+
+missing by era      : {'<=2014': 6589, 'bad year': 21, '2015+': 10477}
+missing by tipo     :
+      8480  RESOLUCION
+      5345  DECRETO
+      1241  LEY
+       870  CIRCULAR EXTERNA
+       316  DIRECTIVA PRESIDENCIAL
+       241  INSTRUCCION ADMINISTRATIVA CONJUNTA
+       229  CIRCULAR
+       222  ACUERDO
+        38  ACTO LEGISLATIVO
+        37  RESOLUCION EXTERNA
+missing by vigencia :
+      8692  Vigente
+      7452  NULL
+       621  Derogado
+       184  Compilado
+        62  No vigente
