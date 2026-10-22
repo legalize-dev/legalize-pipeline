@@ -32,7 +32,8 @@ from legalize.models import (
     Reform,
     Version,
 )
-from legalize.pipeline import _extract_reforms_generic, commit_all_fast, commit_one
+from legalize.pipeline import _extract_reforms_generic, _require_text, commit_all_fast, commit_one
+from legalize.transformer.markdown import render_norm_at_date
 from legalize.state.store import StateStore
 from legalize.storage import load_norma_from_json, save_structured_json
 
@@ -482,3 +483,21 @@ def test_eu_source_selection_does_not_activate_other_countries_future_text(tmp_p
     markdown = next((repo / "fr").rglob("*.md")).read_text()
     assert "Old provision." in markdown
     assert "Deferred provision." not in markdown
+
+
+def test_a_text_that_renders_to_nothing_on_the_day_is_not_written():
+    """Blocks dated after the day being committed render to an empty law: the
+    German daily wrote 396 of those before it was noticed."""
+    norm = _make_norma()
+    at = date(2023, 6, 1)  # before the only version, 2024-01-01
+    markdown = render_norm_at_date(norm.metadata, list(norm.blocks), at)
+    with pytest.raises(ValueError, match="not writing TEST-001 empty"):
+        _require_text(norm.metadata, list(norm.blocks), markdown, at)
+
+
+def test_a_text_in_force_on_the_day_is_written():
+    norm = _make_norma()
+    at = date(2024, 6, 1)
+    markdown = render_norm_at_date(norm.metadata, list(norm.blocks), at)
+    _require_text(norm.metadata, list(norm.blocks), markdown, at)
+    assert "Texto del articulo 1." in markdown

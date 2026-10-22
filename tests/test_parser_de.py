@@ -103,6 +103,18 @@ class TestGIITextParser:
         assert len(reforms) >= 1
         assert "note" in reforms[0]
 
+    def test_versions_are_dated_by_the_builddate_timestamp(self):
+        """The source writes builddate with a time ("20260928220002"). Read
+        whole it did not parse, every block was dated the day the pipeline ran,
+        and the daily committed 396 laws with no text."""
+        xml = b"""<dokumente builddate="20260928220002" doknr="TEST">
+        <norm><metadaten><jurabk>T</jurabk></metadaten></norm>
+        <norm doknr="T01"><metadaten><jurabk>T</jurabk><enbez>P 1</enbez></metadaten>
+        <textdaten><text format="XML"><Content><P>Text.</P></Content></text></textdaten>
+        </norm></dokumente>"""
+        blocks = self.parser.parse_text(xml)
+        assert blocks[0].versions[0].publication_date == date(2026, 9, 28)
+
     def test_empty_xml(self):
         xml = b"<dokumente><norm><metadaten><jurabk>X</jurabk></metadaten></norm></dokumente>"
         blocks = self.parser.parse_text(xml)
