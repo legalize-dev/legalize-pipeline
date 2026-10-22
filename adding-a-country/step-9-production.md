@@ -50,9 +50,10 @@ To onboard a new country's presentation so it comes out identical to the rest:
 
 1. Add a `countries` entry in `src/legalize/readme_data.json` (name, language,
    source_name, source_urls, data_license, scope, norm_types, attribution,
-   notes — free text in the country's language). **Verify the data reuse license
-   of the official source and cite it**; default to "public domain (official
-   government publications)" only when the source has no explicit open license.
+   notes — free text in the country's language). **Verify the official source's
+   reuse terms and cite the source-specific basis.** Never infer public-domain
+   status from the absence of an explicit open licence; block publication until
+   the reuse position is verified.
 2. If the country's language is not yet in the `labels` section of
    `readme_data.json`, add it (translate the section labels, plus `desc_tagline`
    and `desc_clause`, which are used for the GitHub "About" line).
