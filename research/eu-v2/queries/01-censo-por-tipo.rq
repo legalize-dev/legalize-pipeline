@@ -1,0 +1,10 @@
+# §1 — el universo: works con CELEX por tipo de recurso
+PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+SELECT ?rtype (COUNT(DISTINCT ?work) AS ?total) WHERE {
+  ?work cdm:work_has_resource-type ?rtype .
+  ?work cdm:resource_legal_id_celex ?celex .
+  FILTER(?rtype IN (<http://publications.europa.eu/resource/authority/resource-type/REG>, <http://publications.europa.eu/resource/authority/resource-type/REG_IMPL>, <http://publications.europa.eu/resource/authority/resource-type/REG_DEL>, <http://publications.europa.eu/resource/authority/resource-type/REG_FINANC>,
+                    <http://publications.europa.eu/resource/authority/resource-type/DIR>, <http://publications.europa.eu/resource/authority/resource-type/DIR_IMPL>, <http://publications.europa.eu/resource/authority/resource-type/DIR_DEL>,
+                    <http://publications.europa.eu/resource/authority/resource-type/DEC>, <http://publications.europa.eu/resource/authority/resource-type/DEC_IMPL>, <http://publications.europa.eu/resource/authority/resource-type/DEC_DEL>, <http://publications.europa.eu/resource/authority/resource-type/DEC_ENTSCHEID>,
+                    <http://publications.europa.eu/resource/authority/resource-type/RECO>, <http://publications.europa.eu/resource/authority/resource-type/TREATY>, <http://publications.europa.eu/resource/authority/resource-type/AGREE_INTERNATION>))
+} GROUP BY ?rtype ORDER BY DESC(?total)
