@@ -37,6 +37,10 @@ jobs:
         with:
           repository: legalize-dev/legalize-ie
           path: repos/ie
+          # Otherwise checkout stores this workflow's GITHUB_TOKEN as the clone's
+          # credential, and git sends it ahead of the App token in the push URL:
+          # every run until 2026-10-22 ended "denied to github-actions[bot]" (403).
+          persist-credentials: false
           fetch-depth: 0
           filter: tree:0
           sparse-checkout: .github
