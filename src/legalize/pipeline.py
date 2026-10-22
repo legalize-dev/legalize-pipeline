@@ -208,6 +208,19 @@ def _with_last_amendment(
     return replace(metadata, last_amendment=reform.norm_id)
 
 
+def _require_text(metadata, blocks, markdown: str, at: date) -> None:
+    """Refuse to write a law whose parsed text renders to nothing on this date.
+
+    Germany's parser dated every block the day the pipeline ran, so a daily
+    rendering an earlier day found no block in force and committed the law
+    with no text: 396 federal laws, from 2026-06-30 until it was noticed in
+    October. A parse that produced blocks and a render that kept none of them
+    is a dating bug, never a repeal of the whole text.
+    """
+    if blocks and markdown == render_norm_at_date(metadata, [], at):
+        raise ValueError(f"no block in force on {at}: not writing {metadata.identifier} empty")
+
+
 def generic_daily(
     config: Config,
     country: str,
@@ -294,6 +307,7 @@ def generic_daily(
 
                     file_path = norm_to_filepath(metadata)
                     markdown = render_norm_at_date(metadata, blocks, current_date)
+                    _require_text(metadata, blocks, markdown, current_date)
 
                     changed = repo.write_and_add(file_path, markdown)
                     if not changed:

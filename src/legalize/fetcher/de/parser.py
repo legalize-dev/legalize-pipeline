@@ -252,9 +252,12 @@ class GIITextParser(TextParser):
         norms = root.findall(".//norm")
         blocks: list[Block] = []
 
-        # Extract builddate for version dating
+        # Version dating: builddate is a timestamp, "20260928220002", and its
+        # date is the first eight digits. Read whole it parsed as nothing, every
+        # block was dated the day the pipeline ran, and a daily rendering an
+        # earlier day found no block in force and committed the law empty.
         builddate = root.get("builddate", "")
-        pub_date = _parse_gii_date(builddate) or date.today()
+        pub_date = _parse_gii_date(builddate[:8]) or date.today()
 
         for norm in norms[1:]:  # Skip first norm (law-level metadata)
             meta = norm.find("metadaten")
@@ -274,22 +277,6 @@ class GIITextParser(TextParser):
                     blocks.append(block)
 
         return blocks
-
-    def extract_reforms(self, data: bytes) -> list[Any]:
-        """Extract reform info from standangabe metadata."""
-        root = ET.fromstring(data)
-        norms = root.findall(".//norm")
-        reforms = []
-
-        if norms:
-            meta = norms[0].find("metadaten")
-            if meta is not None:
-                for stand in meta.findall("standangabe"):
-                    kommentar = stand.find("standkommentar")
-                    if kommentar is not None and kommentar.text:
-                        reforms.append({"note": kommentar.text.strip()})
-
-        return reforms
 
     def _parse_section(
         self, gliederung: ET.Element, norm: ET.Element, pub_date: date
