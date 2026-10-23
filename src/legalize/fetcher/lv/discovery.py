@@ -20,6 +20,8 @@ from collections.abc import Iterator
 from datetime import date
 from xml.etree import ElementTree as ET
 
+import requests
+
 from legalize.fetcher.base import LegislativeClient, NormDiscovery
 from legalize.fetcher.lv.client import LikumiClient
 
@@ -616,10 +618,15 @@ class LikumiDiscovery(NormDiscovery):
         """
         assert isinstance(client, LikumiClient)
 
+        # Only a missing page means "nothing that day". An unreachable source
+        # must raise: swallowing it marked the day done with 0 commits and a
+        # green job (likumi.lv outage, 2026-10-22).
         try:
             html_bytes = client.get_jaunakie_page(target_date)
-        except Exception as exc:
-            logger.warning("Failed to fetch jaunakie page for %s: %s", target_date, exc)
+        except requests.HTTPError as exc:
+            if exc.response is None or exc.response.status_code != 404:
+                raise
+            logger.info("No jaunakie page for %s (404)", target_date)
             return
 
         html_str = html_bytes.decode("utf-8", errors="replace")
