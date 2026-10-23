@@ -6,10 +6,13 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+import requests
 
 from legalize.countries import get_metadata_parser, get_text_parser
+from legalize.fetcher.lv.client import LikumiClient
 from legalize.fetcher.lv.discovery import (
     DISALLOWED_IDS,
+    LikumiDiscovery,
     extract_ids_from_sitemap,
     extract_sitemap_urls,
 )
@@ -282,6 +285,26 @@ class TestLikumiDiscovery:
         ids = list(extract_ids_from_sitemap(SITEMAP_SAMPLE.read_bytes()))
         for norm_id in ids:
             assert int(norm_id) not in DISALLOWED_IDS
+
+    def _client_raising(self, exc):
+        def fail(target_date):
+            raise exc
+
+        client = LikumiClient.__new__(LikumiClient)
+        client.get_jaunakie_page = fail
+        return client
+
+    def test_daily_unreachable_source_raises(self):
+        # A swallowed outage reported "no changes" and closed the day green.
+        client = self._client_raising(requests.ConnectTimeout("likumi.lv timed out"))
+        with pytest.raises(requests.ConnectTimeout):
+            list(LikumiDiscovery().discover_daily(client, date(2026, 10, 22)))
+
+    def test_daily_missing_page_is_empty(self):
+        resp = requests.Response()
+        resp.status_code = 404
+        client = self._client_raising(requests.HTTPError(response=resp))
+        assert list(LikumiDiscovery().discover_daily(client, date(2026, 10, 24))) == []
 
 
 # ─────────────────────────────────────────────
