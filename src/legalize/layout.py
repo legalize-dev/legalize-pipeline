@@ -35,9 +35,12 @@ from legalize.models import NormMetadata
 SPEC_VERSION = "0.4"
 # A country declares v0.5 only with the rebuild that writes its coverage.json
 # (§Coverage); declaring it earlier would claim a file the repo does not have.
-SPEC_VERSIONS: dict[str, str] = {"ie": "0.5"}
+SPEC_VERSIONS: dict[str, str] = {"ie": "0.5", "mk": "0.5"}
 # What §Coverage measures a 0.5 repo against: the source index its discovery reads.
-SOURCE_INDEX: dict[str, str] = {"ie": "Irish Statute Book, Acts by year (eISB)"}
+SOURCE_INDEX: dict[str, str] = {
+    "ie": "Irish Statute Book, Acts by year (eISB)",
+    "mk": "LDBIS (ldbis.pravda.gov.mk): every listed version of Закон, Уставен закон, Устав and Амандман на Уставот",
+}
 
 
 def spec_version_for(country_code: str) -> str:
@@ -191,6 +194,7 @@ LAYOUT: dict[str, str] = {
     "eu": SHARDED,
     "es": SHARDED,
     "ie": SHARDED,
+    "mk": SHARDED,
 }
 
 

@@ -50,6 +50,7 @@ TEXT_STATE: dict[str, TextState] = {
     # DRE consolidates 5,561 diplomas and publishes the other 159,000 as enacted.
     # The country default is the majority; the parser overrides the consolidated
     # ones back to POINT_IN_TIME per norm.
+    "mk": TextState.AS_ENACTED,  # LDBIS links each enacted gazette version separately
     "pt": TextState.AS_ENACTED,
     # The BOE consolidates 12,387 norms and publishes everything else as
     # enacted — 78,908 acts of Sección I since 1979, counted by the source, so
@@ -254,6 +255,12 @@ REGISTRY: dict[str, dict[str, tuple[str, str]]] = {
         "discovery": ("legalize.fetcher.it.discovery", "NormattivaDiscovery"),
         "text_parser": ("legalize.fetcher.it.parser", "NormattivaTextParser"),
         "metadata_parser": ("legalize.fetcher.it.parser", "NormattivaMetadataParser"),
+    },
+    "mk": {
+        "client": ("legalize.fetcher.mk.client", "LDBISClient"),
+        "discovery": ("legalize.fetcher.mk.discovery", "LDBISDiscovery"),
+        "text_parser": ("legalize.fetcher.mk.parser", "LDBISTextParser"),
+        "metadata_parser": ("legalize.fetcher.mk.parser", "LDBISMetadataParser"),
     },
     "nl": {
         "client": ("legalize.fetcher.nl.client", "BWBClient"),

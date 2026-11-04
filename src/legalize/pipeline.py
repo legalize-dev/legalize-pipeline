@@ -396,7 +396,7 @@ def generic_fetch_one(
     safe_id = norm_id.replace(":", "-").replace("/", "-").replace(" ", "")
     json_path = Path(cc.data_dir) / "json" / f"{safe_id}.json"
 
-    if json_path.exists() and not force:
+    if country != "mk" and json_path.exists() and not force:
         if country == "ie":
             from legalize.fetcher.ie.history import cached_norm_for_text
 
@@ -418,6 +418,18 @@ def generic_fetch_one(
             meta_data = client.get_metadata(norm_id)
             metadata = meta_parser.parse(meta_data, norm_id)
 
+            # MK discovery yields numeric LDBIS card IDs, while the published
+            # repository uses its stable gazette/year/issue/card identifier.
+            # Resolve the cache path only after parsing the card so retries and
+            # monthly runs continue the same JSON file.
+            if country == "mk":
+                json_path = Path(cc.data_dir) / "json" / f"{metadata.identifier}.json"
+                if json_path.exists() and not force:
+                    cached = load_norma_from_json(json_path)
+                    if cached is not None:
+                        console.print(f"  [dim]{norm_id} already processed, skipping[/dim]")
+                        return cached
+
             # Pass pre-fetched metadata to avoid redundant API call
             get_text_kwargs = {}
             if hasattr(client, "get_text") and "meta_data" in client.get_text.__code__.co_varnames:
@@ -429,8 +441,20 @@ def generic_fetch_one(
                 unchanged = cached_norm_for_text(json_path, text_data)
                 if unchanged is not None:
                     return unchanged
-            blocks = text_parser.parse_text(text_data)
-            reforms = _extract_reforms_generic(text_parser, client, norm_id, blocks, text_data)
+            if hasattr(text_parser, "parse_norm_text"):
+                blocks, metadata = text_parser.parse_norm_text(text_data, norm_id, metadata)
+            else:
+                blocks = text_parser.parse_text(text_data)
+            source_reforms = []
+            # A country client may expose a complete source timeline. Its
+            # contract is to return one Reform per published source event for
+            # the current norm's file, never synthetic dates inferred from the
+            # body text.
+            if hasattr(client, "get_reforms"):
+                source_reforms = client.get_reforms(norm_id, meta_data)
+            reforms = source_reforms or _extract_reforms_generic(
+                text_parser, client, norm_id, blocks, text_data
+            )
             if country == "ie":
                 from legalize.fetcher.ie.history import metadata_for_text
 
