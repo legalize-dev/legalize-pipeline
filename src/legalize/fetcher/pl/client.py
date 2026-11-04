@@ -3,6 +3,7 @@
 The Sejm exposes a public REST API at https://api.sejm.gov.pl/eli that returns:
 - Metadata as JSON per act: /acts/{publisher}/{year}/{pos}
 - Consolidated text as HTML:  /acts/{publisher}/{year}/{pos}/text.html
+- The act as PDF:             /acts/{publisher}/{year}/{pos}/text.pdf (the only text since 2025)
 - Hierarchical structure JSON: /acts/{publisher}/{year}/{pos}/struct
 - Per-year paginated search:  /acts/search?publisher=XX&year=YYYY&limit=500
 - Change feed for daily path: /changes/acts?since=YYYY-MM-DDTHH:MM:SS
@@ -41,6 +42,15 @@ def norm_id_to_eli(norm_id: str) -> str:
 def eli_to_norm_id(eli: str) -> str:
     """Convert ELI "DU/2024/1907" → internal "DU-2024-1907"."""
     return eli.replace("/", "-")
+
+
+def _json_dict(data: bytes | None) -> dict:
+    """Act metadata as a dict ({} if missing or not a JSON object)."""
+    try:
+        value = json.loads(data) if data else {}
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
 
 
 class EliClient(HttpClient):
@@ -83,31 +93,40 @@ class EliClient(HttpClient):
         return self._get(f"{self._base_url}/acts/{eli}")
 
     def get_text(self, norm_id: str, meta_data: bytes | None = None) -> bytes:
-        """Fetch the HTML consolidated text of a single act.
-
-        Raises ValueError if the act has no HTML (the API returns a zero-byte
-        body with HTTP 200 in that case).
+        """Fetch the text of a single act: its HTML, or its PDF if the act has no HTML.
 
         The pipeline passes pre-fetched metadata bytes via ``meta_data`` so
         that we can inject a marker comment with the norm_id and publication
-        date into the HTML. The parser reads the marker back (since the body
-        itself does not carry the ELI or a structured publication date).
+        date in front of the text. The parser reads the marker back (since the
+        body itself does not carry the ELI or a structured publication date).
+
+        Acts whose metadata says ``textHTML: false`` and ``textPDF: true`` (all
+        acts since 2025) come back as marker + PDF bytes; EliTextParser sends
+        those to parser_pdf. The same happens when the HTML is empty (the API
+        returns a zero-byte body with HTTP 200) and the metadata lists a PDF.
+        Raises ValueError if the act has neither.
         """
         eli = norm_id_to_eli(norm_id)
-        data = self._get(
-            f"{self._base_url}/acts/{eli}/text.html",
-            headers={"Accept": "text/html"},
-        )
+        meta = _json_dict(meta_data)
+        data = b""
+        if not (meta.get("textHTML") is False and meta.get("textPDF")):
+            data = self._get(
+                f"{self._base_url}/acts/{eli}/text.html",
+                headers={"Accept": "text/html"},
+            )
         if not data:
-            raise ValueError(f"Act {norm_id} has no HTML text (PDF-only)")
+            if not meta_data:  # the generic daily loop passes no metadata: look it up
+                meta = _json_dict(self.get_metadata(norm_id))
+            if not meta.get("textPDF"):
+                raise ValueError(f"Act {norm_id} has no HTML text and no PDF")
+            data = self._get(
+                f"{self._base_url}/acts/{eli}/text.pdf",
+                headers={"Accept": "application/pdf"},
+            )
+            if not data.startswith(b"%PDF-"):
+                raise ValueError(f"Act {norm_id}: text.pdf is not a PDF")
 
-        pub_date = ""
-        if meta_data:
-            try:
-                pub_date = str(json.loads(meta_data).get("announcementDate") or "")
-            except (json.JSONDecodeError, AttributeError):
-                pub_date = ""
-
+        pub_date = str(meta.get("announcementDate") or "")
         marker = f"<!--LEGALIZE norm_id={norm_id} pub_date={pub_date}-->\n".encode()
         return marker + data
 

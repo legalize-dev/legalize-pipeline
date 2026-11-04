@@ -1,0 +1,60 @@
+{
+ "address": "WDU20250001699",
+ "announcementDate": "2025-12-01",
+ "changeDate": "2025-12-05T10:36:58",
+ "displayAddress": "Dz.U. 2025 poz. 1699",
+ "pos": 1699,
+ "promulgation": "2025-12-04",
+ "publisher": "DU",
+ "status": "obowiązujący",
+ "textHTML": false,
+ "textPDF": true,
+ "title": "Obwieszczenie Prezesa Rady Ministrów z dnia 1 grudnia 2025 r. w sprawie ogłoszenia jednolitego tekstu rozporządzenia Prezesa Rady Ministrów w sprawie nadania statutu Głównemu Inspektoratowi Ochrony Środowiska",
+ "type": "Obwieszczenie",
+ "volume": 0,
+ "year": 2025,
+ "authorizedBody": [],
+ "directives": [],
+ "inForce": "IN_FORCE",
+ "keywords": [
+  "statut"
+ ],
+ "keywordsNames": [
+  "Główny Inspektorat Ochrony Środowiska"
+ ],
+ "obligated": [],
+ "previousTitle": [],
+ "prints": [],
+ "references": {
+  "Podstawa prawna": [
+   {
+    "id": "DU/2000/718"
+   }
+  ],
+  "Podstawa prawna z art.": [
+   {
+    "id": "DU/2000/718",
+    "art": "art. 16 ust. 3"
+   }
+  ],
+  "Tekst jednolity dla aktu": [
+   {
+    "id": "DU/2018/2530"
+   }
+  ]
+ },
+ "releasedBy": [
+  "PREZ. RADY MINISTRÓW"
+ ],
+ "texts": [
+  {
+   "fileName": "D20251699.pdf",
+   "type": "O"
+  },
+  {
+   "fileName": "D20251699.pdf",
+   "type": "I"
+  }
+ ],
+ "ELI": "DU/2025/1699"
+}

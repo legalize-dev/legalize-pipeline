@@ -30,10 +30,14 @@ class EliDiscovery(NormDiscovery):
         year_start: int = 1918,
         year_end: int | None = None,
         html_only: bool = True,
+        pdf_from_year: int | None = None,
     ) -> None:
         self.year_start = year_start
         self.year_end = year_end  # None → current year at discovery time
         self.html_only = html_only
+        # With html_only: acts without HTML but with a PDF are kept from this year on
+        # (parsed by parser_pdf). None → HTML only.
+        self.pdf_from_year = pdf_from_year
 
     @classmethod
     def create(cls, source: dict) -> EliDiscovery:
@@ -41,6 +45,25 @@ class EliDiscovery(NormDiscovery):
             year_start=int(source.get("year_start", 1918)),
             year_end=source.get("year_end"),
             html_only=bool(source.get("html_only", True)),
+            pdf_from_year=source.get("pdf_from_year"),
+        )
+
+    def _wanted(self, item: dict, publisher: str) -> bool:
+        """Keep acts with HTML; acts with only a PDF of ``publisher`` from ``pdf_from_year`` on.
+
+        The publisher check matters for the PDF path: the /changes/acts feed lists every
+        publisher, and Monitor Polski acts have a PDF but no HTML.
+        """
+        if not self.html_only or item.get("textHTML"):
+            return True
+        if not self.pdf_from_year or not item.get("textPDF"):
+            return False
+        parts = str(item.get("ELI") or "").split("/")
+        return (
+            len(parts) == 3
+            and parts[0] == publisher
+            and parts[1].isdigit()
+            and int(parts[1]) >= int(self.pdf_from_year)
         )
 
     def _iter_year(self, client: EliClient, year: int) -> Iterator[dict]:
@@ -70,25 +93,25 @@ class EliDiscovery(NormDiscovery):
             offset += count
 
     def discover_all(self, client: EliClient, **kwargs) -> Iterator[str]:  # type: ignore[override]
-        """Yield every DU act ID with HTML available, year by year."""
+        """Yield every DU act ID with HTML (or, see pdf_from_year, a PDF), year by year."""
         current_year = datetime.now().year
         end_year = self.year_end or current_year
 
         for year in range(self.year_start, end_year + 1):
             count_in_year = 0
-            count_html = 0
+            count_kept = 0
             for item in self._iter_year(client, year):
                 count_in_year += 1
-                if self.html_only and not item.get("textHTML"):
+                if not self._wanted(item, client.publisher):
                     continue
-                count_html += 1
+                count_kept += 1
                 eli = item.get("ELI")
                 if not eli:
                     continue
                 yield eli_to_norm_id(eli)
             if count_in_year:
                 logger.info(
-                    "PL discovery year=%d total=%d html=%d", year, count_in_year, count_html
+                    "PL discovery year=%d total=%d kept=%d", year, count_in_year, count_kept
                 )
 
     def discover_daily(
@@ -128,7 +151,7 @@ class EliDiscovery(NormDiscovery):
             for item in items:
                 if item.get("announcementDate") != target_iso:
                     continue
-                if self.html_only and not item.get("textHTML"):
+                if not self._wanted(item, client.publisher):
                     continue
                 eli = item.get("ELI")
                 if not eli:

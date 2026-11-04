@@ -1,0 +1,97 @@
+{
+ "address": "WDU20250001705",
+ "announcementDate": "2025-11-07",
+ "changeDate": "2025-12-09T14:24:24",
+ "displayAddress": "Dz.U. 2025 poz. 1705",
+ "pos": 1705,
+ "promulgation": "2025-12-04",
+ "publisher": "DU",
+ "status": "obowiązujący",
+ "textHTML": false,
+ "textPDF": true,
+ "title": "Ustawa z dnia 7 listopada 2025 r. o zmianie ustawy o systemie informacji w ochronie zdrowia oraz ustawy o ochronie ludności i obronie cywilnej",
+ "type": "Ustawa",
+ "volume": 0,
+ "year": 2025,
+ "authorizedBody": [],
+ "directives": [],
+ "entryIntoForce": "2027-01-01",
+ "inForce": "IN_FORCE",
+ "keywords": [
+  "obrona cywilna",
+  "ochrona zdrowia",
+  "systemy teleinformatyczne"
+ ],
+ "keywordsNames": [],
+ "obligated": [],
+ "previousTitle": [],
+ "prints": [
+  {
+   "link": "https://www.sejm.gov.pl/Sejm10.nsf/PrzebiegProc.xsp?nr=1560",
+   "linkPrintAPI": "https://api.sejm.gov.pl/sejm/term10/prints/1560",
+   "linkProcessAPI": "https://api.sejm.gov.pl/sejm/term10/processes/1560",
+   "number": "1560",
+   "term": 10
+  }
+ ],
+ "references": {
+  "Akty uznane za uchylone": [
+   {
+    "id": "DU/2025/496",
+    "date": "2027-01-01"
+   },
+   {
+    "id": "DU/2024/1952",
+    "date": "2027-01-01"
+   },
+   {
+    "id": "DU/2023/2784",
+    "date": "2027-01-01"
+   },
+   {
+    "id": "DU/2022/283",
+    "date": "2027-01-01"
+   },
+   {
+    "id": "DU/2022/2781",
+    "date": "2027-01-01"
+   },
+   {
+    "id": "DU/2022/1761",
+    "date": "2027-01-01"
+   },
+   {
+    "id": "DU/2021/614",
+    "date": "2027-01-01"
+   }
+  ],
+  "Akty zmienione": [
+   {
+    "id": "DU/2024/1907",
+    "date": "2027-01-01"
+   },
+   {
+    "id": "DU/2011/657",
+    "date": "2027-01-01"
+   }
+  ]
+ },
+ "releasedBy": [
+  "SEJM"
+ ],
+ "texts": [
+  {
+   "fileName": "D20251705.pdf",
+   "type": "O"
+  },
+  {
+   "fileName": "D20251705.pdf",
+   "type": "I"
+  },
+  {
+   "fileName": "D20251705L.pdf",
+   "type": "T"
+  }
+ ],
+ "ELI": "DU/2025/1705"
+}

@@ -2,11 +2,12 @@
 
 Source: ELI API of the Polish Sejm (https://api.sejm.gov.pl/eli).
 
-Scope v1: publisher DU (Dziennik Ustaw) only, acts with HTML text only.
-Acts that only have PDF (Konstytucja 1997, Obwieszczenia with consolidated
-codes, pre-2012 historical acts) are skipped client-side on the listing's own
-``textHTML`` flag: the pipeline publishes Markdown derived from that HTML, so a
-PDF-only act would ship as a law with no text in it at all.
+Scope: publisher DU (Dziennik Ustaw). Acts with HTML text go through
+EliTextParser's HTML path. Acts that only have a PDF (every act since 2025,
+98 acts of 2020-2023) go through parser_pdf when their year is at least
+``pdf_from_year`` (config.yaml); older PDF-only acts (pre-2012 issues, the
+Konstytucja 1997) are still skipped client-side on the listing's own
+``textHTML`` flag.
 """
 
 from legalize.fetcher.pl.client import EliClient
