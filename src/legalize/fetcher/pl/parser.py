@@ -818,7 +818,13 @@ class EliTextParser(TextParser):
         # these, so the tables end up as top-level nodes outside any unit.
         # We collect every non-nested <table> that is NOT already inside a
         # unit we processed and emit it as an annex block.
-        processed_tables: set[int] = set()
+        # Processed tables are marked with an attribute on the element, not collected
+        # as id(): lxml creates element proxies lazily and CPython reuses id() values
+        # once they are garbage-collected, so an id() set also matched unrelated tables
+        # and dropped them, depending on what the process had parsed before (same bug
+        # as _CONSUMED_ATTR in _render_article_body). DU/2024/1466 lost 2 of its annex
+        # tables in some runs.
+        done_attr = "_legalize_table_done"
         # Mark tables inside cite-boxes / units as already processed
         for t in root.iter():
             if (t.tag or "").lower() != "table":
@@ -826,7 +832,7 @@ class EliTextParser(TextParser):
             anc = t.getparent()
             while anc is not None:
                 if _get_classes(anc) & {"cite-box", "cite-body"}:
-                    processed_tables.add(id(t))
+                    t.set(done_attr, "1")
                     break
                 anc = anc.getparent()
 
@@ -834,7 +840,7 @@ class EliTextParser(TextParser):
         for t in root.iter():
             if (t.tag or "").lower() != "table":
                 continue
-            if id(t) in processed_tables:
+            if t.get(done_attr) == "1":
                 continue
             # Only keep the outermost table of a nested chain
             anc = t.getparent()
@@ -880,7 +886,8 @@ class EliTextParser(TextParser):
             )
             # Mark all descendants as processed so inner tables don't get double-emitted
             for desc in t.iter():
-                processed_tables.add(id(desc))
+                if isinstance(desc.tag, str):
+                    desc.set(done_attr, "1")
 
         return blocks
 

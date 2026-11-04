@@ -434,3 +434,44 @@ class TestRenderedMarkdown:
         assert len(frontmatter["keywords"]) > 20
         # has_pdf must be serialized as a real bool / true, not "True"
         assert frontmatter.get("has_pdf") in (True, "true")
+
+
+class TestAnnexTablesAllKept:
+    """Every top-level annex table becomes a block.
+
+    The annex pass used to remember processed tables by id(); lxml proxies are
+    created lazily and CPython reuses their ids, so tables after the first one
+    looked processed and were dropped (DU/2024/1466 kept 1 of its 12 tables).
+    """
+
+    @staticmethod
+    def _doc(n_tables: int) -> bytes:
+        quoted = "".join(f"<table><tr><td>q{i}</td></tr></table>" for i in range(5))
+        article = (
+            '<div class="unit unit_arti" data-id="art_1"><h3>Art. 1.</h3>'
+            '<div class="unit-inner"><div class="cite-box"><div class="cite-body">'
+            f"{quoted}</div></div></div></div>"
+        )
+        annexes = "".join(
+            f'<div class="part"><h2>Załącznik nr {k}</h2>'
+            f"<table><tr><td>A{k}</td><td>B{k}</td></tr></table></div>"
+            for k in range(1, n_tables + 1)
+        )
+        html = (
+            '<html><body><div class="parts"><section>'
+            f"{article}{annexes}</section></div></body></html>"
+        )
+        return _marker("DU-2024-1", "2024-01-01") + html.encode()
+
+    def test_all_annex_tables_emitted(self):
+        blocks = EliTextParser().parse_text(self._doc(10))
+        annex = [b for b in blocks if b.block_type == "annex"]
+        assert len(annex) == 10
+        tables = [b.versions[0].paragraphs[-1].text for b in annex]
+        assert [f"| A{k} | B{k} |" in t for k, t in enumerate(tables, start=1)] == [True] * 10
+
+    def test_quoted_tables_not_emitted_as_annexes(self):
+        blocks = EliTextParser().parse_text(self._doc(1))
+        annex = [b for b in blocks if b.block_type == "annex"]
+        assert len(annex) == 1
+        assert not any("q0" in p.text for b in annex for p in b.versions[0].paragraphs)
