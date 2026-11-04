@@ -1,0 +1,209 @@
+{
+  "msg": "操作成功",
+  "code": 200,
+  "data": {
+    "bbbs": "2c909fdd678bf17901678bf724bd0609",
+    "ossFile": {
+      "ossWordPath": "prod/20180831/665a0e7c7cf147d6952d02e850dccb22.docx",
+      "ossWordOfdPath": "prod/20180831/665a0e7c7cf147d6952d02e850dccb22.ofd",
+      "ossWordOfdSize": 129444,
+      "ossPdfPath": "prod/20180831/efd354e0a6b54e60b7fa60727c21c9e2.pdf",
+      "ossPdfOfdPath": "prod/20180831/efd354e0a6b54e60b7fa60727c21c9e2.ofd",
+      "ossPdfOfdSize": 2286536
+    },
+    "xgwj": [],
+    "lsyg": null,
+    "xgzl": [],
+    "flfg": null,
+    "flxz": "法律",
+    "zdjgName": "全国人民代表大会",
+    "gbrq": "2018-08-31",
+    "sxrq": "2019-01-01",
+    "title": "中华人民共和国个人所得税法",
+    "sxx": 3,
+    "content": {
+      "id": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+      "parentId": "00000000-0000-0000-0000-000000000000",
+      "title": "中华人民共和国个人所得税法",
+      "index": 0,
+      "children": [
+        {
+          "id": "79890000-3e3b-0016-af0e-08dd7bf49d56",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "题注",
+          "index": 1,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-c411-08dd7bf49d56",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第一条",
+          "index": 2,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-d869-08dd7bf49d56",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第二条",
+          "index": 3,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-f0ef-08dd7bf49d56",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第三条",
+          "index": 4,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-07ea-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第四条",
+          "index": 5,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-209f-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第五条",
+          "index": 6,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-37ac-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第六条",
+          "index": 7,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-4f69-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第七条",
+          "index": 8,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-65db-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第八条",
+          "index": 9,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-78d3-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第九条",
+          "index": 10,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-871c-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十条",
+          "index": 11,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-9700-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十一条",
+          "index": 12,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-a49f-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十二条",
+          "index": 13,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-b17e-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十三条",
+          "index": 14,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-bf6b-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十四条",
+          "index": 15,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-cd0b-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十五条",
+          "index": 16,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-da92-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十六条",
+          "index": 17,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-e829-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十七条",
+          "index": 18,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-f5f6-08dd7bf49d57",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十八条",
+          "index": 19,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-05d4-08dd7bf49d58",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第十九条",
+          "index": 20,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-159e-08dd7bf49d58",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第二十条",
+          "index": 21,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-2328-08dd7bf49d58",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第二十一条",
+          "index": 22,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-3123-08dd7bf49d58",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "第二十二条",
+          "index": 23,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-402a-08dd7bf49d58",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "个人所得税税率表一（综合所得适用）",
+          "index": 24,
+          "children": []
+        },
+        {
+          "id": "79890000-3e3b-0016-5107-08dd7bf49d58",
+          "parentId": "79890000-3e3b-0016-ae73-08dd7bf49d56",
+          "title": "个人所得税税率表二（经营所得适用）",
+          "index": 25,
+          "children": []
+        }
+      ]
+    },
+    "xfFlag": 0
+  }
+}
