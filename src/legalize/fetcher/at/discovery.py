@@ -135,7 +135,7 @@ class RISDiscovery(NormDiscovery):
             logger.info("Discovery cache expired (%.0f days old)", age_days)
             return None
         try:
-            data = json.loads(path.read_text())
+            data = json.loads(path.read_text(encoding="utf-8"))
             return data.get("gesetzesnummern", None)
         except (json.JSONDecodeError, OSError):
             return None
@@ -145,7 +145,7 @@ class RISDiscovery(NormDiscovery):
         if path is None:
             return
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps({"gesetzesnummern": gesnrs}, indent=2))
+        path.write_text(json.dumps({"gesetzesnummern": gesnrs}, indent=2), encoding="utf-8")
         logger.info("Saved discovery cache: %d Gesetzesnummern → %s", len(gesnrs), path)
 
     def discover_daily(

@@ -294,25 +294,25 @@ class TestSwedishMetadataParser:
 
 class TestSFSRParsing:
     def test_parse_sfsr_html(self):
-        html = (FIXTURES / "se-sfsr-amendments.html").read_text()
+        html = (FIXTURES / "se-sfsr-amendments.html").read_text(encoding="utf-8")
         reforms = _parse_sfsr_html(html)
         assert len(reforms) == 3
 
     def test_sfsr_reform_dates(self):
-        html = (FIXTURES / "se-sfsr-amendments.html").read_text()
+        html = (FIXTURES / "se-sfsr-amendments.html").read_text(encoding="utf-8")
         reforms = _parse_sfsr_html(html)
         assert reforms[0].date == date(1965, 1, 1)
         assert reforms[1].date == date(1971, 1, 1)
         assert reforms[2].date == date(2026, 1, 1)
 
     def test_sfsr_norm_ids(self):
-        html = (FIXTURES / "se-sfsr-amendments.html").read_text()
+        html = (FIXTURES / "se-sfsr-amendments.html").read_text(encoding="utf-8")
         reforms = _parse_sfsr_html(html)
         assert reforms[0].norm_id == "SFS 1965:146"
         assert reforms[2].norm_id == "SFS 2026:253"
 
     def test_sfsr_affected_sections(self):
-        html = (FIXTURES / "se-sfsr-amendments.html").read_text()
+        html = (FIXTURES / "se-sfsr-amendments.html").read_text(encoding="utf-8")
         reforms = _parse_sfsr_html(html)
         # First reform: "ändr. 2 kap. 1, 3 §§"
         assert "2:1" in reforms[0].affected_blocks
@@ -330,7 +330,7 @@ class TestSFSRParsing:
 
     def test_extract_reforms_from_sfsr(self):
         parser = SwedishTextParser()
-        html = (FIXTURES / "se-sfsr-amendments.html").read_text()
+        html = (FIXTURES / "se-sfsr-amendments.html").read_text(encoding="utf-8")
         reforms = parser.extract_reforms_from_sfsr(html)
         assert len(reforms) == 3
 

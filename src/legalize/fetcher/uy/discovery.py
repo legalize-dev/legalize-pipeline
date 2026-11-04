@@ -193,7 +193,7 @@ class IMPODiscovery(NormDiscovery):
         """
         if self._catalog_path and Path(self._catalog_path).exists():
             try:
-                cached = json.loads(Path(self._catalog_path).read_text())
+                cached = json.loads(Path(self._catalog_path).read_text(encoding="utf-8"))
                 logger.info(
                     "Loaded %d laws from catalog cache at %s",
                     len(cached),
@@ -241,7 +241,9 @@ class IMPODiscovery(NormDiscovery):
         """
         if self._decretos_ley_catalog_path and Path(self._decretos_ley_catalog_path).exists():
             try:
-                cached = json.loads(Path(self._decretos_ley_catalog_path).read_text())
+                cached = json.loads(
+                    Path(self._decretos_ley_catalog_path).read_text(encoding="utf-8")
+                )
                 logger.info(
                     "Loaded %d decretos-ley from catalog cache at %s",
                     len(cached),

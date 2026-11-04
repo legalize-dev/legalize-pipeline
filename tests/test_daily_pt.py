@@ -272,7 +272,7 @@ class TestAmendmentPropagation:
                 _Api(), tmp_path, {"pub:decreto-lei:16-1994-512030"}
             )
             assert changed == {"pub:decreto-lei:16-1994-512030"}
-            index = _json.loads((tmp_path / "amendments.json").read_text())
+            index = _json.loads((tmp_path / "amendments.json").read_text(encoding="utf-8"))
             assert index["pub:decreto-lei:16-1994-512030"] == [
                 ["1994-11-11", "DRE-1994-37-533820", "Alterados os arts. 5.º, 9.º"]
             ]

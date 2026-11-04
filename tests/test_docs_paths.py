@@ -40,7 +40,7 @@ def _resolve(raw: str) -> Path:
 def _named_paths() -> list[tuple[Path, str]]:
     found = []
     for doc in DOCS:
-        for raw in PATH_RE.findall(doc.read_text()):
+        for raw in PATH_RE.findall(doc.read_text(encoding="utf-8")):
             if not PLACEHOLDER_RE.search(raw):
                 found.append((doc, raw))
     return found
@@ -71,7 +71,7 @@ RESEARCH_RE = re.compile(r"\bRESEARCH-[A-Za-z0-9][A-Za-z0-9-]*")
 def _cited_notes() -> list[tuple[Path, str]]:
     found = []
     for src in SOURCES:
-        for name in RESEARCH_RE.findall(src.read_text()):
+        for name in RESEARCH_RE.findall(src.read_text(encoding="utf-8")):
             found.append((src, name))
     return found
 
