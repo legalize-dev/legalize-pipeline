@@ -15,6 +15,84 @@ from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Ve
 
 
 TABLE_ROW = re.compile(r"\| .* \|")
+# How a law's lines become paragraphs, as render_body in legalize-mk/tools/build.py built the
+# published corpus. A PDF line break is only wrapping, so lines join into one paragraph until a
+# paragraph mark, an article heading, a heading in capitals or a line opening a numbered or
+# lettered item. Without it every printed line was its own paragraph (5,481 of 5,544 laws).
+ARTICLE_HEADING = re.compile(r"^(?:Член|Article|ARTICLE)\s+(\d+[а-я]?|[IVXL]+)\.?$")
+ROMAN_HEADING = re.compile(r"^[IVX]+\s*[-.–]\s*\S")
+NEW_PARAGRAPH = re.compile(r"^(\(\d+\)|\d+\.|[-–•]|„?[а-я]\)|\d+\))\s")
+LOWERCASE = re.compile(r"[а-шa-z]")
+UPPERCASE = re.compile(r"[А-ЯA-Z]")
+HYPHENATED = re.compile(r"[а-яА-ЯѓЃќЌљЉњЊџЏѕЅa-zA-Z]-$")
+
+
+def _joined_hyphens(lines: list[str]) -> list[str]:
+    """Rejoin a word the typesetter hyphenated at a line end."""
+    out: list[str] = []
+    for line in lines:
+        if out and HYPHENATED.search(out[-1]) and line[:1].islower():
+            out[-1] = out[-1][:-1] + line
+        else:
+            out.append(line)
+    return out
+
+
+def _paragraphs(lines: list[str], paragraph_mark: str) -> list[Paragraph]:
+    out: list[Paragraph] = []
+    words: list[str] = []
+    rows: list[str] = []
+    after_heading = False
+
+    def flush() -> None:
+        if words:
+            out.append(Paragraph(css_class="parrafo", text=" ".join(words)))
+            words.clear()
+
+    # A table's rows are one paragraph: the renderer puts a blank line between paragraphs,
+    # which would end a pipe table after its first row. A paragraph mark ends a table, so two
+    # tables in a row stay two. A row is "| cell | cell |" as with_tables writes it: OCR reads
+    # a printed bracket as a bar ("|Option 3" in RM-2008-18-14566), and such a line is text.
+    for line in [*_joined_hyphens(lines), paragraph_mark]:
+        if TABLE_ROW.fullmatch(line):
+            flush()
+            rows.append(line)
+            after_heading = False
+            continue
+        if rows:
+            out.append(Paragraph(css_class="table", text="\n".join(rows)))
+            rows = []
+        if line == paragraph_mark:
+            flush()
+            continue
+        capitals = not LOWERCASE.search(line) and UPPERCASE.search(line)
+        if article := ARTICLE_HEADING.match(line):
+            flush()
+            out.append(Paragraph(css_class="articulo", text=article.group(0).rstrip(".")))
+        # A title in capitals wraps onto the next line, which continues the heading above.
+        elif (
+            ROMAN_HEADING.match(line)
+            or (capitals and len(line) > 3 and re.search(r"[А-ЯA-Z]{3}", line))
+            or (capitals and after_heading)
+        ):
+            flush()
+            if (
+                after_heading
+                and out
+                and out[-1].css_class == "titulo"
+                and not ROMAN_HEADING.match(line)
+            ):
+                out[-1] = Paragraph(css_class="titulo", text=f"{out[-1].text} {line}")
+            else:
+                out.append(Paragraph(css_class="titulo", text=line))
+            after_heading = True
+            continue
+        else:
+            if NEW_PARAGRAPH.match(line):
+                flush()
+            words.append(line)
+        after_heading = False
+    return out
 
 
 def _date(value: str) -> date:
@@ -24,13 +102,6 @@ def _date(value: str) -> date:
         except ValueError:
             pass
     raise ValueError(f"Invalid LDBIS date: {value!r}")
-
-
-def _date_from_text(text: str) -> date:
-    match = re.search(r"\b(\d{1,2}[.]\d{1,2}[.]\d{4})\b", text)
-    if not match:
-        raise ValueError("LDBIS text has no source date; pass card metadata to the parser")
-    return _date(match.group(1))
 
 
 def _fix_ldbis_ocr_artifacts(text: str) -> str:
@@ -132,30 +203,15 @@ class LDBISTextParser(TextParser):
         )
         lines, details = parse_pdf(data, norm_id, metadata.title, cache_dir)
         lines = [_fix_ldbis_ocr_artifacts(line) for line in lines]
-        paragraphs = []
-        # A table's rows are one paragraph: the renderer puts a blank line between paragraphs,
-        # which would end a pipe table after its first row. A paragraph mark ends a table, so two
-        # tables in a row stay two. A row is "| cell | cell |" as with_tables writes it: OCR reads
-        # a printed bracket as a bar ("|Option 3" in RM-2008-18-14566), and such a line is text.
-        rows: list[str] = []
-        for line in [*lines, PARAGRAPH]:
-            if TABLE_ROW.fullmatch(line):
-                rows.append(line)
-                continue
-            if rows:
-                paragraphs.append(Paragraph(css_class="table", text="\n".join(rows)))
-                rows = []
-            if line != PARAGRAPH:
-                css_class = "articulo" if re.match(r"^Член\s+\d+\b", line) else "parrafo"
-                paragraphs.append(Paragraph(css_class=css_class, text=line))
+        paragraphs = _paragraphs(lines, PARAGRAPH)
 
         if details["text_source"]:
             extra = dict(metadata.extra)
             extra["text_source"] = details["text_source"]
             if details["doubtful_pages"]:
-                extra["ocr_doubtful_pages"] = ",".join(map(str, details["doubtful_pages"]))
+                extra["ocr_doubtful_pages"] = tuple(details["doubtful_pages"])
             if details["unread_pages"]:
-                extra["ocr_unread_pages"] = ",".join(map(str, details["unread_pages"]))
+                extra["ocr_unread_pages"] = tuple(details["unread_pages"])
             metadata = replace(metadata, extra=tuple(extra.items()))
         return self._blocks(paragraphs, metadata.publication_date), metadata
 
@@ -163,10 +219,13 @@ class LDBISTextParser(TextParser):
     def _blocks(paragraphs: list[Paragraph], publication_date: date | None = None) -> list[Block]:
         if not paragraphs:
             return []
-        source_text = "\n".join(paragraph.text for paragraph in paragraphs)
+        # The version is dated by the card, never by a date read from the body, which may be a
+        # deadline later than the act and would empty its commit.
+        if publication_date is None:
+            raise ValueError("LDBIS text has no card date; pass the card metadata to the parser")
         version = Version(
             norm_id="",
-            publication_date=publication_date or _date_from_text(source_text),
+            publication_date=publication_date,
             effective_date=None,
             paragraphs=tuple(paragraphs),
         )

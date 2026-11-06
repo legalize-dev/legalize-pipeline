@@ -327,6 +327,21 @@ class LDBISClient(HttpClient):
         reforms.sort(key=lambda reform: (reform.date, reform.norm_id))
         return reforms
 
+    def amended_law(self, norm_id: str, meta_data: bytes) -> str:
+        """Return the identifier of the law an amending act or a correction changes, or "".
+
+        It is the law whose history get_reforms gives the act, the latest enactment of the
+        title the act names published on or before it, as RM-2006-13-11057 is for 30409."""
+        card = parse_card(meta_data, norm_id)
+        law = _amended_title(card["title"])
+        if not law:
+            return ""
+        enactments, _ = _family(
+            card, law, lambda related_id: parse_card(self.get_metadata(related_id), related_id)
+        )
+        enacted = _enacted_before(card, enactments)
+        return canonical_identifier(enacted) if enacted else ""
+
     def discover_scope(self) -> list[str]:
         """Return IDs from the official advanced-search result set.
 
@@ -519,12 +534,15 @@ def _belongs(card: dict[str, Any], card_by_id) -> bool:
     if not law:
         return _in_force(card, *_family(card, _normal_title(card["title"]), card_by_id))
     enactments, amendments = _family(card, law, card_by_id)
+    enacted = _enacted_before(card, enactments)
+    return bool(enacted) and _in_force(enacted, enactments, amendments)
+
+
+def _enacted_before(card: dict[str, Any], enactments: list[dict]) -> dict[str, Any] | None:
+    """Return the latest enactment published on or before a card, the law an amendment changes."""
     published = _day(card["publication_date"])
     earlier = [enacted for enacted in enactments if _day(enacted["publication_date"]) <= published]
-    if not earlier:
-        return False
-    enacted = max(earlier, key=lambda related: _day(related["publication_date"]))
-    return _in_force(enacted, enactments, amendments)
+    return max(earlier, key=lambda related: _day(related["publication_date"]), default=None)
 
 
 def _day(value: str) -> date:

@@ -403,6 +403,9 @@ def render_norm_at_date(
         version_date = target_date
     if metadata.country == "ie" and metadata.text_state is not TextState.POINT_IN_TIME:
         version_date = target_date
+    if metadata.country == "mk":
+        # As enacted: last_updated is the date of the latest amendment recorded (SPEC §text_state).
+        version_date = target_date
     parts.append(render_frontmatter(metadata, version_date, structure))
 
     title = metadata.title.rstrip(". ").strip()

@@ -459,6 +459,11 @@ def generic_fetch_one(
                 from legalize.fetcher.ie.history import metadata_for_text
 
                 metadata = metadata_for_text(metadata, text_data)
+            # A client that can name the law an amending act changes (mk) records it as amends.
+            if hasattr(client, "amended_law") and (
+                amends := client.amended_law(norm_id, meta_data)
+            ):
+                metadata = replace(metadata, extra=metadata.extra + (("amends", amends),))
 
             # Suvestine: replace blocks + reforms with versioned historical data.
             # For a suvestine-capable country a fetch/parse failure is a hard

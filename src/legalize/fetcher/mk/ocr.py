@@ -363,14 +363,37 @@ def scrawl(pairs):
     return True
 
 
-def readable(page):
-    """A cached page's lines, without the marks in pictures on a doubtful page, and without the
-    signatures and stamps on any page."""
-    lines = (
-        page["lines"]
-        if page["confidence"] >= DOUBTFUL_PAGE
-        else [pairs for pairs in page["lines"] if not nonsense(pairs)]
+UNREADABLE_CONF = 30
+
+
+def unreadable(pairs):
+    """Whether a line of two words or more holds no known word and the model was under 30 % sure
+    of its words on average.
+
+    On a sure page such a line that is also nonsense is left out: measured on the 30,232 sure
+    cached pages (6 November 2026), the 3,000 such lines are logo marks, stamps, the scrap "- o"
+    under the letterhead of 14566 page 2, and running heads read in the wrong script. A one-word
+    line stays, since "b)" and "cauză." were among them. A page that keeps such a line, as the
+    address under the same letterhead ("mad; delegation-fymmacedonia@ec europa. eu"), is recorded
+    as doubtful, because the line is not nonsense by the word list and no rule tried told its
+    scraps, or the "wl ata" before "EUROPEAN UNION", from real numbering such as "(iii):"."""
+    words = [(w, c) for w, c in pairs if re.search(r"[^\W_]", w)]
+    return (
+        len(pairs) >= 2
+        and bool(words)
+        and sum(c for _, c in words) / len(words) < UNREADABLE_CONF
+        and not any(re.sub(r"[\W\d_]", "", w).casefold() in vocab() for w, _ in words)
     )
+
+
+def readable(page):
+    """A cached page's lines, without the marks in pictures (on a sure page only the unreadable
+    ones), and without the signatures and stamps on any page."""
+    lines = [
+        pairs
+        for pairs in page["lines"]
+        if not nonsense(pairs) or (page["confidence"] >= DOUBTFUL_PAGE and not unreadable(pairs))
+    ]
     return [
         pairs
         for pairs in lines
@@ -2003,6 +2026,14 @@ LEGAL_QUOTE_OPEN = re.compile(
     r"(\b(?:зборовите|зборот|кои гласат|гласи):\s*)[См](?=[А-ШЃЌЅЉЊЏ])", re.I
 )
 GAZETTE_OPEN = re.compile(r"\bС(?=Службен (?:весник|лист))")
+# A quoted number or capitals the old text layer gives as С...м, as "зборовите: С10.000 до
+# 50.000м" (SFRJ-1989-47-1700) and "зборот СПОДЕМм". Only digits, signs and the joining words of
+# an amount may stand between, so a code such as "Потпрограма С1" or "60м2" is left alone.
+PAIRED_QUOTE = re.compile(
+    r"(?<![^\s(:/])С(?P<inner>\d(?:[\d.,%/ –-]|\b(?:до|и|или|од)\b)*?[\d%]"
+    r"|[А-ШЃЌЅЉЊЏ]{2}[А-ШЃЌЅЉЊЏ\d .,/–-]*?[А-ШЃЌЅЉЊЏ])м(?=[\s,.;:)]|$)",
+    re.M,
+)
 MK_ALL = MK_LETTERS + MK_LETTERS.upper()
 HOMOGLYPHS = str.maketrans("aceopxyiAEOPCTHKMBXjJ", "асеорхуіАЕОРСТНКМВХјЈ")
 SERBIAN_MARKERS = (
@@ -2074,6 +2105,7 @@ def fix_quote_artifacts(text):
     text = QUOTE_OPEN.sub(open_quote, text)
     text = QUOTE_OPEN_M.sub(open_quote, text)
     text = LEGAL_QUOTE_OPEN.sub(r"\1„", text)
+    text = PAIRED_QUOTE.sub(r"„\g<inner>“", text)
     # In legal references, "член N став M" is fixed terminology. OCR often
     # turns "став" into the ordinary word "стар", which a dictionary cannot
     # reject on spelling alone.
@@ -2089,10 +2121,29 @@ def fix_quote_artifacts(text):
     text = re.sub(r"(Република Македониј)ам(?=\s*(?:број|бр\.|[.,;)\"-]))", r"\1а“", text)
     out = []
     quoted = False
+    opened = 0
     for pos, char in enumerate(text):
         if char == "„":
-            quoted = True
+            quoted, opened = True, pos
         elif char == "“":
+            quoted = False
+        elif (
+            char == "м"
+            and quoted
+            and (pos + 1 == len(text) or text[pos + 1] in " \t\n,.;:)")
+            and (
+                # A gazette or name in capitals, as "(„Службен весник на СРМм број 4/78".
+                re.search(r"[А-ШЃЌЅЉЊЏ]{2}$", text[max(0, pos - 2) : pos])
+                # An amount the quote opened on, as "„4.500 до 45.000м", never metres in a
+                # quoted passage ("поголеми од 150м").
+                or (
+                    text[pos - 1 : pos] in "0123456789%"
+                    and text[opened + 1 : opened + 2].isdigit()
+                    and pos - opened <= 40
+                )
+            )
+        ):
+            char = "“"
             quoted = False
         elif char in "мо" and quoted:
             start = pos
@@ -2115,8 +2166,13 @@ def fix_quote_artifacts(text):
         out.append(char)
     text = "".join(out)
     text = re.sub(r"[ \t]+:", ":", text)
-    text = re.sub(r'(?<=[„«"])[ \t]+', "", text)
-    text = re.sub(r'[ \t]+(?=[“»"])', "", text)
+    # Macedonian typing uses “ and " to open a quote as well as to close one, as in
+    # 'зборовите: “до' (RM-2010-50-19233). A quote opens where a space or a line start comes
+    # before it, and closes where no letter, digit or opening bracket follows it ('бројот “(1)“'),
+    # so only those spaces are stray.
+    text = re.sub(r"(?<=[„«])[ \t]+", "", text)
+    text = re.sub(r'(?m)(^|\s)"[ \t]+(?=\w)', r'\1"', text)
+    text = re.sub(r'(?<=\w)[ \t]+(?=[“»"](?![\w(]))', "", text)
     return text
 
 
@@ -2249,10 +2305,18 @@ def parse_pdf(
     for page_path in sorted(ocr_dir.glob("*.json"), key=lambda path: int(path.stem)):
         record = json.loads(page_path.read_text(encoding="utf-8"))
         page_number = int(page_path.stem) + 1
-        if record["confidence"] < DOUBTFUL_PAGE or record["words"] < 20:
+        kept = readable(record)
+        if (
+            record["confidence"] < DOUBTFUL_PAGE
+            or record["words"] < 20
+            or any(unreadable(pairs) for pairs in kept if not pairs[0][0].startswith(TABLE_MARK))
+        ):
             doubtful.append(page_number)
-        if record.get("unread_lines") or len(readable(record)) < len(record["lines"]):
+        if record.get("unread_lines") or len(kept) < len(record["lines"]):
             unread.append(page_number)
+    fixes = json.loads((ASSET_ROOT / "ocr_fixes.json").read_text(encoding="utf-8"))
+    left_out = {page for _old, _new, *page in fixes.get(norm_id, []) for page in page}
+    unread = sorted(set(unread) | left_out)
     details = {
         "source_sha256": digest,
         "text_source": text_source_from_pdf(pdf_path),
@@ -2305,7 +2369,9 @@ def doc_lines(
     texts = remove_repeated_headers(texts)
     text = fix_quote_artifacts("\f".join(texts))
     fixes = json.loads((ASSET_ROOT / "ocr_fixes.json").read_text(encoding="utf-8"))
-    for old, new in fixes.get(str(doc_id), []):
+    # An entry may name the page whose unreadable letterhead or running head it leaves out
+    # (14566), and parse_pdf records that page as unread.
+    for old, new, *_page in fixes.get(str(doc_id), []):
         if old not in text:
             raise ValueError(f"Reviewed OCR replacement for LDBIS {doc_id} did not match: {old!r}")
         text = text.replace(old, new)

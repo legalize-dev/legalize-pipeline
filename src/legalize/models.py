@@ -265,7 +265,9 @@ class NormMetadata:
     pdf_url: Optional[str] = None
     subjects: tuple[str, ...] = ()
     summary: str = ""
-    extra: tuple[tuple[str, str], ...] = ()  # Country-specific key-value pairs for frontmatter
+    # Country-specific key-value pairs for frontmatter. A value is a string, or a tuple for a
+    # list such as the page numbers of a scan.
+    extra: tuple[tuple[str, str | tuple[str | int, ...]], ...] = ()
     # None → the country default from countries.TEXT_STATE. Set explicitly only
     # to override one norm: inside a consolidated country there are individual
     # norms the source never consolidated (ar tier 2, eu, lu, ch).

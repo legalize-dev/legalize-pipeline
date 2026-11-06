@@ -8,6 +8,7 @@ Unified CLI with --country flag for all operations.
 from __future__ import annotations
 
 import importlib
+import inspect
 import logging
 from datetime import date
 
@@ -477,7 +478,7 @@ def bootstrap(
     "--since",
     default=None,
     help="Process every day from this one to today (YYYY-MM-DD), past the usual lookback cap."
-    " Generic dailies only: the way back after an outage longer than the cap.",
+    " Generic dailies and mk only: the way back after an outage longer than the cap.",
 )
 @click.option("--repo-path", default=None, help="Override output repo directory.")
 @click.option("--data-dir", default=None, help="Override data directory.")
@@ -533,9 +534,12 @@ def daily(
 
     parsed_since = date.fromisoformat(since) if since else None
     if module is not None and hasattr(module, "daily"):
-        if parsed_since:
+        if not parsed_since:
+            module.daily(config, target_date=parsed_date, dry_run=dry_run)
+        elif "since" in inspect.signature(module.daily).parameters:
+            module.daily(config, target_date=parsed_date, dry_run=dry_run, since=parsed_since)
+        else:
             raise click.UsageError(f"--since is for generic dailies; {country} has its own.")
-        module.daily(config, target_date=parsed_date, dry_run=dry_run)
     else:
         from legalize.pipeline import generic_daily
 

@@ -653,6 +653,11 @@ def test_post_ocr_spacing_and_homoglyph_cleanup_preserves_partner_language():
         _fix_ldbis_ocr_artifacts("„ лице кое “; договорна страна : „ Царинска унија “")
         == "„лице кое“; договорна страна: „Царинска унија“"
     )
+    # The same marks open a quote too, and the space before an opening quote is printed.
+    assert (
+        _fix_ldbis_ocr_artifacts('зборовите: “до 2,5%“ и „12) "Добра репутација" е, бројот “(1)“')
+        == 'зборовите: “до 2,5%“ и „12) "Добра репутација" е, бројот “(1)“'
+    )
     mixed = (
         "Оваа е Mакедонија. Во полскиот текст tej Umowy, a Rządem се наведува и договорната страна."
     )
@@ -730,8 +735,8 @@ def test_norm_parser_runs_post_fixes_after_full_pdf_processing(monkeypatch, tmp_
     assert paragraph.text == "член 2 став 2 на овој член"
     assert enriched_metadata.extra[-3:] == (
         ("text_source", "ocr"),
-        ("ocr_doubtful_pages", "1"),
-        ("ocr_unread_pages", "2"),
+        ("ocr_doubtful_pages", (1,)),
+        ("ocr_unread_pages", (2,)),
     )
 
 
@@ -955,7 +960,11 @@ def test_a_tables_rows_render_as_one_pipe_table(monkeypatch, tmp_path):
     lines = ["Член 3", "| A | B |", "| --- | --- |", "| 1 | 2 |", ocr.PARAGRAPH]
     lines += ["| C |", "| --- |", ocr.PARAGRAPH, "Член 4"]
     # RM-2008-18-14566 pages 53 and 109: printed brackets read as bars are text, not rows.
-    lines += ["|Option 3 - Adverse opinion", "|(дел ...... од програмата во однос на: ...|"]
+    lines += [
+        "|Option 3 - Adverse opinion",
+        ocr.PARAGRAPH,
+        "|(дел ...... од програмата во однос на: ...|",
+    ]
     monkeypatch.setattr(
         ocr,
         "parse_pdf",
@@ -972,6 +981,75 @@ def test_a_tables_rows_render_as_one_pipe_table(monkeypatch, tmp_path):
     assert "| A | B |\n| --- | --- |\n| 1 | 2 |\n\n| C |\n| --- |\n" in rendered
     assert "|Option 3 - Adverse opinion\n\n|(дел" in rendered
     assert [p.css_class for p in paragraphs][-2:] == ["parrafo", "parrafo"]
+
+
+def test_article_2_of_the_pension_law_has_three_whole_list_items(monkeypatch, tmp_path):
+    # The first two pages of RM-2012-98-25996, a text-layer PDF, where each list item of
+    # Член 2 wraps over two printed lines.
+    pdf = Path(__file__).parent / "fixtures" / "mk" / "raw" / "RM-2012-98-25996-p1-2.pdf"
+    metadata = LDBISMetadataParser().parse(FIXTURE.read_bytes(), "RM-2012-98-25996")
+    monkeypatch.setenv("LEGALIZE_MK_OCR_CACHE", str(tmp_path))
+
+    blocks, _ = LDBISTextParser().parse_norm_text(pdf.read_bytes(), "25996", metadata)
+    texts = [p.text for p in blocks[0].versions[0].paragraphs]
+    article = texts[texts.index("Член 2") + 1 : texts.index("Член 3")]
+
+    assert [text for text in article if text.startswith("- ")] == [
+        "- задолжително пензиско и инвалидско осигурување врз основа на генерациска "
+        "солидарност (во натамошниот текст: прв столб),",
+        "- задолжително капитално финансирано пензиско осигурување (во натамошниот текст: "
+        "втор столб) и",
+        "- доброволно капитално финансирано пензиско осигурување (во натамошниот текст: "
+        "трет столб).",
+    ]
+    assert article[0] == "(1) Системот на пензиското и инвалидското осигурување е составен од:"
+
+
+def test_wrapped_lines_join_into_paragraphs_as_the_published_corpus_did(monkeypatch, tmp_path):
+    from legalize.fetcher.mk import ocr
+
+    metadata = LDBISMetadataParser().parse(FIXTURE.read_bytes(), "RM-2013-187-30412")
+    monkeypatch.setenv("LEGALIZE_MK_OCR_CACHE", str(tmp_path))
+    # RM-2010-50-19233, page 1, as its text layer wraps it.
+    lines = [
+        "ПРВ ДЕЛ",
+        "ОПШТИ ОДРЕДБИ",
+        "Член 1",
+        "Во Законот за задолжително капитално финансирано пензиско осигурување („Службен",
+        "весник на Република Македонија” број 29/2002), во членот 3 се менува и гласи:",
+        "а) поединечен акционер или група акционери кои поседуваат најмалку 10% од акци-",
+        "ите со право на глас;",
+        "Член 5 се брише.",
+        ocr.PARAGRAPH,
+        "Член 2.",
+    ]
+    monkeypatch.setattr(
+        ocr,
+        "parse_pdf",
+        lambda data, norm_id, title, cache_dir: (
+            lines,
+            {"text_source": None, "doubtful_pages": [], "unread_pages": []},
+        ),
+    )
+
+    blocks, _ = LDBISTextParser().parse_norm_text(b"pdf", metadata.identifier, metadata)
+    paragraphs = [(p.css_class, p.text) for p in blocks[0].versions[0].paragraphs]
+
+    assert paragraphs == [
+        ("titulo", "ПРВ ДЕЛ ОПШТИ ОДРЕДБИ"),
+        ("articulo", "Член 1"),
+        (
+            "parrafo",
+            "Во Законот за задолжително капитално финансирано пензиско осигурување („Службен "
+            "весник на Република Македонија” број 29/2002), во членот 3 се менува и гласи:",
+        ),
+        (
+            "parrafo",
+            "а) поединечен акционер или група акционери кои поседуваат најмалку 10% од акциите "
+            "со право на глас; Член 5 се брише.",
+        ),
+        ("articulo", "Член 2"),
+    ]
 
 
 def test_rows_a_table_drew_without_rules_are_split_apart():
@@ -1111,3 +1189,69 @@ def test_a_run_downloads_a_partner_model_only_when_a_page_needs_it(monkeypatch, 
         "osd.traineddata",
     ]
     ocr.fetch_model.cache_clear()
+
+
+def test_a_sure_page_drops_unreadable_scraps_and_records_what_it_keeps():
+    from legalize.fetcher.mk import ocr
+
+    # Page 2 of RM-2008-18-14566 (sure at 87.5 %): the scrap under the letterhead goes, the
+    # address that is not nonsense by the word list stays and marks the page doubtful, and a
+    # one-word line such as a list marker stays however unsure the model was.
+    scrap = [["-", 16], ["o", 1]]
+    address = [["mad;", 38], ["delegation-fymmacedonia@ec", 36], ["europa.", 0], ["eu", 0]]
+    marker = [["b)", 12]]
+    text = [["Skopje,", 97], ["30", 97], ["October", 97], ["2007", 96]]
+    page = {"confidence": 87.5, "lines": [text, scrap, address, marker]}
+
+    kept = ocr.readable(page)
+
+    assert kept == [text, address, marker]
+    assert ocr.unreadable(address) and not ocr.unreadable(text) and not ocr.unreadable(marker)
+
+
+def test_quoted_numbers_and_capitals_from_the_old_text_layer_get_their_quotes():
+    from legalize.fetcher.mk.ocr import fix_quote_artifacts
+
+    # SFRJ-1989-47-1700 and its neighbours: the text layer gives „ as С and “ as м.
+    assert (
+        fix_quote_artifacts("во член 70 став 1 зборовите: С10.000 до 50.000м се заменуваат")
+        == "во член 70 став 1 зборовите: „10.000 до 50.000“ се заменуваат"
+    )
+    assert fix_quote_artifacts("процентот С60%м се заменува со процентот С100%м.") == (
+        "процентот „60%“ се заменува со процентот „100%“."
+    )
+    assert fix_quote_artifacts("(„Службен весник на СРМм број 4/78") == (
+        "(„Службен весник на СРМ“ број 4/78"
+    )
+    # Square metres and programme codes are not quotes.
+    for text in ("од најмалку 60м2, кој", "Потпрограма С1 – Унапредување", "„објекти од 150м и"):
+        assert fix_quote_artifacts(text) == text
+
+
+def test_every_reviewed_ocr_fix_is_a_replacement_with_at_most_its_page():
+    import json
+
+    from legalize.fetcher.mk.ocr import ASSET_ROOT
+
+    fixes = json.loads((ASSET_ROOT / "ocr_fixes.json").read_text(encoding="utf-8"))
+    for doc_id, entries in fixes.items():
+        assert doc_id.isdigit()
+        for old, new, *page in entries:
+            assert old and isinstance(new, str) and old != new
+            assert page == [] or (len(page) == 1 and isinstance(page[0], int) and page[0] >= 1)
+    # The letterhead of 14566 page 2 and the running head left on page 103 are left out.
+    assert {entry[2] for entry in fixes["14566"]} == {2, 103}
+
+
+def test_a_version_is_dated_by_the_card_never_by_a_date_in_the_body():
+    from legalize.fetcher.mk.parser import LDBISTextParser
+    from legalize.models import Paragraph
+
+    # A deadline in the body ("до 31.12.2030") would date the version after its reform commit.
+    body = [Paragraph("parrafo", "Обврската се исполнува до 31.12.2030 година.")]
+
+    with pytest.raises(ValueError, match="card date"):
+        LDBISTextParser._blocks(body)
+    assert LDBISTextParser._blocks(body, date(2012, 8, 1))[0].versions[0].publication_date == date(
+        2012, 8, 1
+    )

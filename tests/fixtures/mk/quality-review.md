@@ -160,7 +160,8 @@ These faults remain in the three laws. None is hidden by a hand correction, and
 4. Leftovers of page 103's sideways running head, ".02, 2008 година" and "ЕП ко ОТ",
    follow its tables.
 5. Word misreads in body text such as "authoritics" on page 12, at the rate the
-   doubtful page list reports.
+   doubtful page list reports. In 10930 the English "TOP SECRET" inside a
+   Macedonian sentence on page 7 comes out in Cyrillic as "ТОР ЗЕСКЕТ".
 
 ## Coverage across the corpus
 
