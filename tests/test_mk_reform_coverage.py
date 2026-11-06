@@ -31,8 +31,10 @@ GIT_ENV = {
 def _corpus(tmp_path, *files, commits=(), links=None):
     data = tmp_path / "data" / "json"
     data.mkdir(parents=True)
-    for identifier, title, published in files:
+    for identifier, title, published, *version in files:
         metadata = {"identifier": identifier, "title": title, "publication_date": published}
+        if version:
+            metadata["extra"] = [["version", version[0]]]
         reforms = [{"source_id": act} for act in [identifier, *(links or {}).get(identifier, [])]]
         (data / f"{identifier}.json").write_text(
             json.dumps({"metadata": metadata, "reforms": reforms}), encoding="utf-8"
@@ -56,6 +58,21 @@ def test_amendment_is_owed_to_the_enactment_in_force_when_it_was_published(tmp_p
         ("RM-1995-14-3958", "RM-1993-80-3349"),
         ("RM-2014-97-32407", "RM-2012-98-25996"),
     ]
+
+
+def test_a_consolidated_text_takes_no_amendment_from_its_law(tmp_path):
+    # LDBIS lists the 2013 consolidation of the 2012 pension law under the law's own title, and
+    # a consolidation enacts nothing, so a later amendment is still owed to the 2012 law.
+    consolidated = ("RM-2013-53-28096", NEW_LAW[1], "2013-04-11", "Пречистена верзија")
+    data, repo = _corpus(
+        tmp_path,
+        NEW_LAW,
+        consolidated,
+        NEW_AMENDMENT,
+        commits=[("RM-2014-97-32407", "RM-2012-98-25996")],
+    )
+
+    assert missing_reforms(data, repo) == []
 
 
 def test_committed_pairs_and_laws_outside_the_repository_pass(tmp_path):

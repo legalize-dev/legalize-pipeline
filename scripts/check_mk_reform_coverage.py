@@ -42,8 +42,10 @@ def missing_reforms(data_dir: str | Path, repo_dir: str | Path) -> list[tuple[st
     title alone and not through those links, so an amendment the links miss
     still fails here. A correction of a law, or of an act amending it, counts as
     an amending act of that law. Where several enactments share the title, the act
-    belongs to the latest one published on or before it. An act or law that
-    is not in the repository has nothing to be committed.
+    belongs to the latest one published on or before it. A consolidated text
+    ("Пречистена верзија") carries its law's title but enacts nothing, so it
+    takes no amendment, as in the client. An act or law that is not in the
+    repository has nothing to be committed.
     """
     files = [
         json.loads(path.read_text(encoding="utf-8"))
@@ -53,7 +55,8 @@ def missing_reforms(data_dir: str | Path, repo_dir: str | Path) -> list[tuple[st
     in_repository = {meta["identifier"] for meta in records}
     enactments: dict[str, list[tuple[str, str]]] = {}
     for meta in records:
-        if not _amended_title(meta["title"]):
+        version = dict(meta.get("extra") or {}).get("version")
+        if not _amended_title(meta["title"]) and version != "Пречистена верзија":
             enactments.setdefault(_normal_title(meta["title"]), []).append(
                 (meta["publication_date"], meta["identifier"])
             )
