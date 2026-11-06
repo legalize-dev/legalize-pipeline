@@ -445,6 +445,22 @@ class LDBISClient(HttpClient):
         ]
 
 
+# Acts whose LDBIS links miss the law their title names, by card id, with the law's card id. The
+# reform checker (scripts/check_mk_reform_coverage.py) found them on the rebuild of 6 November
+# 2026, and each card's links were read. Neither the act nor the law links the other, so
+# parse_card adds the link both ways and a correction here corrects the law named.
+_LINK_FIXES = {
+    "5567": "4321",  # the 1999 enterprise transformation amendment links only 5234
+    "5744": "5652",  # the Ukraine tourism ratification's correction links the culture one, 5385
+    "15151": "14659",  # the ICBC China loan law's correction links an IBRD repeal law, 14654
+    "19842": "18463",  # the 2010 budget execution amendment links the 2009 budget law, 16234
+    "28548": "22198",  # the Prespa Lake monument amendment links 22197
+    "39277": "34611",  # the 2015 guarantee amendment links nothing
+    "54491": "54067",  # the 2020 ratification's correction links nothing
+    "66452": "57098",  # the 2024 electrical equipment waste amendment links nothing
+}
+
+
 def parse_card(data: bytes, norm_id: str) -> dict[str, Any]:
     text = data.decode("utf-8", "replace")
     values = {}
@@ -471,7 +487,13 @@ def parse_card(data: bytes, norm_id: str) -> dict[str, Any]:
         re.S | re.I,
     )
     values["chain"] = [related_id for _, related_id in links]
-    values["corrects"] = _corrected_act(values, links)
+    law = _LINK_FIXES.get(card_id)
+    for related_id in [law, *(act for act, fixed in _LINK_FIXES.items() if fixed == card_id)]:
+        if related_id and related_id not in values["chain"]:
+            values["chain"].append(related_id)
+    values["corrects"] = (
+        law if law and _CORRECTION.match(values["title"]) else _corrected_act(values, links)
+    )
     return values
 
 

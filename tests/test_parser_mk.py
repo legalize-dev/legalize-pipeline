@@ -307,6 +307,61 @@ def test_a_correction_corrects_the_latest_act_published_before_it(monkeypatch):
     assert [r.norm_id for r in client.get_reforms("9792", cards["9792"])] == ["RM-2005-88-9792"]
 
 
+def test_a_link_ldbis_gets_wrong_is_repaired_from_the_table(monkeypatch):
+    # The 2010 budget amendment (19842) links the 2009 budget law (16234), and the correction of
+    # the Ukraine tourism ratification (5744) links the culture one (5385). Neither law they
+    # change links them back.
+    ukraine = "Спогодбата меѓу Владата на Република Македонија и Кабинетот на министрите на Украина"
+    budget = "Буџетот на Република Македонија за"
+    cards = {
+        **_linked_cards(
+            {
+                "5385": (
+                    f"Закон за ратификација на {ukraine} за соработка во областа на културата",
+                    "04.03.1999",
+                    "13",
+                ),
+                "5744": (
+                    f"Исправка на Законот за ратификација на {ukraine} за соработка во областа на туризмот",
+                    "02.10.2000",
+                    "79",
+                ),
+            }
+        ),
+        **_linked_cards(
+            {
+                "5652": (
+                    f"Закон за ратификација на {ukraine} за соработка во областа на туризмот",
+                    "17.07.2000",
+                    "55",
+                )
+            }
+        ),
+        **_linked_cards(
+            {
+                "16234": (f"Закон за извршување на {budget} 2009 година", "29.12.2008", "166"),
+                "19842": (
+                    f"Закон за изменување и дополнување на Законот за извршување на {budget} 2010 година",
+                    "16.07.2010",
+                    "95",
+                ),
+            }
+        ),
+        **_linked_cards(
+            {"18463": (f"Закон за извршување на {budget} 2010 година", "25.12.2009", "156")}
+        ),
+    }
+    client = LDBISClient(base_url="https://ldbis.pravda.gov.mk")
+    monkeypatch.setattr(client, "get_metadata", cards.__getitem__)
+    history = lambda law: [r.norm_id for r in client.get_reforms(law, cards[law])]  # noqa: E731
+
+    assert parse_card(cards["5744"], "5744")["corrects"] == "5652"
+    assert history("5652") == ["RM-2000-55-5652", "RM-2000-79-5744"]
+    assert history("5385") == ["RM-1999-13-5385"]
+    assert history("18463") == ["RM-2009-156-18463", "RM-2010-95-19842"]
+    assert history("16234") == ["RM-2008-166-16234"]
+
+
 def test_a_consolidated_text_does_not_end_the_history(monkeypatch):
     # The Electoral Code's 2011 consolidated text has the code's own title.
     cards = _linked_cards(
