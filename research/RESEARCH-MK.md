@@ -209,6 +209,11 @@ script's header names the dump and how to rebuild them. Run on that dump,
 2026-10-31, and the laws have been regenerated since, so a rebuild today adds
 10,640 words found only in them and drops 37 of the shipped list's 1,121,591.
 
+`en_words.txt.gz` is the English word list the OCR uses to tell an English line from a
+misread Macedonian one. It is `/usr/share/dict/words` (Webster's Second International,
+whose 1934 copyright has lapsed) and `/usr/share/dict/propernames` as macOS ships them,
+casefolded, deduplicated and sorted, 234,456 words.
+
 ## Five-law quality review
 
 Date: 2026-11-02

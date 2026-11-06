@@ -202,11 +202,12 @@ def english(words):
     misread with confidence ("В. Член 2Е, став 8" as "B. Ynen 2F, cTas 8") is not taken."""
     global ENGLISH_WORDS
     if ENGLISH_WORDS is None:
-        ENGLISH_WORDS = {
-            w.strip().casefold()
-            for f in ("words", "propernames")
-            for w in open(f"/usr/share/dict/{f}", encoding="utf-8")
-        }
+        # Webster's Second (web2) and the BSD propernames list, as macOS ships them in
+        # /usr/share/dict, casefolded. Shipped so every machine reads the same words, since an
+        # Ubuntu runner has neither file.
+        ENGLISH_WORDS = set(
+            gzip.open(ASSET_ROOT / "en_words.txt.gz", "rt", encoding="utf-8").read().split()
+        )
     found = total = 0
     for w in words:
         w = re.sub(r"[^A-Za-z]", "", w).casefold()
