@@ -4,6 +4,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import functools
 import math
 import os
 import re
@@ -18,6 +19,16 @@ ASSET_ROOT = Path(__file__).with_name("assets")
 PARAGRAPH = " "
 # "бр. од 198" is how some issues print their number.
 HEADER = re.compile(r"^Службен (весник|лист) на .*бр\.\s*(од\s*)?\d+\s*од\s*.*$")
+# A masthead on a line of its own, as in RM-2008-18-14566, where the English model reads
+# „Службен весник на РМ“бр. 18 од 05.02.2008 година as »Cny>x06eH BecHuk Ha PM"6p. 18 on 05.02.2008
+# roauHa. It needs the issue and the full date with nothing else on the line, so a citation in the
+# text, which names the issue as 18/2008, is never taken for one.
+MASTHEAD_LINE = re.compile(
+    r"^[\W_A-Za-z]{0,2}(?:Службен\s*весник|(?:Cny|Chy)\S{1,10}\s*BecH\w*)\s*(?:на|Ha)\s*"
+    r"(?:РС?М|PC?M)\W{0,3}(?:бр|6p|op)\.?\s*\d{1,3}\s*(?:од|o\w)\s*\d{1,2}\.\d{1,2}\.\d{4}"
+    r"\s*(?:година|ro\w{2,5})?[\s\W\d]{0,4}$",
+    re.I,
+)
 CODE = re.compile(r"^\d{11}$")
 FOOTER = re.compile(r"^(\d+)\s*(?:од|on|op|oa|og|0a|of)\s*(\d+)[.!,:;]?$", re.I)
 GAZETTE_HEADER = re.compile(
@@ -124,6 +135,7 @@ DOUBTFUL_PAGE = 85
 
 def tesseract_lines(png, lang, psm="6", tessdata=""):
     """Lines of a page as dicts of box, words and mean word confidence, in reading order."""
+    fetch_model(tessdata, lang)
     env = {**os.environ, "TESSDATA_PREFIX": tessdata, "OMP_THREAD_LIMIT": "1"}
     out = subprocess.run(
         ["tesseract", png, "-", "-l", lang, "--psm", psm, "-c", "tessedit_create_tsv=1"],
@@ -317,14 +329,52 @@ def nonsense(pairs):
     return real < len(cores) / 2 or not cores
 
 
+# A numbered article heading in any of the printed languages, kept however unsure the model was.
+ARTICLE_HEADING = re.compile(r"\b(?:Член|Чл|Article|Artikel|Статья|Neni|Član|Člen)\w*\W*\d", re.I)
+
+
+def scrawl(pairs):
+    """Whether a line on any page is a signature, stamp or rule read as letters: three or more
+    words the model was on average under 35 % sure of and never 60 % sure of one, and no word of
+    four letters that is a known Macedonian or English word, no article heading and no other
+    script.
+
+    RM-2008-18-14566 printed an ambassador's signature as "p: wt on wh wy", and read again as
+    "p: Le aE ws wy", "wy" at 53 %. Measured on the 31,160 confident cached pages (4 November
+    2026), the 950 lines with every word under 40 % were nine in ten signatures, stamps, rules
+    and Latin readings of a Cyrillic running head; widening to the average added 2,065 lines on
+    38,385 pages, of which a sample of 60 held 54 marks and six garbled readings of real words
+    ("Dextsing and athor modified"). The page of each is listed as unread. The exceptions named
+    here ("N Artikel 22", "Општи услови", Arabic and Chinese lines) are what was left."""
+    words = [(w, c) for w, c in pairs if re.search(r"[^\W_]", w)]
+    confidences = [c for _, c in words]
+    if len(words) < 3 or max(confidences) >= 60 or sum(confidences) >= 35 * len(words):
+        return False
+    line = " ".join(w for w, _ in words)
+    if ARTICLE_HEADING.search(line) or re.search(r"[^\W\d_A-Za-zÀ-ɏЀ-ӿ]", line):
+        return False
+    vocab()
+    english([])
+    for word, _ in words:
+        core = re.sub(r"\W|\d|_", "", word).casefold()
+        if len(core) >= 4 and (core in VOCAB or core in ENGLISH_WORDS):
+            return False
+    return True
+
+
 def readable(page):
-    """A cached page's lines, without the marks in pictures on a doubtful page."""
+    """A cached page's lines, without the marks in pictures on a doubtful page, and without the
+    signatures and stamps on any page."""
     lines = (
         page["lines"]
         if page["confidence"] >= DOUBTFUL_PAGE
         else [pairs for pairs in page["lines"] if not nonsense(pairs)]
     )
-    return [pairs for pairs in lines if without_noise(pairs)]
+    return [
+        pairs
+        for pairs in lines
+        if pairs[0][0].startswith(TABLE_MARK) or (without_noise(pairs) and not scrawl(pairs))
+    ]
 
 
 def merged_line(mkd, eng):
@@ -670,7 +720,18 @@ def without_noise(words):
             residual = residual[:start] + residual[end:]
         if len(re.findall(r"[A-Za-zА-Яа-яЃѓЌќЅѕЈјЉљЊњЏџ]", residual)) < 2:
             return []
-    # A lone bar is the border of a boxed title, since no law prints one.
+    # The English model reads the pronoun I as a bar, which took every "I have the honour" and
+    # "I hereby declare" out of RM-2008-18-14566. A single bar in an English line with a small
+    # word after it is that I; a box's border has a bar on each side or stands before a capital.
+    bars = [i for i, (w, _) in enumerate(words) if w == "|"]
+    if (
+        len(bars) == 1
+        and bars[0] + 1 < len(words)
+        and re.match(r"[a-z]", words[bars[0] + 1][0])
+        and english([w for w, _ in words if w != "|"])
+    ):
+        words = [("I", c) if i == bars[0] else (w, c) for i, (w, c) in enumerate(words)]
+    # Any other lone bar is the border of a boxed title, since no law prints one.
     words = [
         (w, c)
         for w, c in words
@@ -811,10 +872,15 @@ def ocr_page(args):
     import pypdfium2
 
     page = pypdfium2.PdfDocument(pdf_path)[page_number].render(scale=300 / 72).to_pil().convert("L")
-    kept, unread = read_image(
+    (kept, unread), tables = read_with_tables(
         np.array(page), f"{output_dir}/{page_number}.png", partner_langs(doc_id, title), tessdata
     )
-    confs = [confidence for pairs in kept for _, confidence in pairs]
+    confs = [
+        confidence
+        for pairs in kept
+        for word, confidence in pairs
+        if not word.startswith(TABLE_MARK)
+    ]
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     with open(f"{output_dir}/{page_number}.json", "w", encoding="utf-8") as out:
         json.dump(
@@ -829,6 +895,16 @@ def ocr_page(args):
                 ),
                 "columns": PAGE_NOTES.get("columns", 1),
                 "dropped": PAGE_NOTES.get("dropped", []),
+                "tables": [
+                    [
+                        [
+                            [[[word, round(conf)] for word, conf in pairs] for pairs in cell]
+                            for cell in row
+                        ]
+                        for row in table
+                    ]
+                    for table in tables
+                ],
             },
             out,
             ensure_ascii=False,
@@ -874,6 +950,469 @@ def gutter(gray):
     ) >= 0.3 * (left + right):
         return middle / width
     return None
+
+
+# A table's place among a page's cached lines: a line holding only this mark and the table's
+# number, which the page's "tables" hold the cells of.
+TABLE_MARK = "\ue000"
+
+
+def ruled_tables(gray):
+    """The ruled tables on a 300 dpi page, each a list of its cells as (x, y, w, h).
+
+    A cell is a region the page's rules enclose that is much smaller than the page, and a table is
+    four or more cells on one connected set of rules, so a frame round the page, a boxed heading or
+    a box round a paragraph is not one. Ruling lines are found at 100 dpi, where on 840 LDBIS PDFs
+    a scan's ragged margin, a copier's edge and a framed title found none while the security
+    agreements' classification tables (10930, 17003, 18006) and 2003's emission limits (20429)
+    were all found (4 November 2026). A column whose outer rule was never drawn, as the last of
+    RM-2008-18-14566's audit sheets on pages 45 and 103, encloses nothing; where a table's rules
+    run on past its last closed cell, that strip is one more column, cut at the rows of the
+    column beside it. A pale grid printed behind a page's text (RSM-2024-170-67511, page 12) is
+    no table: on 600 pages compared, the two such grids had rules of a median gray of 244 and 245,
+    printed rules 100 to 171 and grey ones 213 to 219, so a table's rules must be darker than 235."""
+    import cv2
+    import numpy as np
+
+    small = cv2.resize(gray, None, fx=1 / 3, fy=1 / 3, interpolation=cv2.INTER_AREA)
+    height, width = small.shape
+    ink = cv2.adaptiveThreshold(~small, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, -2)
+    across = cv2.morphologyEx(
+        ink, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (width // 25, 1))
+    )
+    down = cv2.morphologyEx(
+        ink, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1, height // 60))
+    )
+    rules = cv2.dilate(across | down, np.ones((3, 3), np.uint8))
+    contours, hierarchy = cv2.findContours(rules, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+    tables = {}
+    for contour, (_, _, _, parent) in zip(
+        contours, hierarchy[0] if hierarchy is not None else [], strict=True
+    ):
+        x, y, w, h = cv2.boundingRect(contour)
+        if (
+            parent >= 0
+            and w * h < 0.25 * width * height
+            and w > 0.015 * width
+            and h > 0.008 * height
+            and cv2.contourArea(contour) > 0.8 * w * h
+        ):
+            tables.setdefault(parent, []).append((3 * x, 3 * y, 3 * w, 3 * h))
+    found = []
+    lines = (across | down) > 0
+    for parent, cells in tables.items():
+        if len(cells) < 4:
+            continue
+        x, y, w, h = cv2.boundingRect(contours[parent])
+        if np.median(small[y : y + h, x : x + w][lines[y : y + h, x : x + w]]) > 235:
+            continue
+        found.append(cells + open_column(cells, 3 * x, 3 * (x + w), 3 * int(0.015 * width)))
+    return sorted(
+        found, key=lambda cells: (min(y for _, y, _, _ in cells), min(x for x, _, _, _ in cells))
+    )
+
+
+def open_column(cells, rules_left, rules_right, narrowest):
+    """The cells of a first or last column that has rules above and below but none at its outer
+    side, as (x, y, w, h): the rows of the closed column beside it, run out to where the rules end."""
+    added = []
+    left = min(x for x, _, _, _ in cells)
+    right = max(x + w for x, _, w, _ in cells)
+    if rules_right - right > narrowest:
+        added += [
+            (x + w, y, rules_right - x - w, h) for x, y, w, h in cells if right - (x + w) < 30
+        ]
+    if left - rules_left > narrowest:
+        added += [(rules_left, y, x - rules_left, h) for x, y, w, h in cells if x - left < 30]
+    return added
+
+
+def table_grid(cells):
+    """The cells laid out in rows and columns by where their edges fall, None where a cell spans
+    from its left or above."""
+    tolerance = 30  # a tenth of an inch at 300 dpi; rules drawn by hand wander that much
+
+    def edges(values):
+        found = []
+        for value in sorted(values):
+            if not found or value - found[-1] > tolerance:
+                found.append(value)
+        return found
+
+    lefts = edges(x for x, _, _, _ in cells)
+    tops = edges(y for _, y, _, _ in cells)
+    grid = [[None] * len(lefts) for _ in tops]
+    for cell in cells:
+        row = min(range(len(tops)), key=lambda i: abs(tops[i] - cell[1]))
+        column = min(range(len(lefts)), key=lambda i: abs(lefts[i] - cell[0]))
+        grid[row][column] = cell
+    return [row for row in grid if any(row)]
+
+
+def read_cell(gray, cell, png, langs, tessdata):
+    """The (word, confidence) lines of one cell, in whichever of the page's models read it most
+    surely, a reading whose every word is a known Macedonian or English word first.
+
+    One model per cell, never a mix: read with Macedonian and English at once, the English
+    column of RM-2006-10-10930's classification table came out as "ТОР 5ЕСКЕТ". The English
+    model was also the surer one of "СТРОГО СЕКРЕТНО" on its page 24, read as "CTPOI'O CEKPETHO",
+    which is why a reading of known words wins."""
+    import cv2
+
+    x, y, w, h = cell
+    inner = gray[y + 6 : y + h - 6, x + 6 : x + w - 6]
+    if inner.size == 0 or (inner < 128).sum() < 30:
+        return []
+    inner = cv2.resize(inner, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+    cv2.imwrite(png, cv2.copyMakeBorder(inner, 40, 40, 40, 40, cv2.BORDER_CONSTANT, value=255))
+    readings = []
+    for lang in ["mkd", "eng", *langs]:
+        # A word that is a bar and marks only is the cell's own rule (page 24's "“|").
+        lines = [
+            pairs
+            for ln in tesseract_lines(png, lang, "6", tessdata)
+            if (
+                pairs := without_noise(
+                    [
+                        (word, conf)
+                        for word, conf in zip(ln["words"], ln["confs"], strict=True)
+                        if not re.fullmatch(r"[^\w|]*\|[^\w]*", word)
+                    ]
+                )
+            )
+        ]
+        confs = [conf for pairs in lines for _, conf in pairs]
+        readings.append((known_words(lines), sum(confs) / len(confs) if confs else 0.0, lines))
+    os.remove(png)
+    return max(readings, key=lambda reading: reading[:2])[2]
+
+
+def known_words(lines) -> bool:
+    """Whether a cell's reading has a word of four letters or more and every such word is a known
+    Macedonian or English word."""
+    vocab()
+    english([])
+    cores = [
+        core
+        for pairs in lines
+        for word, _ in pairs
+        if len(core := re.sub(r"\W|\d|_", "", word).casefold()) >= 4
+    ]
+    return bool(cores) and all(core in VOCAB or core in ENGLISH_WORDS for core in cores)
+
+
+def open_tables(gray, taken=()):
+    """The tables on a 300 dpi page that are drawn with rules across only, as grids of cell boxes.
+
+    Older treaties set a table between three rules, one above its header, one under it and one at
+    its end, with nothing between the columns: the lists of psychotropic substances in the 1971
+    convention (LDBIS 623, page 22) print French and Macedonian tables side by side that way. Its
+    columns are the gutters that stay empty from the header to the last row, and at least three
+    are needed, so a page of two column text between two rules is never one. A row ends at a gap
+    clearly wider than the gap between the lines of one entry; where every gap is alike, every
+    line is a row. Areas a ruled table already holds ("taken") are left to it."""
+
+    height, width = gray.shape
+    rules, text = long_rules(gray)
+    tables, used = [], set()
+    for i, (top, x0, x1) in enumerate(rules):
+        same = [
+            rule
+            for rule in rules[i + 1 :]
+            if abs(rule[1] - x0) < width // 50 and abs(rule[2] - x1) < width // 50
+        ]
+        if i in used or len(same) < 2:
+            continue
+        (head, *_), (bottom, *_) = same[0], same[1]
+        if not (30 < head - top < height // 12 and bottom - head > head - top):
+            continue
+        if x1 - x0 < width // 4 or any(
+            tx < x1 and x0 < tx + tw and ty < bottom and top < ty + th for tx, ty, tw, th in taken
+        ):
+            continue
+        # A form's lines to write on cross its body; a table's body has no rule across it.
+        if any(head < y < bottom and min(x1, b) - max(x0, a) > (x1 - x0) // 2 for y, a, b in rules):
+            continue
+        edges = text_columns(text[top + 8 : bottom - 8, x0:x1])
+        if len(edges) < 3:
+            continue
+        body = text[head + 8 : bottom - 8, x0:x1]
+        rows = entry_rows(body, edges[0])
+        header = text[top + 8 : head - 4, x0:x1]
+
+        def inked(part, left, right):
+            return (part[:, left:right] > 0).sum() > 40
+
+        # A header names at least two of the columns, and at least two columns run down most of
+        # the rows; dotted lines on a form make gutters, but no header and no filled columns.
+        if (
+            len(rows) < 2
+            or sum(inked(header, left, right) for left, right in edges) < 2
+            or sum(
+                sum(inked(body[a : b + 1], left, right) for a, b in rows) * 2 >= len(rows)
+                for left, right in edges
+            )
+            < 2
+        ):
+            continue
+        spans = [(top + 8, head - 4)] + [(head + 8 + a - 6, head + 8 + b + 6) for a, b in rows]
+        tables.append(
+            [
+                [(x0 + left - 6, y0, right - left + 12, y1 - y0) for left, right in edges]
+                for y0, y1 in spans
+            ]
+        )
+        used.update(i + 1 + j for j, rule in enumerate(rules[i + 1 :]) if rule in same[:2])
+    return tables
+
+
+def entry_rows(body, first_column):
+    """The (top, bottom) spans of a table body's rows, from its ink mask.
+
+    Entries set with a hanging indent, a number at the first column's edge and the rest of the
+    name indented under it ("1. AMPHE-" over "TAMINE"), start a row wherever a line starts at that
+    edge. Otherwise a row ends at a gap clearly wider than the gap between lines of one entry, and
+    where every gap is alike every line is a row."""
+    import numpy as np
+
+    # A row of pixels belongs to a line of text when it crosses more ink than a few specks do.
+    filled = np.flatnonzero((body > 0).sum(axis=1) > max(2, body.shape[1] // 100))
+    if not len(filled):
+        return []
+    lines, run = [], [filled[0], filled[0]]
+    for y in filled[1:]:
+        if y - run[1] > 3:
+            lines.append(tuple(run))
+            run = [y, y]
+        else:
+            run[1] = y
+    lines.append(tuple(run))
+    left, right = first_column
+    starts = []
+    for top, bottom in lines:
+        # A speck of dirt before a line is not where it starts: a letter's stroke is three
+        # pixels of its height at least.
+        ink = np.flatnonzero((body[top : bottom + 1, left:right] > 0).sum(axis=0) >= 3)
+        starts.append(left + ink[0] if len(ink) else None)
+    edge = min((x for x in starts if x is not None), default=None)
+    at_edge = [x is not None and x - edge < 15 for x in starts]
+    if edge is not None and at_edge[0] and 1 < sum(at_edge) < len(lines):
+        new_row = at_edge
+    else:
+        gaps = [after[0] - before[1] for before, after in zip(lines, lines[1:], strict=False)]
+        cut = 1.5 * min(gaps) if gaps and max(gaps) > 1.6 * min(gaps) else 0
+        new_row = [True] + [gap > cut for gap in gaps]
+    rows = []
+    for (top, bottom), new in zip(lines, new_row, strict=True):
+        if new or not rows:
+            rows.append([top, bottom])
+        else:
+            rows[-1][1] = bottom
+    return [tuple(row) for row in rows]
+
+
+def text_columns(ink):
+    """The (left, right) spans of an ink mask's columns of text, split at gutters.
+
+    A column of the scan is blank when it holds no more ink than its specks of dirt, and a gutter
+    is two millimetres of blank at 300 dpi, a speck narrower than a millimetre inside it ignored."""
+    blank = list((ink > 0).sum(axis=0) <= max(2, ink.shape[0] // 66))
+    runs, start = [], 0
+    for x in range(1, len(blank) + 1):
+        if x == len(blank) or blank[x] != blank[start]:
+            runs.append([blank[start], start, x])
+            start = x
+    for k in range(1, len(runs) - 1):
+        if not runs[k][0] and runs[k][2] - runs[k][1] < 10 and runs[k - 1][0] and runs[k + 1][0]:
+            runs[k][0] = True
+    merged = []
+    for run in runs:
+        if merged and merged[-1][0] == run[0]:
+            merged[-1][2] = run[2]
+        else:
+            merged.append(run)
+    runs = merged
+    columns, start = [], None
+    for k, (blank_run, left, right) in enumerate(runs):
+        gutter = blank_run and (right - left >= 24 or k in (0, len(runs) - 1))
+        if not gutter and start is None:
+            start = left
+        elif gutter and start is not None:
+            columns.append((start, left))
+            start = None
+    if start is not None:
+        columns.append((start, len(blank)))
+    return columns
+
+
+def table_box(grid):
+    """The box round a grid of cells, as (x0, y0, x1, y1)."""
+    cells = [cell for row in grid for cell in row if cell]
+    return (
+        min(x for x, _, _, _ in cells),
+        min(y for _, y, _, _ in cells),
+        max(x + w for x, _, w, _ in cells),
+        max(y + h for _, y, _, h in cells),
+    )
+
+
+def long_rules(gray):
+    """A 300 dpi page's rules across, as (y, left, right), and its ink with them taken out."""
+    import cv2
+    import numpy as np
+
+    height, width = gray.shape
+    ink = cv2.adaptiveThreshold(~gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 45, -6)
+    across = cv2.morphologyEx(
+        ink, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (width // 8, 1))
+    )
+    count, _, stats, _ = cv2.connectedComponentsWithStats(across)
+    rules = sorted((y + h // 2, x, x + w) for x, y, w, h, _ in stats[1:count] if h < height // 150)
+    return rules, ink & ~cv2.dilate(across, np.ones((7, 7), np.uint8))
+
+
+def page_tables(gray):
+    """Every table on a page as (grid of cell boxes, (x0, y0, x1, y1) the table covers).
+
+    A form's ruled table often finds cells for its header only, its empty rows below drawn as
+    rules with short ticks between the columns (the review sheets of RM-2008-18-14566, page 45).
+    Those rows are part of the table, so it reaches down over the rules of its own width that
+    follow it; read as text they were noise, and they framed the footnotes under them as a table
+    of their own."""
+    rules, _ = long_rules(gray)
+    tables = []
+    for cells in ruled_tables(gray):
+        grid = table_grid(cells)
+        x0, y0, x1, y1 = table_box(grid)
+        for y, left, right in rules:
+            if y1 - 10 < y < y1 + 120 and left < x0 + 60 and right > x1 - 60:
+                y1 = y
+        tables.append((grid, (x0, y0, x1, y1 + 5)))
+    taken = [(x0, y0, x1 - x0, y1 - y0) for _, (x0, y0, x1, y1) in tables]
+    return tables + [(grid, table_box(grid)) for grid in open_tables(gray, taken)]
+
+
+def read_with_tables(gray, png, langs, tessdata):
+    """read_image's lines and unread count for a page, with each table read cell by cell in its
+    place: the text above a table is read as a page of its own, then the table, then on.
+
+    Read as text, a table's cells ran together across its columns ("ДРЖАВНА ТАЈНА TOP SECRET
+    STROGO TAJNO") and the cells' own line breaks interleaved, so the corpus had no table at all."""
+    import numpy as np
+
+    tables = page_tables(gray)
+    if not tables:
+        return read_image(gray, png, langs, tessdata), []
+    # A table too wide for the page is printed sideways with its caption (the review sheets of
+    # RM-2008-18-14566, pages 45 and 103), so the page is turned upright before it is cut up.
+    turns = {"90": 3, "180": 2, "270": 1}.get(osd(gray, png, tessdata).get("Rotate"))
+    if turns:
+        gray = np.ascontiguousarray(np.rot90(gray, turns))
+        tables = page_tables(gray)
+    lines, unread, read_tables, notes = [], 0, [], {"columns": 1, "dropped": []}
+
+    def read_text(part):
+        nonlocal unread
+        if part.shape[0] < 40 or (part < 128).sum() < 0.002 * part.size:
+            return
+        kept, missed = read_image(part, png, langs, tessdata)
+        lines.extend(kept)
+        unread += missed
+        notes["columns"] = max(notes["columns"], PAGE_NOTES.get("columns", 1))
+        notes["dropped"] += PAGE_NOTES.get("dropped", [])
+
+    bands = []
+    for grid, box in sorted(tables, key=lambda table: table[1][1]):
+        _, top, _, bottom = box
+        if bands and top < bands[-1][1]:
+            bands[-1] = (bands[-1][0], max(bands[-1][1], bottom), bands[-1][2] + [(grid, box)])
+        else:
+            bands.append((top, bottom, [(grid, box)]))
+    above = 0
+    for top, bottom, group in bands:
+        read_text(gray[above:top])
+        beside = gray[top:bottom].copy()
+        for grid, (x0, _, x1, _) in sorted(group, key=lambda table: table[1][0]):
+            lines.append([(f"{TABLE_MARK}{len(read_tables)}", 100)])
+            read_tables.append(
+                [
+                    [read_cell(gray, cell, png, langs, tessdata) if cell else [] for cell in row]
+                    for row in grid
+                ]
+            )
+            beside[:, x0:x1] = 255
+        # Text printed beside a table, in the other column of a two column page.
+        read_text(beside)
+        above = bottom
+    read_text(gray[above:])
+    PAGE_NOTES.update(notes)
+    return (lines, unread), read_tables
+
+
+def with_tables(text, tables):
+    """A page's text with each table mark replaced by its table in pipe rows, the first row taken
+    as the header, as LDBIS tables print theirs."""
+    from legalize.fetcher.mk.parser import _table_to_markdown
+
+    out = []
+    for line in text.split("\n"):
+        if not line.startswith(TABLE_MARK):
+            out.append(line)
+            continue
+        rows = [
+            [corrected(cell) if cell else "" for cell in row]
+            for row in tables[int(line[len(TABLE_MARK) :])]
+        ]
+        if markdown := _table_to_markdown(rows):
+            out += [markdown, PARAGRAPH]
+    return "\n".join(out)
+
+
+def drawn_rows(rows):
+    """pdfplumber's table rows with the rows a table printed without rules between them split
+    apart: the pension law's yearly percentages (RM-2012-98-25996) came out as one row whose cells
+    each held every year. A row is split only when each filled cell holds the same three or more
+    lines, since a heading wrapped over two lines is one cell."""
+    out = []
+    for row in rows:
+        cells = [(cell or "").strip() for cell in row]
+        counts = {len(cell.split("\n")) for cell in cells if cell}
+        if len(counts) == 1 and (lines := counts.pop()) >= 3 and sum(map(bool, cells)) > 1:
+            parts = [cell.split("\n") if cell else [""] * lines for cell in cells]
+            out.extend([part[i] for part in parts] for i in range(lines))
+        else:
+            out.append(cells)
+    return out
+
+
+def text_page(page):
+    """A text-layer page's text with each table pdfplumber finds on it in pipe rows, in its place.
+
+    A table is kept only when its cells hold every character printed inside it: on the same
+    pension law, a cell boundary cut two of twelve percentages off, and the plain text that keeps
+    them is the better copy. The text around a table takes only the letters wholly outside it, since
+    a row touching the table's edge is already one of its rows."""
+    from collections import Counter
+
+    from legalize.fetcher.mk.parser import _table_to_markdown
+
+    page = without_stray_spaces(page)
+    parts, top = [], 0
+    for table in sorted(page.find_tables(), key=lambda table: table.bbox[1]):
+        x0, table_top, x1, bottom = table.bbox
+        rows = drawn_rows(table.extract())
+        printed = Counter(c["text"] for c in page.crop(table.bbox).chars if c["text"].strip())
+        held = Counter(ch for row in rows for cell in row for ch in cell if ch.strip())
+        if table_top < top or printed != held or not (markdown := _table_to_markdown(rows)):
+            continue
+        if table_top > top:
+            parts.append(page.within_bbox((0, top, page.width, table_top)).extract_text() or "")
+        parts += [markdown, PARAGRAPH]
+        beside = page.within_bbox((0, table_top, page.width, bottom)).outside_bbox(table.bbox)
+        parts.append(beside.extract_text() or "")
+        top = bottom
+    parts.append(page.within_bbox((0, top, page.width, page.height)).extract_text() or "")
+    return "\n".join(part for part in parts if part)
 
 
 PAGE_NOTES = {}
@@ -940,7 +1479,9 @@ def read_page(gray, png, langs, mode="block", tessdata=""):
     first = read_columns(gray, png, langs, split, mode, tessdata)
     if not first[1]:
         return first
-    extra = [lang for lang in SCRIPT_LANGS.get(script(gray, png, tessdata), []) if lang not in langs]
+    extra = [
+        lang for lang in SCRIPT_LANGS.get(script(gray, png, tessdata), []) if lang not in langs
+    ]
     if not extra:
         return first
     notes = dict(PAGE_NOTES)
@@ -998,7 +1539,7 @@ def read_column(gray, png, langs, mode, tessdata=""):
     import cv2
 
     cv2.imwrite(png, without_rules(gray, wide=mode == "ruled"))
-    psm = "11" if mode == "cells" else "6"
+    psm = "11" if mode == "cells" else "3"
     mkd, eng = (
         [with_ones(ln) for ln in tesseract_lines(png, "mkd", psm, tessdata)],
         tesseract_lines(png, "eng", psm, tessdata),
@@ -1393,8 +1934,10 @@ def corrected(lines):
 # partner's language models. 3: the script detector for pages with unread lines, and no table
 # borders. 4: pale pages read again darkened, and two columns found under a heading across
 # both (31 October 2026). 5: doubtful pages turned upright when they lie on their side. 6: doubtful
-# pages also read as ruled tables and cell by cell.
-OCR_VERSION = 6
+# pages also read as ruled tables and cell by cell. 7: a bar read for the pronoun I in English
+# kept as I rather than dropped as a box border (4 November 2026). 8: tables, ruled or set
+# between rules, read cell by cell in their place and kept as tables (4 November 2026).
+OCR_VERSION = 8
 
 
 def ocr_current(doc_id, n, ocr_dir):
@@ -1628,17 +2171,35 @@ def ocr_pages(doc_id, pages, pdf_path, output_dir, title, tessdata):
 
 
 def prepare_assets(cache_dir: str | Path) -> Path:
-    """Ensure pinned language models and the local Tesseract executable are available."""
-    cache_dir = Path(cache_dir)
-    tessdata = cache_dir / "tessdata"
+    """Ensure the models every scanned page uses and the local Tesseract executable are available.
+
+    A treaty partner's model is fetched by fetch_model the first time a page needs it, so a run
+    with no treaty downloads three models of the manifest's 53."""
+    tessdata = Path(cache_dir) / "tessdata"
     tessdata.mkdir(parents=True, exist_ok=True)
+    for lang in ("mkd", "eng", "osd"):
+        fetch_model(str(tessdata), lang)
+    if shutil.which("tesseract") is None:
+        raise RuntimeError("Macedonian scanned-PDF OCR requires the Tesseract executable")
+    return tessdata
+
+
+@functools.cache
+def fetch_model(tessdata: str, lang: str) -> None:
+    """Download one pinned model into tessdata unless a copy with its checksum is there. Cached
+    per process, since a page runs Tesseract many times and hashing a model takes a while."""
+    if not tessdata:
+        return
     manifest = json.loads((ASSET_ROOT / "tessdata_manifest.json").read_text(encoding="utf-8"))
     base = f"https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/{manifest['revision']}"
-    for filename, digest in manifest["files"].items():
-        destination = tessdata / filename
-        if destination.exists() and hashlib.sha256(destination.read_bytes()).hexdigest() == digest:
-            continue
-        temporary = destination.with_suffix(".download")
+    filename = f"{lang}.traineddata"
+    digest = manifest["files"][filename]
+    destination = Path(tessdata) / filename
+    if not (
+        destination.exists() and hashlib.sha256(destination.read_bytes()).hexdigest() == digest
+    ):
+        # Each worker process downloads to its own name, and the rename is atomic.
+        temporary = destination.with_suffix(f".{os.getpid()}.download")
         subprocess.run(
             [
                 "curl",
@@ -1658,9 +2219,6 @@ def prepare_assets(cache_dir: str | Path) -> Path:
             temporary.unlink(missing_ok=True)
             raise ValueError(f"Tesseract model checksum mismatch: {filename}")
         temporary.replace(destination)
-    if shutil.which("tesseract") is None:
-        raise RuntimeError("Macedonian scanned-PDF OCR requires the Tesseract executable")
-    return tessdata
 
 
 def parse_pdf(
@@ -1678,11 +2236,16 @@ def parse_pdf(
     kinds = scanned_pages_path(pdf_path)
     tessdata = str(prepare_assets(root)) if any(kinds) else ""
     lines = doc_lines(
-        norm_id, title=title, pdf_path=pdf_path, ocr_dir=ocr_dir, kinds=kinds, tessdata=str(tessdata)
+        norm_id,
+        title=title,
+        pdf_path=pdf_path,
+        ocr_dir=ocr_dir,
+        kinds=kinds,
+        tessdata=str(tessdata),
     )
     lines = law_text_only(lines, title)
     doubtful, unread = [], []
-    for page_path in sorted(ocr_dir.glob("*.json")):
+    for page_path in sorted(ocr_dir.glob("*.json"), key=lambda path: int(path.stem)):
         record = json.loads(page_path.read_text(encoding="utf-8"))
         page_number = int(page_path.stem) + 1
         if record["confidence"] < DOUBTFUL_PAGE or record["words"] < 20:
@@ -1732,9 +2295,9 @@ def doc_lines(
     with pdfplumber.open(pdf_path) as pdf:
         for index, page in enumerate(pdf.pages):
             page_text = (
-                ocr_text(corrected(readable(ocr[index])))
+                with_tables(ocr_text(corrected(readable(ocr[index]))), ocr[index].get("tables", []))
                 if kinds[index]
-                else (without_stray_spaces(page).extract_text() or "")
+                else text_page(page)
             )
             texts.append(without_page_edges(page_text, index + 1, len(pdf.pages)))
     texts, _removed_page_numbers = remove_sequential_page_numbers(texts)
@@ -1752,6 +2315,49 @@ def doc_lines(
                 lines.append(line)
             continue
         line = line.strip()
-        if line and not HEADER.match(line) and not CODE.match(line):
-            lines.append(line)
-    return lines
+        if (
+            line
+            and not HEADER.match(line)
+            and not MASTHEAD_LINE.match(line)
+            and not CODE.match(line)
+        ):
+            lines.append(BRACKET_FOR_I.sub("I", line))
+    return without_page_counters(lines, len(kinds))
+
+
+# The English model reads the capital I of IPA and IPARD as an opening bracket, "[PA" in
+# RM-2008-18-14566. Only these two words: across the cached scans, a bracket before other
+# capitals is as often a real bracket or a misread Cyrillic word as a lost I.
+BRACKET_FOR_I = re.compile(r"\[(?=PA(?:RD)?\b)")
+COUNTER_TOTAL = re.compile(r"\s([\dlI]{2,3})$")
+
+
+def without_page_counters(lines: list[str], page_count: int) -> list[str]:
+    """Drop the PDF's "N од 114" page footers however OCR spelled them.
+
+    RM-2008-18-14566 prints "N од 114" under every page, read as "3o0n 114", "Jon 114",
+    "55 ол 114" or, run together, "400114". The total is the same on every page, so it is
+    taken from the short lines that end in it after an од-like word, when at least three do.
+    It must also be within two of the PDF's page count: in 429 of the 440 cached scans that
+    show such a total it equals the page count, and the other eleven were tariff codes and
+    table figures ("5408 31 00") or a gazette's own page count one or two off.
+    """
+
+    def total_of(line: str) -> str | None:
+        match = COUNTER_TOTAL.search(line)
+        if not match or len(line) > 14 or re.search(r"[^\W\d_]{4,}", line):
+            return None
+        if not re.search(r"[oоOО0]", line[: match.start()]) or not re.search(r"\d", match.group(1)):
+            return None
+        return match.group(1).replace("l", "1").replace("I", "1")
+
+    counts = Counter(total for total in map(total_of, lines) if total)
+    if not counts or counts.most_common(1)[0][1] < 3:
+        return lines
+    total = counts.most_common(1)[0][0]
+    if abs(int(total) - page_count) > 2:
+        return lines
+    # Once the total is known, a short line of digits and од-like letters ending in it is a
+    # counter too, as "13001114", "540n114" and "11301114 0д 114" are.
+    run_together = re.compile(rf"\d[\d\soоOО0nлдaаl]{{0,13}}{total}")
+    return [line for line in lines if total_of(line) != total and not run_together.fullmatch(line)]

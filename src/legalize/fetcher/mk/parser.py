@@ -14,6 +14,9 @@ from legalize.fetcher.mk.client import canonical_identifier, parse_card
 from legalize.models import Block, NormMetadata, NormStatus, Paragraph, Rank, Version
 
 
+TABLE_ROW = re.compile(r"\| .* \|")
+
+
 def _date(value: str) -> date:
     for fmt in ("%d.%m.%Y", "%Y-%m-%d", "%d/%m/%Y"):
         try:
@@ -72,12 +75,8 @@ class LDBISMetadataParser(MetadataParser):
             "in_force_date": _date(card["effective_date"]).isoformat()
             if card["effective_date"]
             else "",
-            "applies_from": _date(card["applies_from"]).isoformat()
-            if card["applies_from"]
-            else "",
-            "expiry_date": _date(card["expiry_date"]).isoformat()
-            if card["expiry_date"]
-            else "",
+            "applies_from": _date(card["applies_from"]).isoformat() if card["applies_from"] else "",
+            "expiry_date": _date(card["expiry_date"]).isoformat() if card["expiry_date"] else "",
             "version": card["version"],
         }
         extra = tuple((key, value) for key, value in extra_values.items() if value)
@@ -134,12 +133,19 @@ class LDBISTextParser(TextParser):
         lines, details = parse_pdf(data, norm_id, metadata.title, cache_dir)
         lines = [_fix_ldbis_ocr_artifacts(line) for line in lines]
         paragraphs = []
-        for line in lines:
-            if line == PARAGRAPH:
+        # A table's rows are one paragraph: the renderer puts a blank line between paragraphs,
+        # which would end a pipe table after its first row. A paragraph mark ends a table, so two
+        # tables in a row stay two. A row is "| cell | cell |" as with_tables writes it: OCR reads
+        # a printed bracket as a bar ("|Option 3" in RM-2008-18-14566), and such a line is text.
+        rows: list[str] = []
+        for line in [*lines, PARAGRAPH]:
+            if TABLE_ROW.fullmatch(line):
+                rows.append(line)
                 continue
-            if line.startswith("|"):
-                paragraphs.append(Paragraph(css_class="table", text=line))
-            else:
+            if rows:
+                paragraphs.append(Paragraph(css_class="table", text="\n".join(rows)))
+                rows = []
+            if line != PARAGRAPH:
                 css_class = "articulo" if re.match(r"^Член\s+\d+\b", line) else "parrafo"
                 paragraphs.append(Paragraph(css_class=css_class, text=line))
 

@@ -39,7 +39,7 @@ SPEC_VERSIONS: dict[str, str] = {"ie": "0.5", "mk": "0.5"}
 # What §Coverage measures a 0.5 repo against: the source index its discovery reads.
 SOURCE_INDEX: dict[str, str] = {
     "ie": "Irish Statute Book, Acts by year (eISB)",
-    "mk": "LDBIS (ldbis.pravda.gov.mk): every listed version of Закон, Уставен закон, Устав and Амандман на Уставот",
+    "mk": "LDBIS (ldbis.pravda.gov.mk): the active Закон, Уставен закон, Устав and Амандман на Уставот records of its advanced search, its active corrections of such a record still in force, and the laws and constitutional records their related-version links reach that are still in force",
 }
 
 

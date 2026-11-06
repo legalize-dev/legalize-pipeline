@@ -941,7 +941,20 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
                 discovered = {
                     line.strip() for line in index.read_text().splitlines() if line.strip()
                 }
-                unaccounted = discovered - {f.stem for f in md_files} - excluded_ids
+                from legalize.countries import get_client_class
+
+                # A client whose discovery ids are not file names keeps them in a frontmatter field.
+                field = getattr(get_client_class(country), "discovery_id_field", None)
+                published_ids = {f.stem for f in md_files}
+                if field:
+                    from legalize.coverage import _frontmatter
+
+                    published_ids |= {
+                        str(front[field])
+                        for front in map(_frontmatter, md_files)
+                        if front.get(field)
+                    }
+                unaccounted = discovered - published_ids - excluded_ids
                 if unaccounted:
                     issues.append(
                         (

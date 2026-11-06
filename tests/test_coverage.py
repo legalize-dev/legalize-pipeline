@@ -152,3 +152,34 @@ def test_a_daily_carries_the_report_forward_by_what_it_changed(tmp_path):
         "discovered": 5,
         "excluded": report["excluded"],
     }
+
+
+def test_a_norm_found_by_its_card_number_counts_as_published(tmp_path):
+    # Macedonia discovers card 30409 and names the file RM-2013-187-30409, so coverage and the
+    # health check match the card number to the ldbis_id the law carries, not to the file name.
+    import subprocess
+
+    from click.testing import CliRunner
+
+    from legalize.cli import cli
+
+    repo, data = tmp_path / "repo", tmp_path / "data"
+    (repo / "mk/ab").mkdir(parents=True)
+    (repo / "mk/ab/RM-2013-187-30409.md").write_text(
+        law("RM-2013-187-30409", 'ldbis_id: "30409"\n').replace('"ie"', '"mk"')
+    )
+    data.mkdir()
+    (data / "discovery_ids.txt").write_text("30409\n1244\n")
+    record_failure(data, "1244", ValueError("LDBIS document 1244 has no linked PDF"))
+
+    report = coverage_report(repo, data, "index", discovery_id_field="ldbis_id")
+    assert (report["discovered"], report["published"]) == (2, 1)
+    assert [e["identifier"] for e in report["excluded"]] == ["1244"]
+
+    (repo / "coverage.json").write_text(render(report))
+    subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
+    config = tmp_path / "config.yaml"
+    config.write_text(f'countries:\n  mk:\n    repo_path: "{repo}"\n    data_dir: "{data}"\n')
+    output = CliRunner().invoke(cli, ["--config", str(config), "health", "-c", "mk"]).output
+    assert "1 published of 2 discovered, 1 excluded" in output, output
+    assert "neither published nor excluded" not in output, output

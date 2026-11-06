@@ -101,8 +101,18 @@ def _gaps(front: dict) -> dict[str, int]:
     return counts
 
 
-def coverage_report(repo_dir: str | Path, data_dir: str | Path, source_index: str) -> dict:
-    """The ``coverage.json`` body for a repo, measured now."""
+def coverage_report(
+    repo_dir: str | Path,
+    data_dir: str | Path,
+    source_index: str,
+    *,
+    discovery_id_field: str | None = None,
+) -> dict:
+    """The ``coverage.json`` body for a repo, measured now.
+
+    A law answers to its file name, and also to ``discovery_id_field`` of its frontmatter when
+    the source's discovery ids are not file names (the client's ``discovery_id_field``).
+    """
     repo, data = Path(repo_dir), Path(data_dir)
     laws = [
         path
@@ -113,7 +123,10 @@ def coverage_report(repo_dir: str | Path, data_dir: str | Path, source_index: st
     published = {path.stem for path in laws}
     counts = {key: 0 for total in GAP_FIELDS.values() for key in (total, f"laws_with_{total}")}
     for path in laws:
-        for total, items in _gaps(_frontmatter(path)).items():
+        front = _frontmatter(path)
+        if discovery_id_field and front.get(discovery_id_field):
+            published.add(str(front[discovery_id_field]))
+        for total, items in _gaps(front).items():
             counts[total] += items
             counts[f"laws_with_{total}"] += bool(items)
     index = data / "discovery_ids.txt"
