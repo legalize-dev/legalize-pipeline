@@ -140,3 +140,25 @@ def test_published_identifiers_reads_every_directory(tmp_path):
     git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "seed")
     repo = GitRepo(tmp_path, "t", "t@t")
     assert published_identifiers(repo) == {"DRE-2017-1-1", "DRE-2018-2-2"}
+
+
+def test_descriptors_posts_the_diploma_not_the_client():
+    """811e30a dropped @staticmethod from _aj_vars: descriptors() sent the client itself
+    as `tipo` and died serialising it, for every diploma, from 2026-08-26 on."""
+    from legalize.fetcher.pt.dre_api import DREApi
+
+    api = DREApi.__new__(DREApi)
+    posted = []
+
+    def call(action, variables):
+        json.dumps(variables)
+        posted.append(variables)
+        return {
+            "ThesaurusTreeList": {
+                "List": [{"ThesaurusElementId": 11, "ThesaurusElementName": "IRC"}]
+            }
+        }
+
+    api.call = call
+    assert api.descriptors("/dr/detalhe/portaria/208-2017-107684448") == {"11": "IRC"}
+    assert posted[0]["Tipo"] == "portaria" and posted[0]["Key"] == "208-2017-107684448"

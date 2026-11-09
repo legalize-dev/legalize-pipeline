@@ -441,6 +441,10 @@ class DREApi(HttpClient):
             documents.extend(((issue.get("DiplomaLegiList") or {}).get("List")) or [])
         return documents
 
+    # A staticmethod: 811e30a dropped the decorator while rewriting the method
+    # above, every descriptors() call has passed the client as `tipo` since, and
+    # each diploma the daily published from 2026-08-26 on shipped with no subjects.
+    @staticmethod
     def _aj_vars(tipo: str, key: str, associacao: str = "informacoes-gerais") -> dict:
         """The AnaliseJuridica screen state.
 
