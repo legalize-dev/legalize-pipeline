@@ -39,6 +39,8 @@ from legalize.fetcher.pt.identifier import build_identifier
 
 logger = logging.getLogger(__name__)
 
+MAX_BROKEN_IN_A_ROW = 5
+
 
 def published_identifiers(repo: GitRepo) -> set[str]:
     """Every identifier HEAD holds a law file for, in any directory (root files are not laws)."""
@@ -78,7 +80,7 @@ def backfill(config, since: date, until: date, *, dry_run: bool = False) -> tupl
     discovery = DREDiscovery.create({**cc.source, "cache_dir": cc.data_dir})
     meta_parser = DREMetadataParser()
 
-    written, failed = 0, []
+    written, failed, broken_in_a_row = 0, [], 0
     with DREClient.create(cc) as client:
         for day, norm_id, identifier in missing(discovery, client, present, since, until):
             if dry_run:
@@ -87,9 +89,17 @@ def backfill(config, since: date, until: date, *, dry_run: bool = False) -> tupl
             try:
                 if commit_new(config, repo, client, meta_parser, norm_id, generic_fetch_one):
                     written += 1
+                broken_in_a_row = 0
             except DREApiError:
-                logger.exception("DRE API contract broken at %s — stopping", norm_id)
-                raise
+                # One record DRE cannot resolve (Decreto do PR 17/2021 is listed in its
+                # journal and its screen answers the default record) is that act's
+                # failure. A changed contract fails every act, so a run of them stops.
+                broken_in_a_row += 1
+                if broken_in_a_row >= MAX_BROKEN_IN_A_ROW:
+                    logger.exception("DRE API contract broken at %s — stopping", norm_id)
+                    raise
+                logger.exception("DRE could not resolve %s (%s)", norm_id, identifier)
+                failed.append(norm_id)
             except Exception:
                 logger.exception("Could not write %s (%s)", norm_id, identifier)
                 failed.append(norm_id)

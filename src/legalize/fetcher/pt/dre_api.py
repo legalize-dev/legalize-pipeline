@@ -451,9 +451,17 @@ class DREApi(HttpClient):
         The SPA splits the key ``47344-1966-477358`` into Numero/Year/ConteudoId
         client-side *before* the first data action fires. Post Tipo/Key alone and DRE
         answers ``IsNullElementType: true`` with every id 0 — a silent empty result.
+
+        A numberless act's key is ``1976-507001``: year and id, no number. Read as one
+        id it reaches the screen as ``ConteudoId: "1976-507001"`` and DRE answers 400.
         """
         parts = key.rsplit("-", 2)
-        numero, ano, conteudo_id = (parts + ["", "", ""])[:3] if len(parts) == 3 else ("", "", key)
+        if len(parts) == 3:
+            numero, ano, conteudo_id = parts
+        elif len(parts) == 2 and all(p.isdigit() for p in parts):
+            numero, (ano, conteudo_id) = "", parts
+        else:
+            numero, ano, conteudo_id = "", "", key
         return {
             "Associacao": associacao,
             "_associacaoInDataFetchStatus": 1,
