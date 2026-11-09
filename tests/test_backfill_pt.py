@@ -164,6 +164,22 @@ def test_descriptors_posts_the_diploma_not_the_client():
     assert posted[0]["Tipo"] == "portaria" and posted[0]["Key"] == "208-2017-107684448"
 
 
+@pytest.mark.parametrize(
+    "key, expected",
+    [
+        ("208-2017-107684448", ("208", 2017, "107684448")),
+        ("37-a-2021-157397604", ("37-a", 2021, "157397604")),
+        # Numberless: the 1974-77 resolutions of the Council of Ministers got a 400.
+        ("1976-507001", ("", 1976, "507001")),
+    ],
+)
+def test_aj_vars_splits_the_key_the_way_the_screen_does(key, expected):
+    from legalize.fetcher.pt.dre_api import DREApi
+
+    v = DREApi._aj_vars("resolucao-conselho-ministros", key)
+    assert (v["Numero"], v["Year"], v["ConteudoId"]) == expected
+
+
 def test_the_daily_walks_the_last_days_again_for_late_supplements():
     """Supplements land after the 10:00 run has walked the day, and on Saturdays."""
     from legalize.fetcher.pt.daily import with_recent_days
