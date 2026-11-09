@@ -20,7 +20,7 @@ import gzip
 import json
 import logging
 import re
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from rich.console import Console
@@ -28,6 +28,7 @@ from rich.console import Console
 from legalize.committer.git_ops import GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
+from legalize.fetcher.pt.identifier import build_identifier
 from legalize.models import CommitType, Reform
 from legalize.pipeline import SKIP_WEEKDAYS, finalize_daily
 from legalize.state.store import StateStore, resolve_dates_to_process
@@ -41,6 +42,19 @@ _URL_ENTRY = re.compile(
     r"<url>\s*<loc>([^<]+)</loc>\s*(?:<lastmod>([^<]*)</lastmod>)?", re.IGNORECASE | re.DOTALL
 )
 _CONS_URL = re.compile(r"/dr/legislacao-consolidada/([^/]+)/(\d{4})-(\d+)")
+
+# DRE publishes supplements later the same day (Portaria 404-A/2026, Decreto-Lei
+# 195-A/2026), after this run has walked that day, and the cursor never returns to
+# it: 21 acts from 2026-08-26 to 2026-11-08, almost all of them -A/-B numbers, some on
+# a Saturday this schedule never walks. So each run walks the last days again,
+# weekends included; what is already published is skipped before anything is fetched.
+SUPPLEMENT_LOOKBACK_DAYS = 3
+
+
+def with_recent_days(dates: list[date], today: date) -> list[date]:
+    """The days to walk: the cursor's, plus the last few whatever their weekday."""
+    recent = {today - timedelta(days=n) for n in range(1, SUPPLEMENT_LOOKBACK_DAYS + 1)}
+    return sorted(set(dates) | recent)
 
 
 def _lastmod_state_path(data_dir: str | Path) -> Path:
@@ -128,6 +142,8 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     if dates_to_process is None:
         console.print("[yellow]No last date found. Use --date or run bootstrap.[/yellow]")
         return 0
+    if target_date is None:
+        dates_to_process = with_recent_days(dates_to_process, date.today())
 
     repo = GitRepo(cc.repo_path, config.git.committer_name, config.git.committer_email)
     meta_parser = DREMetadataParser()
@@ -189,6 +205,10 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                 if dry_run:
                     console.print(f"    [dim]{norm_id}[/dim]")
                     continue
+                _surface, tipo, key = norm_id.split(":", 2)
+                identifier = build_identifier(f"/dr/detalhe/{tipo}/{key}", "")
+                if repo.has_commit_with_source_id(identifier, identifier):
+                    continue  # published by an earlier run: the lookback walks days twice
                 try:
                     markdown = commit_new(
                         config, repo, client, meta_parser, norm_id, generic_fetch_one

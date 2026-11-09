@@ -162,3 +162,12 @@ def test_descriptors_posts_the_diploma_not_the_client():
     api.call = call
     assert api.descriptors("/dr/detalhe/portaria/208-2017-107684448") == {"11": "IRC"}
     assert posted[0]["Tipo"] == "portaria" and posted[0]["Key"] == "208-2017-107684448"
+
+
+def test_the_daily_walks_the_last_days_again_for_late_supplements():
+    """Supplements land after the 10:00 run has walked the day, and on Saturdays."""
+    from legalize.fetcher.pt.daily import with_recent_days
+
+    monday = date(2026, 9, 14)
+    walked = with_recent_days([monday], monday)
+    assert walked == [date(2026, 9, 11), date(2026, 9, 12), date(2026, 9, 13), monday]
