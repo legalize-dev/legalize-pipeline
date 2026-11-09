@@ -20,7 +20,7 @@ import gzip
 import json
 import logging
 import re
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from rich.console import Console
@@ -28,6 +28,7 @@ from rich.console import Console
 from legalize.committer.git_ops import GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
+from legalize.fetcher.pt.identifier import build_identifier
 from legalize.models import CommitType, Reform
 from legalize.pipeline import SKIP_WEEKDAYS, finalize_daily
 from legalize.state.store import StateStore, resolve_dates_to_process
@@ -41,6 +42,19 @@ _URL_ENTRY = re.compile(
     r"<url>\s*<loc>([^<]+)</loc>\s*(?:<lastmod>([^<]*)</lastmod>)?", re.IGNORECASE | re.DOTALL
 )
 _CONS_URL = re.compile(r"/dr/legislacao-consolidada/([^/]+)/(\d{4})-(\d+)")
+
+# DRE publishes supplements later the same day (Portaria 404-A/2026, Decreto-Lei
+# 195-A/2026), after this run has walked that day, and the cursor never returns to
+# it: 21 acts from 2026-08-26 to 2026-11-08, almost all of them -A/-B numbers, some on
+# a Saturday this schedule never walks. So each run walks the last days again,
+# weekends included; what is already published is skipped before anything is fetched.
+SUPPLEMENT_LOOKBACK_DAYS = 3
+
+
+def with_recent_days(dates: list[date], today: date) -> list[date]:
+    """The days to walk: the cursor's, plus the last few whatever their weekday."""
+    recent = {today - timedelta(days=n) for n in range(1, SUPPLEMENT_LOOKBACK_DAYS + 1)}
+    return sorted(set(dates) | recent)
 
 
 def _lastmod_state_path(data_dir: str | Path) -> Path:
@@ -128,6 +142,8 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
     if dates_to_process is None:
         console.print("[yellow]No last date found. Use --date or run bootstrap.[/yellow]")
         return 0
+    if target_date is None:
+        dates_to_process = with_recent_days(dates_to_process, date.today())
 
     repo = GitRepo(cc.repo_path, config.git.committer_name, config.git.committer_email)
     meta_parser = DREMetadataParser()
@@ -189,28 +205,17 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                 if dry_run:
                     console.print(f"    [dim]{norm_id}[/dim]")
                     continue
+                _surface, tipo, key = norm_id.split(":", 2)
+                identifier = build_identifier(f"/dr/detalhe/{tipo}/{key}", "")
+                if repo.has_commit_with_source_id(identifier, identifier):
+                    continue  # published by an earlier run: the lookback walks days twice
                 try:
-                    norm = generic_fetch_one(config, "pt", norm_id, force=True)
-                    if norm is None:
+                    markdown = commit_new(
+                        config, repo, client, meta_parser, norm_id, generic_fetch_one
+                    )
+                    if markdown is None:
                         continue
-                    metadata = meta_parser.parse(client.get_metadata(norm_id), norm_id)
-                    file_path = norm_to_filepath(metadata)
-                    markdown = render_norm_at_date(
-                        metadata, norm.blocks, metadata.publication_date, include_all=True
-                    )
-                    if not repo.write_and_add(file_path, markdown):
-                        continue
-                    reform = Reform(
-                        date=metadata.publication_date,
-                        norm_id=metadata.identifier,
-                        affected_blocks=(),
-                    )
-                    info = build_commit_info(
-                        CommitType.NEW, metadata, reform, norm.blocks, file_path, markdown
-                    )
-                    if repo.commit(info):
-                        commits_created += 1
-                        console.print(f"    [green]✓[/green] {info.subject}")
+                    commits_created += 1
                     amended_today |= analise_juridica.targets_named_by(markdown)
                 except DREApiError:
                     logger.exception("DRE API contract broken — aborting daily run")
@@ -256,6 +261,30 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
         dry_run=dry_run,
         push=config.git.push,
     )
+
+
+def commit_new(config, repo, client, meta_parser, norm_id: str, fetch_one) -> str | None:
+    """Fetch one as-published diploma and commit it as ``[new]``.
+
+    Returns its Markdown when a commit landed, None when there was nothing to
+    write: no data, the same text already in the file, or another act's file.
+    """
+    norm = fetch_one(config, "pt", norm_id, force=True)
+    if norm is None:
+        return None
+    metadata = meta_parser.parse(client.get_metadata(norm_id), norm_id)
+    file_path = norm_to_filepath(metadata)
+    markdown = render_norm_at_date(
+        metadata, norm.blocks, metadata.publication_date, include_all=True
+    )
+    if not repo.write_and_add(file_path, markdown):
+        return None
+    reform = Reform(date=metadata.publication_date, norm_id=metadata.identifier, affected_blocks=())
+    info = build_commit_info(CommitType.NEW, metadata, reform, norm.blocks, file_path, markdown)
+    if not repo.commit(info):
+        return None
+    console.print(f"    [green]✓[/green] {info.subject}")
+    return markdown
 
 
 def _commit_versions(config, repo, client, norm_id: str, fetch_one) -> int:

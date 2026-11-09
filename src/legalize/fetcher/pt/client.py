@@ -229,11 +229,13 @@ class DREClient(LegislativeClient):
     def _build_bundle(self, norm_id: str) -> dict:
         surface, tipo, key = parse_norm_id(norm_id)
         if surface == PUBLISHED:
+            published = self._published(tipo, key)
             return {
                 "surface": PUBLISHED,
                 "tipo": tipo,
                 "key": key,
-                "published": self._published(tipo, key),
+                "published": published,
+                "descriptors": self._descriptors_for(published),
             }
 
         header = self._header(tipo, key)
@@ -267,7 +269,35 @@ class DREClient(LegislativeClient):
                 )
             },
             "published": published,
+            "descriptors": self._descriptors_for(published),
         }
+
+    def _descriptors_for(self, published: dict) -> dict[str, str]:
+        """Subject labels for one diploma, fetched only when no installed map has them.
+
+        DRE names subjects as bare ids and publishes their labels on the análise
+        jurídica screen alone. The labels used to come from a corpus-wide map built
+        once and injected; the daily runs without it, so every diploma it published
+        from 2026-08-26 on went out with no subjects. Asking per diploma, for what is
+        still unlabelled, keeps each bundle sufficient on its own.
+        """
+        # Local: the parser imports this module's surface constants.
+        from legalize.fetcher.pt import parser as pt_parser
+
+        ref = (published.get("LinkSitemap") or "").strip()
+        if not ref:
+            return {}
+        if pt_parser.unlabelled_subjects(published.get("ELIMetadataHTML") or "") == []:
+            return {}
+        try:
+            found = self._api.descriptors(ref)
+        except DREApiError as exc:
+            # One diploma the screen does not resolve is not a broken contract; a
+            # diploma without subjects is the cost, as it was before this call.
+            logger.warning("No descriptors for %s: %s", ref, exc)
+            return {}
+        pt_parser.learn_descriptors(found)
+        return found
 
     # ----------------------------------------------------- LegislativeClient
 
