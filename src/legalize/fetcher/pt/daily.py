@@ -190,27 +190,12 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                     console.print(f"    [dim]{norm_id}[/dim]")
                     continue
                 try:
-                    norm = generic_fetch_one(config, "pt", norm_id, force=True)
-                    if norm is None:
+                    markdown = commit_new(
+                        config, repo, client, meta_parser, norm_id, generic_fetch_one
+                    )
+                    if markdown is None:
                         continue
-                    metadata = meta_parser.parse(client.get_metadata(norm_id), norm_id)
-                    file_path = norm_to_filepath(metadata)
-                    markdown = render_norm_at_date(
-                        metadata, norm.blocks, metadata.publication_date, include_all=True
-                    )
-                    if not repo.write_and_add(file_path, markdown):
-                        continue
-                    reform = Reform(
-                        date=metadata.publication_date,
-                        norm_id=metadata.identifier,
-                        affected_blocks=(),
-                    )
-                    info = build_commit_info(
-                        CommitType.NEW, metadata, reform, norm.blocks, file_path, markdown
-                    )
-                    if repo.commit(info):
-                        commits_created += 1
-                        console.print(f"    [green]✓[/green] {info.subject}")
+                    commits_created += 1
                     amended_today |= analise_juridica.targets_named_by(markdown)
                 except DREApiError:
                     logger.exception("DRE API contract broken — aborting daily run")
@@ -256,6 +241,30 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
         dry_run=dry_run,
         push=config.git.push,
     )
+
+
+def commit_new(config, repo, client, meta_parser, norm_id: str, fetch_one) -> str | None:
+    """Fetch one as-published diploma and commit it as ``[new]``.
+
+    Returns its Markdown when a commit landed, None when there was nothing to
+    write: no data, the same text already in the file, or another act's file.
+    """
+    norm = fetch_one(config, "pt", norm_id, force=True)
+    if norm is None:
+        return None
+    metadata = meta_parser.parse(client.get_metadata(norm_id), norm_id)
+    file_path = norm_to_filepath(metadata)
+    markdown = render_norm_at_date(
+        metadata, norm.blocks, metadata.publication_date, include_all=True
+    )
+    if not repo.write_and_add(file_path, markdown):
+        return None
+    reform = Reform(date=metadata.publication_date, norm_id=metadata.identifier, affected_blocks=())
+    info = build_commit_info(CommitType.NEW, metadata, reform, norm.blocks, file_path, markdown)
+    if not repo.commit(info):
+        return None
+    console.print(f"    [green]✓[/green] {info.subject}")
+    return markdown
 
 
 def _commit_versions(config, repo, client, norm_id: str, fetch_one) -> int:

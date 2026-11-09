@@ -12,6 +12,11 @@ série a document belongs to: 14 % of ``portaria`` URLs are Série II.
 back the série and the issue for free and cannot miss a document that was published.
 It is slower, so it runs as a completeness pass over the sitemap's output.
 
+The 4.6 % was a sample over every year, and it hid where the holes are. For 2014–2021
+the portaria sitemaps list 50–400 a year against ~1,500 a year from 2022: Portaria
+208/2017 is in no sitemap, and the bootstrap of August 2026 ran on the sitemaps alone,
+because this pass was described here and never wired in.
+
 Série is filtered at fetch time, from the detail record — the only place it exists.
 """
 
@@ -21,7 +26,7 @@ import gzip
 import logging
 import re
 from collections.abc import Iterator
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from legalize.fetcher.base import LegislativeClient, NormDiscovery
@@ -223,6 +228,14 @@ class DREDiscovery(NormDiscovery):
 
     # ------------------------------------------------------------ journal walk
 
+    def journal_ids(self, client: DREClient, start: date, end: date) -> Iterator[tuple[date, str]]:
+        """``(day, norm_id)`` for every in-scope Série I document, oldest day first."""
+        day = start
+        while day <= end:
+            for norm_id in self.discover_daily(client, day):
+                yield day, norm_id
+            day += timedelta(days=1)
+
     # ------------------------------------------------------- NormDiscovery API
 
     def discover_all(self, client: LegislativeClient, **kwargs) -> Iterator[str]:
@@ -250,11 +263,23 @@ class DREDiscovery(NormDiscovery):
             yield norm_id
         logger.info("Discovery: %d consolidated diplomas", count)
 
-        published = 0
+        listed: set[str] = set()
         for tipo, key in self.published_ids(client):
-            published += 1
+            listed.add(key)
             yield f"{PUBLISHED}:{tipo}:{key}"
-        logger.info("Discovery: %d as-published diplomas", published)
+        logger.info("Discovery: %d as-published diplomas in the sitemaps", len(listed))
+
+        if not self._journal_walk:
+            return
+        walked = 0
+        start = date(self._earliest_year, 1, 1)
+        for _day, norm_id in self.journal_ids(client, start, date.today()):
+            key = norm_id.rsplit(":", 1)[1]
+            if key not in listed:
+                listed.add(key)
+                walked += 1
+                yield norm_id
+        logger.info("Discovery: %d as-published diplomas only the journal walk found", walked)
 
     def discover_daily(
         self, client: LegislativeClient, target_date: date, **kwargs

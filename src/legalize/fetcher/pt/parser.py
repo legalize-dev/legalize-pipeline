@@ -111,6 +111,23 @@ def set_thesaurus(mapping: dict[str, str]) -> None:
     _THESAURUS.update({str(k): v for k, v in (mapping or {}).items() if v})
 
 
+def learn_descriptors(mapping: dict[str, str]) -> None:
+    """Add labels fetched for one diploma, so the next one naming them needs no call."""
+    _THESAURUS.update({str(k): v for k, v in (mapping or {}).items() if v})
+
+
+def unlabelled_subjects(eli_markup: str) -> list[str] | None:
+    """The subject ids this ELI block names that no label is known for.
+
+    None when the block names no subject at all: that is the 12 % whose subjects
+    exist only on the análise jurídica screen, a different case from a missing label.
+    """
+    ids = _parse_eli_rdfa(eli_markup).get("subjects") or []
+    if not ids:
+        return None
+    return [sid for sid in ids if str(sid) not in _THESAURUS]
+
+
 # {as-published norm id: [(date, amending act identifier), …]}, oldest first. Built
 # by scripts/pt_amendments.py from DRE's eli:amended_by plus the targets the acts
 # link themselves, and injected before a reparse. Only as-published norms use it: a
@@ -753,6 +770,10 @@ class DREMetadataParser(MetadataParser):
         short_title = _cut(descriptive, 80) or citation
 
         eli_meta = _parse_eli_rdfa(published.get("ELIMetadataHTML") or "")
+        # Labels fetched with this diploma (client._descriptors_for), ahead of the
+        # corpus-wide map: a bundle that carries them parses the same anywhere.
+        descriptors: dict[str, str] = bundle.get("descriptors") or {}
+        labels = {**_THESAURUS, **descriptors}
         pdf_url = (published.get("URL_PDF") or consolidation.get("URLPDF") or "").strip()
 
         extra: list[tuple[str, str]] = []
@@ -847,9 +868,10 @@ class DREMetadataParser(MetadataParser):
             # "the thesaurus has no label for it" — otherwise a hole in the
             # thesaurus would quietly be papered over with the other source.
             subjects=(
-                tuple(label for sid in eli_meta["subjects"] if (label := _THESAURUS.get(str(sid))))
+                tuple(label for sid in eli_meta["subjects"] if (label := labels.get(str(sid))))
                 if eli_meta.get("subjects")
                 else _SUBJECT_OVERRIDES.get((published.get("LinkSitemap") or "").strip(), ())
+                or tuple(descriptors.values())
             ),
             summary=sumario,
             extra=tuple(extra),
