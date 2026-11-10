@@ -248,7 +248,11 @@ first bootstrap's captured scope contained 5,609 cards, of which 5,264 had
 publishable PDFs after the documented exclusions. Five real
 cards were fetched in the live validation and the related-version parser was
 exercised against their HTML. A separate 50-law fetch benchmark completed
-50/50 with zero errors in 5m58s at one worker and 0.5 requests/second. The
+50/50 with zero errors in 5m58s at one worker and 0.5 requests/second. A live
+full-month update across October 2026 (`legalize daily -c mk --since 2026-10-01`)
+completed in 815s (13m35s) creating 2 commits for newly published legislation,
+and a second run completed in 574s with zero duplicate commits. The reform coverage
+checker passed across all 5,545 published laws with zero missing reform commits. The
 existing full corpus passes the SPEC v0.5 check and the pipeline health and
 deep-health checks when inspected from a clean clone.
 

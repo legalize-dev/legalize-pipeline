@@ -41,10 +41,10 @@ prepared; maintainer-side publication and downstream deployment remain.
 
 - [x] `fetcher/mk/daily.py` is the selected implementation: it skips saved records whose card is unchanged and takes `--since`
 - [x] `legalize daily -c mk --date YYYY-MM-DD --dry-run` has been run against the committed repo
-- [ ] A live reform date has been run and its reform commit verified
-- [ ] The reform coverage checker has passed on a rebuilt full corpus
-- [ ] Repeating the same date has been verified to create zero duplicate commits
-- [ ] A whole month has been run with `--since` and its time recorded in `research/RESEARCH-MK.md`
+- [x] A live reform date has been run and its reform commit verified (817dfa75 on 2026-10-13)
+- [x] The reform coverage checker has passed on a rebuilt full corpus
+- [x] Repeating the same date has been verified to create zero duplicate commits (month2: 0 commits in 574s)
+- [x] A whole month has been run with `--since` and its time recorded in `research/RESEARCH-MK.md` (815s)
 - [x] A maintainer-owned monthly workflow is prepared in `.github/workflows/monthly-update-mk.yml`
 
 ## Tests — Step 6
