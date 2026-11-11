@@ -1228,6 +1228,49 @@ def test_quoted_numbers_and_capitals_from_the_old_text_layer_get_their_quotes():
         assert fix_quote_artifacts(text) == text
 
 
+def test_a_quote_that_opens_on_a_number_after_its_introducing_word_is_restored():
+    from legalize.fetcher.mk.ocr import fix_quote_artifacts
+
+    # Lines from the rebuilt corpus, where the С before the number had stayed.
+    cases = {
+        'зборовите: С4.500 до 45.000 динари" се заменуваат': (
+            'зборовите: „4.500 до 45.000 динари" се заменуваат'
+        ),
+        "став 1 зборовите: С2.000 до 20.000 динарим се заменуваат": (
+            "став 1 зборовите: „2.000 до 20.000 динари“ се заменуваат"
+        ),
+        "зборовите; С4.000 до 20.000 динарим се": "зборовите; „4.000 до 20.000 динари“ се",
+        "бројот С6м се заменува со бројот С8м.": "бројот „6“ се заменува со бројот „8“.",
+        "наместо бројот С4.м пред текстот": "наместо бројот „4.“ пред текстот",
+        "бројот С0,5%о се заменува": "бројот „0,5%“ се заменува",
+        "броевите: С10, 20,м се заменуваат": "броевите: „10, 20,“ се заменуваат",
+        "стапката С2,5% м се заменува со стапката С3,5 м.": (
+            "стапката „2,5%“ се заменува со стапката „3,5“."
+        ),
+        'процентот: С30%" се заменува со процентот; С50%".': (
+            'процентот: „30%" се заменува со процентот; „50%".'
+        ),
+        "се менува и гласи: С4. ако не изврши имунизација": (
+            "се менува и гласи: „4. ако не изврши имунизација"
+        ),
+    }
+    for text, fixed in cases.items():
+        assert fix_quote_artifacts(text) == fixed
+    # Without an introducing word, a С before a digit is a code, a formula or a licence class.
+    for text in (
+        "Потпрограма С4 - Програма за намалување",
+        "Хлориди (како вкупен С1)",
+        "| С1+Е | С | C+E |",
+        "доколку се смета за потребно С6 цел",
+        "тарифна ознака „5407 20 19 00 --- 3 м или поголема“",
+    ):
+        assert fix_quote_artifacts(text) == text
+    # RM-2001-13-6441: a quote that never closes does not reach into the next article.
+    assert fix_quote_artifacts(
+        'кои гласат: С1) лото;\n\nЧлен 39\n\nЧленот 44 се менува и гласи: "Странско правно'
+    ) == ('кои гласат: „1) лото;\n\nЧлен 39\n\nЧленот 44 се менува и гласи: "Странско правно')
+
+
 def test_every_reviewed_ocr_fix_is_a_replacement_with_at_most_its_page():
     import json
 

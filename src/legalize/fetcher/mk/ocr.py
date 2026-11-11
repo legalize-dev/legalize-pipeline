@@ -2025,6 +2025,14 @@ QUOTE_OPEN_M = re.compile(r"(\s+|[(:]\s*|\bво\s+)м(?P<word>С?[А-ШЃЌЅЉ�
 LEGAL_QUOTE_OPEN = re.compile(
     r"(\b(?:зборовите|зборот|кои гласат|гласи):\s*)[См](?=[А-ШЃЌЅЉЊЏ])", re.I
 )
+# A quote that opens on a number after the word that introduces it, as "зборовите: С4.500 до
+# 45.000 динарим" (RM-1993-12-3321), "гласи: С6. Имунизација" or "бројот С3м". Only these words
+# open it, because a С before a digit elsewhere is a code ("(С171)", "модулите С1 или С2").
+LEGAL_NUMBER_OPEN = re.compile(
+    r"(\b(?:зборовите|зборот|гласи|гласат|бројот|броевите|износот|процентот|стапката)"
+    r"[:;]?\s*)[См](?=\d)",
+    re.I,
+)
 GAZETTE_OPEN = re.compile(r"\bС(?=Службен (?:весник|лист))")
 # A quoted number or capitals the old text layer gives as С...м, as "зборовите: С10.000 до
 # 50.000м" (SFRJ-1989-47-1700) and "зборот СПОДЕМм". Only digits, signs and the joining words of
@@ -2034,6 +2042,7 @@ PAIRED_QUOTE = re.compile(
     r"|[А-ШЃЌЅЉЊЏ]{2}[А-ШЃЌЅЉЊЏ\d .,/–-]*?[А-ШЃЌЅЉЊЏ])м(?=[\s,.;:)]|$)",
     re.M,
 )
+ARTICLE_LINE = re.compile(r"[ \t#]*Член\s+\d+\S*[ \t]*(?:\n|$)")
 MK_ALL = MK_LETTERS + MK_LETTERS.upper()
 HOMOGLYPHS = str.maketrans("aceopxyiAEOPCTHKMBXjJ", "асеорхуіАЕОРСТНКМВХјЈ")
 SERBIAN_MARKERS = (
@@ -2105,6 +2114,7 @@ def fix_quote_artifacts(text):
     text = QUOTE_OPEN.sub(open_quote, text)
     text = QUOTE_OPEN_M.sub(open_quote, text)
     text = LEGAL_QUOTE_OPEN.sub(r"\1„", text)
+    text = LEGAL_NUMBER_OPEN.sub(r"\1„", text)
     text = PAIRED_QUOTE.sub(r"„\g<inner>“", text)
     # In legal references, "член N став M" is fixed terminology. OCR often
     # turns "став" into the ordinary word "стар", which a dictionary cannot
@@ -2127,22 +2137,35 @@ def fix_quote_artifacts(text):
             quoted, opened = True, pos
         elif char == "“":
             quoted = False
+        elif char == "\n" and quoted and ARTICLE_LINE.match(text, pos + 1):
+            # A quote whose closing mark the text layer lost ends at the next article, or it
+            # would take an о or м from a word there ("кои гласат: „1) лото;", RM-2001-13-6441).
+            quoted = False
         elif (
-            char == "м"
+            char in "мо"
             and quoted
             and (pos + 1 == len(text) or text[pos + 1] in " \t\n,.;:)")
             and (
                 # A gazette or name in capitals, as "(„Службен весник на СРМм број 4/78".
-                re.search(r"[А-ШЃЌЅЉЊЏ]{2}$", text[max(0, pos - 2) : pos])
-                # An amount the quote opened on, as "„4.500 до 45.000м", never metres in a
-                # quoted passage ("поголеми од 150м").
+                (char == "м" and re.search(r"[А-ШЃЌЅЉЊЏ]{2}$", text[max(0, pos - 2) : pos]))
+                # An amount the quote opened on, as "„4.500 до 45.000м", "„4.м", "„10, 20,м"
+                # or "„0,5%о", never metres in a quoted passage ("поголеми од 150м").
                 or (
-                    text[pos - 1 : pos] in "0123456789%"
+                    re.search(r"%$" if char == "о" else r"[\d%][,.]?$", text[max(0, pos - 2) : pos])
                     and text[opened + 1 : opened + 2].isdigit()
                     and pos - opened <= 40
                 )
+                # A space before the м only when the quote is the number alone, as "„3,5 м",
+                # never a measure after a code ("„5407 20 19 00 --- 3 м или поголема“").
+                or (
+                    char == "м"
+                    and text[pos - 1] == " "
+                    and re.fullmatch(r"\d[\d.,%]*", text[opened + 1 : pos - 1])
+                )
             )
         ):
+            if out[-1] == " ":
+                out.pop()
             char = "“"
             quoted = False
         elif char in "мо" and quoted:
