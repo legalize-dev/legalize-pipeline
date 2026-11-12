@@ -493,6 +493,9 @@ def parse_card(data: bytes, norm_id: str) -> dict[str, Any]:
                 card_id = canonical_id.group(1)
     values["id"] = card_id
     values["active"] = "aktiven.PNG" in text and "neaktiven" not in text
+    # A card shows one of three badges: Активен, Неактивен or Нов. Нов, on 259 cards from 1946
+    # to 2026, says nothing about force, so only Неактивен makes a law repealed.
+    values["inactive"] = "neaktiven" in text
     pdf = re.search(r"/PdfFiles/([^\"'&\s]+\.pdf)", text, re.I)
     values["pdf_name"] = pdf.group(1) if pdf else ""
     values["source"] = f"{_ROOT}{_PAGE.format(norm_id=norm_id)}"

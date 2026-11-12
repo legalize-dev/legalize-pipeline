@@ -131,7 +131,7 @@ class LDBISMetadataParser(MetadataParser):
         card = parse_card(data, norm_id)
         if not card["title"] or not card["publication_date"]:
             raise ValueError(f"LDBIS card {norm_id} lacks title or publication date")
-        status = NormStatus.IN_FORCE if card["active"] else NormStatus.REPEALED
+        status = NormStatus.REPEALED if card["inactive"] else NormStatus.IN_FORCE
         identifier = canonical_identifier(card)
         year = card["publication_date"][-4:]
         issue = card["issue"] or ""

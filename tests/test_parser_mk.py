@@ -33,6 +33,16 @@ from legalize.fetcher.mk.discovery import LDBISDiscovery
 FIXTURE = Path(__file__).parent / "fixtures" / "mk" / "card.html"
 
 
+def test_only_the_inactive_badge_makes_a_law_repealed():
+    # LDBIS shows Нов where Активен would be on new and old laws alike (RSM-2026-146-74171,
+    # the 2026 weapons law), and Неактивен on a repealed one.
+    card = FIXTURE.read_text()
+    assert "aktiven.PNG" in card
+    for badge, status in (("nov.PNG", "in_force"), ("neaktiven.PNG", "repealed")):
+        data = card.replace("aktiven.PNG", badge).encode()
+        assert LDBISMetadataParser().parse(data, "RM-2013-187-30412").status.value == status
+
+
 def test_metadata_parser_captures_official_fields():
     metadata = LDBISMetadataParser().parse(FIXTURE.read_bytes(), "RM-2013-187-30412")
     assert metadata.country == "mk"
@@ -1317,6 +1327,10 @@ def test_a_capitalised_word_in_a_quote_keeps_its_last_letter():
         "41/80) е Извршниот совет на Собранието на СРМм.\nЧлен 3": (
             "нов член 9-а кој гласи: „Член 9-а Надлежен орган од Законот („Службен лист на СФРЈ“ "
             "број 41/80) е Извршниот совет на Собранието на СРМ“.\nЧлен 3"
+        ),
+        # A year's "година" with the closing quote the text layer gave as м (RM-2002-43-7185).
+        "зборовите: „1 април до 15 април 2002 годинам се заменуваат": (
+            "зборовите: „1 април до 15 април 2002 година“ се заменуваат"
         ),
         # "која" is Macedonian too, so it marks no Serbian (RM-2005-39-9755).
         "која е ставена. (2) „Увозна стокао значи стока која е": (

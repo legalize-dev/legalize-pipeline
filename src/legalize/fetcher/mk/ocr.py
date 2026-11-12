@@ -2044,6 +2044,9 @@ PAIRED_QUOTE = re.compile(
 )
 ARTICLE_LINE = re.compile(r"[ \t#]*Член\s+\d+\S*[ \t]*(?:\n|$)")
 # Cyrillic letters Macedonian does not have, which mark a line of a partner language's text.
+# Quote artifacts the vocabulary took in from the corpus. Macedonian has no "годинам", and all
+# its 20 laws hold "година" with a lost closing quote ("„1 април до 15 април 2002 годинам").
+NOT_WORDS = frozenset({"годинам"})
 FOREIGN_LETTERS = re.compile(r"[ёйыэъщіїєґђћЁЙЫЭЪЩІЇЄҐЂЋ]")
 MK_ALL = MK_LETTERS + MK_LETTERS.upper()
 HOMOGLYPHS = str.maketrans("aceopxyiAEOPCTHKMBXjJ", "асеорхуіАЕОРСТНКМВХјЈ")
@@ -2093,7 +2096,7 @@ def fix_quote_artifacts(text):
     def known(word):
         # Do not use the law-word exception list here: it was built from the
         # existing corpus and can contain the very OCR artifact being fixed.
-        return word.casefold() in words
+        return word.casefold() in words and word.casefold() not in NOT_WORDS
 
     def repair_mixed_script(line):
         cyrillic = sum(char in MK_ALL for char in line)
