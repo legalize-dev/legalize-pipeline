@@ -52,7 +52,7 @@ prepared; maintainer-side publication and downstream deployment remain.
 - [x] `tests/test_parser_mk.py` passes against the five fixtures
 - [x] Country registry dispatch is covered by tests
 - [x] Ruff checks pass for the Macedonian fetcher and tests
-- [x] The full suite passes on the latest branch commit locally (3,248 passed, 27 skipped)
+- [x] The full suite passes on the latest branch commit locally (3,255 passed, 27 skipped, in about 10 minutes)
 - [ ] Pull request CI passes for the latest branch commit (no checks have run on the fork branch)
 
 ## Quality gate — Step 7
@@ -67,6 +67,7 @@ prepared; maintainer-side publication and downstream deployment remain.
 
 - [x] One-worker 50-law benchmark passed 50/50 in 5m58s
 - [x] Existing relevant corpus bootstrap completed with 5,264 law files and 7,578 commits, before the second review's parser changes
+- [x] Full rebuild with the second review's parser changes (12 November 2026): 5,545 law files and 9,054 commits, reform checker PASS, then two daily runs since 1 October 2026 with 1 commit in 596s and 0 commits in 484s
 - [x] SPEC v0.5 content validation passed
 - [x] Health and deep-health checks passed on a clean corpus clone
 - [x] Public fork `stojkovskistefan/legalize-mk` is populated, tagged, and has a Macedonian README
