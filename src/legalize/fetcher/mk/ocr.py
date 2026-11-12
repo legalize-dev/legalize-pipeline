@@ -2059,6 +2059,7 @@ SERBIAN_MARKERS = (
     "писмене",
     "уговорниц",
     "захтјев",
+    "републике",
     "овог члана",
     "одредбама",
 )
@@ -2139,17 +2140,21 @@ def fix_quote_artifacts(text):
     text = re.sub(r"(?m)^([ \t]*)Членб\b", r"\1Член 6", text)
     text = re.sub(r"(Република Македониј)ам(?=\s*(?:број|бр\.|[.,;)\"-]))", r"\1а“", text)
     out = []
-    quoted = False
-    opened = 0
+    # The open quotes, innermost last. A quote opens inside another only after a bracket, as an
+    # amended article citing a gazette ("„Член 9-а ... („Службен лист на СФРЈм ...) ... СРМм",
+    # SFRJ-1985-3-1259); any other „ starts afresh, since the text layer may have lost a close.
+    opens = []
     for pos, char in enumerate(text):
+        quoted = bool(opens)
+        opened = opens[-1] if opens else 0
         if char == "„":
-            quoted, opened = True, pos
+            opens = [*opens, pos] if opens and text[pos - 1 : pos] == "(" else [pos]
         elif char == "“":
-            quoted = False
+            opens = opens[:-1]
         elif char == "\n" and quoted and ARTICLE_LINE.match(text, pos + 1):
             # A quote whose closing mark the text layer lost ends at the next article, or it
             # would take an о or м from a word there ("кои гласат: „1) лото;", RM-2001-13-6441).
-            quoted = False
+            opens = []
         elif (
             char in "мо"
             and quoted
@@ -2176,7 +2181,7 @@ def fix_quote_artifacts(text):
             if out[-1] == " ":
                 out.pop()
             char = "“"
-            quoted = False
+            opens = opens[:-1]
         elif char in "мо" and quoted:
             # The whole word, capital included: "Странско" judged as "транск" lost its о.
             start = pos
@@ -2225,7 +2230,7 @@ def fix_quote_artifacts(text):
                 and not foreign_text_line(near)
             ):
                 char = "“"
-                quoted = False
+                opens = opens[:-1]
         out.append(char)
     text = "".join(out)
     text = re.sub(r"[ \t]+:", ":", text)
