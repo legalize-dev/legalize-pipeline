@@ -2041,6 +2041,14 @@ GLUED_WORD_OPEN = re.compile(r"(\b[Зз]боро(?:т|вите)[:;]?[ \t]*)С(?P
 GLUED_SAYS_OPEN = re.compile(r"(\b(?:гласи|гласат):[ \t]*)С(?P<word>(?![А-ШЃЈЌЅЉЊЏ])[^\s\"“„”]*)")
 # An amount whose first digit OCR read as a letter, as "износот Сl.000.000\"" or "бројот СЗ\"".
 GLUED_AMOUNT_OPEN = re.compile(r"(\b(?:износот|бројот)[ \t]*)С(?=[lIЗ][\d.,]*[\"“”м])")
+# A one word quote the text layer gave as С...м, known by the capital after the С, since no word
+# starts with two capitals and then small letters: "аеродромите ССкопјем и СОхридм"
+# (RM-1992-24-114), "звање СBachelorм" and "зборот СCoцијалистичкам" (SFRJ-1991-38-2024, whose C
+# and o are Latin). A С before a single capital, as "Споразум" or "Систем", is the word's own.
+CAPITAL_PAIR_QUOTE = re.compile(
+    r"(?<!\w)С(?P<word>[А-ШЃЈЌЅЉЊЏA-Z][а-шѓјќѕљњџa-z][А-ШЃЈЌЅЉЊЏа-шѓјќѕљњџA-Za-z-]*?)м"
+    r"(?=[\s,.;:)\"']|$)"
+)
 GAZETTE_OPEN = re.compile(r"\bС(?=Службен (?:весник|лист))")
 # A quoted number or capitals the old text layer gives as С...м, as "зборовите: С10.000 до
 # 50.000м" (SFRJ-1989-47-1700) and "зборот СПОДЕМм". Only digits, signs and the joining words of
@@ -2125,6 +2133,18 @@ def fix_quote_artifacts(text):
 
     text = "".join(repair_mixed_script(line) for line in text.splitlines(keepends=True))
 
+    def capital_pair(m):
+        word = m["word"]
+        # Latin letters inside a Cyrillic word are the text layer's, so they are read as Cyrillic.
+        if re.search(r"[A-Za-z]", word) and re.search(rf"[{MK_ALL}]", word):
+            word = word.translate(HOMOGLYPHS)
+        # A quote opened just before on the same line makes this С its double, as
+        # "зборот: „1 СПоединеченм се" (RM-1996-17-4281).
+        before = m.string[max(0, m.start() - 30) : m.start()].rsplit("\n", 1)[-1]
+        opened = before.rfind("„") > max(before.rfind("“"), before.rfind('"'))
+        return ("" if opened else "„") + word + "“"
+
+    text = CAPITAL_PAIR_QUOTE.sub(capital_pair, text)
     text = GAZETTE_OPEN.sub("„", text)
     text = re.sub(r"\b[см]службен\s+весник\b", "„Службен весник", text, flags=re.I)
 
