@@ -1271,6 +1271,54 @@ def test_a_quote_that_opens_on_a_number_after_its_introducing_word_is_restored()
     ) == ('кои гласат: „1) лото;\n\nЧлен 39\n\nЧленот 44 се менува и гласи: "Странско правно')
 
 
+def test_a_capitalised_word_in_a_quote_keeps_its_last_letter():
+    from legalize.fetcher.mk.ocr import fix_quote_artifacts
+
+    # The closing о or м is judged on the whole word, capital included. "Странско" lost its о
+    # because "транск" is a word fragment the vocabulary has (RM-2005-88-9792, RSM-2022-99-59456).
+    for text in (
+        "6. „Странско моторно возило“ е моторно возило",
+        "се менува и гласи: „Странско трговско друштво или странски трговец",
+        "„Бирото за јавни набавки",
+        # An о on an adjective stem in н is its neuter ending (RM-2004-77-9113, RM-2016-25-40443).
+        "„Метализирано предиво",
+        "„Пречистено масло",
+        # Partner-language treaty text ends real words in м (RM-1998-7-5032, RM-1997-50-4564).
+        "„Договор“ и „представительство либо каким-либо иным образом), не превращает",
+        "„Влада Републике Македоније и Савезна влада (у дањем тексту: стране уговорнице)",
+        "„Интервју ће договорити страна која подноси захтјев у сарадњи са надлежном мисијом",
+        # A hyphen joins a word broken across lines or a compound (RM-1999-40-5425).
+        "„хирдо- хлорната",
+        "„акрило-нитрил",
+        # Serbian with no ђ, ћ or marker word (DFJ-1945-69-172).
+        "„овлашкен је да подноси извештаје у економским, социјалним, културним, здравственим",
+        "„возилом које су у категорији",
+    ):
+        assert fix_quote_artifacts(text) == text
+    fixed = {
+        "зборовите: С40 до 200 платио. Во став 2": "зборовите: „40 до 200 плати“. Во став 2",
+        "зборовите: „Република Македонијам се": "зборовите: „Република Македонија“ се",
+        # After a consonant the о is still a quote where the word with о is no word
+        # (RM-2005-84-9709).
+        "зборовите: „Судото се": "зборовите: „Судот“ се",
+        "зборовите: „дејносто се": "зборовите: „дејност“ се",
+        # A С stuck to the word opened the quote (RM-1996-17-4281).
+        "по зборот: „1 СПоединеченм се": "по зборот: „1 СПоединечен“ се",
+        # Russian treaty text in the article before says nothing about this one (RM-2004-49-9239).
+        "РЕСПУБЛИКИ МАКЕДОНИИ РОССИЙСКОЙ ФЕДЕРАЦИИ\nЧлен 3\nОвој закон влегува во сила осмиот ден "
+        "од денот на објавувањето во „Службен весник на Република Македонијам.": (
+            "РЕСПУБЛИКИ МАКЕДОНИИ РОССИЙСКОЙ ФЕДЕРАЦИИ\nЧлен 3\nОвој закон влегува во сила осмиот "
+            "ден од денот на објавувањето во „Службен весник на Република Македонија“."
+        ),
+        # "која" is Macedonian too, so it marks no Serbian (RM-2005-39-9755).
+        "која е ставена. (2) „Увозна стокао значи стока која е": (
+            "која е ставена. (2) „Увозна стока“ значи стока која е"
+        ),
+    }
+    for text, want in fixed.items():
+        assert fix_quote_artifacts(text) == want
+
+
 def test_every_reviewed_ocr_fix_is_a_replacement_with_at_most_its_page():
     import json
 

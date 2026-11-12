@@ -2043,6 +2043,8 @@ PAIRED_QUOTE = re.compile(
     re.M,
 )
 ARTICLE_LINE = re.compile(r"[ \t#]*Член\s+\d+\S*[ \t]*(?:\n|$)")
+# Cyrillic letters Macedonian does not have, which mark a line of a partner language's text.
+FOREIGN_LETTERS = re.compile(r"[ёйыэъщіїєґђћЁЙЫЭЪЩІЇЄҐЂЋ]")
 MK_ALL = MK_LETTERS + MK_LETTERS.upper()
 HOMOGLYPHS = str.maketrans("aceopxyiAEOPCTHKMBXjJ", "асеорхуіАЕОРСТНКМВХјЈ")
 SERBIAN_MARKERS = (
@@ -2056,9 +2058,12 @@ SERBIAN_MARKERS = (
     "запримањ",
     "писмене",
     "уговорниц",
+    "захтјев",
     "овог члана",
     "одредбама",
 )
+SERBIAN_SHORT_WORDS = re.compile(r"(?<![\w-])(?:је|у|су|ће|који|које)(?![\w-])")
+ARTICLE_START = re.compile(r"\n[ \t#]*Член\s+\d")
 OTHER_PARTNER_MARKERS = ("съгласно", "държав", "настоящ", "згідно", "держав", "договір")
 
 
@@ -2066,6 +2071,10 @@ def foreign_text_line(line):
     """Protect semantic fixes from partner-language treaty sentences."""
     lower = line.casefold()
     if any(marker in lower for marker in SERBIAN_MARKERS):
+        return True
+    # Serbian without ђ, ћ or a marker word still shows in its short words, which Macedonian
+    # does not use ("овлашкен је да врши", "које су у категорији").
+    if len(SERBIAN_SHORT_WORDS.findall(lower)) >= 2:
         return True
     return sum(marker in lower for marker in OTHER_PARTNER_MARKERS) >= 2
 
@@ -2169,20 +2178,51 @@ def fix_quote_artifacts(text):
             char = "“"
             quoted = False
         elif char in "мо" and quoted:
+            # The whole word, capital included: "Странско" judged as "транск" lost its о.
             start = pos
-            while start and text[start - 1] in MK_LETTERS:
+            while start and text[start - 1] in MK_ALL:
                 start -= 1
             base = text[start:pos]
-            # The old PDF text layer uses both м and о as closing-quote
-            # artifacts. An о is accepted only when it is appended to a word
-            # that does not itself end in о, avoiding ordinary neuter words.
-            artifact = char == "м" or (base and not base.endswith("о"))
+            # A quote the text layer opened with a С stuck to the word, as "СПоединеченм" or
+            # "Счленовитем". "Странско" is a word, so its С stays.
+            if (
+                base[:1] == "С"
+                and not known(base)
+                and not known(base + char)
+                and known(base[1:])
+                and not known(base[1:] + char)
+            ):
+                base = base[1:]
+            # A partner language shows within a few lines, not always on the word's own line,
+            # but a treaty's text in another article says nothing about this one.
+            lo, hi = max(0, pos - 300), pos + 300
+            for heading in ARTICLE_START.finditer(text, lo, hi):
+                if heading.start() < pos:
+                    lo = heading.start()
+                else:
+                    hi = heading.start()
+                    break
+            near = text[lo:hi]
+            # The old PDF text layer uses both м and о as closing-quote artifacts. An о after an
+            # adjective stem in н is its neuter ending, which the vocabulary may lack
+            # ("„Метализирано", "„Пречистено"), not a quote.
+            artifact = char == "м" or (
+                base
+                and not base.endswith("о")
+                and not (base.endswith("н") and (known(base + "а") or known(base + "и")))
+            )
             if (
                 artifact
                 and base
                 and known(base)
                 and not known(base + char)
-                and (pos + 1 == len(text) or text[pos + 1] not in MK_LETTERS)
+                # A hyphen joins a word broken across lines or a compound ("хирдо- хлорната",
+                # "акрило-нитрил"), never a quote's end.
+                and (pos + 1 == len(text) or text[pos + 1] not in MK_LETTERS + "-\u00ac\u00ad")
+                # Russian, Ukrainian and Serbian treaty text ends real words in м and о
+                # ("образом", "дањем", "повторио").
+                and not FOREIGN_LETTERS.search(near)
+                and not foreign_text_line(near)
             ):
                 char = "“"
                 quoted = False
