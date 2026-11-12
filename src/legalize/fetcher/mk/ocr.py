@@ -2138,11 +2138,7 @@ def fix_quote_artifacts(text):
         # Latin letters inside a Cyrillic word are the text layer's, so they are read as Cyrillic.
         if re.search(r"[A-Za-z]", word) and re.search(rf"[{MK_ALL}]", word):
             word = word.translate(HOMOGLYPHS)
-        # A quote opened just before on the same line makes this С its double, as
-        # "зборот: „1 СПоединеченм се" (RM-1996-17-4281).
-        before = m.string[max(0, m.start() - 30) : m.start()].rsplit("\n", 1)[-1]
-        opened = before.rfind("„") > max(before.rfind("“"), before.rfind('"'))
-        return ("" if opened else "„") + word + "“"
+        return "„" + word + "“"
 
     text = CAPITAL_PAIR_QUOTE.sub(capital_pair, text)
     text = GAZETTE_OPEN.sub("„", text)
