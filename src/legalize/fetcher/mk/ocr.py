@@ -2020,10 +2020,11 @@ def without_page_edges(text, page_number, page_count):
     return "\n".join(kept)
 
 
-QUOTE_OPEN = re.compile(r"([(:]\s*)С(?P<word>С?[А-ШЃЌЅЉЊЏ][а-шѓќѕљњџА-ШЃЌЅЉЊЏ]+)")
-QUOTE_OPEN_M = re.compile(r"(\s+|[(:]\s*|\bво\s+)м(?P<word>С?[А-ШЃЌЅЉЊЏ][а-шѓќѕљњџА-ШЃЌЅЉЊЏ]+)")
+QUOTE_OPEN = re.compile(r"([(:]\s*)С(?P<word>С?[А-ШЃЈЌЅЉЊЏ][а-шѓјќѕљњџА-ШЃЈЌЅЉЊЏ]+)")
+QUOTE_OPEN_M = re.compile(r"(\s+|[(:]\s*|\bво\s+)м(?P<word>С?[А-ШЃЈЌЅЉЊЏ][а-шѓјќѕљњџА-ШЃЈЌЅЉЊЏ]+)")
 LEGAL_QUOTE_OPEN = re.compile(
-    r"(\b(?:зборовите|зборот|кои гласат|гласи):\s*)[См](?=[А-ШЃЌЅЉЊЏ])", re.I
+    r"(\b(?:зборовите|зборот|гласат|гласи):\s*)(?P<mark>[См])(?P<word>[А-ШЃЈЌЅЉЊЏ][^\s\"“„”]*)",
+    re.I,
 )
 # A quote that opens on a number after the word that introduces it, as "зборовите: С4.500 до
 # 45.000 динарим" (RM-1993-12-3321), "гласи: С6. Имунизација" or "бројот С3м". Only these words
@@ -2033,12 +2034,20 @@ LEGAL_NUMBER_OPEN = re.compile(
     r"[:;]?\s*)[См](?=\d)",
     re.I,
 )
+# A quote the old text layer opened with a С stuck to the quoted word, after the words that
+# introduce one, as "зборот Сповлечените" or "зборовите Ссојузниот орган" (RM-1996-17-4281 alone
+# has dozens). Its close is often a straight quote ("зборот Содзема\" се заменува").
+GLUED_WORD_OPEN = re.compile(r"(\b[Зз]боро(?:т|вите)[:;]?[ \t]*)С(?P<word>[^\s\"“„”]*)")
+GLUED_SAYS_OPEN = re.compile(r"(\b(?:гласи|гласат):[ \t]*)С(?P<word>(?![А-ШЃЈЌЅЉЊЏ])[^\s\"“„”]*)")
+# An amount whose first digit OCR read as a letter, as "износот Сl.000.000\"" or "бројот СЗ\"".
+GLUED_AMOUNT_OPEN = re.compile(r"(\b(?:износот|бројот)[ \t]*)С(?=[lIЗ][\d.,]*[\"“”м])")
 GAZETTE_OPEN = re.compile(r"\bС(?=Службен (?:весник|лист))")
 # A quoted number or capitals the old text layer gives as С...м, as "зборовите: С10.000 до
 # 50.000м" (SFRJ-1989-47-1700) and "зборот СПОДЕМм". Only digits, signs and the joining words of
 # an amount may stand between, so a code such as "Потпрограма С1" or "60м2" is left alone.
 PAIRED_QUOTE = re.compile(
     r"(?<![^\s(:/])С(?P<inner>\d(?:[\d.,%/ –-]|\b(?:до|и|или|од)\b)*?[\d%]"
+    # No Ј here: "СФРЈм" is the federation's own С with a quote's м, never „ФРЈ“.
     r"|[А-ШЃЌЅЉЊЏ]{2}[А-ШЃЌЅЉЊЏ\d .,/–-]*?[А-ШЃЌЅЉЊЏ])м(?=[\s,.;:)]|$)",
     re.M,
 )
@@ -2122,12 +2131,58 @@ def fix_quote_artifacts(text):
     def open_quote(match):
         word = match.group("word")
         mark = match.group(0)[-len(word) - 1]
-        return match.group(1) + ("„" if known(word) and not known(mark + word) else mark) + word
+        # The word may carry its own closing о or м, as "мАкцијао е" (RM-2005-95-9976).
+        stem = word[:-1] if not known(word) and word[-1] in "мо" else word
+        return match.group(1) + ("„" if known(stem) and not known(mark + stem) else mark) + word
+
+    def letters(word):
+        return re.match(r"[^\W\d_]*", word).group(0)
 
     text = QUOTE_OPEN.sub(open_quote, text)
     text = QUOTE_OPEN_M.sub(open_quote, text)
-    text = LEGAL_QUOTE_OPEN.sub(r"\1„", text)
+    # A title in capitals keeps a С that makes it a word, as "гласи: СПОГОДБА меѓу Владата"
+    # (RM-1997-55-4619), which the text gave as „ПОГОДБА.
+    text = LEGAL_QUOTE_OPEN.sub(
+        lambda m: (
+            m.group(1)
+            + (
+                "С"
+                if m["mark"] == "С"
+                and re.fullmatch(r"[А-ШЃЈЌЅЉЊЏ]{2,}\W*", m["word"])
+                and known("С" + letters(m["word"]))
+                else "„"
+            )
+            + m["word"]
+        ),
+        text,
+    )
     text = LEGAL_NUMBER_OPEN.sub(r"\1„", text)
+
+    # After "зборот" the С stays only where it is the word's own first letter: "Собранието" is a
+    # word and "обранието" is none. Both "Си" and "и" are, and there a quote is what follows.
+    def glued_word(m):
+        word = m["word"]
+        stem = letters(word)
+        if known("С" + stem) and not known(stem):
+            return m.group(1) + "С" + word
+        # A one word quote whose м is its close, as "зборот Сказнам се" (RM-1999-80-5571), where
+        # "казнам" is in the vocabulary but "казна" is the word. Short words keep the м ("Сдом").
+        if stem.endswith("м") and len(stem) >= 5 and known(stem[:-1]):
+            word = stem[:-1] + "“" + word[len(stem) :]
+        return m.group(1) + "„" + word
+
+    text = GLUED_WORD_OPEN.sub(glued_word, text)
+    # LEGAL_QUOTE_OPEN judged a Cyrillic capital after "гласи:", so this takes a Latin numeral
+    # ("СVI.") or a small letter, where a word such as "Сметката" keeps its С.
+    text = GLUED_SAYS_OPEN.sub(
+        lambda m: (
+            m.group(1)
+            + ("С" if m["word"][:1].islower() and known("С" + letters(m["word"])) else "„")
+            + m["word"]
+        ),
+        text,
+    )
+    text = GLUED_AMOUNT_OPEN.sub(r"\1„", text)
     text = PAIRED_QUOTE.sub(r"„\g<inner>“", text)
     # In legal references, "член N став M" is fixed terminology. OCR often
     # turns "став" into the ordinary word "стар", which a dictionary cannot
@@ -2152,7 +2207,10 @@ def fix_quote_artifacts(text):
         opened = opens[-1] if opens else 0
         if char == "„":
             opens = [*opens, pos] if opens and text[pos - 1 : pos] == "(" else [pos]
-        elif char == "“":
+        elif char == "“" or (
+            # A straight quote closes one the text layer opened, as „одзема" се заменува.
+            char == '"' and opens and not re.match(r"[\w(]", text[pos + 1 : pos + 2])
+        ):
             opens = opens[:-1]
         elif char == "\n" and quoted and ARTICLE_LINE.match(text, pos + 1):
             # A quote whose closing mark the text layer lost ends at the next article, or it
@@ -2164,7 +2222,7 @@ def fix_quote_artifacts(text):
             and (pos + 1 == len(text) or text[pos + 1] in " \t\n,.;:)")
             and (
                 # A gazette or name in capitals, as "(„Службен весник на СРМм број 4/78".
-                (char == "м" and re.search(r"[А-ШЃЌЅЉЊЏ]{2}$", text[max(0, pos - 2) : pos]))
+                (char == "м" and re.search(r"[А-ШЃЈЌЅЉЊЏ]{2}$", text[max(0, pos - 2) : pos]))
                 # An amount the quote opened on, as "„4.500 до 45.000м", "„4.м", "„10, 20,м"
                 # or "„0,5%о", never metres in a quoted passage ("поголеми од 150м").
                 or (

@@ -1341,6 +1341,40 @@ def test_a_capitalised_word_in_a_quote_keeps_its_last_letter():
         assert fix_quote_artifacts(text) == want
 
 
+def test_a_quote_the_text_layer_opened_with_a_glued_s_is_restored():
+    from legalize.fetcher.mk.ocr import fix_quote_artifacts
+
+    fixed = {
+        # RM-1996-17-4281 closes with straight quotes.
+        'Во ставот 1 зборот Содзема" се заменува со зборот Сукинува".': (
+            'Во ставот 1 зборот „одзема" се заменува со зборот „укинува".'
+        ),
+        "треба да стои зборот Сповлеченитем. Број": "треба да стои зборот „повлечените“. Број",
+        "зборот ССоцијалистичкам пред": "зборот „Социјалистичка“ пред",
+        # Ј is outside А-Ш (SFRJ-1979-52-1019).
+        "зборовите: СЈугословенската банкам и": "зборовите: „Југословенската банка“ и",
+        "гласат: СВо случај на делумно загубување": "гласат: „Во случај на делумно загубување",
+        'износот Сl.000.000", а зборот': 'износот „l.000.000", а зборот',
+        # "казнам" is in the vocabulary, so the м is judged against "казна" (RM-1999-80-5571).
+        "по зборот Сказнам се додаваат": "по зборот „казна“ се додаваат",
+        # A short word keeps its м, since "до" is a word too.
+        "по зборот Сдом се": "по зборот „дом се",
+        "гласи: С(З) За изнесување на своето тврдењем. Член16": (
+            "гласи: „(З) За изнесување на своето тврдење“. Член16"
+        ),
+        # The quoted word carries its own close (RM-2005-95-9976).
+        "1. мАкцијао е сопственичка": "1. „Акција“ е сопственичка",
+    }
+    for text, want in fixed.items():
+        assert fix_quote_artifacts(text) == want
+    for text in (
+        "по зборот Собранието се",
+        "гласи: СПОГОДБА меѓу Владата",
+        "Износот се пресметува",
+    ):
+        assert fix_quote_artifacts(text) == text
+
+
 def test_every_reviewed_ocr_fix_is_a_replacement_with_at_most_its_page():
     import json
 
