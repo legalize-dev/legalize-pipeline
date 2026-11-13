@@ -395,8 +395,13 @@ def generic_fetch_one(
     cc = config.get_country(country)
     safe_id = norm_id.replace(":", "-").replace("/", "-").replace(" ", "")
     json_path = Path(cc.data_dir) / "json" / f"{safe_id}.json"
+    client_cls = get_client_class(country)
+    # A client whose discovery ids are not the file identifiers names the frontmatter field that
+    # keeps them in discovery_id_field, and its saved norm is found by the identifier its metadata
+    # parser reads, after the fetch below.
+    identifier_from_metadata = bool(getattr(client_cls, "discovery_id_field", None))
 
-    if json_path.exists() and not force:
+    if not identifier_from_metadata and json_path.exists() and not force:
         if country == "ie":
             from legalize.fetcher.ie.history import cached_norm_for_text
 
@@ -407,7 +412,6 @@ def generic_fetch_one(
             console.print(f"  [dim]{norm_id} already processed, skipping[/dim]")
             return cached
 
-    client_cls = get_client_class(country)
     text_parser = get_text_parser(country)
     meta_parser = get_metadata_parser(country)
 
@@ -417,6 +421,14 @@ def generic_fetch_one(
 
             meta_data = client.get_metadata(norm_id)
             metadata = meta_parser.parse(meta_data, norm_id)
+
+            if identifier_from_metadata:
+                json_path = Path(cc.data_dir) / "json" / f"{metadata.identifier}.json"
+                if json_path.exists() and not force:
+                    cached = load_norma_from_json(json_path)
+                    if cached is not None:
+                        console.print(f"  [dim]{norm_id} already processed, skipping[/dim]")
+                        return cached
 
             # Pass pre-fetched metadata to avoid redundant API call
             get_text_kwargs = {}
@@ -429,12 +441,30 @@ def generic_fetch_one(
                 unchanged = cached_norm_for_text(json_path, text_data)
                 if unchanged is not None:
                     return unchanged
-            blocks = text_parser.parse_text(text_data)
-            reforms = _extract_reforms_generic(text_parser, client, norm_id, blocks, text_data)
+            if hasattr(text_parser, "parse_norm_text"):
+                blocks, metadata = text_parser.parse_norm_text(text_data, norm_id, metadata)
+            else:
+                blocks = text_parser.parse_text(text_data)
+            source_reforms = []
+            # A country client may expose a complete source timeline. Its
+            # contract is to return one Reform per published source event for
+            # the current norm's file, never synthetic dates inferred from the
+            # body text.
+            if hasattr(client, "get_reforms"):
+                source_reforms = client.get_reforms(norm_id, meta_data)
+            reforms = source_reforms or _extract_reforms_generic(
+                text_parser, client, norm_id, blocks, text_data
+            )
             if country == "ie":
                 from legalize.fetcher.ie.history import metadata_for_text
 
                 metadata = metadata_for_text(metadata, text_data)
+            # A client that can name the law an amending act changes (mk) records it as amends,
+            # a YAML list of identifiers (SPEC §Amending acts).
+            if hasattr(client, "amended_law") and (
+                amends := client.amended_law(norm_id, meta_data)
+            ):
+                metadata = replace(metadata, extra=metadata.extra + (("amends", (amends,)),))
 
             # Suvestine: replace blocks + reforms with versioned historical data.
             # For a suvestine-capable country a fetch/parse failure is a hard
@@ -1638,6 +1668,13 @@ def write_country_meta(config: Config, country: str) -> None:
     console.print(f"  [dim]Wrote {meta_path}[/dim]")
 
 
+def _measured_coverage(repo_dir, data_dir, country: str) -> dict:
+    from legalize.countries import get_client_class
+
+    field = getattr(get_client_class(country), "discovery_id_field", None)
+    return coverage_report(repo_dir, data_dir, SOURCE_INDEX[country], discovery_id_field=field)
+
+
 def write_repo_meta(config: Config, country: str, *, coverage: dict | None = None) -> None:
     """Write repo-level meta files (.github/FUNDING.yml, ...) into the country repo.
 
@@ -1668,7 +1705,7 @@ def write_repo_meta(config: Config, country: str, *, coverage: dict | None = Non
         # unless a daily, which holds neither, carries the last report forward.
         previous = repo_dir / "coverage.json"
         files["coverage.json"] = render_coverage(
-            coverage or coverage_report(repo_dir, cc.data_dir, SOURCE_INDEX[country]),
+            coverage or _measured_coverage(repo_dir, cc.data_dir, country),
             previous.read_text(encoding="utf-8") if previous.exists() else None,
         )
     changed = [

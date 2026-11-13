@@ -312,6 +312,18 @@ countries:
       max_retries: 5
       requests_per_second: 4.0
 
+  mk:
+    repo_path: "../countries/mk"
+    data_dir: "../countries/data-mk"
+    cache_dir: ".cache"
+    max_workers: 1
+    source:
+      base_url: "https://ldbis.pravda.gov.mk"
+      search_url: "https://ldbis.pravda.gov.mk/Prebaruvanje.aspx"
+      request_timeout: 120
+      max_retries: 5
+      requests_per_second: 0.5
+      user_agent: "legalize-mk/1.0 (+https://github.com/legalize-dev/legalize)"
   nl:
     repo_path: "../countries/nl"
     data_dir: "../countries/data-nl"

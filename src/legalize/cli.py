@@ -8,6 +8,7 @@ Unified CLI with --country flag for all operations.
 from __future__ import annotations
 
 import importlib
+import inspect
 import logging
 from datetime import date
 
@@ -477,7 +478,7 @@ def bootstrap(
     "--since",
     default=None,
     help="Process every day from this one to today (YYYY-MM-DD), past the usual lookback cap."
-    " Generic dailies only: the way back after an outage longer than the cap.",
+    " Generic dailies and mk only: the way back after an outage longer than the cap.",
 )
 @click.option("--repo-path", default=None, help="Override output repo directory.")
 @click.option("--data-dir", default=None, help="Override data directory.")
@@ -533,9 +534,12 @@ def daily(
 
     parsed_since = date.fromisoformat(since) if since else None
     if module is not None and hasattr(module, "daily"):
-        if parsed_since:
+        if not parsed_since:
+            module.daily(config, target_date=parsed_date, dry_run=dry_run)
+        elif "since" in inspect.signature(module.daily).parameters:
+            module.daily(config, target_date=parsed_date, dry_run=dry_run, since=parsed_since)
+        else:
             raise click.UsageError(f"--since is for generic dailies; {country} has its own.")
-        module.daily(config, target_date=parsed_date, dry_run=dry_run)
     else:
         from legalize.pipeline import generic_daily
 
@@ -941,7 +945,20 @@ def health(ctx: click.Context, country: str, sample: int, deep: bool) -> None:
                 discovered = {
                     line.strip() for line in index.read_text().splitlines() if line.strip()
                 }
-                unaccounted = discovered - {f.stem for f in md_files} - excluded_ids
+                from legalize.countries import get_client_class
+
+                # A client whose discovery ids are not file names keeps them in a frontmatter field.
+                field = getattr(get_client_class(country), "discovery_id_field", None)
+                published_ids = {f.stem for f in md_files}
+                if field:
+                    from legalize.coverage import _frontmatter
+
+                    published_ids |= {
+                        str(front[field])
+                        for front in map(_frontmatter, md_files)
+                        if front.get(field)
+                    }
+                unaccounted = discovered - published_ids - excluded_ids
                 if unaccounted:
                     issues.append(
                         (
