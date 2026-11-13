@@ -164,7 +164,7 @@ def test_a_saved_record_is_fetched_again_only_when_its_card_changed(tmp_path):
     reforms = tuple(client.get_reforms("74875", card))
     # What the text parser adds to the card's metadata is not a change of the card.
     saved = replace(
-        metadata, extra=metadata.extra + (("text_source", "ocr"), ("amends", "RSM-2020-1-1"))
+        metadata, extra=metadata.extra + (("text_source", "ocr"), ("amends", ("RSM-2020-1-1",)))
     )
     version = Version("", metadata.publication_date, None, (Paragraph("parrafo", "Член 1"),))
     blocks = (Block("body", "article", "", (version,)),)
@@ -243,6 +243,41 @@ def test_ocr_pages_are_yaml_lists_that_survive_the_saved_json(tmp_path):
     fields = yaml.safe_load(render_frontmatter(loaded, metadata.publication_date).split("---")[1])
     assert fields["ocr_doubtful_pages"] == [2]
     assert fields["ocr_unread_pages"] == [2, 103]
+
+
+def test_an_amending_act_writes_amends_as_a_yaml_list(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    import yaml
+
+    from legalize.config import Config, CountryConfig
+    from legalize.fetcher.mk.parser import LDBISTextParser
+    from legalize.models import Block, Paragraph, Version
+    from legalize.pipeline import generic_fetch_one
+    from legalize.storage import load_norma_from_json
+    from legalize.transformer.frontmatter import render_frontmatter
+
+    card = (Path(__file__).parent / "fixtures/mk/raw/RSM-2026-212-74875.html").read_bytes()
+
+    def parse_norm_text(self, data, norm_id, metadata):
+        version = Version("", metadata.publication_date, None, (Paragraph("parrafo", "Член 1"),))
+        return (Block("body", "article", "", (version,)),), metadata
+
+    monkeypatch.setattr(LDBISClient, "get_metadata", lambda self, norm_id: card)
+    monkeypatch.setattr(LDBISClient, "get_text", lambda self, norm_id, meta_data=None: b"")
+    monkeypatch.setattr(LDBISClient, "get_reforms", lambda self, norm_id, meta_data: [])
+    monkeypatch.setattr(
+        LDBISClient, "amended_law", lambda self, norm_id, meta_data: "RM-2012-98-25996"
+    )
+    monkeypatch.setattr(LDBISTextParser, "parse_norm_text", parse_norm_text)
+    config = Config(countries={"mk": CountryConfig(data_dir=str(tmp_path))})
+
+    norm = generic_fetch_one(config, "mk", "74875", force=True)
+    saved = load_norma_from_json(tmp_path / "json" / f"{norm.metadata.identifier}.json")
+    front = render_frontmatter(saved.metadata, saved.metadata.publication_date)
+
+    assert 'amends: ["RM-2012-98-25996"]' in front
+    assert yaml.safe_load(front.split("---")[1])["amends"] == ["RM-2012-98-25996"]
 
 
 def test_the_mk_daily_takes_since_for_a_month_at_once(monkeypatch):
