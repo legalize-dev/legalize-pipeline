@@ -11,7 +11,7 @@ prepared; maintainer-side publication and downstream deployment remain.
 - [x] Formatting inventory covers text, tables, scans, OCR, lists, headings, and unsupported image-only content
 - [x] Version-history spike shows separate dated LDBIS versions
 - [x] Historical access pattern and request cost are documented
-- [x] Relevant scope is documented as 5,609 cards and 5,264 publishable records
+- [x] Relevant scope is documented in `research/RESEARCH-MK.md` §0.6 (5,567 records; 5,545 law files after the 12 November rebuild)
 
 ## Fetcher — Step 1
 
@@ -25,7 +25,7 @@ prepared; maintainer-side publication and downstream deployment remain.
 - [x] A corpus-level reform coverage checker compares saved links with Git trailers
 - [x] C0/C1 controls are stripped and UTF-8 is enforced
 - [x] Image-drop counting is explicitly marked not applicable for MK: PDF images are OCR input, not discarded legal content
-- [x] Amending acts record the law they amend as `amends`, through a client capability rather than a country check
+- [x] Amending acts record the law they amend as `amends`, a YAML list of identifiers, through a client capability rather than a country check
 - [x] OCR doubtful and unread pages are recorded as lists in the JSON and in the frontmatter
 - [x] Unreadable OCR lines on sure pages are left out and their pages recorded; reviewed per-law fixes live in `assets/ocr_fixes.json`
 - [x] Every version is dated by its card; no date is taken from the body text
@@ -43,8 +43,8 @@ prepared; maintainer-side publication and downstream deployment remain.
 - [x] `legalize daily -c mk --date YYYY-MM-DD --dry-run` has been run against the committed repo
 - [x] A live reform date has been run and its reform commit verified (817dfa75 on 2026-10-13)
 - [x] The reform coverage checker has passed on a rebuilt full corpus
-- [x] Repeating the same date has been verified to create zero duplicate commits (month2: 0 commits in 574s)
-- [x] A whole month has been run with `--since` and its time recorded in `research/RESEARCH-MK.md` (815s)
+- [x] Repeating the same date has been verified to create zero duplicate commits (after the 12 November rebuild: 0 commits in 484s)
+- [x] A whole month has been run with `--since` and its time recorded in `research/RESEARCH-MK.md` (596s after the 12 November rebuild)
 - [x] A maintainer-owned monthly workflow is prepared in `.github/workflows/monthly-update-mk.yml`
 
 ## Tests — Step 6
@@ -52,15 +52,15 @@ prepared; maintainer-side publication and downstream deployment remain.
 - [x] `tests/test_parser_mk.py` passes against the five fixtures
 - [x] Country registry dispatch is covered by tests
 - [x] Ruff checks pass for the Macedonian fetcher and tests
-- [x] The full suite passes on the latest branch commit locally (3,255 passed, 27 skipped, in about 10 minutes)
+- [x] The full suite passes on the latest branch commit locally (3,256 passed, 27 skipped)
 - [ ] Pull request CI passes for the latest branch commit (no checks have run on the fork branch)
 
 ## Quality gate — Step 7
 
 - [x] Five representative laws were fetched and rendered
 - [x] Metadata, text, structure, formatting, and encoding review is recorded in `research/RESEARCH-MK.md`
-- [x] Scanned OCR and table pages have a written source comparison; approval remains open
-- [ ] Manual source comparison has been accepted by the repository owner
+- [x] Scanned OCR and table pages have a written source comparison in `tests/fixtures/mk/quality-review.md`
+- [x] The source comparison has been accepted by the maintainer as the text fidelity gate (third review)
 - [x] Relevant sample histories preserve chronological reform ordering
 
 ## Production — Steps 8–9
