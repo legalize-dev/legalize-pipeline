@@ -162,6 +162,10 @@ class JustelClient(HttpClient):
         """Fetch the 'recently consolidated' page for daily discovery."""
         return self._get(self.summary_url())
 
+    def get_article(self, cn: str) -> bytes:
+        """Fetch an act's consolidated page by its Justel number (``cn_search``)."""
+        return self._get(f"{self._base_url}/cgi_loi/article.pl?language=fr&cn_search={cn}")
+
     # ----- Historical version walking -----
 
     def _archive_url(

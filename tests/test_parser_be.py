@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -403,3 +404,41 @@ class TestEncoding:
             for p in b.versions[0].paragraphs:
                 # Should round-trip through UTF-8 without errors
                 p.text.encode("utf-8")
+
+
+class TestDiscoverDailyResolvesCn:
+    """summary.pl lists Justel CNs; the corpus is keyed by the ELI's NUMAC."""
+
+    _SUMMARY = b"""<html><body>
+<div id="list-title-1"><h2 class="list-title">10&nbsp;novembre&nbsp;2026</h2>
+<a class="list-item--title" href="article.pl?language=fr&cn_search=2014040423&view_numac=">Loi</a>
+<a class="list-item--title" href="article.pl?language=fr&cn_search=2019032210&view_numac=">Arr\xeat\xe9</a>
+</div>
+<div id="list-title-1"><h2 class="list-title">9&nbsp;novembre&nbsp;2026</h2>
+<a class="list-item--title" href="article.pl?language=fr&cn_search=2024022928&view_numac=">Loi</a>
+</div></body></html>"""
+
+    _ARTICLES = {
+        "2014040423": b"<A href=http://www.ejustice.just.fgov.be/eli/loi/2014/04/04/2014011239/justel >",
+        "2019032210": b"<A href=http://www.ejustice.just.fgov.be/eli/arrete/2019/03/22/2019012345/justel >",
+    }
+
+    class _Client(JustelClient):
+        def __init__(self, articles):
+            self._articles = articles
+
+        def get_daily_summary(self):
+            return TestDiscoverDailyResolvesCn._SUMMARY
+
+        def get_article(self, cn):
+            return self._articles[cn]
+
+    def test_cn_resolves_to_the_eli_numac_and_skips_arretes(self):
+        client = self._Client(self._ARTICLES)
+        ids = list(JustelDiscovery().discover_daily(client, date(2026, 11, 10)))
+        assert ids == ["loi:2014:04:04:2014011239"]
+
+    def test_a_page_without_eli_fails_the_day(self):
+        client = self._Client({**self._ARTICLES, "2014040423": b"<html></html>"})
+        with pytest.raises(ValueError, match="2014040423"):
+            list(JustelDiscovery().discover_daily(client, date(2026, 11, 10)))
