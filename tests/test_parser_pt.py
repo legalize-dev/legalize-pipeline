@@ -515,6 +515,88 @@ class TestFragment:
         assert paragraphs[0].text == "a) C1.2 < 15 % - 1 ponto;"
 
 
+class TestInlineOnlyTexto:
+    """A ``Texto`` whose only markup is inline — paragraphs separated by ``<br/>``,
+    a ``<sup>`` in a plain run — has no ``<p>`` for the as-published walker to find,
+    and every such article shipped as a bare heading: the Código das Sociedades
+    Comerciais' article 379 since 1986, and most of what DRE re-consolidated from
+    August 2026 on, when it started separating paragraphs with ``<br/>``. The
+    fixtures are real fragments, trimmed to the fields the parser reads."""
+
+    @staticmethod
+    def _versions(case: str) -> dict:
+        return _load_fixture("legcons-inline-only-texto.json")[case]["versions"]
+
+    @staticmethod
+    def _body(entry: dict) -> list[str]:
+        heading, paragraphs = _fragment_paragraphs(entry, "")
+        return [p.text for p in paragraphs if p.text != heading]
+
+    def test_br_paragraphs_keep_their_text(self):
+        """Regulamento das Custas Processuais, article 1, as DRE consolidated it for
+        2026-09-01: the same two numbers it had, plus the new third."""
+        versions = self._versions("rcp_article_1")
+        before = self._body(versions["2026-02-27"])
+        after = self._body(versions["2026-09-01"])
+        assert len(before) == 2
+        assert after[:2] == before
+        assert len(after) == 3 and after[2].startswith("3 - Sempre que")
+        assert not any("<br" in line for line in after)
+
+    def test_one_paragraph_per_br_segment(self):
+        """RJUE article 5 before and after its 2026-09-07 consolidation: one
+        paragraph per number either way, and only the amended wording differs."""
+        versions = self._versions("rjue_article_5")
+        before = self._body(versions["2026-05-01"])
+        after = self._body(versions["2026-09-07"])
+        assert len(after) == len(before) == 4
+        assert [a == b for a, b in zip(before, after, strict=True)] == [False, True, True, True]
+        assert "artigo 4.º" in after[0] and "artigo anterior" in before[0]
+
+    def test_article_published_empty_since_1986(self):
+        entry = self._versions("csc_article_379")["1986-11-29"]
+        body = self._body(entry)
+        assert len(body) == 6
+        assert body[0].startswith("1 - Têm direito de estar presentes na assembleia geral")
+
+    def test_inline_tag_is_flattened_as_elsewhere(self):
+        """A <sup> in a newline-separated run: kept as the inline <sup> the
+        as-published path writes, and the lines still split where they did."""
+        body = self._body(self._versions("sup_only")["2025-03-20"])
+        assert body[0] == "São revogados:"
+        assert len(body) == 4
+        assert "n.<sup>os</sup>" in body[1]
+
+    def test_reformatting_alone_is_not_a_reform(self):
+        """DRE rewrote paragraph breaks as <br/> when it re-consolidated. Same words
+        in the new markup must render the same, or every re-consolidation would
+        record a change no legislature made."""
+        plain = self._versions("rcp_article_1")["2026-02-27"]
+        rewritten = json.loads(json.dumps(plain))
+        texto = rewritten["version"]["Texto"]
+        rewritten["version"]["Texto"] = texto.rstrip("\n").replace("\n", "<br/>")
+        assert "<br/>" in rewritten["version"]["Texto"]
+        assert _fragment_paragraphs(rewritten, "") == _fragment_paragraphs(plain, "")
+
+        blob = json.dumps(
+            {
+                "norm_id": "cons:decreto-lei:2008-34454975",
+                "surface": "cons",
+                "diploma_frag_id": "34454975",
+                "versions": [
+                    {"date": "2026-02-27", "amending": None, "fragments_b64": _pack([plain])},
+                    {
+                        "date": "2026-09-01",
+                        "amending": {"legis_id": "1152409207"},
+                        "fragments_b64": _pack([rewritten]),
+                    },
+                ],
+            }
+        ).encode()
+        _blocks, reforms = DRETextParser().parse_suvestine(blob, "cons:decreto-lei:2008-34454975")
+        assert len(reforms) == 1
+
+
 class TestSuvestine:
     """One commit per reform is the product; the old repo had zero."""
 

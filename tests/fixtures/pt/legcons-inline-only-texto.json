@@ -1,0 +1,86 @@
+{
+ "rcp_article_1": {
+  "norm_id": "cons:decreto-lei:2008-34454975",
+  "identifier": "DRE-2008-34-247448",
+  "versions": {
+   "2026-02-27": {
+    "version": {
+     "FragmentoId": "38250075",
+     "TipoFragmentoId": 11,
+     "Tituo": "Artigo 1.º",
+     "Epigrafe": "Regras gerais",
+     "Texto": "1 - Todos os processos estão sujeitos a custas, nos termos fixados pelo presente Regulamento.\n2 - Para efeitos do presente Regulamento, considera-se como processo autónomo cada acção, execução, incidente, procedimento cautelar ou recurso, corram ou não por apenso, desde que o mesmo possa dar origem a uma tributação própria.\n"
+    },
+    "nota": []
+   },
+   "2026-09-01": {
+    "version": {
+     "FragmentoId": "38250075",
+     "TipoFragmentoId": 11,
+     "Tituo": "Artigo 1.º",
+     "Epigrafe": "Regras gerais",
+     "Texto": "1 - Todos os processos estão sujeitos a custas, nos termos fixados pelo presente Regulamento.<br/>2 - Para efeitos do presente Regulamento, considera-se como processo autónomo cada acção, execução, incidente, procedimento cautelar ou recurso, corram ou não por apenso, desde que o mesmo possa dar origem a uma tributação própria.<br/>3 - Sempre que, nos termos do presente regulamento ou de lei especial, a obrigação de pagamento de qualquer quantia seja precedida de notificação pela secretaria para o efeito, ou se uma tal notificação fizer automaticamente iniciar a contagem de um prazo para pagamento, esta é necessariamente acompanhada do respetivo documento de pagamento, nos termos a definir por portaria do membro do Governo responsável pela área da justiça.<br/>"
+    },
+    "nota": []
+   }
+  }
+ },
+ "rjue_article_5": {
+  "norm_id": "cons:decreto-lei:1999-34567875",
+  "identifier": "DRE-1999-555-655682",
+  "versions": {
+   "2026-05-01": {
+    "version": {
+     "FragmentoId": "38307575",
+     "TipoFragmentoId": 11,
+     "Tituo": "Artigo 5.º",
+     "Epigrafe": "Competência",
+     "Texto": "1 - A concessão da licença prevista no n.º 2 do artigo anterior é da competência da câmara municipal, com faculdade de delegação no presidente e de subdelegação nos vereadores e nos dirigentes dos serviços municipais.\r\n2 - (Revogado.)\r\n3 - (Revogado.)\r\n4 - A aprovação da informação prévia regulada no presente diploma é da competência da câmara municipal, podendo ser delegada no seu presidente, com faculdade de subdelegação nos vereadores e nos dirigentes dos serviços municipais.\r\n"
+    },
+    "nota": []
+   },
+   "2026-09-07": {
+    "version": {
+     "FragmentoId": "38307575",
+     "TipoFragmentoId": 11,
+     "Tituo": "Artigo 5.º",
+     "Epigrafe": "Competência",
+     "Texto": "1 - A concessão da licença prevista no n.º 2 do artigo 4.º é da competência da câmara municipal, com faculdade de delegação no presidente e de subdelegação nos vereadores e nos dirigentes dos serviços municipais.<br/>2 - (Revogado.)<br/>3 - (Revogado.)<br/>4 - A aprovação da informação prévia regulada no presente diploma é da competência da câmara municipal, podendo ser delegada no seu presidente, com faculdade de subdelegação nos vereadores e nos dirigentes dos serviços municipais.<br/>"
+    },
+    "nota": []
+   }
+  }
+ },
+ "csc_article_379": {
+  "norm_id": "cons:decreto-lei:1986-34443975",
+  "identifier": "DRE-1986-262-220107",
+  "versions": {
+   "1986-11-29": {
+    "version": {
+     "FragmentoId": "40021175",
+     "TipoFragmentoId": 11,
+     "Tituo": "Artigo 379",
+     "Epigrafe": "(Participação na assembleia)",
+     "Texto": "1 - Têm direito de estar presentes na assembleia geral e aí discutir e votar os accionistas que, segundo a lei e o contrato, tiverem direito a, pelo menos, um voto.<br/>2 - Os accionistas sem direito de voto e os obrigacionistas podem assistir às assembleias gerais e participar na discussão dos assuntos indicados na ordem do dia, se o contrato de sociedade não determinar o contrário.<br/>3 - Podem ainda estar presentes nas assembleias gerais de accionistas os representantes comuns de titulares de acções preferenciais sem voto e de obrigacionistas.<br/>4 - Devem estar presentes nas assembleias gerais de accionistas os administradores ou directores, os membros do conselho fiscal ou do conselho geral e, na assembleia anual, os revisores oficiais de contas.<br/>5 - Sempre que o contrato de sociedade exija a posse de um certo número de acções para conferir voto, poderão os accionistas possuidores de menor número de acções agrupar-se de forma a completarem o número exigido ou um número superior e fazer-se representar por um dos agrupados.<br/>6 - A presença na assembleia geral de qualquer pessoa não indicada nos números anteriores depende de autorização do presidente da mesa, mas a assembleia pode revogar essa autorização.<br/>"
+    },
+    "nota": []
+   }
+  }
+ },
+ "sup_only": {
+  "norm_id": "cons:decreto-lei:2025-911678600",
+  "versions": {
+   "2025-03-20": {
+    "version": {
+     "FragmentoId": "911678633",
+     "TipoFragmentoId": 11,
+     "Tituo": "Artigo 29.º",
+     "Epigrafe": "Norma revogatória",
+     "Texto": "São revogados:\na) Os artigos 2.º, 3.º, 6.º, 36.º, 37.º, 38.º, 65.º, 80.º, 85.º e 86.º e os n.<sup>os </sup>1 e 2 do artigo 122.º do Decreto-Lei n.º 343/99, de 26 de agosto, na sua redação atual;\nb) O Decreto-Lei n.º 485/99, de 10 de novembro, na redação atual;\nc) O n.º 3 do artigo 34.º e os n.<sup>os </sup>1 e 4 do artigo 36.º do Decreto-Lei n.º 102/2001, de 29 de março, na sua redação atual.\r\n"
+    },
+    "nota": []
+   }
+  },
+  "identifier": null
+ }
+}

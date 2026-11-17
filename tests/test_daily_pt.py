@@ -423,11 +423,15 @@ class TestTheDailyCommitsWhatTheBootstrapWould:
             }
         }
 
+        # What DRE's consolidated sitemap lists today; a test adds to it.
+        sitemap = self.sitemap = {"lei/2000-11": "2026-11-16"}
+        self.bundles, self.blobs = bundles, blobs
+
         class Api:
             def get_text_body(self, url):
                 if url.endswith("sitemap/sitemap.xml"):
                     return _INDEX
-                return _consolidated_sitemap({"lei/2000-11": "2026-11-16"})
+                return _consolidated_sitemap(sitemap)
 
             def associations(self, ref, association_id):
                 named = ref in (
@@ -596,3 +600,73 @@ class TestTheDailyCommitsWhatTheBootstrapWould:
             self.CONS,
         )
         assert cons == render_norm_at_date(meta, blocks, date.fromisoformat(self.TODAY))
+
+    @staticmethod
+    def _log(repo: Path) -> str:
+        return subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "log",
+                "--format=%(trailers:key=Source-Id,valueonly)%x09%(trailers:key=Norm-Id,valueonly)",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+
+    def test_a_law_published_as_enacted_is_not_switched_to_consolidated(self, world):
+        """DRE consolidates a law the repo publishes as enacted. Committing that
+        history would put a second [bootstrap] on top of the law's own, and the
+        whole text would change surface in a commit no legislature made."""
+        config, repo = world
+        cons = "cons:decreto-lei:1994-512030"
+        self.sitemap["decreto-lei/1994-512030"] = self.TODAY
+        self.bundles[cons] = {**self.bundles[self.LAW], "surface": "cons", "key": "1994-512030"}
+        self.blobs[cons] = self._cons_blob({"1994-01-22": "consolidado", "2025-03-06": "alterado"})
+        self._run_daily(config)
+
+        law = self._head(repo, "pt/1994/DRE-1994-16-512030.md")
+        assert 'text_state: "as_enacted"' in law and "Texto original." in law
+        assert "consolidado" not in law and "alterado" not in law
+        assert "@" not in "".join(
+            line for line in self._log(repo).splitlines() if "DRE-1994-16-512030" in line
+        )
+
+    def test_a_diploma_the_corpus_leaves_out_stays_out(self, world):
+        """The consolidated sitemap lists despachos and avisos too: 277 of the 627
+        diplomas it re-dated between August and November 2026."""
+        config, repo = world
+        cons = "cons:despacho:2026-77"
+        self.sitemap["despacho/2026-77"] = self.TODAY
+        self.bundles[cons] = {
+            "surface": "cons",
+            "tipo": "despacho",
+            "key": "2026-77",
+            "published": self._published("despacho", "77-2026-77", "2026-01-05"),
+        }
+        self.blobs[cons] = self._cons_blob({"2026-01-05": "nomeia", "2026-11-01": "renomeia"})
+        self._run_daily(config)
+
+        assert "DRE-2026-77-77" not in self._log(repo)
+        assert not (repo / "pt" / "2026" / "DRE-2026-77-77.md").exists()
+
+    def test_a_back_filled_version_does_not_go_over_a_newer_one(self, world):
+        """DRE now has a 2005 version the repo never had, older than the 2010 one it
+        publishes: committing it would put the 2005 text on top of the 2010 one."""
+        config, repo = world
+        self.blobs[self.CONS] = self._cons_blob(
+            {
+                "2000-01-01": "original",
+                "2005-03-03": "intermédio",
+                "2010-05-05": "reformado",
+                self.TODAY: "hoje",
+            }
+        )
+        before = self._head(repo, "pt/2000/DRE-2000-1-11.md")
+        self._run_daily(config)
+
+        assert self._head(repo, "pt/2000/DRE-2000-1-11.md") == before
+        log = self._log(repo)
+        assert "@2005-03-03" not in log and f"@{self.TODAY}" not in log

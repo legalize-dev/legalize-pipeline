@@ -168,12 +168,15 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
             raise
         if changed:
             console.print(f"[bold]{len(changed)} diploma(s) re-consolidated[/bold]")
+        published = repo.load_existing_commits() if changed and not dry_run else set()
         for norm_id in changed:
             if dry_run:
                 console.print(f"  [dim]would refresh {norm_id}[/dim]")
                 continue
             try:
-                commits_created += _commit_versions(config, norm_id, generic_fetch_one)
+                commits_created += _commit_versions(
+                    config, norm_id, generic_fetch_one, published=published
+                )
             except DREApiError:
                 logger.exception("DRE API contract broken — aborting daily run")
                 raise
@@ -297,17 +300,61 @@ def commit_new(config, repo, client, meta_parser, norm_id: str, fetch_one) -> st
     return markdown
 
 
-def _commit_versions(config, norm_id: str, fetch_one) -> int:
+def _commit_versions(config, norm_id: str, fetch_one, published: set | None = None) -> int:
     """Re-fetch a diploma and commit any version or amendment it has gained.
 
     Through ``commit_one``, which renders each reform as the bootstrap's fast import
     does, and not a copy of it: the copy never named the amending act, so every
     amendment the daily recorded on an as-enacted law dropped its ``last_amendment``.
+
+    ``published`` (the repo's Source-Id/Norm-Id pairs) makes it a re-consolidation:
+    only versions that extend what the repo already publishes are committed.
     """
     norm = fetch_one(config, "pt", norm_id, force=True)
     if norm is None:
         return 0
+    if published is not None:
+        refusal = not_an_extension(norm, published)
+        if refusal:
+            console.print(f"  [yellow]{norm_id}: {refusal}; not committed[/yellow]")
+            logger.warning("%s (%s): %s", norm_id, norm.metadata.identifier, refusal)
+            return 0
     return commit_one(config, "pt", norm.metadata.identifier)
+
+
+def not_an_extension(norm, published: set[tuple[str, str]]) -> str | None:
+    """Why committing this consolidated history would not just extend the repo's.
+
+    ``commit_one`` commits every version the repo lacks, in date order, onto the
+    file as it stands. That is an append only when the repo already publishes the
+    law from this surface and lacks nothing but its newest versions:
+
+    - Not published from it at all — a law the repo has as published, or not at
+      all — and the first commit would be a second ``[bootstrap]``, the whole text
+      switched to the consolidated surface on top of its as-published history.
+      The consolidated sitemap also lists diplomas the corpus leaves out
+      (despachos, avisos): the same rule keeps those out.
+    - A missing version is not newer than the newest one published: DRE
+      back-filled an amendment, or moved one to an earlier date (the Código Penal's
+      2026-09-01 version is 2026-08-24 now). Committing it would put a version
+      dated earlier on top of a later one.
+    """
+    identifier = norm.metadata.identifier
+    # A consolidated Source-Id ends in the version's date (parser._reform_source_id).
+    newest = max(
+        (
+            source.rsplit("@", 1)[1]
+            for source, law in published
+            if law == identifier and "@" in source
+        ),
+        default=None,
+    )
+    if newest is None:
+        return "not published from the consolidated surface"
+    missing = [r for r in norm.reforms if (r.norm_id, identifier) not in published]
+    if any(r.date.isoformat() <= newest for r in missing):
+        return f"a missing version is not newer than the published {newest}"
+    return None
 
 
 def _consolidated_laws(repo: GitRepo) -> set[str]:
