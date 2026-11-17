@@ -11,7 +11,7 @@ import pytest
 import requests
 from lxml import etree
 
-from legalize.fetcher.uk.client import LegislationGovUkClient
+from legalize.fetcher.uk.client import NS, LegislationGovUkClient
 from legalize.fetcher.uk.discovery import LegislationGovUkDiscovery
 from legalize.pipeline import generic_daily
 
@@ -175,7 +175,10 @@ class TestDailyWaitsForTheDayToEnd:
 def test_the_daily_downloads_a_law_once():
     """generic_daily calls get_metadata, then get_text: both are the same /data.xml."""
     client = LegislationGovUkClient()
-    with patch.object(client, "_get", return_value=b"<Legislation/>") as get:
+    document = (
+        f'<Legislation xmlns:ukm="{NS["ukm"]}"><ukm:Made Date="2000-10-26"/></Legislation>'.encode()
+    )
+    with patch.object(client, "_get", return_value=document) as get:
         assert client.get_metadata("uksi-2000-2853") == client.get_text("uksi-2000-2853")
         client.get_text("uksi-2000-2854")
     assert [call.args[0].rsplit("/", 2)[-2] for call in get.call_args_list] == ["2853", "2854"]
@@ -253,3 +256,34 @@ class TestAVersionPublishedBeforeItTakesEffect:
         state = StateStore(config.countries["uk"].state_path)
         state.load()
         assert state.last_summary_date == date(2026, 11, 13)  # the day closed clean
+
+
+class TestPublicationDateIsTheActsOwn:
+    """The latest revision of uksi/2018/65 lost its ukm:Made; the made version has it."""
+
+    REVISED = "sample-si-uksi-2018-65-revised-no-made.xml"
+
+    def test_the_date_comes_from_the_original_version(self):
+        from legalize.fetcher.uk.parser import UKMetadataParser
+
+        documents = {
+            "uksi/2018/65/data.xml": self.REVISED,
+            "uksi/2018/65/enacted/data.xml": "sample-si-uksi-2018-65-enacted.xml",
+        }
+        client = LegislationGovUkClient()
+        with _source(documents):
+            meta_data = client.get_metadata("uksi-2018-65")
+            text = client.get_text("uksi-2018-65", meta_data=meta_data)
+        assert UKMetadataParser().parse(meta_data, "uksi-2018-65").publication_date == date(
+            2018, 1, 22
+        )
+        assert text == (FIXTURES / self.REVISED).read_bytes()  # the text is still the revision
+
+    def test_a_version_date_is_never_the_publication_date(self):
+        """No original to ask: the year is a placeholder, dct:valid would be a lie."""
+        from legalize.fetcher.uk.parser import UKMetadataParser
+
+        with _source({"uksi/2018/65/data.xml": self.REVISED}):
+            meta_data = LegislationGovUkClient().get_metadata("uksi-2018-65")
+        meta = UKMetadataParser().parse(meta_data, "uksi-2018-65")
+        assert meta.publication_date != date(2026, 4, 1)  # this revision's dct:valid

@@ -150,21 +150,43 @@ class LegislationGovUkClient(HttpClient):
 
         The pipeline calls ``get_metadata`` first and then ``get_text``; for
         UK both resolve to the same ``/data.xml`` so we accept the already-
-        fetched ``meta_data`` and return it as-is. That saves one HTTP
+        fetched ``meta_data`` and return its document. That saves one HTTP
         request per law across the whole bootstrap (~3,970 requests). The
         daily does not pass it, so the document get_metadata just fetched for
         the same law is reused instead.
         """
         if meta_data is not None:
-            return meta_data
+            return open_envelope(meta_data)[0]
         if self._last_document[0] == norm_id:
             return self._last_document[1]
         return self._get(self._law_url(norm_id))
 
     def get_metadata(self, norm_id: str) -> bytes:
-        """Metadata is embedded in the same XML document."""
-        self._last_document = (norm_id, self._get(self._law_url(norm_id)))
-        return self._last_document[1]
+        """Metadata is embedded in the same XML document, but for the act's date.
+
+        The latest revision of some laws carries no ``ukm:EnactmentDate`` or
+        ``ukm:Made`` (uksi/2018/65, ukpga/1987/26), and the only dates left in it
+        are the revision's own. The act's date is then read off its original
+        version and travels with the document in an envelope (see
+        ``open_envelope``); the document stays what ``get_text`` returns.
+        """
+        document = self._get(self._law_url(norm_id))
+        self._last_document = (norm_id, document)
+        if _extract_enacted_date(document):
+            return document
+        try:
+            enacted_date = _extract_enacted_date(self.get_enacted(norm_id))
+        except requests.HTTPError as exc:
+            if exc.response is None or exc.response.status_code != 404:
+                raise
+            enacted_date = None
+        if not enacted_date:
+            return document
+        envelope = {
+            "enacted_date": enacted_date,
+            "xml_b64": base64.b64encode(document).decode("ascii"),
+        }
+        return json.dumps(envelope).encode("utf-8")
 
     # ─── UK-specific fetchers ───────────────────────────────────
 
@@ -348,6 +370,14 @@ class LegislationGovUkClient(HttpClient):
 
 
 # ─── Module-level helpers ────────────────────────────────────────
+
+
+def open_envelope(data: bytes) -> tuple[bytes, str | None]:
+    """The CLML document ``get_metadata`` returned, and the act's date sent with it."""
+    if not data.lstrip().startswith(b"{"):
+        return data, None
+    envelope = json.loads(data)
+    return base64.b64decode(envelope["xml_b64"]), envelope["enacted_date"]
 
 
 def _extract_enacted_date(xml_bytes: bytes) -> str | None:

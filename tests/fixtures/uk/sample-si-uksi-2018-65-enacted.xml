@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DocumentURI="http://www.legislation.gov.uk/uksi/2018/65/enacted" IdURI="http://www.legislation.gov.uk/id/uksi/2018/65" NumberOfProvisions="19" xsi:schemaLocation="http://www.legislation.gov.uk/namespaces/legislation http://www.legislation.gov.uk/schema/legislation.xsd" SchemaVersion="1.0"><ukm:Metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ukm="http://www.legislation.gov.uk/namespaces/metadata">
+					<dc:identifier>http://www.legislation.gov.uk/uksi/2018/65/enacted</dc:identifier><dc:title>The Universal Credit (Miscellaneous Amendments, Saving and Transitional Provision) Regulations 2018</dc:title><dc:language>en</dc:language><dc:publisher>King's Printer of Acts of Parliament</dc:publisher><dc:modified>2019-05-21</dc:modified><dc:subject scheme="SIheading">SOCIAL SECURITY</dc:subject>
+					<dc:description>Regulation 2 in these Regulations amends the Discretionary Financial Assistance Regulations 2001 (S.I. 2001/1167), regulation 3 amends the Universal Credit Regulations 2013 (S.I. 2013/376) (the “Universal Credit Regulations”), regulation 4 amends the Jobseeker’s Allowance Regulations 2013 (S.I. 2013/378) (the “Jobseeker’s Allowance Regulations”), regulation 5 amends the Universal Credit, Personal Independence Payment, Jobseeker’s Allowance and Employment and Support Allowance (Decisions and Appeals) Regulations 2013 (S.I. 2013/381) (the “Decisions and Appeals Regulations”), regulation 6 amends the Universal Credit (Transitional Provisions) Regulations 2014 (S.I. 2014/1230) (the “Transitional Regulations”) and regulation 7 amends the Universal Credit (Surpluses and Self-employed Losses) (Digital Service) Amendment Regulations 2015 (S.I. 2015/345) (the “Surplus Amendment Regulations”).</dc:description>
+					<ukm:SecondaryMetadata><ukm:DocumentClassification>
+<ukm:DocumentCategory Value="secondary"/>
+<ukm:DocumentMainType Value="UnitedKingdomStatutoryInstrument"/>
+<ukm:DocumentStatus Value="final"/>
+<ukm:DocumentMinorType Value="regulation"/>
+</ukm:DocumentClassification><ukm:Year Value="2018"/><ukm:Number Value="65"/><ukm:Made Date="2018-01-22" Time="13:05:00"/><ukm:Laid Date="2018-01-22" Time="16:00:00" Class="UnitedKingdomParliament"/><ukm:ISBN Value="9780111164648"/></ukm:SecondaryMetadata>
+									<ukm:Statistics>
+									<ukm:TotalParagraphs Value="19"/>
+									<ukm:BodyParagraphs Value="19"/>
+									<ukm:ScheduleParagraphs Value="0"/>
+									<ukm:AttachmentParagraphs Value="0"/>
+									<ukm:TotalImages Value="2"/>
+								</ukm:Statistics>
+				</ukm:Metadata><Versions><Version id="v00001" Description="Equation graphical version" RestrictOutput="true" Class="graphic"><Image ResourceRef="r00001" Width="63.84pt" Height="34.08pt"/></Version><Version id="v00002" Description="Equation graphical version" RestrictOutput="true" Class="graphic"><Image ResourceRef="r00002" Width="97.44pt" Height="30.48pt"/></Version></Versions><Resources><Resource id="r00001">
+<ExternalVersion URI="http://www.legislation.gov.uk/uksi/2018/65/images/uksi_20180065_en_001"/>
+</Resource><Resource id="r00002">
+<ExternalVersion URI="http://www.legislation.gov.uk/uksi/2018/65/images/uksi_20180065_en_002"/>
+</Resource></Resources></Legislation>

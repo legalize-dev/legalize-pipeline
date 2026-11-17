@@ -48,7 +48,7 @@ from typing import Any
 from lxml import etree
 
 from legalize.fetcher.base import MetadataParser, TextParser
-from legalize.fetcher.uk.client import NS, split_norm_id
+from legalize.fetcher.uk.client import NS, open_envelope, split_norm_id
 from legalize.models import (
     Block,
     NormMetadata,
@@ -1410,15 +1410,18 @@ class UKMetadataParser(MetadataParser):
 
     def parse(self, data: bytes, norm_id: str) -> NormMetadata:
         data = _decode_maybe_gzipped(data)
+        enacted_elsewhere = None
         # Multi-version blobs are produced by the client.get_suvestine path;
         # we pick the first (earliest) version's XML for metadata, since
         # static fields like title and rank don't change across versions.
-        if data.lstrip().startswith(b"{"):
+        if data.lstrip().startswith(b"{") and b'"versions"' in data:
             blob = json.loads(data)
             versions = blob.get("versions") or []
             if not versions:
                 raise ValueError(f"{norm_id}: suvestine blob has no versions")
             data = b64decode(versions[0]["xml_b64"])
+        else:
+            data, enacted_elsewhere = open_envelope(data)
 
         root = etree.fromstring(data)
         meta = root.find("ukm:Metadata", NS)
@@ -1454,16 +1457,11 @@ class UKMetadataParser(MetadataParser):
         enactment_date_raw = (
             enactment_date_el.get("Date") if enactment_date_el is not None else None
         )
-        publication_date = _parse_iso_date(enactment_date_raw) if enactment_date_raw else None
-        # Fallback: root/@RestrictStartDate or dct:valid.
-        if publication_date is None:
-            valid = _text_of(meta, "dct:valid")
-            if valid:
-                publication_date = _parse_iso_date(valid)
-        if publication_date is None:
-            rsd = root.get("RestrictStartDate")
-            if rsd:
-                publication_date = _parse_iso_date(rsd)
+        # The act's own date, from this document or its original version. Never
+        # dct:valid or RestrictStartDate: they date the revision, so a file took a
+        # new publication_date each time the law changed, and the daily refused
+        # the next version as another act (uksi/2018/65 went 2018-01-22 → 2026-04-01).
+        publication_date = _parse_iso_date(enactment_date_raw) or _parse_iso_date(enacted_elsewhere)
         if publication_date is None:
             publication_date = date(year, 1, 1)  # conservative fallback
 
