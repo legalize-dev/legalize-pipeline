@@ -11,7 +11,7 @@ import pytest
 import requests
 from lxml import etree
 
-from legalize.fetcher.uk.client import LegislationGovUkClient
+from legalize.fetcher.uk.client import NS, LegislationGovUkClient
 from legalize.fetcher.uk.discovery import LegislationGovUkDiscovery
 from legalize.pipeline import generic_daily
 
@@ -175,7 +175,115 @@ class TestDailyWaitsForTheDayToEnd:
 def test_the_daily_downloads_a_law_once():
     """generic_daily calls get_metadata, then get_text: both are the same /data.xml."""
     client = LegislationGovUkClient()
-    with patch.object(client, "_get", return_value=b"<Legislation/>") as get:
+    document = (
+        f'<Legislation xmlns:ukm="{NS["ukm"]}"><ukm:Made Date="2000-10-26"/></Legislation>'.encode()
+    )
+    with patch.object(client, "_get", return_value=document) as get:
         assert client.get_metadata("uksi-2000-2853") == client.get_text("uksi-2000-2853")
         client.get_text("uksi-2000-2854")
     assert [call.args[0].rsplit("/", 2)[-2] for call in get.call_args_list] == ["2853", "2854"]
+
+
+FIXTURES = Path(__file__).parent / "fixtures" / "uk"
+
+
+def _source(documents: dict[str, str]):
+    """legislation.gov.uk serving fixture files by URL path; anything else is a 404."""
+
+    def get(_client, url: str) -> bytes:
+        path = url.removeprefix("https://www.legislation.gov.uk/")
+        if path not in documents:
+            response = requests.Response()
+            response.status_code = 404
+            raise requests.HTTPError("404", response=response)
+        return (FIXTURES / documents[path]).read_bytes()
+
+    return patch.object(LegislationGovUkClient, "_get", get)
+
+
+def _daily(tmp_path: Path, day: date, norm_id: str):
+    """generic_daily for one day on a fresh repo, with the real UK client and parsers."""
+    from legalize.config import Config, CountryConfig, GitConfig
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    config = Config(
+        git=GitConfig(committer_name="Legalize", committer_email="test@test.com"),
+        countries={
+            "uk": CountryConfig(
+                repo_path=str(repo),
+                data_dir=str(tmp_path / "data"),
+                state_path=str(tmp_path / "state.json"),
+                source={},
+            )
+        },
+    )
+    discovery = MagicMock()
+    discovery.discover_daily.side_effect = lambda _c, d: iter([norm_id] if d == day else [])
+    with patch("legalize.countries.get_discovery_class") as discovery_cls:
+        discovery_cls.return_value.create.return_value = discovery
+        commits = generic_daily(config, "uk", target_date=day)
+    return commits, repo, config
+
+
+class TestAVersionPublishedBeforeItTakesEffect:
+    """nisr/2026/186: made on 9 November, in the log on the 13th, in operation on the 30th.
+
+    Rendered on the 13th no block was in force, and the daily refused the law as
+    empty, every run, until the lookback dropped the day.
+    """
+
+    def test_it_is_published_as_the_text_in_force_from_its_start(self, tmp_path):
+        from legalize.state.store import StateStore, latest_source_date
+
+        documents = {"nisr/2026/186/data.xml": "sample-si-nisr-2026-186-not-yet-in-force.xml"}
+        with _source(documents):
+            commits, repo, config = _daily(tmp_path, date(2026, 11, 13), "nisr-2026-186")
+
+        assert commits == 1
+        text = (repo / "uk-nir" / "nisr-2026-186.md").read_text()
+        assert 'publication_date: "2026-11-09"' in text
+        assert 'last_updated: "2026-11-30"' in text  # never in force before it was
+        assert "These Regulations may be cited as" in text
+        # Dated the day it was published, so the cursor cannot run past the days
+        # between publication and commencement, with or without the state file.
+        message = subprocess.run(
+            ["git", "log", "-1", "--format=%B"], cwd=repo, capture_output=True, text=True
+        ).stdout
+        assert "Source-Date: 2026-11-13" in message
+        assert latest_source_date(str(repo)) == date(2026, 11, 13)
+        state = StateStore(config.countries["uk"].state_path)
+        state.load()
+        assert state.last_summary_date == date(2026, 11, 13)  # the day closed clean
+
+
+class TestPublicationDateIsTheActsOwn:
+    """The latest revision of uksi/2018/65 lost its ukm:Made; the made version has it."""
+
+    REVISED = "sample-si-uksi-2018-65-revised-no-made.xml"
+
+    def test_the_date_comes_from_the_original_version(self):
+        from legalize.fetcher.uk.parser import UKMetadataParser
+
+        documents = {
+            "uksi/2018/65/data.xml": self.REVISED,
+            "uksi/2018/65/enacted/data.xml": "sample-si-uksi-2018-65-enacted.xml",
+        }
+        client = LegislationGovUkClient()
+        with _source(documents):
+            meta_data = client.get_metadata("uksi-2018-65")
+            text = client.get_text("uksi-2018-65", meta_data=meta_data)
+        assert UKMetadataParser().parse(meta_data, "uksi-2018-65").publication_date == date(
+            2018, 1, 22
+        )
+        assert text == (FIXTURES / self.REVISED).read_bytes()  # the text is still the revision
+
+    def test_a_version_date_is_never_the_publication_date(self):
+        """No original to ask: the year is a placeholder, dct:valid would be a lie."""
+        from legalize.fetcher.uk.parser import UKMetadataParser
+
+        with _source({"uksi/2018/65/data.xml": self.REVISED}):
+            meta_data = LegislationGovUkClient().get_metadata("uksi-2018-65")
+        meta = UKMetadataParser().parse(meta_data, "uksi-2018-65")
+        assert meta.publication_date != date(2026, 4, 1)  # this revision's dct:valid

@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Legislation xmlns="http://www.legislation.gov.uk/namespaces/legislation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DocumentURI="http://www.legislation.gov.uk/nisr/2026/186" IdURI="http://www.legislation.gov.uk/id/nisr/2026/186" NumberOfProvisions="2" Match="false" RestrictStartDate="2026-11-30" xsi:schemaLocation="http://www.legislation.gov.uk/namespaces/legislation http://www.legislation.gov.uk/schema/legislation.xsd" SchemaVersion="1.0" RestrictExtent="N.I."><ukm:Metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ukm="http://www.legislation.gov.uk/namespaces/metadata">
+					<dc:identifier>http://www.legislation.gov.uk/nisr/2026/186</dc:identifier><dc:title>The Universal Credit, Personal Independence Payment, Jobseeker’s Allowance and Employment and Support Allowance (Claims and Payments) (Amendment No. 2) Regulations (Northern Ireland) 2026</dc:title><dc:language>en</dc:language><dc:subject scheme="SIheading">SOCIAL SECURITY</dc:subject><dc:modified>2026-11-12</dc:modified><dc:publisher>Statute Law Database</dc:publisher><dct:valid>2026-11-09</dct:valid>
+					<dc:description>These Regulations amend the Universal Credit, Personal Independence Payment, Jobseeker’s Allowance and Employment and Support Allowance (Claims and Payments) Regulations (Northern Ireland) 2016 (S.R. 2016 No. 220) so as to make provision for reclaims of universal credit for claimants taking part in a funded employment scheme.</dc:description>
+					<ukm:SecondaryMetadata><ukm:DocumentClassification><ukm:DocumentCategory Value="secondary"/><ukm:DocumentMainType Value="NorthernIrelandStatutoryRule"/><ukm:DocumentStatus Value="revised"/><ukm:DocumentMinorType Value="regulation"/></ukm:DocumentClassification><ukm:Year Value="2026"/><ukm:Number Value="186"/><ukm:Made Date="2026-11-09"/><ukm:ComingIntoForce>
+<ukm:DateTime Date="2026-11-30"/>
+</ukm:ComingIntoForce><ukm:ISBN Value="9780338027146"/></ukm:SecondaryMetadata>
+									<ukm:Statistics>
+									<ukm:TotalParagraphs Value="2"/>
+									<ukm:BodyParagraphs Value="2"/>
+									<ukm:ScheduleParagraphs Value="0"/>
+									<ukm:AttachmentParagraphs Value="0"/>
+									<ukm:TotalImages Value="0"/>
+								</ukm:Statistics>
+				</ukm:Metadata><Secondary>
+<SecondaryPrelims DocumentURI="http://www.legislation.gov.uk/nisr/2026/186/introduction" IdURI="http://www.legislation.gov.uk/id/nisr/2026/186/introduction" Match="false" RestrictStartDate="2026-11-30" RestrictExtent="N.I.">
+<Number>2026 No. 186</Number>
+<SubjectInformation>
+<Subject>
+<Title>Social Security</Title>
+</Subject>
+</SubjectInformation>
+<Title>The Universal Credit, Personal Independence Payment, Jobseeker’s Allowance and Employment and Support Allowance (Claims and Payments) (Amendment No. 2) Regulations (Northern Ireland) 2026</Title>
+<MadeDate>
+<Text>Made</Text>
+<DateText><Emphasis>09th November 2026</Emphasis></DateText>
+</MadeDate>
+<ComingIntoForce>
+<Text>Coming into operation</Text>
+<DateText>30th November 2026</DateText>
+</ComingIntoForce>
+<SecondaryPreamble>
+<IntroductoryText>
+<P>
+<Text>The Department for Communities<FootnoteRef Ref="f00001"/> makes these Regulations in exercise of the powers conferred by Sections 1(1) and 165(1), (4) and (6) of the Social Security Administration (Northern Ireland) Act 1992<FootnoteRef Ref="f00002"/> and now vested in it<Strong/><FootnoteRef Ref="f00003"/><Strong/>.</Text>
+</P>
+</IntroductoryText>
+<EnactingText>
+<Para>
+<Text>The powers are exercisable by the Department for Communities by virtue of Article 2 of the Welfare Reform (Northern Ireland) Order 2015 (Cessation of Transitory Provision) Order 2020<FootnoteRef Ref="f00004"/>.</Text>
+</Para>
+</EnactingText>
+</SecondaryPreamble>
+</SecondaryPrelims>
+<Body DocumentURI="http://www.legislation.gov.uk/nisr/2026/186/body" IdURI="http://www.legislation.gov.uk/id/nisr/2026/186/body" NumberOfProvisions="2" Match="false" RestrictStartDate="2026-11-30" RestrictExtent="N.I.">
+<P1group Match="false" RestrictStartDate="2026-11-30" RestrictExtent="N.I.">
+<Title>Citation and commencement</Title>
+<P1 DocumentURI="http://www.legislation.gov.uk/nisr/2026/186/regulation/1" IdURI="http://www.legislation.gov.uk/id/nisr/2026/186/regulation/1" id="regulation-1">
+<Pnumber>1</Pnumber>
+<P1para>
+<Text>These Regulations may be cited as the Universal Credit, Personal Independence Payment, Jobseeker’s Allowance and Employment and Support Allowance (Claims and Payments) (Amendment No. 2) Regulations (Northern Ireland) 2026 and come into operation on 30 November 2026.</Text>
+</P1para>
+</P1>
+</P1group>
+</Body>
+</Secondary></Legislation>

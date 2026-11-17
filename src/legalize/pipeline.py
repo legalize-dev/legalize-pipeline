@@ -99,6 +99,16 @@ SKIP_WEEKDAYS: dict[str, set[int]] = {
 # The automatic range for these stops at yesterday, in UTC as the log is.
 WAIT_FOR_DAY_END: set[str] = {"uk"}
 
+# Sources whose daily text is one snapshot, the latest version, which can be
+# published before it takes effect: legislation.gov.uk put the Working Time
+# Regulations' 1 October 2026 version out on 29 September, and a new rule made
+# on 9 November and coming into operation on the 30th out on the 13th. Rendered
+# on the day it was published, no block is in force yet and the law is refused
+# as empty, so it is rendered on the day its version starts instead. The commit
+# keeps the day of publication as its Source-Date, as every daily commit of
+# these countries does; last_updated says when the text takes effect.
+RENDER_AT_VERSION_START: set[str] = {"uk"}
+
 
 class ShadowedLaw(RuntimeError):
     """A law could not be published because another act holds its file name."""
@@ -332,8 +342,11 @@ def generic_daily(
                     blocks = text_parser.parse_text(text_data)
 
                     file_path = norm_to_filepath(metadata)
-                    markdown = render_norm_at_date(metadata, blocks, current_date)
-                    _require_text(metadata, blocks, markdown, current_date)
+                    at = current_date
+                    if country in RENDER_AT_VERSION_START:
+                        at = max([at, *(v.in_force_from for b in blocks for v in b.versions)])
+                    markdown = render_norm_at_date(metadata, blocks, at)
+                    _require_text(metadata, blocks, markdown, at)
 
                     changed = repo.write_and_add(file_path, markdown)
                     if not changed:

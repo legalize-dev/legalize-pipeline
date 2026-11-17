@@ -165,6 +165,22 @@ def test_a_dutch_law_takes_its_new_version(tmp_path):
     assert repo.refused == []
 
 
+def test_a_uk_law_corrects_a_stale_publication_date(tmp_path):
+    """ukpga/1987/26 was published dated 2026-01-12, a revision's date; it is 1987-05-15.
+
+    The identifier is legislation.gov.uk's type/year/number, so the file cannot hold
+    another act: the corrected date has to land with the next version.
+    """
+    repo = _repo(tmp_path)
+    path = "uk/ukpga-1987-26.md"
+    stale = NL_APRIL.replace('"nl"', '"uk"').replace("2026-04-11", "2026-01-12")
+    repo.write_and_add(path, stale)
+
+    fixed = stale.replace("2026-01-12", "1987-05-15").replace("Artikel 1", "Section 1")
+    assert repo.write_and_add(path, fixed) is True
+    assert repo.refused == []
+
+
 def test_the_guard_still_holds_where_the_date_is_the_acts_own(tmp_path):
     repo = _repo(tmp_path)
     path = "pt/DRE-PORT-953-2008.md"
