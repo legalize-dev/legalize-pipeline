@@ -25,7 +25,7 @@ import time
 from collections import Counter
 from contextlib import ExitStack
 from dataclasses import replace
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import requests
@@ -91,6 +91,13 @@ SKIP_WEEKDAYS: dict[str, set[int]] = {
     "dk": {5, 6},  # Mon-Fri (Retsinformation harvest API, business days)
     "ee": {5, 6},  # Mon-Fri (Riigi Teataja)
 }
+
+
+# Sources whose day is a running log rather than an edition published once:
+# legislation.gov.uk publishes revisions from morning to night, so a run that
+# took today would commit its first hours and move the cursor past the rest.
+# The automatic range for these stops at yesterday, in UTC as the log is.
+WAIT_FOR_DAY_END: set[str] = {"uk"}
 
 
 class ShadowedLaw(RuntimeError):
@@ -256,6 +263,9 @@ def generic_daily(
     if dates_to_process is None:
         console.print("[yellow]No last date found. Use --date or run bootstrap.[/yellow]")
         return 0
+    if target_date is None and country in WAIT_FOR_DAY_END:
+        today = datetime.now(UTC).date()
+        dates_to_process = [d for d in dates_to_process if d < today]
     if not dates_to_process:
         console.print("[green]Nothing to process — up to date[/green]")
         return 0

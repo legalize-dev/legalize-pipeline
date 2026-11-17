@@ -9,7 +9,7 @@ URL patterns used:
     As-enacted text       /{type}/{year}/{number}/enacted/data.xml
     Point-in-time         /{type}/{year}/{number}/{YYYY-MM-DD}/data.xml
     Per-year Atom feed    /{type}/{year}/data.feed?page={N}&results-count={R}
-    Publication log       /update/data.feed?start-date={D}&end-date={D}
+    Publication log       /update/data.feed?page={N}  (newest first, 20 per page)
     Change timeline       /changes/affected/{type}/{year}/{number}/data.feed?...
 
 The fair-use policy (https://www.legislation.gov.uk/fair-use-policy) caps
@@ -109,6 +109,8 @@ class LegislationGovUkClient(HttpClient):
             request_timeout=request_timeout,
             max_retries=max_retries,
         )
+        # The document get_metadata fetched last, for the get_text that follows.
+        self._last_document: tuple[str, bytes] = ("", b"")
 
     # ─── URL builders ───────────────────────────────────────────
 
@@ -133,11 +135,13 @@ class LegislationGovUkClient(HttpClient):
         """Aggregate Atom feed for a single type code (all years, paged)."""
         return f"{self._base_url}/{type_code}/data.feed?page={page}&results-count=100"
 
-    def update_feed_url(self, target_date: date) -> str:
-        iso = target_date.isoformat()
-        return (
-            f"{self._base_url}/update/data.feed?start-date={iso}&end-date={iso}&results-count=200"
-        )
+    def update_feed_url(self, page: int = 1) -> str:
+        """One page of the publication log, newest event first.
+
+        Only ``page`` is honoured: the site ignores start-date, end-date and
+        results-count on this feed and always pages the whole log by 20.
+        """
+        return f"{self._base_url}/update/data.feed?page={page}"
 
     # ─── LegislativeClient contract ─────────────────────────────
 
@@ -147,15 +151,20 @@ class LegislationGovUkClient(HttpClient):
         The pipeline calls ``get_metadata`` first and then ``get_text``; for
         UK both resolve to the same ``/data.xml`` so we accept the already-
         fetched ``meta_data`` and return it as-is. That saves one HTTP
-        request per law across the whole bootstrap (~3,970 requests).
+        request per law across the whole bootstrap (~3,970 requests). The
+        daily does not pass it, so the document get_metadata just fetched for
+        the same law is reused instead.
         """
         if meta_data is not None:
             return meta_data
+        if self._last_document[0] == norm_id:
+            return self._last_document[1]
         return self._get(self._law_url(norm_id))
 
     def get_metadata(self, norm_id: str) -> bytes:
         """Metadata is embedded in the same XML document."""
-        return self._get(self._law_url(norm_id))
+        self._last_document = (norm_id, self._get(self._law_url(norm_id)))
+        return self._last_document[1]
 
     # ─── UK-specific fetchers ───────────────────────────────────
 
@@ -198,9 +207,9 @@ class LegislationGovUkClient(HttpClient):
         """Fetch the aggregate Atom feed for a type code."""
         return self._get(self.type_feed_url(type_code, page))
 
-    def get_update_feed(self, target_date: date) -> bytes:
-        """Fetch the publication log feed for a single day (daily discovery)."""
-        return self._get(self.update_feed_url(target_date))
+    def get_update_feed(self, page: int = 1) -> bytes:
+        """Fetch one page of the publication log (daily discovery)."""
+        return self._get(self.update_feed_url(page))
 
     # ─── Historical walk (consolidated blob, consumed by parser) ────
 

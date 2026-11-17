@@ -3,8 +3,8 @@
 Two entry points:
 - discover_all: iterate every configured type code via the aggregate Atom
   feed. Yields ``{type}-{year}-{number}`` IDs.
-- discover_daily: poll /update/data.feed filtered to a single date and keep
-  only entries whose type is in our tracked set.
+- discover_daily: page the publication log (/update/data.feed) back to the
+  day asked for and keep the laws of a tracked type published on it.
 
 Covers both primary legislation (Acts/Measures: ukpga, asp, asc, anaw, mwa,
 nia) and secondary legislation (Statutory Instruments: uksi, ssi, wsi, nisr,
@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 import re
 from collections.abc import Iterator
-from datetime import date
+from datetime import UTC, date, datetime
 from typing import TYPE_CHECKING
 
 from lxml import etree
@@ -68,6 +68,10 @@ class LegislationGovUkDiscovery(NormDiscovery):
         self._types = types
         self._min_year = min_year
         self._max_year = max_year
+        # The publication log of this run: day each law was last published, and
+        # the oldest day it was read back to. See discover_daily.
+        self._last_published: dict[str, date] = {}
+        self._read_back_to: date | None = None
 
     @classmethod
     def create(cls, source: dict) -> LegislationGovUkDiscovery:
@@ -125,30 +129,54 @@ class LegislationGovUkDiscovery(NormDiscovery):
     def discover_daily(
         self, client: LegislativeClient, target_date: date, **kwargs
     ) -> Iterator[str]:
-        """Yield norm IDs touched on a specific date (publication log).
+        """Yield the tracked laws whose latest publication fell on ``target_date``.
 
-        The update feed lists every publication/revision event. We filter to
-        the ones whose ``<atom:id>`` points at a law of a tracked type and
-        whose ``<atom:updated>`` matches the target date.
+        The daily fetches a law's current text and dates the commit by this day,
+        so a law published again on a later day is left for that day: its text
+        is the later one. Days are UTC, as the log writes them.
+
+        The log is read once per run, back to the oldest day asked for —
+        ``generic_daily`` asks oldest first, one day at a time. A failed fetch
+        raises, so the day is not closed with nothing found.
         """
-        uk: LegislationGovUkClient = client  # type: ignore[assignment]
-        try:
-            body = uk.get_update_feed(target_date)
-        except Exception as exc:
-            logger.warning("Update feed fetch failed for %s: %s", target_date, exc)
-            return
-        try:
-            root = etree.fromstring(body)
-        except etree.XMLSyntaxError:
-            return
-        seen: set[str] = set()
-        for entry in root.findall(".//atom:entry", NS):
-            # The update feed points at provision-level URIs; strip to the law.
-            eid = entry.find("atom:id", NS)
-            if eid is None or not eid.text:
-                continue
-            norm_id = _entry_to_norm_id(eid.text)
-            if not norm_id or norm_id in seen:
-                continue
-            seen.add(norm_id)
-            yield norm_id
+        if self._read_back_to is None or target_date < self._read_back_to:
+            self._last_published = _last_published(client, target_date)
+            self._read_back_to = target_date
+        for norm_id, day in self._last_published.items():
+            if day == target_date:
+                yield norm_id
+
+
+def _last_published(client: LegislationGovUkClient, since: date) -> dict[str, date]:
+    """Day of each tracked law's newest event in the publication log, back to ``since``.
+
+    legislation.gov.uk ignores start-date, end-date and results-count on
+    /update/data.feed: every request answers with the newest 20 events of the
+    whole log, so the only way to a day is to page back to it (about 40 pages
+    for a working day in November 2026). New events push entries down while we
+    page, which repeats an entry and never skips one.
+    """
+    last: dict[str, date] = {}
+    page = 1
+    while True:
+        root = etree.fromstring(client.get_update_feed(page))
+        # A log that ignored ``page`` too would serve page 1 forever.
+        served = root.findtext("leg:page", namespaces=NS)
+        if served != str(page):
+            raise ValueError(f"update feed served page {served!r} when asked for page {page}")
+        entries = root.findall("atom:entry", NS)
+        if not entries:
+            return last  # the start of the log
+        oldest = None
+        for entry in entries:
+            updated = datetime.fromisoformat(entry.findtext("atom:updated", namespaces=NS))
+            day = updated.astimezone(UTC).date()
+            oldest = min(oldest or day, day)
+            # Changes-only events (/changes/affecting/...) do not match: the text
+            # is not republished, only the list of effects.
+            norm_id = _entry_to_norm_id(entry.findtext("atom:id", default="", namespaces=NS))
+            if norm_id and since <= day and last.get(norm_id, date.min) < day:
+                last[norm_id] = day
+        if oldest < since:
+            return last
+        page += 1
