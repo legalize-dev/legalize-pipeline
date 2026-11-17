@@ -79,6 +79,10 @@ TEXT_STATE: dict[str, TextState] = {
 VERSIONED_PUBLICATION_DATE: frozenset[str] = frozenset(
     {
         "nl",  # BWBR id names the law; publication_date is the toestand's inwerkingtreding
+        # type/year/number is legislation.gov.uk's own id and cannot name two acts.
+        # The parser now writes the act's date, but files published before it carry
+        # a revision's date or a 1 January placeholder; their next version fixes it.
+        "uk",
     }
 )
 
