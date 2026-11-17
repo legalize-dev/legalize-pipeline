@@ -175,6 +175,12 @@ class GitRepo:
         listed = self._run(["ls-tree", "-r", "--name-only", "HEAD", "--", rel_path], check=False)
         return bool(listed)
 
+    def read(self, rel_path: str) -> str:
+        """HEAD's copy of a file, or "" when HEAD does not track it (see has_file)."""
+        if not (self._path / ".git").exists():
+            return ""
+        return self._run(["show", f"HEAD:{rel_path}"], check=False)
+
     def sync_index(self) -> None:
         """Rebuild the index from HEAD, so the next commit's tree comes from it.
 

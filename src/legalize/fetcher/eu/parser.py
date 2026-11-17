@@ -1012,6 +1012,16 @@ class EURLexTextParser(TextParser):
         ]
 
 
+class PendingStatus(ValueError):
+    """EUR-Lex states the act is not in force and gives no status we can publish.
+
+    No repeal, no finite end, no qualified commencement: typically an agreement
+    published on signature whose entry into force waits on ratification, which
+    CELLAR dates 1001-01-01. ``in_force`` would be false and ``expired`` invented,
+    and the spec has no "not yet" status, so the act waits until the source says.
+    """
+
+
 class EURLexMetadataParser(MetadataParser):
     """Parse EUR-Lex SPARQL metadata JSON into NormMetadata."""
 
@@ -1102,7 +1112,9 @@ class EURLexMetadataParser(MetadataParser):
                 status = NormStatus.EXPIRED
             elif (
                 entry_force
-                and entry_force > date.today()
+                # CELLAR flips the flag a day or more after commencement:
+                # 32026R2489 entered into force on 2026-11-14 and read "0" that day.
+                and entry_force >= date.today()
                 and (not end_validity or end_validity >= entry_force)
                 and first.get("hasCons", {}).get("value", "") not in ("1", "true")
                 and not first.get("lastAmendment", {}).get("value")
@@ -1113,7 +1125,7 @@ class EURLexMetadataParser(MetadataParser):
                 future_original = True
                 status = NormStatus.IN_FORCE
             else:
-                raise ValueError(
+                raise PendingStatus(
                     f"{norm_id}: source states not in force but no repeal or finite end of validity; "
                     f"cannot infer expiration (qualified entry into force: {entry_force})"
                 )

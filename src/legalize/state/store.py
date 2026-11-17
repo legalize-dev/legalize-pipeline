@@ -254,6 +254,9 @@ class StateStore:
         self._path = Path(path)
         self._last_summary: Optional[str] = None
         self._runs: list[RunRecord] = []
+        # Acts a finished day discovered but could not publish yet, by reason —
+        # an EU agreement awaiting ratification. Kept so a later run retries them.
+        self.pending: dict[str, str] = {}
 
     def load(self) -> None:
         """Load state from disk."""
@@ -264,6 +267,7 @@ class StateStore:
             data = json.load(f)
 
         self._last_summary = data.get("last_summary")
+        self.pending = data.get("pending", {})
 
         for r in data.get("runs", []):
             self._runs.append(
@@ -290,6 +294,7 @@ class StateStore:
         data = {
             "last_summary": self._last_summary,
             "runs": [asdict(r) for r in self._runs],
+            "pending": self.pending,
         }
 
         fd, tmp = tempfile.mkstemp(

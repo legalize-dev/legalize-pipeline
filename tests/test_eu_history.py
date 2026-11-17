@@ -19,6 +19,8 @@ from legalize.storage import save_structured_json
 from legalize.transformer.markdown import render_paragraphs
 
 FIXTURES = Path(__file__).parent / "fixtures" / "eu"
+# What a daily reads back for an act the corpus already holds.
+PUBLISHED = '---\nidentifier: "32016R0679"\n---\nBody\n'
 
 
 def test_amending_act_is_not_repeated_for_a_later_journal_correction(monkeypatch):
@@ -352,7 +354,7 @@ def test_daily_publishes_completed_day_before_interruption(tmp_path, monkeypatch
         daily_module.EURLexDiscovery, "create", lambda _: SimpleNamespace(discover_daily=discover)
     )
     monkeypatch.setattr(daily_module, "resolve_dates_to_process", lambda *_: days)
-    repo = Mock(refused=[])
+    repo = Mock(refused=[], read=lambda _: PUBLISHED)
     monkeypatch.setattr(daily_module, "GitRepo", lambda *_: repo)
     monkeypatch.setattr(daily_module, "commit_one", lambda *_: 1)
     state_path = tmp_path / "state.json"
@@ -414,7 +416,9 @@ def test_daily_fetches_concurrently_and_commits_in_discovery_order(tmp_path, mon
         "create",
         lambda _: SimpleNamespace(discover_daily=lambda *_: ids),
     )
-    monkeypatch.setattr(daily_module, "GitRepo", lambda *_: Mock(refused=[]))
+    monkeypatch.setattr(
+        daily_module, "GitRepo", lambda *_: Mock(refused=[], read=lambda _: PUBLISHED)
+    )
     monkeypatch.setattr(daily_module, "commit_one", commit)
     config = Config(
         countries={
@@ -443,3 +447,181 @@ def test_entry_into_force_uses_annotated_ev_not_application():
     parsed = EURLexMetadataParser().parse(json.dumps(metadata).encode(), celex)
     assert dict(parsed.extra)["entry_into_force"] == "2017-05-25"
     assert json.loads(dict(parsed.extra)["source_metadata"])["date_annotations"] == annotations
+
+
+def _eu_daily(tmp_path, monkeypatch, ids, metadata, published=lambda _: "", **client):
+    """One EU daily over a stubbed source and corpus; returns its config and saved norms."""
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+
+    from legalize.fetcher.eu import daily as daily_module
+
+    saved = []
+    monkeypatch.setattr(EURLexClient, "get_metadata_sparql", lambda _, celex: metadata[celex])
+    monkeypatch.setattr(EURLexClient, "_merge_list_facts", lambda *_: None)
+    for name, value in client.items():
+        monkeypatch.setattr(EURLexClient, name, value)
+    monkeypatch.setattr(
+        daily_module.EURLexDiscovery,
+        "create",
+        lambda _: SimpleNamespace(discover_daily=lambda *_: list(ids)),
+    )
+    monkeypatch.setattr(daily_module, "GitRepo", lambda *_: Mock(refused=[], read=published))
+    monkeypatch.setattr(daily_module, "save_structured_json", lambda _, norm: saved.append(norm))
+    monkeypatch.setattr(daily_module, "commit_one", lambda *_: 1)
+    config = Config(
+        countries={
+            "eu": CountryConfig(
+                data_dir=str(tmp_path / "data"), state_path=str(tmp_path / "state.json")
+            )
+        }
+    )
+    return config, saved
+
+
+def _act(celex: str, published_on: str, **extra) -> dict:
+    row = {
+        "celex": {"value": celex},
+        "title": {"value": f"Act {celex}"},
+        "publicationDate": {"value": published_on},
+        "force": {"value": "1"},
+        "rtype": {"value": "http://publications.europa.eu/resource/authority/resource-type/REG"},
+    }
+    row.update({key: {"value": value} for key, value in extra.items()})
+    return {"results": {"bindings": [row]}}
+
+
+def _envelope(self, celex, **_) -> bytes:
+    return (
+        f'<eurlex-multi-version celex="{celex}"><version type="original" source-id="{celex}" '
+        f'effective-date="2026-11-03"><html><body><p>Body</p></body></html></version>'
+        "</eurlex-multi-version>"
+    ).encode()
+
+
+def test_daily_refreshes_the_published_corpus_and_never_bootstraps_outside_it(
+    tmp_path, monkeypatch
+):
+    from legalize.fetcher.eu.daily import daily
+    from legalize.state.store import StateStore
+
+    day = date(2026, 11, 3)
+    metadata = {
+        "32026R2387": _act("32026R2387", "2026-11-03"),  # new that day
+        "32008R1272": _act("32008R1272", "2008-12-31"),  # published, amended that day
+        "32005R0396": _act("32005R0396", "2005-03-16"),  # left out of the pinned scope
+        "32006R1907": {"results": {"bindings": []}},  # REACH: no English HTML original
+    }
+    fetched = []
+
+    def get_text(self, celex, **kwargs):
+        fetched.append(celex)
+        return _envelope(self, celex)
+
+    config, saved = _eu_daily(
+        tmp_path,
+        monkeypatch,
+        metadata,
+        metadata,
+        published=lambda path: PUBLISHED if path.endswith("/32008R1272.md") else "",
+        get_text=get_text,
+    )
+    assert daily(config, day) == 2
+    assert fetched == [norm.metadata.identifier for norm in saved] == ["32026R2387", "32008R1272"]
+    state = StateStore(tmp_path / "state.json")
+    state.load()
+    assert state.last_summary_date == day
+
+
+def test_daily_holds_an_agreement_until_eurlex_states_it_in_force(tmp_path, monkeypatch):
+    from legalize.fetcher.eu import daily as daily_module
+    from legalize.fetcher.eu.parser import PendingStatus
+    from legalize.state.store import StateStore
+
+    celex = "22026A02361"
+    metadata = {celex: _act(celex, "2026-10-26")}
+
+    def awaiting(self, norm_id, **_):
+        raise PendingStatus(f"{norm_id}: source states not in force")
+
+    config, saved = _eu_daily(tmp_path, monkeypatch, [celex], metadata, get_text=awaiting)
+    # Nothing failed, so nothing turns the run red, and the day is done.
+    assert daily_module.daily(config, date(2026, 10, 26)) == 0
+    state = StateStore(tmp_path / "state.json")
+    state.load()
+    assert state.last_summary_date == date(2026, 10, 26) and celex in state.pending
+
+    # Ratified: no query of a later day finds it, the flag does.
+    monkeypatch.setattr(
+        daily_module.EURLexDiscovery,
+        "create",
+        lambda _: __import__("types").SimpleNamespace(discover_daily=lambda *_: []),
+    )
+    monkeypatch.setattr(
+        EURLexClient,
+        "get_source_facts",
+        lambda _, ids: {i: {"resource_legal_in-force": [{"value": "1"}]} for i in ids},
+    )
+    monkeypatch.setattr(EURLexClient, "get_text", _envelope)
+    assert daily_module.daily(config, date(2026, 11, 20)) == 1
+    assert [norm.metadata.identifier for norm in saved] == [celex]
+    state = StateStore(tmp_path / "state.json")
+    state.load()
+    assert state.pending == {}
+
+
+def test_daily_keeps_a_published_laws_recorded_version_gaps(tmp_path, monkeypatch):
+    from legalize.fetcher.eu.daily import daily
+
+    celex = "32021R0403"
+    reason = "CELLAR PDF contains rasterized legal text"
+    gaps = json.dumps([{"norm_id": celex, "date": "2021-04-21", "reason": reason, "sha256": "c6"}])
+    published = f'---\nidentifier: "{celex}"\nsource_version_gaps: {json.dumps(gaps)}\n---\nBody\n'
+    seen = {}
+
+    def merge(self, norm_id, result):
+        seen["hasCons"] = result["results"]["bindings"][0]["hasCons"]["value"]
+
+    def get_text(self, norm_id, meta_data=None, version_exclusions=None):
+        seen["excluded"] = version_exclusions
+        return _envelope(self, norm_id)
+
+    config, saved = _eu_daily(
+        tmp_path,
+        monkeypatch,
+        [celex],
+        {celex: _act(celex, "2021-03-31", hasCons="1")},
+        published=lambda _: published,
+        get_consolidated_versions=lambda _, __: [
+            {"celex": "02021R0403-20210421", "date": "2021-04-21"}
+        ],
+        _merge_list_facts=merge,
+        get_text=get_text,
+    )
+    assert daily(config, date(2026, 11, 1)) == 1
+    # Not downloaded again, and with no consolidation left the act stays as enacted.
+    assert seen == {"hasCons": "false", "excluded": {"02021R0403-20210421": reason}}
+    [norm] = saved
+    assert dict(norm.metadata.extra)["source_version_gaps"] == gaps
+    assert norm.metadata.text_state is None
+
+
+def test_pdf_download_asks_cellar_for_the_item_when_doc_1_is_absent(monkeypatch):
+    import requests
+
+    manifest = "http://publications.europa.eu/resource/cellar/548c7b6f.0006.02"
+
+    def get(url, **_):
+        if url == manifest.replace("http://", "https://") + "/DOC_2":
+            return b"%PDF-1.7"
+        raise requests.HTTPError("404 Client Error")
+
+    client = EURLexClient()
+    monkeypatch.setattr(client, "_get", get)
+    monkeypatch.setattr(
+        client,
+        "sparql_query",
+        lambda _: {"results": {"bindings": [{"item": {"value": manifest + "/DOC_2"}}]}},
+    )
+    version = {"celex": "02021R0403-20250227", "manifest_uri": manifest, "format": "pdfa2a"}
+    assert client.download_pdf(version) == b"%PDF-1.7"
