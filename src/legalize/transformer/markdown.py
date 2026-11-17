@@ -401,6 +401,15 @@ def render_norm_at_date(
             version_date = None
     if metadata.country == "es" and metadata.text_state is TextState.AS_ENACTED:
         version_date = target_date
+    # An as-enacted body is dated the day it was enacted at every commit, so the
+    # newest date in force is the enactment's. The spec dates an as_enacted file by
+    # its most recent amendment recorded, which is the commit's own date. Portugal's
+    # as-published diplomas take the state from the country default, not the norm.
+    if (
+        metadata.country == "pt"
+        and (metadata.text_state or text_state_for("pt")) is TextState.AS_ENACTED
+    ):
+        version_date = target_date
     if metadata.country == "ie" and metadata.text_state is not TextState.POINT_IN_TIME:
         version_date = target_date
     parts.append(render_frontmatter(metadata, version_date, structure))

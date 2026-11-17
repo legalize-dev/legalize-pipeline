@@ -30,7 +30,7 @@ from legalize.committer.message import build_commit_info
 from legalize.config import Config
 from legalize.fetcher.pt.identifier import build_identifier
 from legalize.models import CommitType, Reform
-from legalize.pipeline import SKIP_WEEKDAYS, finalize_daily
+from legalize.pipeline import SKIP_WEEKDAYS, commit_one, finalize_daily
 from legalize.state.store import StateStore, resolve_dates_to_process
 from legalize.transformer.markdown import render_norm_at_date
 from legalize.transformer.slug import norm_to_filepath
@@ -169,9 +169,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                 console.print(f"  [dim]would refresh {norm_id}[/dim]")
                 continue
             try:
-                commits_created += _commit_versions(
-                    config, repo, client, norm_id, generic_fetch_one
-                )
+                commits_created += _commit_versions(config, norm_id, generic_fetch_one)
             except DREApiError:
                 logger.exception("DRE API contract broken — aborting daily run")
                 raise
@@ -238,11 +236,19 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                 changed_laws = set()
             if changed_laws:
                 console.print(f"\n[bold]{len(changed_laws)} law(s) amended today[/bold]")
+                # Read after step 1, which commits through its own GitRepo.
+                consolidated = _consolidated_laws(repo)
             for law_id in sorted(changed_laws):
                 try:
-                    commits_created += _commit_versions(
-                        config, repo, client, law_id, generic_fetch_one
-                    )
+                    _surface, tipo, key = law_id.split(":", 2)
+                    if build_identifier(f"/dr/detalhe/{tipo}/{key}", "") in consolidated:
+                        # The bootstrap's rule (bootstrap.py): a law DRE consolidates is
+                        # published from that surface, and its as-published twin must
+                        # never land on it. Its re-consolidation, in step 1, is what
+                        # records the amendment.
+                        console.print(f"  [dim]{law_id}: consolidated, not overwritten[/dim]")
+                        continue
+                    commits_created += _commit_versions(config, law_id, generic_fetch_one)
                 except Exception as exc:
                     errors.append(f"Error recording amendment on {law_id}: {exc}")
                     logger.exception("Error recording amendment on %s", law_id)
@@ -287,26 +293,23 @@ def commit_new(config, repo, client, meta_parser, norm_id: str, fetch_one) -> st
     return markdown
 
 
-def _commit_versions(config, repo, client, norm_id: str, fetch_one) -> int:
-    """Re-fetch a consolidated diploma and commit any version it has gained."""
-    from legalize.fetcher.pt.parser import DREMetadataParser
+def _commit_versions(config, norm_id: str, fetch_one) -> int:
+    """Re-fetch a diploma and commit any version or amendment it has gained.
 
+    Through ``commit_one``, which renders each reform as the bootstrap's fast import
+    does, and not a copy of it: the copy never named the amending act, so every
+    amendment the daily recorded on an as-enacted law dropped its ``last_amendment``.
+    """
     norm = fetch_one(config, "pt", norm_id, force=True)
-    if norm is None or not norm.reforms:
+    if norm is None:
         return 0
-    metadata = DREMetadataParser().parse(client.get_metadata(norm_id), norm_id)
-    file_path = norm_to_filepath(metadata)
-    created = 0
+    return commit_one(config, "pt", norm.metadata.identifier)
 
-    for index, reform in enumerate(norm.reforms):
-        # One reform can affect many norms, so the dedupe key is the pair.
-        if repo.has_commit_with_source_id(reform.norm_id, metadata.identifier):
-            continue
-        markdown = render_norm_at_date(metadata, norm.blocks, reform.date, include_all=index == 0)
-        if not repo.write_and_add(file_path, markdown):
-            continue
-        commit_type = CommitType.BOOTSTRAP if index == 0 else CommitType.REFORM
-        info = build_commit_info(commit_type, metadata, reform, norm.blocks, file_path, markdown)
-        if repo.commit(info):
-            created += 1
-    return created
+
+def _consolidated_laws(repo: GitRepo) -> set[str]:
+    """The laws this repo publishes from DRE's consolidated surface.
+
+    Only a consolidated version has an ``@`` in its Source-Id (``_reform_source_id``
+    in the parser); an act, or an as-published bootstrap, never does.
+    """
+    return {norm for source, norm in repo.load_existing_commits() if "@" in source}
