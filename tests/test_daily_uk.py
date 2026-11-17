@@ -179,3 +179,77 @@ def test_the_daily_downloads_a_law_once():
         assert client.get_metadata("uksi-2000-2853") == client.get_text("uksi-2000-2853")
         client.get_text("uksi-2000-2854")
     assert [call.args[0].rsplit("/", 2)[-2] for call in get.call_args_list] == ["2853", "2854"]
+
+
+FIXTURES = Path(__file__).parent / "fixtures" / "uk"
+
+
+def _source(documents: dict[str, str]):
+    """legislation.gov.uk serving fixture files by URL path; anything else is a 404."""
+
+    def get(_client, url: str) -> bytes:
+        path = url.removeprefix("https://www.legislation.gov.uk/")
+        if path not in documents:
+            response = requests.Response()
+            response.status_code = 404
+            raise requests.HTTPError("404", response=response)
+        return (FIXTURES / documents[path]).read_bytes()
+
+    return patch.object(LegislationGovUkClient, "_get", get)
+
+
+def _daily(tmp_path: Path, day: date, norm_id: str):
+    """generic_daily for one day on a fresh repo, with the real UK client and parsers."""
+    from legalize.config import Config, CountryConfig, GitConfig
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    config = Config(
+        git=GitConfig(committer_name="Legalize", committer_email="test@test.com"),
+        countries={
+            "uk": CountryConfig(
+                repo_path=str(repo),
+                data_dir=str(tmp_path / "data"),
+                state_path=str(tmp_path / "state.json"),
+                source={},
+            )
+        },
+    )
+    discovery = MagicMock()
+    discovery.discover_daily.side_effect = lambda _c, d: iter([norm_id] if d == day else [])
+    with patch("legalize.countries.get_discovery_class") as discovery_cls:
+        discovery_cls.return_value.create.return_value = discovery
+        commits = generic_daily(config, "uk", target_date=day)
+    return commits, repo, config
+
+
+class TestAVersionPublishedBeforeItTakesEffect:
+    """nisr/2026/186: made on 9 November, in the log on the 13th, in operation on the 30th.
+
+    Rendered on the 13th no block was in force, and the daily refused the law as
+    empty, every run, until the lookback dropped the day.
+    """
+
+    def test_it_is_published_as_the_text_in_force_from_its_start(self, tmp_path):
+        from legalize.state.store import StateStore, latest_source_date
+
+        documents = {"nisr/2026/186/data.xml": "sample-si-nisr-2026-186-not-yet-in-force.xml"}
+        with _source(documents):
+            commits, repo, config = _daily(tmp_path, date(2026, 11, 13), "nisr-2026-186")
+
+        assert commits == 1
+        text = (repo / "uk-nir" / "nisr-2026-186.md").read_text()
+        assert 'publication_date: "2026-11-09"' in text
+        assert 'last_updated: "2026-11-30"' in text  # never in force before it was
+        assert "These Regulations may be cited as" in text
+        # Dated the day it was published, so the cursor cannot run past the days
+        # between publication and commencement, with or without the state file.
+        message = subprocess.run(
+            ["git", "log", "-1", "--format=%B"], cwd=repo, capture_output=True, text=True
+        ).stdout
+        assert "Source-Date: 2026-11-13" in message
+        assert latest_source_date(str(repo)) == date(2026, 11, 13)
+        state = StateStore(config.countries["uk"].state_path)
+        state.load()
+        assert state.last_summary_date == date(2026, 11, 13)  # the day closed clean
