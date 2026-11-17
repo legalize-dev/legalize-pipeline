@@ -475,22 +475,31 @@ def _fragment_paragraphs(entry: dict, pdf_url: str) -> tuple[str, list[Paragraph
         paragraphs.append(Paragraph(css_class=css, text=heading))
 
     body = version.get("Texto") or ""
-    if body:
-        if "<" in body:
-            paragraphs.extend(_parse_published_html(body, pdf_url))
-        else:
-            # No tag in the body, but DRE still escapes its angle brackets there:
-            # "lotes &lt;15 t" shipped verbatim. Unescape here and not before the
-            # branch above, or "&lt;15 t" would look like a tag to the HTML parser.
-            for line in clean(body).split("\n"):
-                line = collapse_inline_whitespace(html.unescape(line)).strip()
-                if line:
-                    paragraphs.append(
-                        Paragraph(
-                            css_class="firma" if type_id == 7 else "parrafo",
-                            text=_link_ver_documento(line, pdf_url),
-                        )
-                    )
+    lines: list[str] = []
+    if "<" in body:
+        blocks = _parse_published_html(body, pdf_url)
+        paragraphs.extend(blocks)
+        if not blocks:
+            # Markup with no <p>, <table> or <img> for that walker to find: the
+            # paragraphs separated by <br/>, as DRE writes the consolidations it has
+            # made since August 2026, or a plain run carrying a link or a <sup>.
+            # Every one of those articles shipped as a bare heading. Flattened the
+            # way the headings are, then split where the plain branch splits.
+            lines = _rich_text(body).split("\n")
+    elif body:
+        # No tag in the body, but DRE still escapes its angle brackets there:
+        # "lotes &lt;15 t" shipped verbatim. Unescape here and not before the
+        # branch above, or "&lt;15 t" would look like a tag to the HTML parser.
+        lines = [html.unescape(line) for line in clean(body).split("\n")]
+    for line in lines:
+        line = collapse_inline_whitespace(line).strip()
+        if line:
+            paragraphs.append(
+                Paragraph(
+                    css_class="firma" if type_id == 7 else "parrafo",
+                    text=_link_ver_documento(line, pdf_url),
+                )
+            )
 
     for note in entry.get("nota") or []:
         text = _inline(lxml_html.fromstring(f"<div>{clean(note)}</div>", parser=_HTML_PARSER))
