@@ -10,7 +10,9 @@ On every dashboard we have, a healthy country and a dead one look identical.
 So this asks the only question that distinguishes them: when did the repo last
 receive anything?
 
-Prints one ``code<TAB>cadence<TAB>days<TAB>limit`` line per silent country.
+Prints one ``code<TAB>cadence<TAB>days<TAB>limit`` line per scheduled country,
+silent or not (``days > limit`` is silent), so the workflow can also close the
+issue of a country that publishes again.
 """
 
 from __future__ import annotations
@@ -77,7 +79,7 @@ def main() -> int:
     )
 
     now = datetime.now(timezone.utc)
-    silent = []
+    rows = []
     for repo in repos:
         code = repo["name"].removeprefix("legalize-")
         how_often = cadence.get(code)
@@ -89,12 +91,12 @@ def main() -> int:
         # anything. A meta push (README, LICENSE) does reset this, which makes
         # the check miss a country for one cycle rather than cry wolf.
         days = (now - datetime.fromisoformat(repo["pushedAt"])).days
-        if days > LIMIT_DAYS[how_often]:
-            silent.append((code, how_often, days, LIMIT_DAYS[how_often]))
+        rows.append((code, how_often, days, LIMIT_DAYS[how_often]))
 
-    for row in sorted(silent, key=lambda r: -r[2]):
+    for row in sorted(rows, key=lambda r: -r[2]):
         print("\t".join(str(field) for field in row))
-    print(f"{len(silent)} silent of {len(cadence)} scheduled", file=sys.stderr)
+    silent = sum(days > limit for _, _, days, limit in rows)
+    print(f"{silent} silent of {len(cadence)} scheduled", file=sys.stderr)
     return 0
 
 
