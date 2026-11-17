@@ -66,8 +66,8 @@ class RISClient(HttpClient):
                 content = xml.decode("utf-8", errors="replace")
                 content = content.replace('<?xml version="1.0" encoding="UTF-8"?>', "").strip()
                 return (nor_id, content)
-            except Exception:
-                logger.warning("Could not fetch NOR %s, skipping", nor_id)
+            except Exception as exc:
+                logger.warning("Could not fetch NOR %s: %s", nor_id, exc)
                 return (nor_id, None)
 
         with ThreadPoolExecutor(max_workers=8) as pool:
@@ -76,6 +76,19 @@ class RISClient(HttpClient):
                 nid, content = future.result()
                 if content:
                     nor_xmls[nid] = content
+
+        # Each NOR is one paragraph of the law. Combining the ones that did
+        # arrive would commit the law with the rest deleted: a fictitious
+        # amendment. From October 2026 RIS answered GitHub runners with a 503
+        # bot check for most NORs, and that is how laws such as the
+        # Bankwesengesetz were published nearly empty. Fail the whole law
+        # instead; the daily keeps the day open and retries it.
+        missing = [nid for nid in nor_ids if nid not in nor_xmls]
+        if missing:
+            raise RuntimeError(
+                f"Gesetzesnummer {gesetzesnummer}: {len(missing)} of {len(nor_ids)} "
+                f"NOR documents could not be fetched (first: {missing[0]})"
+            )
 
         # Reassemble in original order
         parts = ['<?xml version="1.0" encoding="UTF-8"?>']
