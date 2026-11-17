@@ -323,7 +323,9 @@ class TestTheDailyCommitsWhatTheBootstrapWould:
 
     From 2026-08-31 every amendment the daily recorded on an as-enacted law lost
     ``last_amendment``, and from October its ``last_updated`` too: it had its own
-    render-and-commit loop.
+    render-and-commit loop. It also wrote the as-published twin of a law DRE
+    consolidates over that law, the overwrite the bootstrap's phase order exists
+    to prevent (37 laws).
     """
 
     TODAY = "2026-11-16"
@@ -553,3 +555,42 @@ class TestTheDailyCommitsWhatTheBootstrapWould:
 
         path = "pt/1994/DRE-1994-16-512030.md"
         assert self._head(repo, path) == self._head(fresh, path)
+
+    def test_a_consolidated_law_keeps_its_text_and_takes_the_new_version(self, world):
+        """The as-published twin is never written over it; its re-consolidation is."""
+        from legalize.fetcher.pt.parser import DREMetadataParser, DRETextParser
+        from legalize.transformer.markdown import render_norm_at_date
+
+        config, repo = world
+        self._run_daily(config)
+
+        cons = self._head(repo, "pt/2000/DRE-2000-1-11.md")
+        assert "text_state" not in cons and "last_amendment" not in cons
+        assert "Texto publicado" not in cons and "hoje" in cons
+        log = subprocess.run(
+            ["git", "-C", str(repo), "log", "--format=%s%x09%(trailers:key=Source-Id,valueonly)"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        assert "pub:lei:1-2000-11" not in log, "the twin was committed over the law"
+
+        # Unchanged from what the daily's own loop rendered for a re-consolidation.
+        client_bundle = json.dumps(
+            {
+                "surface": "cons",
+                "tipo": "lei",
+                "key": "2000-11",
+                "published": self._published("lei", "1-2000-11", "2000-01-01"),
+            }
+        )
+        meta = DREMetadataParser().parse(client_bundle.encode(), self.CONS)
+        blocks, _ = DRETextParser().parse_suvestine(
+            json.dumps(
+                self._cons_blob(
+                    {"2000-01-01": "original", "2010-05-05": "reformado", self.TODAY: "hoje"}
+                )
+            ).encode(),
+            self.CONS,
+        )
+        assert cons == render_norm_at_date(meta, blocks, date.fromisoformat(self.TODAY))
