@@ -79,6 +79,49 @@ def test_diary_client_resolves_the_official_eli_link(tmp_path):
         with patch.object(client, "_fetch", return_value=b"<html>No ELI link</html>"):
             with pytest.raises(ValueError, match="no ELI"):
                 client.get_disposition_xml("BOE-A-2026-10881")
+            with pytest.raises(ValueError, match="neither ELI nor XML"):
+                client.get_disposition_xml("BOE-A-2026-10881", html_fallback=False)
+
+
+def test_consolidated_norm_without_eli_is_enriched_from_its_xml(tmp_path):
+    """Regional-gazette norms the BOE consolidates have no ELI and no Sección.
+
+    Their enrichment went through the Sección I HTML rebuild, which refuses their
+    references, so every daily that listed one logged the same error. The page
+    links the diary XML every other norm is enriched from. Saved from the BOE on
+    2026-11-17: /metadatos, doc.php and xml.php of BOJA-b-2021-90155.
+    """
+    import gzip
+    from pathlib import Path
+    from unittest.mock import patch
+    from legalize.fetcher.cache import FileCache
+    from legalize.fetcher.es.client import BOEClient
+    from legalize.fetcher.es.config import BOEConfig
+    from legalize.fetcher.es.fetch import fetch_metadata
+
+    identifier = "BOJA-b-2021-90155"
+    fixtures = Path(__file__).parent / "fixtures" / "es"
+    served = {
+        f"https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/{identifier}/metadatos": f"metadata-{identifier}.xml.gz",
+        f"https://www.boe.es/buscar/doc.php?id={identifier}": f"diary-{identifier}.html.gz",
+        f"https://www.boe.es/buscar/xml.php?id={identifier}": f"diary-{identifier}.xml.gz",
+    }
+
+    def fetch(url, bypass_cache=False):
+        return gzip.decompress((fixtures / served[url]).read_bytes())
+
+    with BOEClient(BOEConfig(), FileCache(tmp_path)) as client:
+        with patch.object(client, "_fetch", side_effect=fetch):
+            with pytest.raises(ValueError, match="references need explicit parsing"):
+                client.get_disposition_xml(identifier)
+            metadata = fetch_metadata(client, identifier)
+    extra = dict(metadata.extra)
+    assert metadata.jurisdiction == "es-an"
+    assert metadata.pdf_url == "https://www.boe.es/ccaa/boja/2021/037/b00002-00006.pdf"
+    assert (extra["section"], extra["official_journal_code"]) == ("A", "BOJA")
+    assert extra["references_subsequent"].startswith("SE DEROGA [210] BOE-A-2021-17915: ")
+    assert "DE CONFORMIDAD con [440] BOJA-b-2018-90363: " in extra["references_previous"]
+    assert "BOJA extraordinario núm. 37" in extra["notes"]
 
 
 def test_expansion_resume_retains_bytes_and_exclusions(tmp_path, monkeypatch):

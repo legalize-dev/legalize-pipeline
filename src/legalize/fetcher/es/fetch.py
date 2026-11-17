@@ -45,7 +45,9 @@ def fetch_metadata(client, boe_id: str) -> NormMetadata:
     meta_xml = client.get_metadata(boe_id)
     metadata = parse_metadata(meta_xml, boe_id)
     try:
-        diario_xml = client.get_disposition_xml(boe_id, eli_url=metadata.source)
+        diario_xml = client.get_disposition_xml(
+            boe_id, eli_url=metadata.source, html_fallback=False
+        )
     except requests.HTTPError as exc:
         if exc.response is None or exc.response.status_code != 404:
             raise
