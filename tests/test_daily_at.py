@@ -467,3 +467,27 @@ class TestDailyATOrchestration:
         assert state["last_summary"] == "2026-04-01"
         assert len(state["runs"]) == 1
         assert state["runs"][0]["commits_created"] == 0
+
+
+class TestGetTextNeverPartial:
+    """A law with a NOR that could not be fetched must fail, not shrink."""
+
+    def _client(self, blocked: set[str]) -> RISClient:
+        client = RISClient()
+        client._extract_nor_ids = lambda meta: ["NOR1", "NOR2", "NOR3"]
+
+        def fetch(nor_id: str) -> bytes:
+            if nor_id in blocked:
+                raise RuntimeError("HTTP 503: Security Check")
+            return f"<nor id='{nor_id}'/>".encode()
+
+        client._fetch_nor_xml = fetch
+        return client
+
+    def test_all_nors_are_combined_in_order(self):
+        text = self._client(blocked=set()).get_text("10004827", meta_data=b"{}").decode()
+        assert text.index("NOR1") < text.index("NOR2") < text.index("NOR3")
+
+    def test_one_missing_nor_fails_the_law(self):
+        with pytest.raises(RuntimeError, match="1 of 3 NOR documents"):
+            self._client(blocked={"NOR2"}).get_text("10004827", meta_data=b"{}")
