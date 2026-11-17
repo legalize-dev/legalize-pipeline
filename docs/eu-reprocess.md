@@ -47,7 +47,10 @@ preparation script. Every exclusion records the source ID, date, reason and
 available hash in `source-version-exclusions.json`, and is repeated in the law's
 `extra.source_version_gaps`. This does not certify complete source history.
 The ordinary bootstrap/daily client cannot reuse an excluded draft's cache as
-a complete chain.
+a complete chain. Once published, the daily reads a law's
+`source_version_gaps` back from its file, leaves those versions out and keeps
+the list; it records no new gap itself, so an unreadable version it meets later
+fails until a reprocess reviews it.
 
 ```sh
 engine-eu-reprocess/.venv/bin/python engine-eu-reprocess/scripts/prepare_eu_reprocess.py countries/data-eu-reprocess --accept-version-gaps

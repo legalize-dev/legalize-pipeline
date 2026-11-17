@@ -8,10 +8,11 @@ getting one wrong is not a rendering bug — it is a corpus that lies. See
 from __future__ import annotations
 
 import json
+from datetime import date
 
 import pytest
 
-from legalize.fetcher.eu.parser import EURLexMetadataParser
+from legalize.fetcher.eu.parser import EURLexMetadataParser, PendingStatus
 from legalize.models import NormStatus, Rank, TextState
 
 _RTYPE = "http://publications.europa.eu/resource/authority/resource-type/"
@@ -60,8 +61,28 @@ def test_expiration_needs_a_finite_source_end_date(parser):
 
 
 def test_not_in_force_without_end_or_repeal_is_not_expired(parser):
-    with pytest.raises(ValueError, match="cannot infer expiration"):
+    with pytest.raises(PendingStatus, match="cannot infer expiration"):
         parser.parse(_meta(force="false", endValidity="9999-12-31"), "32026R2205")
+
+
+def _entry_into_force(day: str) -> str:
+    annotation = {"date": {"value": day}, "typeOfDate": {"value": "{EV|entry-into-force}"}}
+    return json.dumps({"date_annotations": [annotation]})
+
+
+def test_agreement_awaiting_ratification_is_pending_not_expired(parser):
+    """CELLAR dates an unknown entry into force 1001-01-01 (22026A02361)."""
+    meta = _meta(force="0", endValidity="9999-12-31", sourceFacts=_entry_into_force("1001-01-01"))
+    with pytest.raises(PendingStatus):
+        parser.parse(meta, "22026A02361")
+
+
+def test_commencement_today_is_in_force_before_cellar_flips_the_flag(parser):
+    """32026R2489 entered into force on 2026-11-14 and CELLAR still said "0" that day."""
+    today = date.today().isoformat()
+    meta = parser.parse(_meta(force="0", sourceFacts=_entry_into_force(today)), "32026R2489")
+    assert meta.status is NormStatus.IN_FORCE
+    assert dict(meta.extra)["initial_effective_date"] == today
 
 
 def test_absent_status_raises_instead_of_guessing(parser):

@@ -775,11 +775,22 @@ SELECT DISTINCT ?celex ?date ?typeOfDate ?comment WHERE {{
         urls.append(
             f"https://publications.europa.eu/resource/celex/{quote(version['celex'], safe='')}.ENG"
         )
+
+        def candidates():
+            yield from urls
+            # DOC_1 is a guess. The item is named per manifestation, and the only
+            # one 02021R0403-20250227 holds is DOC_2, so ask CELLAR before failing.
+            yield from self._manifestation_items(manifestations)
+
         error = None
-        for url in dict.fromkeys(urls):
+        tried: set[str] = set()
+        for url in candidates():
+            if url in tried:
+                continue
+            tried.add(url)
             try:
                 data = self._get(
-                    url, headers={"Accept": "*/*" if url.endswith("/DOC_1") else "application/pdf"}
+                    url, headers={"Accept": "*/*" if "/DOC_" in url else "application/pdf"}
                 )
                 if not data.startswith(b"%PDF"):
                     raise ValueError(f"{url}: response is not PDF")
@@ -787,6 +798,23 @@ SELECT DISTINCT ?celex ?date ?typeOfDate ?comment WHERE {{
             except Exception as exc:
                 error = exc
         raise ValueError(f"{version['celex']}: all PDF manifestations failed") from error
+
+    def _manifestation_items(self, manifestations: list[str]) -> list[str]:
+        """The binary items CELLAR files under these manifestations."""
+        if not manifestations:
+            return []
+        values = " ".join(f"<{uri.replace('https://', 'http://', 1)}>" for uri in manifestations)
+        rows = self.sparql_query(
+            f"""PREFIX cdm: <{_CDM}>
+SELECT ?item WHERE {{
+  VALUES ?manifest {{ {values} }}
+  ?item cdm:item_belongs_to_manifestation ?manifest .
+}} ORDER BY ?item"""
+        )
+        return [
+            row["item"]["value"].replace("http://", "https://", 1)
+            for row in rows.get("results", {}).get("bindings", [])
+        ]
 
     # ─────────────────────────────────────────
     # LegislativeClient interface
@@ -811,6 +839,9 @@ SELECT DISTINCT ?celex ?date ?typeOfDate ?comment WHERE {{
         celex = norm_id
         metadata = json.loads(meta_data or self.get_metadata(norm_id))
         rows = metadata.get("results", {}).get("bindings", [])
+        if not rows:
+            # _ACT_PATTERN matched nothing, as for REACH, whose English original is PDF only.
+            raise ValueError(f"{celex}: no in-scope metadata (needs an English HTML original)")
         publication_dates = [
             r["publicationDate"]["value"] for r in rows if r.get("publicationDate")
         ]
