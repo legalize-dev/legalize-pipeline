@@ -121,7 +121,7 @@ class JustelDiscovery(NormDiscovery):
     """Discovers Belgian legal acts via Justel year-level ELI listing pages.
 
     Bootstrap cost: ~265 HTTP requests (1 listing per year per document type).
-    Daily cost:     1 HTTP request (summary.pl).
+    Daily cost:     1 HTTP request (summary.pl) + 1 per consolidated act.
     """
 
     def discover_all(
@@ -175,35 +175,27 @@ class JustelDiscovery(NormDiscovery):
         Scrapes /cgi_loi/summary.pl, which groups recent consolidations by
         date in ``<div id='list-title-1'>`` blocks preceded by a French date
         header. We parse the header, match it against ``target_date``, and
-        yield every NUMAC in that block.
+        resolve every act in that block.
 
         Each ``<div class='list-item'>`` inside the matching section has an
-        ``<a class='list-item--title' href='article.pl?...&cn_search=NUMAC&...'>``.
-        We extract the ``cn_search`` query parameter as the NUMAC.
+        ``<a class='list-item--title' href='article.pl?...&cn_search=CN&...'>``.
 
-        The summary page exposes the NUMAC but not the promulgation date,
-        so we look up each NUMAC in the ELI listing for the likely year(s)
-        to rebuild the composite ``dt:yyyy:mm:dd:numac`` form that the
-        client uses to build URLs.
+        ``cn_search`` is Justel's own number (promulgation date + sequence),
+        not the NUMAC the ELI and the corpus use: CN 2014040423 is NUMAC
+        2014011239. Reading it as a NUMAC found almost nothing in the ELI
+        listings, so the daily ended green with no commits. The act's page
+        names its own ELI, so each CN is resolved there: one request per
+        consolidation, and a failure fails the day instead of hiding it.
         """
         assert isinstance(client, JustelClient)
 
-        try:
-            html_bytes = client.get_daily_summary()
-        except Exception as exc:
-            logger.warning("Failed to fetch daily summary for %s: %s", target_date, exc)
-            return
+        html_bytes = client.get_daily_summary()
+        tree = lxml_html.fromstring(
+            html_bytes,
+            parser=lxml_html.HTMLParser(encoding="iso-8859-1"),
+        )
 
-        try:
-            tree = lxml_html.fromstring(
-                html_bytes,
-                parser=lxml_html.HTMLParser(encoding="iso-8859-1"),
-            )
-        except Exception as exc:
-            logger.warning("Failed to parse daily summary HTML: %s", exc)
-            return
-
-        target_numacs: list[str] = []
+        target_cns: list[str] = []
         day_sections = tree.xpath('//div[@id="list-title-1"]')
         for section in day_sections:
             header_nodes = section.xpath('.//h2[contains(@class, "list-title")]')
@@ -217,56 +209,19 @@ class JustelDiscovery(NormDiscovery):
                 href = a.get("href", "") or ""
                 match = re.search(r"cn_search=(\d+)", href)
                 if match:
-                    target_numacs.append(match.group(1))
+                    target_cns.append(match.group(1))
 
-        if not target_numacs:
+        if not target_cns:
             logger.info("No consolidations found for %s on Justel", target_date)
             return
 
-        known_years_loaded: dict[tuple[str, int], list[str]] = {}
-
-        def load_year(dt: str, year: int) -> list[str]:
-            key = (dt, year)
-            if key in known_years_loaded:
-                return known_years_loaded[key]
-            try:
-                listing = client.get_listing(dt, year)
-            except Exception as exc:
-                logger.warning("Failed to load %s listing %d: %s", dt, year, exc)
-                known_years_loaded[key] = []
-                return []
-            ids = list(extract_norm_ids_from_listing(listing))
-            known_years_loaded[key] = ids
-            return ids
-
-        # Look up each NUMAC in the ELI listing(s) for the likely year(s).
-        # The NUMAC usually starts with the promulgation year; we also try
-        # the target date year +/- 1 as a fallback.
         seen: set[str] = set()
-        for numac in target_numacs:
-            guesses: list[int] = []
-            if len(numac) >= 4 and numac[:4].isdigit():
-                guesses.append(int(numac[:4]))
-            for y in (target_date.year, target_date.year - 1, target_date.year - 2):
-                if y not in guesses:
-                    guesses.append(y)
-
-            resolved_id: str | None = None
-            for y in guesses:
-                if y < 1800 or y > date.today().year + 1:
-                    continue
-                for dt in DOCUMENT_TYPES:
-                    for nid in load_year(dt, y):
-                        if nid.endswith(f":{numac}"):
-                            resolved_id = nid
-                            break
-                    if resolved_id:
-                        break
-                if resolved_id:
-                    break
-
-            if resolved_id and resolved_id not in seen:
-                seen.add(resolved_id)
-                yield resolved_id
-            elif not resolved_id:
-                logger.warning("NUMAC %s on %s not found in any ELI listing", numac, target_date)
+        for cn in target_cns:
+            norm_id = next(extract_norm_ids_from_listing(client.get_article(cn)), None)
+            if norm_id is None:
+                raise ValueError(f"Justel CN {cn} ({target_date}): its page names no ELI")
+            if norm_id.split(":")[0] not in DOCUMENT_TYPES:
+                continue  # arrete: secondary legislation, outside the corpus (see client)
+            if norm_id not in seen:
+                seen.add(norm_id)
+                yield norm_id
