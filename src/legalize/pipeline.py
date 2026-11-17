@@ -46,7 +46,7 @@ from legalize.models import (
     Reform,
     TextState,
 )
-from legalize.state.store import StateStore, resolve_dates_to_process
+from legalize.state.store import MAX_LOOKBACK_DAYS, StateStore, resolve_dates_to_process
 from legalize.storage import (
     load_norma_from_json,
     overwritten_identifiers,
@@ -116,6 +116,10 @@ class NothingPublished(RuntimeError):
     """The run had errors and published nothing, so it must not exit green."""
 
 
+class DaysDropped(RuntimeError):
+    """The lookback cap dropped days that never finished, and what they held with them."""
+
+
 # One fast-import session per chunk. The session is the unit of durability: the
 # ref only moves when it ends, so a run killed mid-session loses that session and
 # nothing before it. Portugal died three times in one evening at 35,000, 10,000
@@ -176,6 +180,16 @@ def finalize_daily(
     if errors and commits_created == 0:
         raise NothingPublished(
             f"{len(errors)} error(s) and no commits: nothing was published. First: {errors[0]}"
+        )
+
+    # Last, so everything else is already pushed and recorded. Red once: the next
+    # run starts inside the window and has nothing left to say about these days.
+    if state.dropped:
+        first, last = state.dropped
+        raise DaysDropped(
+            f"{first}..{last} never finished cleanly and fell out of the "
+            f"{MAX_LOOKBACK_DAYS}-day lookback: what those days still held is not "
+            f"published. Once the cause is fixed, recover them with --since {first}."
         )
 
     return commits_created

@@ -95,6 +95,15 @@ def resolve_dates_to_process(
             max_lookback,
             MAX_LOOKBACK_DAYS,
         )
+        # The state's cursor only advances over days that finished clean, so when
+        # it is the one past the cap, the days in between held an error the whole
+        # time and whatever they still held is now dropped. That used to be this
+        # warning and nothing else: es lost BOE-A-2026-22008 and eu nine new acts
+        # that way in October 2026. A git cursor past the cap is only a quiet
+        # source, not lost work.
+        unfinished = state.last_summary_date
+        if unfinished is not None and unfinished + timedelta(days=1) < max_lookback:
+            state.dropped = (unfinished + timedelta(days=1), max_lookback - timedelta(days=1))
         start = max_lookback
 
     skip = skip_weekdays or set()
@@ -257,6 +266,9 @@ class StateStore:
         # Acts a finished day discovered but could not publish yet, by reason —
         # an EU agreement awaiting ratification. Kept so a later run retries them.
         self.pending: dict[str, str] = {}
+        # Days this run's lookback cap dropped although they never finished clean.
+        # In memory only: finalize_daily ends the run red over them, once.
+        self.dropped: tuple[date, date] | None = None
 
     def load(self) -> None:
         """Load state from disk."""
