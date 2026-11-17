@@ -504,7 +504,9 @@ class TestTheDailyCommitsWhatTheBootstrapWould:
             # Nothing else on disk survives into CI: the run has no amendment index,
             # only what it fetches itself. And today DRE re-consolidates CONS.
             shutil.rmtree(tmp_path / "data")
-            _write_lastmods(config.get_country("pt").data_dir, {self.CONS: "2010-05-05"})
+            _write_lastmods(
+                Path(config.get_country("pt").state_path).parent, {self.CONS: "2010-05-05"}
+            )
             blobs[self.CONS] = self._cons_blob(
                 {"2000-01-01": "original", "2010-05-05": "reformado", self.TODAY: "hoje"}
             )

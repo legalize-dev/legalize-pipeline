@@ -157,8 +157,12 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
 
     with DREClient.create(cc) as client:
         # ---- 1. diplomas DRE re-consolidated: one commit per new reform ----
+        # The sitemap baseline lives next to the run state, which the daily workflow
+        # caches between runs. In data_dir, which it does not, every CI run found no
+        # baseline, recorded one and claimed nothing changed: step 1 never ran there.
+        lastmod_dir = Path(cc.state_path).parent
         try:
-            changed, lastmods = reconsolidated_since_last_run(client, cc.data_dir)
+            changed, lastmods = reconsolidated_since_last_run(client, lastmod_dir)
         except DREApiError:
             logger.exception("DRE API contract broken while reading the sitemap — aborting")
             raise
@@ -256,7 +260,7 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
         # Only record the sitemap baseline once the run got this far: crashing
         # mid-run must not make us forget the diplomas we had not refreshed yet.
         if not dry_run and not errors:
-            _write_lastmods(cc.data_dir, lastmods)
+            _write_lastmods(lastmod_dir, lastmods)
 
     return finalize_daily(
         repo,
