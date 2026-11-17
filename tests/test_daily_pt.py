@@ -9,6 +9,10 @@ from __future__ import annotations
 
 import gzip
 import json
+import shutil
+import subprocess
+from datetime import date
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -312,3 +316,240 @@ class TestAmendmentPropagation:
 
         source = inspect.getsource(pt_daily.daily)
         assert "targets_named_by" in source and "refresh_amendments" in source
+
+
+class TestTheDailyCommitsWhatTheBootstrapWould:
+    """``daily()`` end to end on a real repo, with DRE faked at the client.
+
+    From 2026-08-31 every amendment the daily recorded on an as-enacted law lost
+    ``last_amendment``, and from October its ``last_updated`` too: it had its own
+    render-and-commit loop.
+    """
+
+    TODAY = "2026-11-16"
+    LAW = "pub:decreto-lei:16-1994-512030"  # as-enacted, amended once before
+    ACT = "pub:lei:67-2026-1194586764"  # published today, amends LAW and TWIN
+    CONS = "cons:lei:2000-11"  # a law DRE consolidates ...
+    TWIN = "pub:lei:1-2000-11"  # ... and its as-published twin, same identifier
+
+    @staticmethod
+    def _published(tipo: str, key: str, when: str) -> dict:
+        return {
+            "Id": key.rsplit("-", 1)[1],
+            "TipoDiploma": tipo.title(),
+            "DataPublicacao": when,
+            "Sumario": f"Sumário de {key}",
+            "LinkSitemap": f"/dr/detalhe/{tipo}/{key}",
+        }
+
+    @staticmethod
+    def _pub_blob(norm_id: str, when: str, html: str) -> dict:
+        from legalize.fetcher.pt.client import _pack
+
+        return {
+            "norm_id": norm_id,
+            "surface": "pub",
+            "versions": [{"date": when, "is_original": True, "html_b64": _pack(html)}],
+        }
+
+    @staticmethod
+    def _cons_blob(texts: dict[str, str]) -> dict:
+        from legalize.fetcher.pt.client import _pack
+
+        def version(when: str, text: str) -> dict:
+            row = {"FragmentoId": "a", "Tituo": "Artigo 1.º", "Texto": text, "TipoFragmentoId": 11}
+            return {
+                "date": when,
+                "amending": {"legis_id": when[:4]},
+                "fragments_b64": _pack([{"frag": {"Id": "row-a"}, "version": row}]),
+            }
+
+        return {
+            "norm_id": "cons:lei:2000-11",
+            "surface": "cons",
+            "diploma_frag_id": "11",
+            "versions": [version(when, text) for when, text in texts.items()],
+        }
+
+    @pytest.fixture
+    def world(self, tmp_path, monkeypatch):
+        """The repo as the bootstrap left it, and a DRE that publishes ACT today."""
+        from legalize.config import Config, CountryConfig, GitConfig
+        from legalize.fetcher.pt import analise_juridica, parser as pt_parser
+        from legalize.pipeline import commit_all_fast, generic_fetch_one
+        from legalize.storage import reset_write_tracking
+
+        twin = self._published("lei", "1-2000-11", "2000-01-01")
+        bundles = {
+            self.LAW: {
+                "surface": "pub",
+                "tipo": "decreto-lei",
+                "key": "16-1994-512030",
+                "published": self._published("decreto-lei", "16-1994-512030", "1994-01-22"),
+            },
+            self.ACT: {
+                "surface": "pub",
+                "tipo": "lei",
+                "key": "67-2026-1194586764",
+                "published": self._published("lei", "67-2026-1194586764", self.TODAY),
+            },
+            self.CONS: {"surface": "cons", "tipo": "lei", "key": "2000-11", "published": twin},
+            self.TWIN: {"surface": "pub", "tipo": "lei", "key": "1-2000-11", "published": twin},
+        }
+        blobs = {
+            self.LAW: self._pub_blob(self.LAW, "1994-01-22", "<p>Texto original.</p>"),
+            self.ACT: self._pub_blob(
+                self.ACT,
+                self.TODAY,
+                "<p>Altera o <a href='/dr/detalhe/decreto-lei/16-1994-512030'>DL 16/94</a>"
+                " e a <a href='/dr/detalhe/lei/1-2000-11'>Lei 1/2000</a>.</p>",
+            ),
+            self.CONS: self._cons_blob({"2000-01-01": "original", "2010-05-05": "reformado"}),
+            self.TWIN: self._pub_blob(self.TWIN, "2000-01-01", "<p>Texto publicado.</p>"),
+        }
+        amended_by_act = {
+            "InversasList": {
+                "List": [
+                    {
+                        "Data": self.TODAY,
+                        "Texto": "Alterado o artigo 3.º",
+                        "LinkSitemapAnaliseJuridica": (
+                            "/dr/analise-juridica/informacoes-gerais/lei/67-2026-1194586764"
+                        ),
+                    }
+                ]
+            }
+        }
+
+        class Api:
+            def get_text_body(self, url):
+                if url.endswith("sitemap/sitemap.xml"):
+                    return _INDEX
+                return _consolidated_sitemap({"lei/2000-11": "2026-11-16"})
+
+            def associations(self, ref, association_id):
+                named = ref in (
+                    "/dr/detalhe/decreto-lei/16-1994-512030",
+                    "/dr/detalhe/lei/1-2000-11",
+                )
+                return amended_by_act if named and association_id == "162" else {}
+
+        class Client:
+            """The parts of DREClient the daily and the fetch read, raw cache included."""
+
+            def __init__(self, raw: Path):
+                self._api, self.raw = Api(), raw
+
+            @classmethod
+            def create(cls, cc):
+                return cls(Path(cc.data_dir) / "raw")
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def get_metadata(self, norm_id):
+                self.raw.mkdir(parents=True, exist_ok=True)
+                name = analise_juridica.safe_name(norm_id)
+                with gzip.open(self.raw / f"{name}.meta.json.gz", "wt", encoding="utf-8") as fh:
+                    json.dump(bundles[norm_id], fh)
+                return json.dumps(bundles[norm_id]).encode()
+
+            def get_text(self, norm_id, meta_data=None):
+                return b"{}"
+
+            def get_suvestine(self, norm_id):
+                return json.dumps(blobs[norm_id]).encode()
+
+        act, today = self.ACT, self.TODAY
+
+        class Discovery:
+            @classmethod
+            def create(cls, source):
+                return cls()
+
+            def discover_daily(self, client, day):
+                return [act] if day.isoformat() == today else []
+
+        monkeypatch.setattr("legalize.fetcher.pt.client.DREClient", Client)
+        monkeypatch.setattr("legalize.fetcher.pt.discovery.DREDiscovery", Discovery)
+
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, check=True)
+        config = Config(
+            git=GitConfig(),
+            countries={
+                "pt": CountryConfig(
+                    repo_path=str(repo),
+                    data_dir=str(tmp_path / "data"),
+                    state_path=str(tmp_path / "state.json"),
+                )
+            },
+        )
+        # The bootstrap, as it built legalize-pt: as-published first, consolidated
+        # last, then one fast-import over the JSON.
+        reset_write_tracking()
+        pt_parser.set_amendments({self.LAW: [["2025-03-06", "DRE-2025-13-909816057", ""]]})
+        try:
+            for norm_id in (self.LAW, self.TWIN):
+                generic_fetch_one(config, "pt", norm_id, force=True)
+            reset_write_tracking()
+            generic_fetch_one(config, "pt", self.CONS, force=True)
+            commit_all_fast(config, "pt")
+            # Nothing else on disk survives into CI: the run has no amendment index,
+            # only what it fetches itself. And today DRE re-consolidates CONS.
+            shutil.rmtree(tmp_path / "data")
+            _write_lastmods(config.get_country("pt").data_dir, {self.CONS: "2010-05-05"})
+            blobs[self.CONS] = self._cons_blob(
+                {"2000-01-01": "original", "2010-05-05": "reformado", self.TODAY: "hoje"}
+            )
+            reset_write_tracking()
+            yield config, repo
+        finally:
+            pt_parser.set_amendments({})
+            reset_write_tracking()
+
+    @staticmethod
+    def _head(repo: Path, path: str) -> str:
+        return subprocess.run(
+            ["git", "-C", str(repo), "show", f"HEAD:{path}"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+
+    def _run_daily(self, config):
+        from legalize.fetcher.pt.daily import daily
+
+        return daily(config, target_date=date.fromisoformat(self.TODAY))
+
+    def test_an_amendment_names_its_act_and_dates_the_file(self, world):
+        """Spec §Text state: as_enacted ``last_updated`` is the most recent
+        amendment recorded, and ``last_amendment`` names it."""
+        config, repo = world
+        self._run_daily(config)
+
+        law = self._head(repo, "pt/1994/DRE-1994-16-512030.md")
+        assert 'last_amendment: "DRE-2026-67-1194586764"' in law
+        assert f'last_updated: "{self.TODAY}"' in law
+        assert 'text_state: "as_enacted"' in law
+        assert "Texto original." in law  # the body is still the act as enacted
+
+    def test_the_amendment_is_what_the_bootstrap_commits(self, world, tmp_path):
+        """Byte for byte: the same JSON through the bootstrap path, on an empty repo."""
+        from legalize.pipeline import commit_all_fast
+
+        config, repo = world
+        self._run_daily(config)
+
+        fresh = tmp_path / "fresh"
+        fresh.mkdir()
+        subprocess.run(["git", "init", "-q", "-b", "main"], cwd=fresh, check=True)
+        config.get_country("pt").repo_path = str(fresh)
+        commit_all_fast(config, "pt", norm_ids={"DRE-1994-16-512030"})
+
+        path = "pt/1994/DRE-1994-16-512030.md"
+        assert self._head(repo, path) == self._head(fresh, path)
