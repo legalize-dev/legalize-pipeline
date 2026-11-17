@@ -29,10 +29,15 @@ class RISClient(HttpClient):
     @classmethod
     def create(cls, country_config):
         """Create RISClient from CountryConfig."""
-        return cls()
+        source = country_config.source or {}
+        return cls(requests_per_second=float(source.get("requests_per_second", 4.0)))
 
-    def __init__(self) -> None:
-        super().__init__(requests_per_second=25.0)
+    def __init__(self, requests_per_second: float = 4.0) -> None:
+        # www.ris.bka.gv.at sits behind a bot check (Myra) that answers bursts with a
+        # 503 "checking your browser" page and then keeps refusing the address for
+        # hours. 25 req/s tripped it from GitHub runners on every run from late
+        # October 2026, and 20 req/s from a residential address; 4-8 req/s did not.
+        super().__init__(requests_per_second=requests_per_second)
 
     def get_text(self, gesetzesnummer: str, meta_data: bytes | None = None) -> bytes:
         """Fetch all NOR XMLs for a Gesetzesnummer and combine them.

@@ -71,7 +71,9 @@ countries:
     repo_path: "../countries/at"
     data_dir: "../countries/data-at"
     max_workers: 8
-    source: {}  # RIS OGD API, no config needed
+    source:
+      # Shared by all workers. See RISClient: faster trips RIS's bot check.
+      requests_per_second: 4.0
 
   de:
     repo_path: "../countries/de"
