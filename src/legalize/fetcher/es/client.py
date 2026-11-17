@@ -139,8 +139,17 @@ class BOEClient(HttpClient):
         path = f"/api/legislacion-consolidada/id/{id_boe}/metadatos"
         return self._fetch(self._build_url(path))
 
-    def get_disposition_xml(self, id_boe: str, *, eli_url: str | None = None) -> bytes:
-        """Fetch the full diary entry through its canonical ELI XML resource."""
+    def get_disposition_xml(
+        self, id_boe: str, *, eli_url: str | None = None, html_fallback: bool = True
+    ) -> bytes:
+        """Fetch the full diary entry through its canonical ELI XML resource.
+
+        Without an ELI, the default rebuilds a Sección I original from its HTML page.
+        ``html_fallback=False`` takes the ``xml.php`` document the page links instead:
+        a consolidated norm needs only the diary's metadata and analysis, and it can be
+        a regional-gazette act (``DOGC-f``, ``DOCM-q``...) or a Sección III one, which
+        have no ELI and are not Sección I originals.
+        """
         if not eli_url or not eli_url.startswith("https://www.boe.es/eli/"):
             page = html.fromstring(
                 self._fetch(f"https://www.boe.es/buscar/doc.php?id={id_boe}").decode("utf-8")
@@ -149,6 +158,11 @@ class BOEClient(HttpClient):
             eli_url = next(
                 (url for url in links if url.startswith("https://www.boe.es/eli/")), None
             )
+        if not eli_url and not html_fallback:
+            xml_url = next((url for url in links if url.endswith(f"/xml.php?id={id_boe}")), None)
+            if not xml_url:
+                raise ValueError(f"{id_boe}: source page has neither ELI nor XML resource")
+            return self._fetch(xml_url)
         if not eli_url:
             from legalize.fetcher.es.diary import ExcludedDiary, diary_xml_from_html
 
