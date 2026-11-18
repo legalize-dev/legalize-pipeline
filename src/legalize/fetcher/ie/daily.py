@@ -85,6 +85,16 @@ class Sources:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(asdict(self), sort_keys=True) + "\n", encoding="utf-8")
 
+    def retry_rebuild(self) -> None:
+        """Queue again the norms held for a rebuild, first.
+
+        A norm stays held while its history cannot be appended to. Once a fix removes
+        what held it (engine #205: a reworded directory annotation), it is retried:
+        one that still cannot be appended goes straight back to ``rebuild``.
+        """
+        self.pending = [*self.rebuild, *(n for n in self.pending if n not in self.rebuild)]
+        self.rebuild = {}
+
 
 def content_digest(page: bytes) -> str:
     """A directory page without the "Updated to" banner that every update rewrites."""
@@ -399,6 +409,11 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
         # digests, queue and rebuild list describe a corpus that no longer exists.
         console.print("[yellow]The corpus was rebuilt; starting from its baseline.[/yellow]")
         sources = Sources.baseline()
+    if str((cc.source or {}).get("retry_rebuild", "")).lower() == "true" and sources.rebuild:
+        console.print(
+            f"[yellow]Retrying {len(sources.rebuild)} law(s) held for a rebuild.[/yellow]"
+        )
+        sources.retry_rebuild()
     created, errors, discovered = 0, [], None
     with refresh_sources():
         try:

@@ -12,7 +12,12 @@ on:
   schedule:
     # Mon-Sat at 10:30 UTC, after the matrix
     - cron: "30 10 * * 1-6"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      retry_rebuild:
+        description: "Queue again the laws held for a local rebuild (after a fix to what held them)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -66,8 +71,10 @@ jobs:
       - name: Run daily pipeline
         env:
           PYTHONUNBUFFERED: "1"
+          RETRY_REBUILD: ${{ inputs.retry_rebuild || false }}
         run: |
           legalize -o countries.ie.source.daily_minutes=240 \
+            -o countries.ie.source.retry_rebuild="$RETRY_REBUILD" \
             daily -c ie --repo-path repos/ie
 
       # Saved even when the run ends red: a law that cannot be appended to is
