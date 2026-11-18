@@ -49,8 +49,13 @@ available hash in `source-version-exclusions.json`, and is repeated in the law's
 The ordinary bootstrap/daily client cannot reuse an excluded draft's cache as
 a complete chain. Once published, the daily reads a law's
 `source_version_gaps` back from its file, leaves those versions out and keeps
-the list; it records no new gap itself, so an unreadable version it meets later
-fails until a reprocess reviews it.
+the list. A PDF version it meets later that fails the same extraction guards,
+for a reason this rebuild reviewed (`REVIEWED_GAP_REASONS` in
+`fetcher/eu/daily.py`), joins the list with its reason and SHA-256; any other
+reason still fails the act until it is reviewed. A download failure is never a
+gap, and a recorded entry without a SHA-256 is checked again. The list reaches
+the file with the law's next version; a day that brings the law no version
+commits nothing, so showing it sooner takes a per-law reprocess.
 
 ```sh
 engine-eu-reprocess/.venv/bin/python engine-eu-reprocess/scripts/prepare_eu_reprocess.py countries/data-eu-reprocess --accept-version-gaps
