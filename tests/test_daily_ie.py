@@ -770,3 +770,13 @@ def test_a_rebuilt_corpus_discards_the_state_of_the_history_it_replaced(
     ie_daily.daily(daily_config)
     saved = ie_daily.Sources.load(_sources_path(daily_config))
     assert saved.rebuild == {} and saved.tip == new
+
+
+def test_retry_rebuild_queues_the_held_norms_first():
+    sources = ie_daily.Sources(
+        pending=["IE-2024-act-1", "IE-1937-act-38"],
+        rebuild={"IE-1937-act-38": "annotation reworded", "IE-1954-act-18": "same"},
+    )
+    sources.retry_rebuild()
+    assert sources.pending == ["IE-1937-act-38", "IE-1954-act-18", "IE-2024-act-1"]
+    assert sources.rebuild == {}
