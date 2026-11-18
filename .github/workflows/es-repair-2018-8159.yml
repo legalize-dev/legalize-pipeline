@@ -71,7 +71,9 @@ jobs:
           echo "== per-file order: author dates oldest first"
           git log --reverse --format=%aI -- "$LAW_PATH" | sort -c
           echo "== the inserted reform is there"
-          git log --format=%B -- "$LAW_PATH" | grep -q '^Source-Id: BOE-A-2023-9098$'
+          # Read it whole first: grep -q stops early and pipefail turns that SIGPIPE into a failure.
+          bodies=$(git log --format=%B -- "$LAW_PATH")
+          grep -x 'Source-Id: BOE-A-2023-9098' <<< "$bodies"
           echo "== identity"
           git log --format='%an <%ae> | %cn <%ce>' "$OLD..$NEW" 2>/dev/null | sort | uniq -c || true
           git log --format='%an <%ae> | %cn <%ce>' -- "$LAW_PATH" | sort | uniq -c
