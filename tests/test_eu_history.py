@@ -296,7 +296,11 @@ def test_daily_real_source_ids_idempotence_and_retry(tmp_path, monkeypatch):
     monkeypatch.setattr(client, "_merge_list_facts", lambda *_: None)
     monkeypatch.setattr(client, "get_text", lambda *_, **__: raw)
     monkeypatch.setattr(client, "get_consolidated_versions", lambda _: [])
-    discovery = SimpleNamespace(discover_daily=lambda *_: [celex])
+    discovery = SimpleNamespace(
+        discover_daily=lambda *_: [celex],
+        discover_published=lambda *_: {},
+        discover_consolidations_created=lambda *_: [],
+    )
     monkeypatch.setattr(EURLexDiscovery, "create", lambda _: discovery)
     state_path = tmp_path / "state.json"
     repo = tmp_path / "repo"
@@ -353,7 +357,13 @@ def test_daily_publishes_completed_day_before_interruption(tmp_path, monkeypatch
         return ["32016R0679"]
 
     monkeypatch.setattr(
-        daily_module.EURLexDiscovery, "create", lambda _: SimpleNamespace(discover_daily=discover)
+        daily_module.EURLexDiscovery,
+        "create",
+        lambda _: SimpleNamespace(
+            discover_daily=discover,
+            discover_published=lambda *_: {},
+            discover_consolidations_created=lambda *_: [],
+        ),
     )
     monkeypatch.setattr(daily_module, "resolve_dates_to_process", lambda *_: days)
     repo = Mock(refused=[], read=lambda _: PUBLISHED)
@@ -417,7 +427,11 @@ def test_daily_fetches_concurrently_and_commits_in_discovery_order(tmp_path, mon
     monkeypatch.setattr(
         daily_module.EURLexDiscovery,
         "create",
-        lambda _: SimpleNamespace(discover_daily=lambda *_: ids),
+        lambda _: SimpleNamespace(
+            discover_daily=lambda *_: ids,
+            discover_published=lambda *_: {},
+            discover_consolidations_created=lambda *_: [],
+        ),
     )
     monkeypatch.setattr(
         daily_module, "GitRepo", lambda *_: Mock(refused=[], read=lambda _: PUBLISHED)
@@ -467,7 +481,11 @@ def _eu_daily(tmp_path, monkeypatch, ids, metadata, published=lambda _: "", **cl
     monkeypatch.setattr(
         daily_module.EURLexDiscovery,
         "create",
-        lambda _: SimpleNamespace(discover_daily=lambda *_: list(ids)),
+        lambda _: SimpleNamespace(
+            discover_daily=lambda *_: list(ids),
+            discover_published=lambda *_: {},
+            discover_consolidations_created=lambda *_: [],
+        ),
     )
     monkeypatch.setattr(daily_module, "GitRepo", lambda *_: Mock(refused=[], read=published))
     monkeypatch.setattr(daily_module, "save_structured_json", lambda _, norm: saved.append(norm))
@@ -558,7 +576,11 @@ def test_daily_holds_an_agreement_until_eurlex_states_it_in_force(tmp_path, monk
     monkeypatch.setattr(
         daily_module.EURLexDiscovery,
         "create",
-        lambda _: __import__("types").SimpleNamespace(discover_daily=lambda *_: []),
+        lambda _: __import__("types").SimpleNamespace(
+            discover_daily=lambda *_: [],
+            discover_published=lambda *_: {},
+            discover_consolidations_created=lambda *_: [],
+        ),
     )
     monkeypatch.setattr(
         EURLexClient,
@@ -744,6 +766,62 @@ def test_daily_still_fails_on_a_kind_of_gap_nobody_reviewed(tmp_path, monkeypatc
     with pytest.raises(NothingPublished, match="mathematical glyphs"):
         daily_module.daily(config, date(2026, 11, 1))
     assert saved == []
+
+
+def test_daily_fetches_what_cellar_indexed_after_its_day_was_done(tmp_path, monkeypatch):
+    """The run read 17 Nov before CELLAR had its acts; a consolidation dated 9 Oct came on 6 Nov."""
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+
+    from legalize.fetcher.eu import daily as daily_module
+
+    late, held = "32026R2565", "32026R2527"
+    stale, current = "32020D0472", "32016R0679"
+    metadata = {
+        celex: _act(celex, day)
+        for celex, day in [
+            ("32026R2600", "2026-11-18"),
+            (late, "2026-11-17"),
+            (stale, "2020-03-31"),
+        ]
+    }
+    spans = []
+
+    def published(_, first, last):
+        spans.append((first, last))
+        # One the corpus lacks, one it already holds.
+        return {late: date(2026, 11, 17), held: date(2026, 11, 17)}
+
+    def created(_, since):
+        spans.append(since)
+        return [
+            (stale, "02020D0472-20261009", date(2026, 10, 9)),  # not in its history
+            (current, "02016R0679-20261001", date(2026, 10, 1)),  # already committed
+            (current, "02016R0679-20270101", date(2027, 1, 1)),  # its day is still ahead
+        ]
+
+    config, saved = _eu_daily(tmp_path, monkeypatch, ["32026R2600"], metadata, get_text=_envelope)
+    monkeypatch.setattr(
+        daily_module.EURLexDiscovery,
+        "create",
+        lambda _: SimpleNamespace(
+            discover_daily=lambda *_: ["32026R2600"],
+            discover_published=published,
+            discover_consolidations_created=created,
+        ),
+    )
+    corpus = {held, stale, current}
+    repo = Mock(
+        refused=[],
+        read=lambda path: PUBLISHED if path.endswith(f"{stale}.md") else "",
+        has_file=lambda path: any(path.endswith(f"{celex}.md") for celex in corpus),
+        has_commit_with_source_id=lambda source, norm: source == "02016R0679-20261001",
+    )
+    monkeypatch.setattr(daily_module, "GitRepo", lambda *_: repo)
+    assert daily_module.daily(config, date(2026, 11, 18)) == 3
+    # The late act as new on its own day; the act with a late consolidation refreshed.
+    assert [norm.metadata.identifier for norm in saved] == ["32026R2600", late, stale]
+    assert spans == [(date(2026, 11, 8), date(2026, 11, 17)), date(2026, 11, 8)]
 
 
 def test_pdf_download_asks_cellar_for_the_item_when_doc_1_is_absent(monkeypatch):
