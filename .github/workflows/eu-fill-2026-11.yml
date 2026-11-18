@@ -1,0 +1,70 @@
+# Temporary, removed with its branch: publishes the EU acts and consolidations the
+# corpus missed (see .github/eu-fill/fill.py) onto legalize-eu's fill-2026-11 branch.
+# main is fast-forwarded by hand after review.
+name: Fill eu 2026-11
+
+on:
+  push:
+    branches: [ci/eu-fill-2026-11]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eu-fill
+  cancel-in-progress: false
+
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          repository: legalize-dev/legalize-eu
+          path: repos/eu
+          persist-credentials: false
+          fetch-depth: 0
+          filter: tree:0
+          sparse-checkout: .github
+          sparse-checkout-cone-mode: true
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e .
+
+      - name: Fill
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          echo "BASE=$(git -C repos/eu rev-parse HEAD)" >> "$GITHUB_ENV"
+          python .github/eu-fill/fill.py "$PWD/repos/eu" "$PWD/data-eu"
+
+      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        id: app-token
+        if: always()
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-eu
+
+      - name: Stage on fill-2026-11
+        if: always()
+        working-directory: repos/eu
+        env:
+          PUSH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          echo "base $BASE, head $(git rev-parse HEAD), new commits $(git rev-list --count "$BASE..HEAD")"
+          echo "files touched: $(git diff --name-only "$BASE" HEAD | wc -l), of them new: $(git diff --name-only --diff-filter=A "$BASE" HEAD | wc -l)"
+          git diff --name-only --diff-filter=M "$BASE" HEAD
+          git log --format='%an <%ae>' "$BASE..HEAD" | sort | uniq -c
+          if [ -n "$(git rev-list "$BASE..HEAD")" ]; then
+            git push -q "https://x-access-token:${PUSH_TOKEN}@github.com/legalize-dev/legalize-eu.git" HEAD:refs/heads/fill-2026-11
+            echo "staged $(git rev-parse HEAD)"
+          fi
