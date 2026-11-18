@@ -134,6 +134,67 @@ LIMIT {_PAGE_SIZE}"""
 
         logger.info("Discovery complete: %d total regulations found", total_yielded)
 
+    def discover_published(
+        self, client: LegislativeClient, first: date, last: date
+    ) -> dict[str, date]:
+        """Acts in scope published between two dates, inclusive, by first publication.
+
+        The same pattern as ``discover_daily``'s new acts, over a span: CELLAR
+        indexes a day's journal over hours, so what one day's query misses
+        another run can still find.
+        """
+        if not isinstance(client, EURLexClient):
+            raise TypeError(f"Expected EURLexClient, got {type(client).__name__}")
+        query = f"""PREFIX cdm: <{_CDM}>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?celex ?publicationDate WHERE {{
+{_ACT_PATTERN.format(types=client._rtype_uris())}
+  FILTER(?publicationDate >= "{first.isoformat()}"^^xsd:date)
+  FILTER(?publicationDate <= "{last.isoformat()}"^^xsd:date)
+}}"""
+        published: dict[str, date] = {}
+        for binding in client.sparql_query(query).get("results", {}).get("bindings", []):
+            celex = binding["celex"]["value"]
+            day = date.fromisoformat(binding["publicationDate"]["value"])
+            # A later journal correction is not the act's publication.
+            published[celex] = min(day, published.get(celex, day))
+        return published
+
+    def discover_consolidations_created(
+        self, client: LegislativeClient, since: date
+    ) -> list[tuple[str, str, date]]:
+        """``(base act, consolidation, its date)`` for consolidations CELLAR created since a day.
+
+        A consolidation is dated by when its text applies and is often created
+        weeks later, after ``discover_daily`` has read that date; CELLAR's own
+        creation time is what says it is new.
+        """
+        if not isinstance(client, EURLexClient):
+            raise TypeError(f"Expected EURLexClient, got {type(client).__name__}")
+        query = f"""PREFIX cdm: <{_CDM}>
+PREFIX cmr: <http://publications.europa.eu/ontology/cdm/cmr#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?baseCelex ?consCelex ?consDate WHERE {{
+  ?cons cdm:work_has_resource-type <{_RTYPE_BASE}CONS_TEXT> .
+  ?cons cmr:creationDate ?created .
+  FILTER(?created >= "{since.isoformat()}T00:00:00"^^xsd:dateTime)
+  ?cons cdm:work_date_document ?consDate .
+  ?cons cdm:resource_legal_id_celex ?consCelex .
+  ?cons cdm:act_consolidated_based_on_resource_legal ?baseWork .
+  ?baseWork cdm:work_has_resource-type ?rtype .
+  {self._build_rtype_filter()}
+  ?baseWork cdm:resource_legal_in-force ?force .
+  ?baseWork cdm:resource_legal_id_celex ?baseCelex .
+}}"""
+        return [
+            (
+                binding["baseCelex"]["value"],
+                binding["consCelex"]["value"],
+                date.fromisoformat(binding["consDate"]["value"]),
+            )
+            for binding in client.sparql_query(query).get("results", {}).get("bindings", [])
+        ]
+
     def discover_daily(
         self, client: LegislativeClient, target_date: date, **kwargs
     ) -> Iterator[str]:

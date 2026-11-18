@@ -7,7 +7,7 @@ import logging
 import json
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from legalize.committer.git_ops import GitRepo
@@ -20,17 +20,21 @@ from legalize.fetcher.eu.parser_pdf import UnsupportedPDF, parse_pdf
 from legalize.layout import layout_for, path_from_frontmatter
 from legalize.models import ParsedNorm
 from legalize.pipeline import commit_one, finalize_daily
-from legalize.state.store import StateStore, resolve_dates_to_process
+from legalize.state.store import MAX_LOOKBACK_DAYS, StateStore, resolve_dates_to_process
 from legalize.storage import save_structured_json
 
 logger = logging.getLogger(__name__)
 
 
-def _published_file(repo: GitRepo, celex: str) -> str:
-    """The act's file at HEAD, or "" when the corpus does not hold it."""
+def _law_path(celex: str) -> str:
     # Same identifier rule as EURLexMetadataParser.parse: "/" becomes "-".
     front = {"identifier": celex.replace("/", "-"), "country": "eu"}
-    return repo.read(path_from_frontmatter(front, layout_for("eu")))
+    return path_from_frontmatter(front, layout_for("eu"))
+
+
+def _published_file(repo: GitRepo, celex: str) -> str:
+    """The act's file at HEAD, or "" when the corpus does not hold it."""
+    return repo.read(_law_path(celex))
 
 
 # The kinds of unreadable source the 2026-10-07 rebuild reviewed and recorded as
@@ -164,11 +168,34 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                 for v in facts.get(celex, {}).get("resource_legal_in-force", [])
             )
         ]
+        # CELLAR indexes after the fact, and a run that reads day D on D finishes D
+        # with whatever was there: no act published on 14 Oct 2026 was ever fetched.
+        # An act published within the lookback that the corpus still lacks is fetched
+        # now, on its own publication day.
+        since = dates[-1] - timedelta(days=MAX_LOOKBACK_DAYS)
+        late = {
+            celex: day
+            for celex, day in discovery.discover_published(
+                client, since, dates[0] - timedelta(days=1)
+            ).items()
+            if celex not in state.pending and not repo.has_file(_law_path(celex))
+        }
+        # A consolidation lands weeks after the date it carries (02020D0472-20261009
+        # on 6 Nov), so its day is long done. A published act gets one created since
+        # the lookback began and missing from its history refreshed now.
+        late |= {
+            base: dates[0]
+            for base, consolidation, day in discovery.discover_consolidations_created(client, since)
+            if day < dates[0]
+            and repo.has_file(_law_path(base))
+            and not repo.has_commit_with_source_id(consolidation, base.replace("/", "-"))
+        }
         for current_date in dates:
             errors_before = len(errors)
             try:
                 ids = list(discovery.discover_daily(client, current_date))
                 ids += [celex for celex in due if celex not in ids]
+                ids += [celex for celex in late if celex not in ids]
                 due = []
                 if dry_run:
                     for norm_id in ids:
@@ -176,8 +203,10 @@ def daily(config: Config, target_date: date | None = None, dry_run: bool = False
                     continue
                 with ThreadPoolExecutor(max_workers=cc.max_workers or 1) as pool:
                     futures = [
-                        (norm_id, pool.submit(fetch, norm_id, current_date)) for norm_id in ids
+                        (norm_id, pool.submit(fetch, norm_id, late.get(norm_id, current_date)))
+                        for norm_id in ids
                     ]
+                    late = {}
                     # Git writes stay serial and follow discovery order.
                     for norm_id, future in futures:
                         try:
