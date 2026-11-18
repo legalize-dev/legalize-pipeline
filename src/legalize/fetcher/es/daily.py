@@ -18,7 +18,7 @@ from rich.console import Console
 from legalize.committer.git_ops import GitRepo
 from legalize.committer.message import build_commit_info
 from legalize.config import Config
-from legalize.models import CommitType, ParsedNorm, TextState
+from legalize.models import CommitType, NormStatus, ParsedNorm, Reform, TextState
 from legalize.pipeline import SKIP_WEEKDAYS, _with_last_amendment, finalize_daily
 from legalize.state.store import StateStore, resolve_dates_to_process
 from legalize.transformer.markdown import render_norm_at_date
@@ -114,7 +114,88 @@ def _commit_norm(repo: GitRepo, norm: ParsedNorm, current_date: date) -> int:
             existing = True
             stages.add(key)
             console.print(f"    [green]✓[/green] {info.subject}")
+    if not commits and head_date <= current_date:
+        commits += _commit_repeal_in_effect(repo, norm, path, previous, applicable, blocks)
     return commits
+
+
+# One entry of `references_subsequent`, as metadata._reference writes it:
+# "SE DEROGA [210] BOE-A-2026-21081: , por Resolución…". 210 is SE DEROGA and
+# 230 SE DEJA SIN EFECTO, the two relations the BOE files a whole repeal under.
+_REPEALING_REFERENCE = re.compile(r"\[(?:210|230)\] (\S+?): ")
+
+
+def _repealing_act(metadata) -> str | None:
+    """The newest act the BOE's own analysis says repeals this one.
+
+    Ordered by the id's (year, sequence), as metadata.last_amendment_of does:
+    the BOE's order is unreliable. Partial repeals use the same codes, and in
+    every stale law measured (legalize-es#9) they predate the total one.
+    """
+    # ponytail: sequences of two gazettes in the same year do not compare; it
+    # needs a law repealed in part and in whole by different journals that year.
+    refs = dict(metadata.extra).get("references_subsequent", "")
+    return max(
+        _REPEALING_REFERENCE.findall(refs),
+        key=lambda act: tuple(int(n) for n in re.findall(r"\d+", act)[-2:]),
+        default=None,
+    )
+
+
+def _commit_repeal_in_effect(
+    repo: GitRepo,
+    norm: ParsedNorm,
+    path: str,
+    previous: str,
+    applicable: list[Reform],
+    blocks: tuple,
+) -> int:
+    """Commit a repeal on the day the source says it takes effect.
+
+    A repeal announced with a later effective date publishes its act while the
+    BOE still says ``estatus_derogacion: N``. On the effective date the BOE flips
+    it to ``S`` and lists the law as updated again, but there is no new version,
+    so nothing above commits and the law stayed ``in_force`` (legalize-es#9).
+
+    The commit is that act taking effect: its Source-Id, its publication date
+    when the text carries a version of it, and the source's ``fecha_derogacion``
+    as Effective-Date. An act with no version — an autonomous law the BOE has
+    not republished yet — has no publication date here, so per SPEC §Dates the
+    commit goes without Source-Date rather than with a guessed one.
+    """
+    metadata = norm.metadata
+    head = re.search(r'^status: "([^"]*)"$', previous, re.M)
+    repeal_date = dict(metadata.extra).get("repeal_date")
+    if (
+        metadata.status is not NormStatus.REPEALED
+        or head is None
+        or head[1] == metadata.status.value
+        or not repeal_date
+    ):
+        return 0
+    act = _repealing_act(metadata)
+    if act is None:
+        logger.warning("%s: repealed, but the source names no repealing act", metadata.identifier)
+        return 0
+    effective = date.fromisoformat(repeal_date)
+    reform = next(
+        (r for r in reversed(applicable) if r.norm_id == act),
+        Reform(effective, act, (), has_source_date=False),
+    )
+    reform = replace(reform, effective_date=effective)
+    markdown = render_norm_at_date(
+        _with_last_amendment(metadata, reform),
+        blocks,
+        reform.date,
+        source_id=act,
+        effective_date=effective,
+    )
+    repo.write_and_add(path, markdown)
+    info = build_commit_info(CommitType.REPEAL, metadata, reform, blocks, path, markdown)
+    if not repo.commit(info):
+        return 0
+    console.print(f"    [green]✓[/green] {info.subject}")
+    return 1
 
 
 def _commit_reforms(

@@ -134,10 +134,10 @@ class BOEClient(HttpClient):
         path = f"/api/legislacion-consolidada?limit={limit}&offset={offset}"
         return self._fetch(self._build_url(path))
 
-    def get_metadata(self, id_boe: str) -> bytes:
+    def get_metadata(self, id_boe: str, bypass_cache: bool = False) -> bytes:
         """Fetches metadata for a norm: /api/legislacion-consolidada/id/{id}/metadatos."""
         path = f"/api/legislacion-consolidada/id/{id_boe}/metadatos"
-        return self._fetch(self._build_url(path))
+        return self._fetch(self._build_url(path), bypass_cache=bypass_cache)
 
     def get_disposition_xml(
         self, id_boe: str, *, eli_url: str | None = None, html_fallback: bool = True

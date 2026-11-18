@@ -26,7 +26,7 @@ def fetch_norm(client, boe_id: str, *, force: bool = False) -> ParsedNorm:
     from legalize.fetcher.es.diary import fetch_diary
 
     try:
-        metadata = fetch_metadata(client, boe_id)
+        metadata = fetch_metadata(client, boe_id, force=force)
         text_xml = client.get_consolidated_text(boe_id, bypass_cache=force)
     except requests.HTTPError as exc:
         if exc.response is None or exc.response.status_code != 404:
@@ -38,11 +38,15 @@ def fetch_norm(client, boe_id: str, *, force: bool = False) -> ParsedNorm:
     return ParsedNorm(metadata, tuple(blocks), tuple(extract_reforms(blocks)))
 
 
-def fetch_metadata(client, boe_id: str) -> NormMetadata:
-    """Fetch both BOE metadata surfaces, retrying incomplete transient responses."""
+def fetch_metadata(client, boe_id: str, *, force: bool = False) -> NormMetadata:
+    """Fetch both BOE metadata surfaces, retrying incomplete transient responses.
+
+    ``force`` re-reads the status flags too: the BOE flips them on the day a
+    repeal takes effect, and a cached copy would keep the old status.
+    """
     from legalize.fetcher.es.metadata import parse_metadata
 
-    meta_xml = client.get_metadata(boe_id)
+    meta_xml = client.get_metadata(boe_id, bypass_cache=force)
     metadata = parse_metadata(meta_xml, boe_id)
     try:
         diario_xml = client.get_disposition_xml(
