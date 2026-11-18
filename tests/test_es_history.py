@@ -235,3 +235,71 @@ def test_delayed_stage_retains_intervening_effective_reforms():
     )
     assert "Deferred stage" in content
     assert "Already effective" in content
+
+
+@pytest.mark.parametrize("act", ["BOE-A-2026-13031", "DOGC-f-2026-90247"])
+def test_repeal_taking_effect_later_is_committed_when_the_source_flips_status(tmp_path, act):
+    """legalize-es#9: the repealing act lands before its effective date, while the
+    BOE still says in force; the flip arrives later with no new version. A DOGC
+    act is one the consolidated text carries no version of."""
+    from legalize.committer.git_ops import GitRepo
+    from legalize.fetcher.es.daily import _commit_norm
+    from legalize.models import CommitType, NormStatus
+
+    norm = parsed("sample-constitution")
+    original = Version(
+        norm.metadata.identifier,
+        date(2020, 1, 1),
+        date(2020, 1, 2),
+        (Paragraph("parrafo", "Body"),),
+    )
+    partial = Version(
+        "BOE-A-2017-7353", date(2017, 3, 30), date(2017, 3, 31), (Paragraph("parrafo", "Art. 8"),)
+    )
+    announced = Version(
+        "BOE-A-2026-13031",
+        date(2026, 6, 16),
+        date(2026, 6, 17),
+        (Paragraph("parrafo", "Norma derogada, con efectos de 2 de noviembre"),),
+    )
+    versions = (original, partial) + ((announced,) if act.startswith("BOE") else ())
+    blocks = (Block("a1", "precepto", "Article 1", versions),)
+    refs = (
+        f"SE DEROGA [210] {act}: , con los efectos indicados, por Ley 1/2026 | "
+        "SE DEROGA [210] BOE-A-2017-7353: el art. 8.1, por Ley 5/2017"
+    )
+    in_force = replace(
+        norm,
+        metadata=replace(
+            norm.metadata,
+            status=NormStatus.IN_FORCE,
+            extra=(("repeal_date", "2026-11-02"), ("references_subsequent", refs)),
+        ),
+        blocks=blocks,
+        reforms=tuple(extract_reforms(blocks)),
+    )
+    repo = GitRepo(tmp_path / "repo", "Legalize", "legalize@legalize.dev")
+    repo.init()
+    published = _commit_norm(repo, in_force, date(2026, 6, 16))
+    # Listed again while nothing changed: no commit.
+    assert _commit_norm(repo, in_force, date(2026, 10, 1)) == 0
+
+    repealed = replace(in_force, metadata=replace(in_force.metadata, status=NormStatus.REPEALED))
+    assert _commit_norm(repo, repealed, date(2026, 11, 2)) == 1
+    assert _commit_norm(repo, repealed, date(2026, 11, 3)) == 0
+
+    law = next((tmp_path / "repo" / "es").rglob("*.md")).relative_to(tmp_path / "repo")
+    message = repo._run(["log", "-1", "--format=%B"])
+    content = repo._run(["show", f"HEAD:{law}"])
+    before = repo._run(["show", f"HEAD~1:{law}"])
+    assert published == len(versions)
+    assert message.startswith(f"[{CommitType.REPEAL.value}]")
+    assert f"Source-Id: {act}" in message
+    assert "Effective-Date: 2026-11-02" in message
+    if act.startswith("BOE"):
+        assert "Source-Date: 2026-06-16" in message
+    else:
+        # No version, so no publication date: no Source-Date rather than a guess.
+        assert "Source-Date:" not in message
+    assert 'status: "repealed"' in content and 'status: "in_force"' in before
+    assert content.split("\n---", 1)[1] == before.split("\n---", 1)[1]
