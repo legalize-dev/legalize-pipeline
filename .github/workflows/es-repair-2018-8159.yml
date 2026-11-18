@@ -1,0 +1,112 @@
+# Temporary, removed with its branch: rebuilds BOE-A-2018-8159's history in legalize-es.
+# On 2026-11-12 the BOE inserted Ley 4/2023 (BOE-A-2023-9098) into the middle of this
+# law's consolidated history, so its published commits no longer match the source and
+# the daily rightly refuses to append. The law's commits are removed and reprocessed;
+# the result goes to the repair-2026-11 branch. main is swapped by hand after review.
+name: Repair es BOE-A-2018-8159
+
+on:
+  push:
+    branches: [ci/es-repair-2018-8159]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: es-repair
+  cancel-in-progress: false
+
+env:
+  LAW: BOE-A-2018-8159
+  LAW_PATH: es-ex/a1/BOE-A-2018-8159.md
+  REPO: /home/runner/es
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e . git-filter-repo
+
+      - name: Clone legalize-es
+        run: |
+          # The mirror keeps the old history: filter-repo prunes what it replaces, and the
+          # validation and the chunked push both need the old main next to the new one.
+          git clone -q --mirror https://github.com/legalize-dev/legalize-es.git /home/runner/es-old.git
+          git clone -q --shared /home/runner/es-old.git "$REPO"
+          echo "OLD=$(git -C "$REPO" rev-parse HEAD)" >> "$GITHUB_ENV"
+          git -C "$REPO" log --format='%aI %h %s' -- "$LAW_PATH" | cut -c1-120
+
+      - name: Remove the law's history
+        run: |
+          git -C "$REPO" filter-repo --force --prune-empty never \
+            --invert-paths --path "$LAW_PATH" \
+            --commit-callback "if re.search(rb'^Norm-Id: $LAW\$', commit.message, re.M): commit.skip(commit.first_parent())"
+          test ! -e "$REPO/$LAW_PATH"
+          test -z "$(git -C "$REPO" log --format=%h --grep="^Norm-Id: $LAW\$")"
+
+      - name: Reprocess the law from the BOE
+        run: |
+          legalize -o countries.es.repo_path="$REPO" -o countries.es.data_dir=/home/runner/data-es \
+            reprocess -c es --reason "BOE inserted BOE-A-2023-9098 into the consolidated history (2026-11-12)" "$LAW"
+          echo "NEW=$(git -C "$REPO" rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Validate
+        run: |
+          set -euo pipefail
+          cd "$REPO"
+          echo "== new history of $LAW (oldest first)"
+          git log --reverse --format='%aI %h %s | %(trailers:key=Source-Id,valueonly,separator=)' -- "$LAW_PATH" | cut -c1-160
+          echo "== files changed between old and new main (must be only the law)"
+          changed=$(git diff --name-only "$OLD" "$NEW")
+          echo "$changed"
+          [ "$changed" = "$LAW_PATH" ]
+          echo "== per-file order: author dates oldest first"
+          git log --reverse --format=%aI -- "$LAW_PATH" | sort -c
+          echo "== the inserted reform is there"
+          git log --format=%B -- "$LAW_PATH" | grep -q '^Source-Id: BOE-A-2023-9098$'
+          echo "== identity"
+          git log --format='%an <%ae> | %cn <%ce>' "$OLD..$NEW" 2>/dev/null | sort | uniq -c || true
+          git log --format='%an <%ae> | %cn <%ce>' -- "$LAW_PATH" | sort | uniq -c
+          echo "== commits: old $(git rev-list --count "$OLD") new $(git rev-list --count "$NEW")"
+          echo "== a second reprocess adds nothing"
+          legalize -o countries.es.repo_path="$REPO" -o countries.es.data_dir=/home/runner/data-es \
+            reprocess -c es --reason "idempotency check" "$LAW"
+          [ "$(git rev-parse HEAD)" = "$NEW" ]
+
+      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        id: app-token
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-es
+
+      - name: Stage on repair-2026-11, in chunks under GitHub's 2 GiB push limit
+        env:
+          PUSH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          cd "$REPO"
+          url="https://x-access-token:${PUSH_TOKEN}@github.com/legalize-dev/legalize-es.git"
+          # Only rewritten commits travel; every 5,000th is a stepping stone.
+          git rev-list --reverse --first-parent "$NEW" > /tmp/chain
+          base=$(git merge-base "$OLD" "$NEW" || true)
+          start=1
+          [ -n "$base" ] && start=$(( $(grep -n "^$base\$" /tmp/chain | cut -d: -f1) + 1 ))
+          total=$(wc -l < /tmp/chain)
+          for n in $(seq "$start" 5000 "$total") "$total"; do
+            sha=$(sed -n "${n}p" /tmp/chain)
+            git push -q "$url" "$sha:refs/heads/repair-2026-11"
+            echo "pushed $n/$total"
+          done
+          git ls-remote "$url" refs/heads/repair-2026-11 refs/heads/main
+          echo "OLD main recorded: $OLD"
+          echo "NEW tip:           $NEW"
