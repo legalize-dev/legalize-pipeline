@@ -1037,18 +1037,34 @@ def commit_one(config: Config, country: str, norm_id: str, dry_run: bool = False
         _validate_ie_published_history(cc.repo_path, norm, reforms) if country == "ie" else set()
     )
 
-    for reform in reforms:
+    def published(reform) -> bool:
         # Idempotency check: Source-Id + Norm-Id (a single Source-Id can be both its own norm AND a reform of another)
-        if (
-            reform.norm_id in published_ie
-            if country == "ie"
-            else repo.has_commit_with_source_id(
-                reform.norm_id,
-                metadata.identifier,
-                effective_date=reform.effective_date,
-                stage=country == "es",
+        if country == "ie":
+            return reform.norm_id in published_ie
+        return repo.has_commit_with_source_id(
+            reform.norm_id,
+            metadata.identifier,
+            effective_date=reform.effective_date,
+            stage=country == "es",
+        )
+
+    # A version older than the newest one published cannot be appended: the file's
+    # history would stop running oldest first (spec §History) and HEAD would go back
+    # to older text. CELLAR creates consolidations weeks after the date they carry.
+    # ponytail: eu only; es, ie and pt guard this in their own paths, and the other
+    # countries have not been measured. Extend once they are.
+    if country == "eu":
+        done = {reform.norm_id: published(reform) for reform in reforms}
+        newest = max((r.date for r in reforms if done[r.norm_id]), default=None)
+        earlier = [r.norm_id for r in reforms if not done[r.norm_id] and newest and r.date < newest]
+        if earlier:
+            raise HistoryMismatch(
+                f"{metadata.identifier}: the source gained {', '.join(earlier)} before its "
+                f"newest published version ({newest}); rebuild this law before publishing"
             )
-        ):
+
+    for reform in reforms:
+        if published(reform):
             continue
 
         is_first = reform == reforms[0]
