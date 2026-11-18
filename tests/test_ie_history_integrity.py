@@ -84,7 +84,7 @@ def _head(repo):
 @pytest.mark.parametrize("committer", [pipeline.commit_one, pipeline.commit_all_fast])
 @pytest.mark.parametrize(
     "change",
-    ["date", "cutoff", "body", "source", "status", "note", "removed", "title", "warning", "extra"],
+    ["date", "cutoff", "body", "source", "status", "removed", "title", "warning", "extra"],
 )
 @pytest.mark.parametrize("new_event", [False, True])
 def test_changed_published_version_is_rejected_before_any_new_commit(
@@ -111,8 +111,6 @@ def test_changed_published_version_is_rejected_before_any_new_commit(
         versions[0] = replace(versions[0], source="https://source.test/corrected-original")
     elif change == "status":
         reforms[0] = replace(reforms[0], status=NormStatus.PARTIALLY_REPEALED)
-    elif change == "note":
-        reforms[1] = replace(reforms[1], change_note="S. 3 substituted: corrected source scope")
     elif change == "removed":
         del reforms[1]
     elif change == "title":
@@ -139,6 +137,42 @@ def test_changed_published_version_is_rejected_before_any_new_commit(
             committer(config, "ie")
     assert _head(tmp_path / "repo") == previous_head
     assert path.read_bytes() == previous_tip
+
+
+@pytest.mark.parametrize("committer", [pipeline.commit_one, pipeline.commit_all_fast])
+@pytest.mark.parametrize(
+    "note",
+    [
+        # eISB reworded the annotation: "art." is now "reg."
+        "S. 2 substituted — S.I. No. 70 of 1994, reg. 35(2)",
+        # an order commenced the provision, so the directory dropped the status
+        "S. 2 substituted; commencement:  Not yet commenced.",
+    ],
+)
+def test_reworded_directory_annotation_keeps_history_and_appends(tmp_path, committer, note):
+    norm = _norm()
+    config = _config(tmp_path)
+    save_structured_json(tmp_path / "data", norm)
+    assert pipeline.commit_all_fast(config, "ie") == 4
+    repo = tmp_path / "repo"
+    before = subprocess.check_output(
+        ["git", "-C", str(repo), "log", "--reverse", "--format=%H%n%B%x00"], text=True
+    )
+    reforms = list(norm.reforms)
+    reforms[1] = replace(reforms[1], change_note=note)
+    reforms.append(Reform(date(2024, 1, 1), "IE-2024-act-1", (), change_note="S. 4 amended"))
+    save_structured_json(tmp_path / "data", replace(norm, reforms=tuple(reforms)))
+    if committer is pipeline.commit_one:
+        assert committer(config, "ie", norm.metadata.identifier) == 1
+    else:
+        assert committer(config, "ie") == 5
+    after = subprocess.check_output(
+        ["git", "-C", str(repo), "log", "--reverse", "--format=%H%n%B%x00"], text=True
+    )
+    # The published events, their messages included, are untouched; the new one follows.
+    assert after.startswith(before)
+    assert "Change: S. 2 substituted\n" in before
+    assert "Change: S. 4 amended" in after[len(before) :]
 
 
 @pytest.mark.parametrize("committer", [pipeline.commit_one, pipeline.commit_all_fast])

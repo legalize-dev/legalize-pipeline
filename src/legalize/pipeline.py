@@ -830,6 +830,19 @@ def _ie_historical_content(content: bytes) -> bytes:
     return b"---\n" + b"\n".join(lines) + separator + body
 
 
+_IE_CHANGE_NOTE = re.compile(r"^Change: .*(?:\n|$)", re.M)
+
+
+def _ie_historical_message(message: str) -> str:
+    """A commit message without its ``Change:`` line, the directory's annotation of the effect.
+
+    The Legislation Directory rewords these annotations ("art. 35(2)" becomes "reg. 35(2)")
+    and drops "Not yet commenced" once an order commences the provision. Neither changes
+    the act, its date or the text the commit published, which are compared on their own.
+    """
+    return _IE_CHANGE_NOTE.sub("", message).rstrip("\n")
+
+
 def _ie_read_history_blob(process, object_id: str, identifier: str) -> bytes:
     """Request and read one blob, without buffering the law's complete history."""
     process.stdin.write(object_id.encode("ascii") + b"\n")
@@ -866,6 +879,10 @@ def _validate_ie_published_history(
     catalogue date, and the PDF reads differently. It is the same consolidation, so
     the published reading stands, and so do the published events rendered from it.
     A new event is appended only if it does not render that reading itself.
+
+    Commit messages are compared without their ``Change:`` annotation (see
+    ``_ie_historical_message``): a published event keeps the annotation it was
+    published with, and a new event carries the directory's current one.
     """
     metadata = norm.metadata
     if records is None:
@@ -971,7 +988,9 @@ def _validate_ie_published_history(
                 file_path,
                 markdown,
             )
-            if message.rstrip("\n") != format_commit_message(info).rstrip("\n"):
+            if _ie_historical_message(message) != _ie_historical_message(
+                format_commit_message(info)
+            ):
                 raise HistoryMismatch(
                     f"{metadata.identifier}: source history changed for published event "
                     f"{reform.norm_id}; rebuild locally before publication"
