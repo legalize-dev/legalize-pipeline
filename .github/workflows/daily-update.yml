@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       country:
-        description: "Country code (es, at, se, pt, lv, ad, lt, ee, pl, gr, nl, be, cz, fi, it, lu, eu, uk) — not fr or de, see the matrix comment below"
+        description: "Country code (es, at, se, pt, lv, ad, lt, ee, pl, gr, nl, be, cz, fi, it, lu, eu, uk) — not fr, de, or mk, which use separate workflows"
         required: false
         type: string
         default: ""

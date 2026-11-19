@@ -1,0 +1,5 @@
+source: https://ldbis.pravda.gov.mk/Prebaruvanje.aspx
+norm: RM-2013-187-30412
+version-1: 2013-12-30 | Закон за финансиска дисциплина | source card 30412
+version-2: 2025-01-03 | Закон за изменување и дополнување на Законот за финансиска дисциплина | amendment card from LDBIS related-version chain
+effective-date-source: lblDNaStapuvanjeVoSila and lblPochetokNaPrimena on each LDBIS card

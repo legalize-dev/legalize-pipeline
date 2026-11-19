@@ -26,6 +26,10 @@ dev = [
     # installs explicitly (see the comment there).
     "ruff==0.15.8",
 ]
+mk-ocr = [
+    "numpy==2.5.2",
+    "opencv-python-headless==5.0.0.93",
+]
 
 [project.scripts]
 legalize = "legalize.cli:cli"
@@ -36,6 +40,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/legalize"]
+artifacts = ["src/legalize/fetcher/mk/assets/**"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
