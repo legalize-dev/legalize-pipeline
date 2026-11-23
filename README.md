@@ -49,6 +49,7 @@ src/legalize/
     lt/                   Lithuania (TAR / data.gov.lt)
     lu/                   Luxembourg (Legilux)
     lv/                   Latvia (likumi.lv HTML scraping with sitemap discovery)
+    mk/                   North Macedonia (LDBIS)
     nl/                   Netherlands (BWB / wetten.overheid.nl)
     no/                   Norway (Lovdata)
     pl/                   Poland (Dziennik Ustaw / Sejm ELI)
@@ -106,6 +107,7 @@ All commands use a unified `--country` / `-c` flag:
 legalize fetch -c es --catalog             # Spain: full BOE catalog
 legalize fetch -c fr --all --legi-dir /path # France: all codes from LEGI dump
 legalize fetch -c se --all                  # Sweden: all statutes from SFSR
+legalize fetch -c mk --all                  # North Macedonia: LDBIS legislation
 legalize fetch BOE-A-1978-31229             # Single law by ID
 
 # Generate git commits from local data/ (does not download)
@@ -119,6 +121,7 @@ legalize bootstrap -c se                    # Sweden
 
 # Daily incremental update
 legalize daily -c es --date 2026-03-28
+legalize daily -c mk                       # North Macedonia: LDBIS updates
 
 # Reprocess specific norms
 legalize reprocess -c es --reason "bug fix" BOE-A-1978-31229
@@ -194,6 +197,7 @@ never enough.
 | Lithuania | Daily | — | [TAR](https://www.e-tar.lt/) | [legalize-lt](https://github.com/legalize-dev/legalize-lt) | — |
 | Luxembourg | Daily | — | [Legilux](https://legilux.public.lu/) | [legalize-lu](https://github.com/legalize-dev/legalize-lu) | — |
 | Netherlands | Daily | — | [BWB](https://wetten.overheid.nl/) | [legalize-nl](https://github.com/legalize-dev/legalize-nl) | — |
+| North Macedonia | Monthly | Reviewed 2026-11-02 | [LDBIS](https://ldbis.pravda.gov.mk/Prebaruvanje.aspx) | [legalize-mk](https://github.com/legalize-dev/legalize-mk) | — |
 | Norway | Unscheduled | — | [Lovdata](https://lovdata.no/) | [legalize-no](https://github.com/legalize-dev/legalize-no) | — |
 | Poland | Daily | — | [Dziennik Ustaw](https://isap.sejm.gov.pl/) | [legalize-pl](https://github.com/legalize-dev/legalize-pl) | — |
 | Portugal | Daily | Reviewed 2026-08-26 | [DRE](https://dre.pt/) | [legalize-pt](https://github.com/legalize-dev/legalize-pt) | — |

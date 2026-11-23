@@ -107,7 +107,14 @@ def render_frontmatter(
     for key, value in metadata.extra:
         if key in written:
             continue
-        lines.append(f'{_escape_yaml(key)}: "{_escape_yaml(value)}"')
+        if isinstance(value, tuple):
+            # A list such as the page numbers of a scan (mk ocr_unread_pages).
+            items = (
+                str(item) if isinstance(item, int) else f'"{_escape_yaml(item)}"' for item in value
+            )
+            lines.append(f"{_escape_yaml(key)}: [{', '.join(items)}]")
+        else:
+            lines.append(f'{_escape_yaml(key)}: "{_escape_yaml(value)}"')
         written.add(key)
 
     lines.append("---")

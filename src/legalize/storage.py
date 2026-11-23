@@ -211,7 +211,7 @@ def _norm_to_dict(norm: ParsedNorm) -> dict:
         extra_dict["subjects"] = list(meta.subjects)
     for key, value in meta.extra:
         if value and key not in extra_dict:
-            extra_dict[key] = value
+            extra_dict[key] = list(value) if isinstance(value, tuple) else value
     if extra_dict:
         metadata_dict["extra"] = extra_dict
 
@@ -347,7 +347,10 @@ def load_norma_from_json(json_path: Path) -> ParsedNorm:
         if isinstance(subjects_raw, list)
         else tuple(s.strip() for s in subjects_raw.split(",") if s.strip())
     )
-    extra = tuple(extra_dict.items())
+    extra = tuple(
+        (key, tuple(value) if isinstance(value, list) else value)
+        for key, value in extra_dict.items()
+    )
 
     metadata = NormMetadata(
         title=meta["title"],

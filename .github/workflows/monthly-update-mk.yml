@@ -1,0 +1,85 @@
+name: Monthly update (Macedonia)
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Date to process (YYYY-MM-DD, empty = automatic)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: monthly-update-mk
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3
+        id: app-token
+        with:
+          app-id: ${{ secrets.LEGALIZE_APP_ID }}
+          private-key: ${{ secrets.LEGALIZE_APP_PRIVATE_KEY }}
+          owner: legalize-dev
+          repositories: legalize-mk
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          repository: legalize-dev/legalize-mk
+          path: repos/mk
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: false
+          fetch-depth: 0
+          filter: tree:0
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Tesseract
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes tesseract-ocr
+
+      - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
+        with:
+          path: ~/.cache/legalize/mk-ocr/tessdata
+          key: mk-tessdata-${{ hashFiles('src/legalize/fetcher/mk/assets/tessdata_manifest.json') }}
+
+      - name: Install pipeline
+        run: pip install -e '.[mk-ocr]'
+
+      - name: Prepare Macedonian OCR assets
+        run: python -c "from pathlib import Path; from legalize.fetcher.mk.ocr import prepare_assets; prepare_assets(Path.home() / '.cache/legalize/mk-ocr')"
+
+      - name: Run monthly update
+        env:
+          INPUT_DATE: ${{ inputs.date }}
+        run: |
+          DATE_FLAG=""
+          if [ -n "$INPUT_DATE" ]; then
+            DATE_FLAG="--date $INPUT_DATE"
+          fi
+          legalize daily -c mk --repo-path repos/mk $DATE_FLAG
+
+      - name: Push generated commits
+        if: success()
+        working-directory: repos/mk
+        env:
+          PUSH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          if [ -z "$(git rev-list origin/main..HEAD)" ]; then
+            echo "No new Macedonian records to push."
+          else
+            git push "https://x-access-token:${PUSH_TOKEN}@github.com/legalize-dev/legalize-mk.git" HEAD:main
+          fi
